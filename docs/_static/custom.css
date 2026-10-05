@@ -2,3 +2,5 @@
 .rst-content table.docutils td { white-space: normal; }
 .rst-content .admonition { border-radius: 3px; }
 .rst-content pre { line-height: 1.5; }
+.rst-content dl.py > dt.sig { display: block; line-height: 1.7; }
+.rst-content dl.field-list > dd li { margin-bottom: 0.75rem; }

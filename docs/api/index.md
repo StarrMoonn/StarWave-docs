@@ -1,60 +1,57 @@
-# API 索引
+# API 参考
 
-本页记录 2.0.0 wheel 中已核验的常用公开接口。签名静态核对，无需构建站点时导入软件或加载 CUDA。这里只写调用契约，不发布实现代码。
+本参考以 StarWave **2.0.0** 公开 wheel 为准。每个传播函数提供真实签名、逐项参数、返回值、梯度范围、注意事项与调用示例。参数类型描述运行时接受的值；签名保留实际关键字边界和默认值。
 
-## `starwave.scalar`
+页面组织参考 [Deepwave 官方 Usage](https://ausargeo.com/deepwave/usage) 的 Sphinx Python API 风格，正文按 StarWave 的实际契约重新编写。两者的参数集合、源单位、返回结构和可微范围不能互换。
 
-```{py:function} starwave.scalar(v, grid_spacing, dt, *, source_amplitudes, source_locations, receiver_locations, accuracy=8, pml_freq=25.0, pml_width=20, boundary_buffer=5, memory="boundary", max_vel=None, freq_taper_frac=0.0, time_pad_frac=0.0, time_taper=False, illumination=None)
+```{toctree}
+:maxdepth: 2
 
-二维标量声学；返回单元素元组 `(records,)`，记录为 `[B,R,T]`。模型与源单位见 [scalar](../modeling/scalar.md)。
+scalar
+vrz
+vti
 ```
 
-## `starwave.vrz`
+## 传播函数速查
 
-```{py:function} starwave.vrz(v, grid_spacing, dt, *, impedance=None, density=None, source_amplitudes, source_locations, receiver_locations, accuracy=8, pml_freq=25.0, pml_width=20, boundary_buffer=5, memory="boundary", max_vel=None, freq_taper_frac=0.0, time_pad_frac=0.0, time_taper=False, illumination=None)
+<span id="starwave.scalar"></span>
 
-二维变密度声学；`impedance` 与 `density` 恰好提供一个。返回 `(records,)`。`illumination` 必须为 `None`。见 [VRZ](../modeling/vrz.md)。
-```
+- {py:func}`starwave.scalar`：二维标量声学；速度模型 `v`；返回单元素记录元组。
 
-## `starwave.vti`
+<span id="starwave.vrz"></span>
 
-```{py:function} starwave.vti(vp, epsilon, delta, rho, grid_spacing, dt, *, source_amplitudes, source_locations, receiver_locations, source_fields=("sH", "sV"), receiver_fields=("vz",), accuracy=4, pml_freq=25.0, pml_width=20, boundary_buffer=5, memory="boundary", max_vel=None, freq_taper_frac=0.0, time_pad_frac=0.0, time_taper=False)
+- {py:func}`starwave.vrz`：二维变密度声学；`v` 加恰好一种 `impedance` / `density` 参数化。
 
-二维/三维声学 VTI；返回元组按 `receiver_fields` 顺序排列，各项为 `[B,R,T]`。见 [VTI](../modeling/vti.md)。
-```
+<span id="starwave.vti"></span>
 
-## 公共参数速查
+- {py:func}`starwave.vti`：二维/三维声学 VTI；`vp, epsilon, delta, rho`；按所选分量顺序返回记录。
 
-| 参数 | 含义与条件 |
-|---|---|
-| `grid_spacing`, `dt` | 正网格间距、正用户时间步；不参与求导 |
-| `source_amplitudes` | `[B,S,T]` 固定源；VTI 与 scalar/VRZ 的单位不同 |
-| `source_locations`, `receiver_locations` | 整数物理网格下标，详见[约定](../modeling/conventions.md) |
-| `accuracy` | 空间阶数 2、4、6、8；scalar/VRZ 默认 8，VTI 默认 4 |
-| `pml_freq` | 正频率，默认 25.0 Hz；不是波形生成器 |
-| `pml_width` | 正整数或相同面宽序列；默认 20 个网格 |
-| `boundary_buffer` | 非负空间网格数，默认 5；boundary 有最小值要求 |
-| `memory` | `"boundary"` 或 `"full"`；默认 boundary |
-| `max_vel` | 默认 `None`，每次调用动态规划；显式值必须覆盖当前所需包络 |
-| `freq_taper_frac`, `time_pad_frac` | [0,1] 内的有限比例，默认 0.0；影响时间重采样 |
-| `time_taper` | 布尔值，默认 False；时间重采样的 Hann taper |
-
-三个 taper/padding 参数改变信号处理，不是单位转换；内部不需要时间重采样时有效参数不产生作用。没有公开 `nt` 参数，用户时间长度取自源的最后一维。
+符号约定：`B` 炮数、`S` 每炮源数、`R` 每炮接收点数、`T` 用户时间采样数、`D` 空间维数。源和接收点使用物理模型的整数网格下标，不是米坐标，不包含 PML 偏移。
 
 ## 原生运行库
 
 ```{py:function} starwave.native_status()
 
-返回状态字典，不编译、不传播。入门检查可读取 `library_exists` 和 `library_loaded`。库存在或已加载不等于数值验收通过。
+查询当前运行库状态，不执行编译或传播。
+
+:returns: 状态字典；常用条目包括 `library_exists`、`library_loaded`、`torch_version`、`torch_cuda_version` 和 `cuda_available`。存在或加载成功均不代表数值验收通过。
+:rtype: `dict`
 ```
 
 ```{py:function} starwave.prepare_native(device_ids)
 
-在主线程准备已存在的兼容原生库。`device_ids` 是非空、无重复、非负的可见逻辑 CUDA 编号列表或元组；返回准备状态字典，不执行编译。
+在主线程验证并预加载已有的原生库，供后续传播或 DataParallel 使用，不执行编译。
+
+:param device_ids: 必填。非空、无重复、非负的可见逻辑 CUDA 编号；拒绝布尔值。编号按当前进程的设备可见性映射填写。
+:type device_ids: `list[int] | tuple[int, ...]`
+:returns: 包含原生状态、`selected_device_ids` 与准备消息的字典。初始化成功不是 GPU 数值测试。
+:rtype: `dict`
 ```
 
-## 其它已导出的名称
+## 其它导出名称与范围
 
-`ScalarIllumination`、`IlluminationFields`、`precondition_gradient` 为可选 scalar 照明与显式梯度预条件相关接口。完整签名、生命周期和独立示例尚未纳入本入门版索引，不建议仅凭名称推断调用方法。不存在本手册可用的 `starwave.Scalar` 类；文中 Module wrapper 均由教程自定义。
+`ScalarIllumination`、`IlluminationFields`、`precondition_gradient` 是已核验导出的 scalar 照明相关名称。本版暂不提供它们的完整生命周期教程；传播函数页会解释 `illumination` 参数的使用边界。
+
+StarWave 2.0.0 没有公开 `starwave.Scalar` 包装类。教程中的 Module wrapper 由教程定义；不能将其它库的类名、状态参数、`nt` 或存储选项直接添加到这里的调用中。
 
 {ref}`genindex`

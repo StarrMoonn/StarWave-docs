@@ -14,10 +14,13 @@ source .venv/bin/activate
 python -m pip install -r docs/requirements.txt
 python -m sphinx -n -W --keep-going -b html -d _build/doctrees docs _build/html
 python tools/check_site.py _build/html
+python tools/check_api_docs.py
 python -m http.server 8000 --directory _build/html --bind 127.0.0.1
 ```
 
 打开 http://127.0.0.1:8000 。严格构建把警告视为错误；`check_site.py` 检查站内链接、锚点和静态资源，并检查文档包中不应出现的内容。
+
+`check_api_docs.py` 检查每个已文档化参数的类型、默认值、描述覆盖及返回契约，并解析 Python 代码片段。可附加 `--wheel` 和公开 2.0.0 wheel 的文件名，按 SHA-256 与 AST 校验真实签名；此检查不导入或执行 StarWave。wheel 不属于文档项目或发布产物。
 
 ## 托管配置
 

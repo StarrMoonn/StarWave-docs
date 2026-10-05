@@ -13,3 +13,7 @@
 新增安装/WSL、合成 scalar 示例、三类方程使用说明、FWI/DataParallel/INR 入门、API 索引与 FAQ。站点采用 Sphinx + Read the Docs 主题，可输出到 GitHub Pages 或其它静态服务器。
 
 本手册首稿不附带 CUDA 实现、传播 Python 实现、私人实验数据或内部记录。待完成的教程与验收见[文档状态](status.md)。
+
+## API 参考完善
+
+scalar、VRZ、VTI 各自提供独立参考页，以 Sphinx Python 域展示完整签名、逐项参数类型/默认值/形状/单位、返回结构、自动微分范围及示例。补充 54 项参数说明；保留原 API 索引中的函数入口锚点。此为文档改进，不改变 StarWave 2.0.0 的运行接口或验收状态。

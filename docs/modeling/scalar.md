@@ -17,7 +17,7 @@ records = starwave.scalar(
 )[0]
 ```
 
-此片段依赖已准备的输入；完整独立程序见[快速入门](../quickstart.md)。参数默认值见 [API 索引](../api/index.md)。
+此片段依赖已准备的输入；完整独立程序见[快速入门](../quickstart.md)。逐项参数与默认值见 [scalar API 参考](../api/scalar.md)。
 
 ## 梯度与照明
 
