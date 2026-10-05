@@ -1,8 +1,8 @@
 # StarWave-docs · 中文 / English
 
-StarWave 2.0.0 双语使用手册，基于 Sphinx、Read the Docs 主题和 MyST Markdown。完整中文和英文版本各含 18 个内容页面，覆盖安装、正演、反演及 API；每种语言独立构建、导航和搜索。API 采用 Deepwave 风格的类型签名、参数、返回、注意事项及示例组织，所有说明针对 StarWave 原创编写。
+StarWave 2.0.0 双语使用手册，基于 Sphinx、Read the Docs 主题和 MyST Markdown。完整中文和英文版本各含 19 个内容页面，覆盖安装、正演、反演、API 与演示文稿；每种语言独立构建、导航和搜索。API 采用 Deepwave 风格的类型签名、参数、返回、注意事项及示例组织，所有说明针对 StarWave 原创编写。
 
-Bilingual user documentation for StarWave 2.0.0, built with Sphinx, the Read the Docs theme, and MyST Markdown. Each language contains the complete 18-page manual and a separate search index. The API presentation takes organizational cues from Deepwave while preserving StarWave’s own public contracts.
+Bilingual user documentation for StarWave 2.0.0, built with Sphinx, the Read the Docs theme, and MyST Markdown. Each language contains the complete 19-page manual and a separate search index. The API presentation takes organizational cues from Deepwave while preserving StarWave’s own public contracts.
 
 ## 构建 / Build
 
@@ -32,6 +32,7 @@ Each page has an accessible language switch. Section and Python-object anchors s
 ## 检查 / Checks
 
 - `check_site.py`: local links, anchors, resources, complete locale coverage, independent search assets, English translation coverage, Python syntax and restricted-content guardrails.
+- `check_presentation_asset.py` (also run by `check_site.py`): the reviewed PDF's SHA-256, exactly 30 slides, an image hash for each reviewed watermark-bearing page, absence of active PDF actions or embedded files, and a strict publication allowlist. These checks preserve the independently reviewed pixels; they do not claim to recognize a watermark automatically.
 - `check_api_docs.py`: all five typed function signatures, types/defaults/descriptions, scalar 16 / VRZ 18 / VTI 20 parameter coverage, return contracts and Python snippets. The checked-in public contract snapshot prevents cross-language agreement from hiding interface drift.
 - `check_tutorial_assets.py`: clean notebook/script parity, numerical-source provenance, safe metadata, configuration and measured-result invariants.
 - Optional `--wheel PATH`: verifies the public 2.0.0 wheel SHA-256 and compares signatures through AST parsing, without importing or running StarWave. Wheels are never part of the source or published site.
@@ -48,7 +49,7 @@ python -m playwright install chromium
 python tools/check_browser.py
 ```
 
-The browser checks cover desktop/mobile layout, section and API switching, legacy routes, search isolation, browser history, keyboard access and no-JavaScript navigation. Screenshots are written under `_build/qa/`.
+The browser checks cover desktop/mobile layout, section and API switching, legacy routes, search isolation, browser history, keyboard access and no-JavaScript navigation. Presentation checks cover the same-origin PDF response and hash, embedded-viewer configuration, real new-window and download links, and mobile/no-JavaScript alternatives in both languages. Actual inline PDF rendering depends on the browser's built-in reader. Screenshots are written under `_build/qa/`.
 
 ## 托管 / Hosting
 
@@ -61,3 +62,5 @@ The browser checks cover desktop/mobile layout, section and API switching, legac
 This repository contains documentation, original synthetic usage examples and build tooling. It contains no propagation implementation, binary libraries, private datasets or internal records. It neither imports StarWave through autodoc nor publishes source pages. Public 2.0.0 API signatures are verified; The three original tutorials now include measured A30 / StarWave 0.1.0.dev9 results and clean notebook downloads. Public-wheel GPU validation, full adjoint correctness, performance, multi-GPU operation, and FWI convergence remain unvalidated. See the manual’s documentation-status page.
 
 No new software or documentation license is declared on behalf of the owners.
+
+The Presentation chapter publishes only the approved original 30-slide watermarked PDF. The editable slide deck, authoring files, and reference presentations are not distributed in this repository or the built site. The PDF has no new open-license grant. Visible watermarks help identify the source; they are not an unremovable protection mechanism. No external PDF viewer service or JavaScript viewer bundle is used.

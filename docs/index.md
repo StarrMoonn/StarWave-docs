@@ -93,6 +93,7 @@ loss.backward()
 :caption: 开始使用
 
 关于 StarWave <about>
+演示文稿 <presentation>
 安装 <installation>
 Docker <docker>
 WSL <wsl>

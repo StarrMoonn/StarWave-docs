@@ -1,0 +1,198 @@
+{
+  "file": "starwave-presentation.pdf",
+  "publication": "original-watermarked-presentation",
+  "reviewed_on": "2026-10-05",
+  "sha256": "0e77a93427d00d798749fe5982603aec35197e240ba8b4eb59e64ebec60088a0",
+  "bytes": 5521174,
+  "pages": 30,
+  "watermark": {
+    "method": "baked-into-reviewed-page-image",
+    "visible_text": [
+      "StarWave",
+      "starrmoonn.github.io/StarWave-docs/"
+    ],
+    "review": "All 30 final page images were visually reviewed for watermark visibility and legibility."
+  },
+  "page_proofs": [
+    {
+      "page": 1,
+      "width": 1920,
+      "height": 1080,
+      "image_sha256": "73e7efe44212088537e51d4f568ebf85ee59b35041806cbed3f641ed266e2b35"
+    },
+    {
+      "page": 2,
+      "width": 1920,
+      "height": 1080,
+      "image_sha256": "8c4e40aabd2bbe04f2da07de18658502d0af2a49fd0dcfd1c1c8bf59a5a50a98"
+    },
+    {
+      "page": 3,
+      "width": 1920,
+      "height": 1080,
+      "image_sha256": "b58cefb01eddc7b4adb39f03de7f346633d8c9754bae6a29f5287a1d64779889"
+    },
+    {
+      "page": 4,
+      "width": 1920,
+      "height": 1080,
+      "image_sha256": "d40804274d765373fc0d18085d81f4c11ae1e8130987b6869b0fb63c1539c4dd"
+    },
+    {
+      "page": 5,
+      "width": 1920,
+      "height": 1080,
+      "image_sha256": "f08caa0df307575c492291bebd8462dbc345b8004d8747366017c2e40636d249"
+    },
+    {
+      "page": 6,
+      "width": 1920,
+      "height": 1080,
+      "image_sha256": "c1db8ffc6e3348643945164058299fdba012f0269016a1864d8aad4132940fc0"
+    },
+    {
+      "page": 7,
+      "width": 1920,
+      "height": 1080,
+      "image_sha256": "3a048cef5659223150cd90d6262dc2fccb386c87ba0bc1c73d448400364bcdd6"
+    },
+    {
+      "page": 8,
+      "width": 1920,
+      "height": 1080,
+      "image_sha256": "f56f715e1eb2f78a2ed4d328093292672ba750dac425b8a117c8820a416fb635"
+    },
+    {
+      "page": 9,
+      "width": 1920,
+      "height": 1080,
+      "image_sha256": "cc2e8c222e84757ffc696394e090f4280d97c92b19720c48e180c26beb365124"
+    },
+    {
+      "page": 10,
+      "width": 1920,
+      "height": 1080,
+      "image_sha256": "930f1e5b65edd5b14bfa2e5dd320f20a87c3a002f039c0ef5baf8e144d25a99c"
+    },
+    {
+      "page": 11,
+      "width": 1920,
+      "height": 1080,
+      "image_sha256": "18859b5e70f42e7a90bd0384d30101cee8492f993d067b2975460b64000c4e26"
+    },
+    {
+      "page": 12,
+      "width": 1920,
+      "height": 1080,
+      "image_sha256": "6b6582d3c4730538d1cbae86c74560c815f8bd17b3cbcf856b1513425f4b7814"
+    },
+    {
+      "page": 13,
+      "width": 1920,
+      "height": 1080,
+      "image_sha256": "4da764247ad42b95a75229565b11bbbe4e2404393ae4ae670ee0f31975f36aca"
+    },
+    {
+      "page": 14,
+      "width": 1920,
+      "height": 1080,
+      "image_sha256": "b4bcee304e8a1495d13dcb85f0d419b43f6f2bdf9817ca3d7e8878ec0ca2ac4a"
+    },
+    {
+      "page": 15,
+      "width": 1920,
+      "height": 1080,
+      "image_sha256": "c32a110ad1cceb2842bfe6eda41f3fb01556b288340dbdb6b1bd07379bc0510e"
+    },
+    {
+      "page": 16,
+      "width": 1920,
+      "height": 1080,
+      "image_sha256": "27ec1e6569ca7b8dc7d74176b66295e5d044def1421adc5406030a2f435d9656"
+    },
+    {
+      "page": 17,
+      "width": 1920,
+      "height": 1080,
+      "image_sha256": "a48cffaf043f105c938d80bc55bbcce47ab42ac65d69f278f2ca2a78beed8e4f"
+    },
+    {
+      "page": 18,
+      "width": 1920,
+      "height": 1080,
+      "image_sha256": "3a7ad72ede10c70ce3dc8c8ab6bc8210cad581ae04ae972c690c2a92485a197e"
+    },
+    {
+      "page": 19,
+      "width": 1920,
+      "height": 1080,
+      "image_sha256": "71a849bc2fe6949dbe8d387d3be92eac77b78a8c5c7a9b979398cd225f732b85"
+    },
+    {
+      "page": 20,
+      "width": 1920,
+      "height": 1080,
+      "image_sha256": "a7a93446bd73dc3f33d972738f087e7a99a4f5f5ac41e952aa0087e0cf9cfd95"
+    },
+    {
+      "page": 21,
+      "width": 1920,
+      "height": 1080,
+      "image_sha256": "b9d57b63ca6312ae1b3ce5ac5da8c37ea5a047b5747e77703b929db887d5e6bb"
+    },
+    {
+      "page": 22,
+      "width": 1920,
+      "height": 1080,
+      "image_sha256": "0e0d6d643ec3b92d0f9150ac97ab4867063e449a1873d5eb60680b8a200e8f9a"
+    },
+    {
+      "page": 23,
+      "width": 1920,
+      "height": 1080,
+      "image_sha256": "e11971704466b9e0ca83ddb73015bc8bfa7dc3f27a5495cf0a776e36e73ea413"
+    },
+    {
+      "page": 24,
+      "width": 1920,
+      "height": 1080,
+      "image_sha256": "e51fe57c34cc5a28182860e21a736188ea27701600408c85d4970dcc1ee2346f"
+    },
+    {
+      "page": 25,
+      "width": 1920,
+      "height": 1080,
+      "image_sha256": "5212088de95a60c04b4556fda7676e1bdb771fbca0b08d6017aad2dc28d2b640"
+    },
+    {
+      "page": 26,
+      "width": 1920,
+      "height": 1080,
+      "image_sha256": "d721ad8e4b602b9e88326beb0999198d12428d4a72de502d7f05fef370355714"
+    },
+    {
+      "page": 27,
+      "width": 1920,
+      "height": 1080,
+      "image_sha256": "6d489834c5c936f910b05c9a39e65e2d52eed0b5b1e673211db74ba5f901413e"
+    },
+    {
+      "page": 28,
+      "width": 1920,
+      "height": 1080,
+      "image_sha256": "41b930128923ee5f1d0af7c7cdb95d1f1145487268cff0b5a7914edeabd155d9"
+    },
+    {
+      "page": 29,
+      "width": 1920,
+      "height": 1080,
+      "image_sha256": "04858c6cac5e87e89f63ff27dbdd1d324f3a018b5c759167b7c3b06ab7c7ed0a"
+    },
+    {
+      "page": 30,
+      "width": 1920,
+      "height": 1080,
+      "image_sha256": "8dfebb7e1910e2a9ce25d683e46506e6761b951c961eac44a19b30e496fe7e28"
+    }
+  ]
+}

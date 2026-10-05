@@ -1,5 +1,6 @@
 """Browser regression checks for the built bilingual site (no GPU required)."""
 import argparse
+import hashlib
 import json
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
@@ -21,7 +22,7 @@ USAGE_TARGETS = tuple(
 TOC_TARGETS = ('scalar', 'vrz', 'vti', 'native-status', 'prepare-native', 'other-exports')
 USAGE_SECTIONS = tuple(target for target in USAGE_TARGETS if not target.endswith('-function'))
 CHAPTERS = {
-    'about', 'installation', 'docker', 'wsl', 'quickstart', 'modeling/conventions',
+    'about', 'presentation', 'installation', 'docker', 'wsl', 'quickstart', 'modeling/conventions',
     'modeling/scalar', 'modeling/gradient', 'modeling/acquisition', 'modeling/wave-propagation', 'inversion/fwi',
     'inversion/dataparallel', 'inversion/inr', 'usage', 'faq',
     'release-notes', 'status',
@@ -437,6 +438,52 @@ def check_forward_modeling(page, base, locale, output):
     page.screenshot(path=str(output / f'{locale}-docker-{width}.png'))
 
 
+def check_presentation(page, base, locale, output):
+    """Check the same-origin viewer plus usable mobile and no-JS alternatives."""
+    page.goto(base + locale + '/presentation.html', wait_until='networkidle')
+    viewer = page.locator('object.sw-pdf-viewer')
+    assert viewer.count() == 1 and viewer.get_attribute('type') == 'application/pdf'
+    assert viewer.get_attribute('title') and viewer.get_attribute('aria-describedby') == 'pdf-viewer-help'
+    expected_path = f'/{locale}/_static/presentations/starwave-presentation.pdf'
+    source = viewer.evaluate('e => e.data')
+    assert urlsplit(source).path == expected_path and urlsplit(source).netloc == urlsplit(base).netloc
+    assert viewer.locator('a').count() == 2, 'Missing native object fallback links'
+    opener = page.locator('[data-sw-pdf-open]')
+    download = page.locator('[data-sw-pdf-download]')
+    for link in (opener, download):
+        assert link.is_visible() and urlsplit(link.evaluate('e => e.href')).path == expected_path
+        assert link.bounding_box()['height'] >= 44
+    assert opener.get_attribute('target') == '_blank' and 'noopener' in opener.get_attribute('rel').split()
+    assert download.get_attribute('download') == 'StarWave-Presentation.pdf'
+    response = page.request.get(base.rstrip('/') + expected_path)
+    assert response.ok and 'application/pdf' in response.headers.get('content-type', '')
+    manifest = json.loads((PROJECT / 'docs/_static/presentations/manifest.json').read_text())
+    assert hashlib.sha256(response.body()).hexdigest() == manifest['sha256']
+    assert not response.headers.get('content-disposition', '').lower().startswith('attachment')
+    with page.expect_download() as event:
+        download.click()
+    item = event.value
+    assert item.suggested_filename == 'StarWave-Presentation.pdf' and item.failure() is None
+    assert hashlib.sha256(Path(item.path()).read_bytes()).hexdigest() == manifest['sha256']
+    with page.expect_popup() as event:
+        opener.click()
+    popup = event.value
+    popup.wait_for_url('**/starwave-presentation.pdf')
+    assert urlsplit(popup.url).path == expected_path
+    popup.close()
+    width = page.viewport_size['width']
+    if width <= 768:
+        assert not viewer.is_visible() and page.locator('.sw-pdf-mobile').is_visible()
+    else:
+        assert viewer.is_visible() and not page.locator('.sw-pdf-mobile').is_visible()
+        box = viewer.bounding_box()
+        assert box['height'] >= 540 and box['width'] > 200
+        assert box['x'] + box['width'] <= width
+    assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
+    page.evaluate('window.scrollTo(0, 0)')
+    page.screenshot(path=str(output / f'{locale}-presentation-{width}.png'), full_page=True)
+
+
 def check_search(page, base):
     for locale in ('en', 'zh'):
         page.goto(base + locale + '/index.html')
@@ -464,7 +511,7 @@ def check_search(page, base):
         assert enter_results == {urlsplit(link).path for link in click_results}, (locale, click_results)
         index = page.evaluate('Search._index')
         assert 'usage' in index['docnames'] and not any(name.startswith('api/') for name in index['docnames']), index['docnames']
-        assert {'modeling/wave-propagation', 'modeling/acquisition', 'docker'} <= set(index['docnames'])
+        assert {'modeling/wave-propagation', 'modeling/acquisition', 'docker', 'presentation'} <= set(index['docnames'])
         assert not {'modeling/vrz', 'modeling/vti'} & set(index['docnames'])
         objects = {item[4]: item[0] for item in index['objects'].get('starwave', [])}
         assert set(API_NAMES) <= objects.keys(), objects
@@ -489,7 +536,9 @@ def check(root, browser_path=None):
     errors = []
     try:
         with sync_playwright() as playwright:
-            options = {'executable_path': browser_path} if browser_path else {}
+            # Full Chromium's new headless mode includes the native PDF viewer;
+            # Playwright's default headless shell does not mirror that UI.
+            options = {'executable_path': browser_path} if browser_path else {'channel': 'chromium'}
             browser = playwright.chromium.launch(**options)
             page = browser.new_page(viewport={'width': 1440, 'height': 1000})
             page.on('pageerror', lambda error: errors.append(str(error)))
@@ -511,6 +560,7 @@ def check(root, browser_path=None):
                     check_tutorials(page, base, locale, output)
                     check_homepage(page, base, locale, output)
                     check_forward_modeling(page, base, locale, output)
+                    check_presentation(page, base, locale, output)
                 check_search(page, base)
             # Narrow phones and the smallest desktop sidebar layouts exercise
             # the homepage breakpoints without duplicating the entire API suite.
@@ -583,6 +633,10 @@ def check(root, browser_path=None):
                     assert urlsplit(plain.url).path == '/en/modeling/wave-propagation.html'
                     assert urlsplit(plain.url).fragment == 'wave-' + name
             for locale in ('zh', 'en'):
+                for size in ({'width': 1440, 'height': 1000}, {'width': 390, 'height': 844}):
+                    plain.set_viewport_size(size)
+                    check_presentation(plain, base, locale, output)
+                plain.set_viewport_size({'width': 1440, 'height': 1000})
                 plain.goto(base + locale + '/index.html')
                 assert plain.locator('.sw-home-logo').is_visible()
                 plain.locator('.sw-home-actions a[href="quickstart.html"]').click()
@@ -596,7 +650,7 @@ def check(root, browser_path=None):
             context.close()
             browser.close()
         assert not errors, errors
-        print('PASS: flat desktop/mobile navigation, Usage TOC and API fields, search, direct legacy routes, language anchors, history, keyboard and no-JS fallback.')
+        print('PASS: flat desktop/mobile navigation, Usage TOC and API fields, search, direct legacy routes, language anchors, history, keyboard, PDF preview/download, and no-JS fallback.')
     finally:
         server.shutdown()
         server.server_close()

@@ -21,6 +21,7 @@ jobs:
           cache-dependency-path: docs/requirements.txt
       - run: python -m pip install -r docs/requirements.txt
       - run: python tools/build_docs.py
+      - run: python tools/check_presentation_asset.py _build/html
       - run: python tools/check_site.py _build/html
       - run: python tools/check_api_docs.py
       - run: python tools/check_tutorial_assets.py

@@ -9,6 +9,7 @@ import re
 import sys
 import xml.etree.ElementTree as ET
 from urllib.parse import unquote, urlsplit
+from check_presentation_asset import ASSET_PATH, check as check_presentation
 
 
 class Page(HTMLParser):
@@ -32,7 +33,7 @@ class Page(HTMLParser):
             self.id_sections[attrs['id']] = self.sections[-1] if self.sections else None
         if tag == "a" and "name" in attrs:
             self.ids.add(attrs["name"])
-        for key in ("href", "src"):
+        for key in ("href", "src") + (("data",) if tag == "object" else ()):
             if key in attrs:
                 self.links.append(attrs[key])
 
@@ -45,6 +46,7 @@ def check(root):
     project = Path(__file__).resolve().parents[1]
     root = root.resolve()
     errors = []
+    errors.extend(check_presentation(root))
     pages = {p: Page(p.read_text(encoding="utf-8")) for p in root.rglob("*.html")}
     if not pages or not (root / "index.html").is_file():
         errors.append("Missing HTML output or index.html")
@@ -136,7 +138,7 @@ def check(root):
         docnames = json.loads(index.removeprefix('Search.setIndex(').removesuffix(')'))['docnames']
         if 'usage' not in docnames or any(name.startswith('api/') for name in docnames):
             errors.append(f'API search entries are duplicated or missing: {locale}')
-        if not {'modeling/wave-propagation', 'modeling/acquisition', 'docker'} <= set(docnames) or {'modeling/vrz', 'modeling/vti'} & set(docnames):
+        if not {'modeling/wave-propagation', 'modeling/acquisition', 'docker', 'presentation'} <= set(docnames) or {'modeling/vrz', 'modeling/vti'} & set(docnames):
             errors.append(f'Modeling search entries are duplicated or missing: {locale}')
         combined = (root / locale / 'modeling/wave-propagation.html').read_text()
         if len(re.findall(r'data-sw-anchor="wave-[^"]+"', combined)) != 7:
@@ -300,14 +302,15 @@ def check(root):
         is_font_file = relative.parts[:3] == ("docs", "_static", "fonts") and p.name in font_names
         is_diagram_file = relative.as_posix() == 'docs/_static/diagrams/acquisition.svg'
         is_tutorial_notebook = p.suffix == ".ipynb" and relative.parts[:2] == ("examples", "tutorials")
-        if p.name != ".gitignore" and p.suffix not in allowed and not is_tutorial_png and not is_tutorial_notebook and not is_brand_file and not is_font_file and not is_diagram_file:
+        is_presentation = p == ASSET_PATH
+        if p.name not in {".gitignore", ".gitattributes"} and p.suffix not in allowed and not is_tutorial_png and not is_tutorial_notebook and not is_brand_file and not is_font_file and not is_diagram_file and not is_presentation:
             errors.append(f"Unexpected source file: {relative}")
         if p.suffix == ".py":
             try:
                 ast.parse(p.read_text(encoding="utf-8"))
             except SyntaxError as exc:
                 errors.append(f"Python syntax: {relative}: {exc.msg}")
-        if p != Path(__file__).resolve() and not is_tutorial_png and not (is_brand_file and p.suffix == ".png") and not is_font_file:
+        if p not in {Path(__file__).resolve(), project / 'tools' / 'check_presentation_asset.py'} and not is_tutorial_png and not (is_brand_file and p.suffix == ".png") and not is_font_file and not is_presentation:
             text = p.read_text(encoding="utf-8")
             if any(pattern.search(text) for pattern in forbidden):
                 errors.append(f"Review restricted content: {relative}")

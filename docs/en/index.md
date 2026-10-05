@@ -93,6 +93,7 @@ loss.backward()
 :caption: Getting started
 
 About StarWave <about>
+Presentation <presentation>
 Installation <installation>
 Docker <docker>
 WSL <wsl>

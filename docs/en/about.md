@@ -2,6 +2,8 @@
 
 StarWave is a differentiable wave-propagation toolkit for PyTorch that connects subsurface models, simulated observations, and model updates. CUDA handles propagation, while PyTorch autograd carries loss gradients back to the model, bringing forward modeling and inversion into a familiar tensor-and-optimizer workflow.
 
+Read or download the [original 30-slide presentation](presentation.md) for an overview of FWI, automatic differentiation, and the StarWave workflow.
+
 ## What it provides
 
 - **Wave simulation**: 2D scalar acoustics, 2D VRZ, and 2D/3D acoustic VTI, each with its own medium parameters, source conventions, and recorded quantities.
