@@ -92,31 +92,32 @@ loss.backward()
 :hidden:
 :caption: 开始使用
 
-installation
-wsl
-quickstart
+关于 StarWave <about>
+安装 <installation>
+WSL <wsl>
+快速入门 <quickstart>
 ```
 
 ```{toctree}
 :maxdepth: 1
 :hidden:
-:caption: 正演建模
+:caption: 正演
 
-modeling/conventions
-modeling/scalar
-modeling/gradient
-modeling/vrz
-modeling/vti
+基本约定 <modeling/conventions>
+标量声学 <modeling/scalar>
+梯度 <modeling/gradient>
+VRZ <modeling/vrz>
+VTI <modeling/vti>
 ```
 
 ```{toctree}
 :maxdepth: 1
 :hidden:
-:caption: 反演与神经网络
+:caption: 反演
 
-inversion/fwi
-inversion/dataparallel
-inversion/inr
+FWI <inversion/fwi>
+DataParallel <inversion/dataparallel>
+INR <inversion/inr>
 ```
 
 ```{toctree}
@@ -124,15 +125,15 @@ inversion/inr
 :hidden:
 :caption: Usage
 
-usage
+Usage <usage>
 ```
 
 ```{toctree}
 :maxdepth: 1
 :hidden:
-:caption: 参考与维护
+:caption: 参考
 
-faq
-release-notes
-status
+常见问题 <faq>
+更新日志 <release-notes>
+文档状态 <status>
 ```

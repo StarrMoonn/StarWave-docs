@@ -4,9 +4,9 @@
 
 **本页内容**
 
-- [starwave.scalar](#scalar)
-- [starwave.vrz](#vrz)
-- [starwave.vti](#vti)
+- [Scalar Function](#scalar)
+- [VRZ Function](#vrz)
+- [VTI Function](#vti)
 - [starwave.native_status](#native-status)
 - [starwave.prepare_native](#prepare-native)
 - [其它导出名称与范围](#other-exports)
@@ -28,11 +28,7 @@
 符号约定：`B` 炮数、`S` 每炮源数、`R` 每炮接收点数、`T` 用户时间采样数、`D` 空间维数。源和接收点使用物理模型的整数网格下标，不是米坐标，不包含 PML 偏移。
 
 (scalar)=
-## scalar：二维标量声学
-
-
-(scalar-function)=
-### 函数
+## Scalar Function
 
 ```{py:function} starwave.scalar(v: torch.Tensor, grid_spacing: float | int | list[float] | tuple[float, ...], dt: float | int, *, source_amplitudes: torch.Tensor, source_locations: torch.Tensor, receiver_locations: torch.Tensor, accuracy: int=8, pml_freq: float | int=25.0, pml_width: int | list[int] | tuple[int, ...]=20, boundary_buffer: int=5, memory: str='boundary', max_vel: float | int | None=None, freq_taper_frac: float | int=0.0, time_pad_frac: float | int=0.0, time_taper: bool=False, illumination: ScalarIllumination | None=None) -> tuple[torch.Tensor]
 
@@ -110,11 +106,7 @@ receiver_amplitudes, = starwave.scalar(
 - 本页已核对接口契约，未完成目标 GPU 数值、性能或 FWI 验收。
 
 (vrz)=
-## vrz：二维变密度声学
-
-
-(vrz-function)=
-### 函数
+## VRZ Function
 
 ```{py:function} starwave.vrz(v: torch.Tensor, grid_spacing: float | int | list[float] | tuple[float, ...], dt: float | int, *, impedance: torch.Tensor | None=None, density: torch.Tensor | None=None, source_amplitudes: torch.Tensor, source_locations: torch.Tensor, receiver_locations: torch.Tensor, accuracy: int=8, pml_freq: float | int=25.0, pml_width: int | list[int] | tuple[int, ...]=20, boundary_buffer: int=5, memory: str='boundary', max_vel: float | int | None=None, freq_taper_frac: float | int=0.0, time_pad_frac: float | int=0.0, time_taper: bool=False, illumination: None=None) -> tuple[torch.Tensor]
 
@@ -199,11 +191,7 @@ receiver_amplitudes, = starwave.vrz(
 - 本页已核对接口契约，未完成目标 GPU 数值、性能或 FWI 验收。
 
 (vti)=
-## vti：二维与三维声学 VTI
-
-
-(vti-function)=
-### 函数
+## VTI Function
 
 ```{py:function} starwave.vti(vp: torch.Tensor, epsilon: torch.Tensor, delta: torch.Tensor, rho: torch.Tensor, grid_spacing: float | int | list[float] | tuple[float, ...], dt: float | int, *, source_amplitudes: torch.Tensor, source_locations: torch.Tensor, receiver_locations: torch.Tensor, source_fields: str | list[str] | tuple[str, ...]=('sH', 'sV'), receiver_fields: str | list[str] | tuple[str, ...]=('vz',), accuracy: int=4, pml_freq: float | int=25.0, pml_width: int | list[int] | tuple[int, ...]=20, boundary_buffer: int=5, memory: str='boundary', max_vel: float | int | None=None, freq_taper_frac: float | int=0.0, time_pad_frac: float | int=0.0, time_taper: bool=False) -> tuple[torch.Tensor, ...]
 

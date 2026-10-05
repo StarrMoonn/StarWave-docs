@@ -4,9 +4,9 @@
 
 **On this page**
 
-- [starwave.scalar](#scalar)
-- [starwave.vrz](#vrz)
-- [starwave.vti](#vti)
+- [Scalar Function](#scalar)
+- [VRZ Function](#vrz)
+- [VTI Function](#vti)
 - [starwave.native_status](#native-status)
 - [starwave.prepare_native](#prepare-native)
 - [Other exported names and scope](#other-exports)
@@ -28,11 +28,7 @@ The page organization follows the Sphinx Python API style of the [official Deepw
 Notation: `B` is the number of shots, `S` the sources per shot, `R` the receivers per shot, `T` the number of user time samples, and `D` the number of spatial dimensions. Sources and receivers use integer grid indices in the physical model, not coordinates in meters, and do not include PML offsets.
 
 (scalar)=
-## scalar: 2D scalar acoustics
-
-
-(scalar-function)=
-### Function
+## Scalar Function
 
 ```{py:function} starwave.scalar(v: torch.Tensor, grid_spacing: float | int | list[float] | tuple[float, ...], dt: float | int, *, source_amplitudes: torch.Tensor, source_locations: torch.Tensor, receiver_locations: torch.Tensor, accuracy: int=8, pml_freq: float | int=25.0, pml_width: int | list[int] | tuple[int, ...]=20, boundary_buffer: int=5, memory: str='boundary', max_vel: float | int | None=None, freq_taper_frac: float | int=0.0, time_pad_frac: float | int=0.0, time_taper: bool=False, illumination: ScalarIllumination | None=None) -> tuple[torch.Tensor]
 
@@ -110,11 +106,7 @@ For complete input construction without external data files and one FWI update, 
 - This page’s interface contract has been checked. Target-GPU numerical, performance, and FWI acceptance tests have not been completed.
 
 (vrz)=
-## vrz: 2D variable-density acoustics
-
-
-(vrz-function)=
-### Function
+## VRZ Function
 
 ```{py:function} starwave.vrz(v: torch.Tensor, grid_spacing: float | int | list[float] | tuple[float, ...], dt: float | int, *, impedance: torch.Tensor | None=None, density: torch.Tensor | None=None, source_amplitudes: torch.Tensor, source_locations: torch.Tensor, receiver_locations: torch.Tensor, accuracy: int=8, pml_freq: float | int=25.0, pml_width: int | list[int] | tuple[int, ...]=20, boundary_buffer: int=5, memory: str='boundary', max_vel: float | int | None=None, freq_taper_frac: float | int=0.0, time_pad_frac: float | int=0.0, time_taper: bool=False, illumination: None=None) -> tuple[torch.Tensor]
 
@@ -199,11 +191,7 @@ For the impedance parameterization, replace `density=rho` with `impedance=Z`; do
 - This page’s interface contract has been checked. Target-GPU numerical, performance, and FWI acceptance tests have not been completed.
 
 (vti)=
-## vti: 2D and 3D acoustic VTI
-
-
-(vti-function)=
-### Function
+## VTI Function
 
 ```{py:function} starwave.vti(vp: torch.Tensor, epsilon: torch.Tensor, delta: torch.Tensor, rho: torch.Tensor, grid_spacing: float | int | list[float] | tuple[float, ...], dt: float | int, *, source_amplitudes: torch.Tensor, source_locations: torch.Tensor, receiver_locations: torch.Tensor, source_fields: str | list[str] | tuple[str, ...]=('sH', 'sV'), receiver_fields: str | list[str] | tuple[str, ...]=('vz',), accuracy: int=4, pml_freq: float | int=25.0, pml_width: int | list[int] | tuple[int, ...]=20, boundary_buffer: int=5, memory: str='boundary', max_vel: float | int | None=None, freq_taper_frac: float | int=0.0, time_pad_frac: float | int=0.0, time_taper: bool=False) -> tuple[torch.Tensor, ...]
 

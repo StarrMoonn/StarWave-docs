@@ -37,6 +37,31 @@ def add_anchors(text, stable_anchors=None, section_numbers=None):
 FWI_SECTIONS = ('fwi', 'fwi-run', 'fwi-configuration', 'fwi-loop', 'fwi-metrics', 'fwi-models', 'fwi-limits', 'fwi-wiring')
 FWI_NUMBERS = (0, 4, 5, 2, 6, 7, 3, 1)
 
+# Function subheadings merged into their propagator headings. Keep the original
+# positional numbers and every published localized alias from before the merge.
+USAGE_SECTIONS = ('usage', 'propagators', 'scalar', 'scalar-details',
+                  'scalar-examples', 'scalar-notes', 'vrz', 'vrz-details',
+                  'vrz-examples', 'vrz-notes', 'vti', 'vti-details',
+                  'vti-examples', 'vti-notes', 'native-runtime', 'native-status',
+                  'prepare-native', 'native-notes', 'native-examples', 'other-exports')
+USAGE_NUMBERS = (0, 1, 2, 4, 5, 6, 7, 9, 10, 11, 12, 14, 15, 16, 17, 18, 19, 20, 21, 22)
+
+
+def canonical_usage_sections(text, locale):
+    aliases = json.loads((PROJECT / 'tools' / 'usage_anchors.json').read_text())[locale]
+    assert len(sections(text)) == len(USAGE_SECTIONS), 'Usage section structure changed'
+    targets = iter(zip(USAGE_SECTIONS, USAGE_NUMBERS))
+    def replace(match):
+        target, number = next(targets)
+        # Discard regenerated idN aliases, whose meaning can shift when headings
+        # disappear. Recreate only the published aliases with stable meanings.
+        spans = ''.join(f'<span id="{alias}"></span>'
+                        for alias, destination in aliases.items()
+                        if destination == target and alias not in {target, f'sw-section-{number}'})
+        heading = match[3].replace(f'href="#{match[1]}"', f'href="#{target}"')
+        return f'<section id="{target}">{spans}{heading}'
+    return SECTION.sub(replace, text)
+
 
 def canonical_fwi_sections(text, locale):
     """Preserve original localized and positional FWI bookmarks after expansion."""
@@ -130,6 +155,8 @@ def build(destination):
         texts = [path.read_text(encoding='utf-8'), other.read_text(encoding='utf-8')]
         if relative == 'inversion/fwi.html':
             texts = [canonical_fwi_sections(text, locale) for text, locale in zip(texts, ('zh', 'en'))]
+        if relative == 'usage.html':
+            texts = [canonical_usage_sections(text, locale) for text, locale in zip(texts, ('zh', 'en'))]
         pairs = [sections(text) for text in texts]
         assert len(pairs[0]) == len(pairs[1]), f'Heading parity differs: {relative}'
         mapping = {}
@@ -148,10 +175,13 @@ def build(destination):
             texts = [add_page_toc(text, locale) for text, locale in zip(texts, ('zh', 'en'))]
         stable = None
         if relative == 'usage.html':
-            stable = ['usage'] + re.findall(r'^\(([^)]+)\)=\n#+ ', (PROJECT / 'docs' / 'usage.md').read_text(), re.M)
+            stable = USAGE_SECTIONS
+            source_sections = ['usage'] + re.findall(r'^\(([^)]+)\)=\n#+ ', (PROJECT / 'docs' / 'usage.md').read_text(), re.M)
+            assert source_sections == list(stable), 'Usage source order differs from stable section map'
             assert len(stable) == len(pairs[0]), 'Usage anchors must cover every section'
-        numbers = FWI_NUMBERS if relative == 'inversion/fwi.html' else None
-        if numbers:
+        numbers = USAGE_NUMBERS if relative == 'usage.html' else None
+        if relative == 'inversion/fwi.html':
+            numbers = FWI_NUMBERS
             stable = FWI_SECTIONS
         path.write_text(add_anchors(texts[0], stable, numbers), encoding='utf-8')
         other.write_text(add_anchors(texts[1], stable, numbers), encoding='utf-8')

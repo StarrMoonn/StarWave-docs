@@ -106,8 +106,17 @@ def check(root):
         if 'Usage / API' in content or 'toctree-l2' in content:
             errors.append(f'Navigation is not flat: {locale}')
         anchors = re.findall(r'data-sw-anchor="([^"]+)"', content)
-        if len(anchors) != 23 or len(set(anchors)) != 23 or any(anchor not in pages[usage].ids for anchor in anchors):
+        if len(anchors) != 20 or len(set(anchors)) != 20 or any(anchor not in pages[usage].ids for anchor in anchors):
             errors.append(f'Missing or invalid stable Usage section metadata: {locale}')
+        aliases = json.loads((project / 'tools' / 'usage_anchors.json').read_text())[locale]
+        for alias, target in aliases.items():
+            if alias not in pages[usage].ids or pages[usage].id_sections.get(alias) != pages[usage].id_sections.get(target):
+                errors.append(f'Legacy Usage anchor drift: {locale}/{alias} -> {target}')
+        for name, label in (('scalar', 'Scalar Function'), ('vrz', 'VRZ Function'), ('vti', 'VTI Function')):
+            if content.count(f'<h2>{label}<a') != 1:
+                errors.append(f'Missing or repeated Usage function heading: {locale}/{name}')
+        if re.search(r'<h3>(?:Function|函数)<a', content):
+            errors.append(f'Redundant Usage function subheading: {locale}')
         other = pages[root / ('en' if locale == 'zh' else 'zh') / 'usage.html']
         if any(anchor not in other.ids for anchor in anchors):
             errors.append(f'Usage section cannot switch language: {locale}')
@@ -212,7 +221,11 @@ def check(root):
     font_names = {'home-sans-sc-regular.woff', 'home-sans-sc-bold.woff'}
     if {p.name for p in font_dir.iterdir()} != font_names | {'OFL.txt', 'manifest.json'}:
         errors.append('Unexpected homepage font files')
-    home_source = (project / 'docs' / 'index.md').read_text() + (project / 'docs' / 'usage.md').read_text()
+    # Hidden toctrees supply the sidebar, which retains RTD's own typeface.
+    # Only the homepage/Usage article text uses the custom Chinese glyph subset.
+    home_source = re.sub(r'```\{toctree\}.*?\n```', '',
+                         (project / 'docs' / 'index.md').read_text(), flags=re.S)
+    home_source += (project / 'docs' / 'usage.md').read_text()
     chinese = set(re.findall(r'[\u3000-\u303f\u4e00-\u9fff\uff00-\uffef]', home_source))
     for font in font_manifest['assets']:
         path = font_dir / font['file']

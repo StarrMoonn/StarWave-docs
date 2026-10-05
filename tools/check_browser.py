@@ -19,8 +19,9 @@ USAGE_TARGETS = tuple(
 ) + ('usage', 'propagators', 'native-runtime', 'native-status', 'prepare-native',
      'native-notes', 'native-examples', 'other-exports')
 TOC_TARGETS = ('scalar', 'vrz', 'vti', 'native-status', 'prepare-native', 'other-exports')
+USAGE_SECTIONS = tuple(target for target in USAGE_TARGETS if not target.endswith('-function'))
 CHAPTERS = {
-    'installation', 'wsl', 'quickstart', 'modeling/conventions',
+    'about', 'installation', 'wsl', 'quickstart', 'modeling/conventions',
     'modeling/scalar', 'modeling/gradient', 'modeling/vrz', 'modeling/vti', 'inversion/fwi',
     'inversion/dataparallel', 'inversion/inr', 'usage', 'faq',
     'release-notes', 'status',
@@ -52,6 +53,12 @@ def check_navigation(page, locale, relative):
     usage = [link for link in links if urlsplit(link['href']).path == f'/{locale}/usage.html']
     assert len(usage) == 1 and usage[0]['text'] == 'Usage', usage
     assert all(not urlsplit(link['href']).fragment for link in links), relative
+    # Chapter labels stay readable on one line at the existing sidebar size.
+    assert nav.locator('a').evaluate_all("""items => items.every(a => {
+        const range = document.createRange(); range.selectNodeContents(a);
+        const rows = Array.from(range.getClientRects()).filter(r => r.width && r.height);
+        return new Set(rows.map(r => Math.round(r.top))).size <= 1 && a.scrollWidth <= a.clientWidth;
+    })"""), f'Wrapped or clipped sidebar label: {relative}'
     search = page.locator('#rtd-search-form input[name="q"]')
     assert search.count() == 1, relative
     assert search.get_attribute('placeholder') == 'Search docs', relative
@@ -85,6 +92,23 @@ def check_usage(page, locale, output):
     for target in USAGE_TARGETS:
         assert ids.count(target) == 1, (locale, target)
     page.evaluate('document.fonts.ready')
+    title = main.locator('#usage > h1').evaluate("e => ({size:parseFloat(getComputedStyle(e).fontSize),font:getComputedStyle(e).fontFamily,weight:getComputedStyle(e).fontWeight})")
+    assert abs(title['size'] - 40.8) < .01 and 'Georgia' in title['font'] and title['weight'] == '400', title
+    for name, label in (('scalar', 'Scalar Function'), ('vrz', 'VRZ Function'), ('vti', 'VTI Function')):
+        heading = main.locator(f'#{name} > h2')
+        assert heading.evaluate("e => e.firstChild.textContent.trim()") == label
+        assert abs(heading.evaluate('e => parseFloat(getComputedStyle(e).fontSize)') - 30.6) < .01
+        assert 'Georgia' in heading.evaluate('e => getComputedStyle(e).fontFamily')
+    assert not main.locator('h3').evaluate_all("items => items.some(e => ['Function', '函数'].includes(e.firstChild.textContent.trim()))")
+    for name, count in (('scalar', 16), ('vrz', 18), ('vti', 20), ('prepare_native', 1)):
+        parameters = main.locator(f'dt[id="starwave.{name}"]').locator('..').locator('dl.field-list > dd').first.locator('p')
+        assert parameters.count() == count, (locale, name, parameters.count())
+        rows = parameters.evaluate_all("""items => items.map(p => ({
+            name: p.querySelector('strong')?.textContent,
+            type: p.querySelector('code.literal')?.textContent,
+            sizes: [p, ...p.querySelectorAll('strong, code, span, em')].map(e => parseFloat(getComputedStyle(e).fontSize))
+        }))""")
+        assert all(row['name'] and row['type'] and all(size == 17 for size in row['sizes']) for row in rows), (locale, name, rows)
     for signature in main.locator('dt.sig[id^="starwave."]').all():
         style = signature.evaluate("e => { const s = getComputedStyle(e); return {font:s.fontFamily,size:parseFloat(s.fontSize),line:parseFloat(s.lineHeight),border:s.borderTopWidth,bg:s.backgroundColor}; }")
         assert 'Consolas' in style['font'] and 'monospace' in style['font'] and style['size'] == 17, style
@@ -105,11 +129,15 @@ def check_usage(page, locale, output):
     toc_links = toc.locator('a').evaluate_all('(items) => items.map(a => a.getAttribute("href"))')
     assert toc_links and all(link.startswith('#') for link in toc_links), toc_links
     assert [unquote(link[1:]) for link in toc_links] == list(TOC_TARGETS), toc_links
+    assert toc.locator('a').all_text_contents()[:3] == ['Scalar Function', 'VRZ Function', 'VTI Function']
     assert all(unquote(link[1:]) in ids for link in toc_links), toc_links
     assert toc.evaluate("e => Boolean(e.compareDocumentPosition(document.getElementById('starwave.scalar')) & Node.DOCUMENT_POSITION_FOLLOWING)"), locale
     width = page.viewport_size['width']
     page.evaluate('window.scrollTo(0, 0)')
     page.screenshot(path=str(output / f'{locale}-usage-top-{width}.png'))
+    for name in ('scalar', 'vrz', 'vti'):
+        main.locator(f'#{name} > h2').evaluate("e => e.scrollIntoView({block: 'start'})")
+        page.screenshot(path=str(output / f'{locale}-usage-{name}-heading-{width}.png'))
     main.locator('[id="starwave.scalar"]').evaluate("e => e.scrollIntoView({block: 'start'})")
     page.screenshot(path=str(output / f'{locale}-usage-scalar-signature-{width}.png'))
     # A focused viewport capture makes the actual parameter fields reviewable,
@@ -137,12 +165,8 @@ def check_heading_language_switches(page, base):
             return {id: section.id, stable: section.dataset.swAnchor,
                     permalink: heading?.querySelector('.headerlink')?.getAttribute('href')};
         })""")
-        assert len(sections) == len(USAGE_TARGETS), (locale, sections)
-        assert {section['stable'] for section in sections} == set(USAGE_TARGETS), (locale, sections)
-        if locale == 'en':
-            mappings = {section['id']: section['stable'] for section in sections}
-            assert mappings['scalar-2d-scalar-acoustics'] == 'scalar', mappings
-            assert mappings['sources-and-autograd'] == 'scalar-details', mappings
+        assert len(sections) == len(USAGE_SECTIONS), (locale, sections)
+        assert {section['stable'] for section in sections} == set(USAGE_SECTIONS), (locale, sections)
         for section in sections:
             assert section['permalink'] == '#' + section['id'], (locale, section)
             query = 'q=illumination&from=heading'
@@ -155,6 +179,18 @@ def check_heading_language_switches(page, base):
             assert unquote(destination.fragment) == section['stable'], (locale, section, page.url)
             assert destination.query == query, (locale, section, page.url)
             assert page.locator(f'[id="{section["stable"]}"]').count() == 1, (locale, section)
+
+        # Old autogenerated/localized/positional aliases still refer to the same
+        # content after combining each pair of propagator/function headings.
+        aliases = json.loads((PROJECT / 'tools' / 'usage_anchors.json').read_text())[locale]
+        for alias, target in aliases.items():
+            page.goto(base + locale + '/usage.html?from=old-heading#' + quote(alias))
+            assert page.locator(f'[id="{alias}"]').evaluate('e => e.closest("section[data-sw-anchor]").dataset.swAnchor') == target
+            open_mobile_menu(page)
+            page.locator(f'[data-sw-language="{other}"]').click()
+            assert urlsplit(page.url).path == f'/{other}/usage.html'
+            assert unquote(urlsplit(page.url).fragment) == target
+            assert urlsplit(page.url).query == 'from=old-heading'
 
     # Ordinary chapters retain their positional, cross-language section aliases.
     page.goto(base + 'en/installation.html?from=chapter#runtime-requirements')
@@ -404,6 +440,12 @@ def check(root, browser_path=None):
                 page.set_viewport_size(size)
                 for locale in ('zh', 'en'):
                     check_homepage(page, base, locale, output)
+                    page.goto(base + locale + '/usage.html', wait_until='networkidle')
+                    check_usage(page, locale, output)
+                    assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), (locale, size)
+                    open_mobile_menu(page)
+                    check_navigation(page, locale, 'usage.html')
+                    close_mobile_menu(page)
             page.set_viewport_size({'width': 390, 'height': 844})
             page.goto(base + 'zh/usage.html')
             open_mobile_menu(page)

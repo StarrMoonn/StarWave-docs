@@ -92,31 +92,32 @@ loss.backward()
 :hidden:
 :caption: Getting started
 
-installation
-wsl
-quickstart
+About StarWave <about>
+Installation <installation>
+WSL <wsl>
+Quickstart <quickstart>
 ```
 
 ```{toctree}
 :maxdepth: 1
 :hidden:
-:caption: Forward modeling
+:caption: Modeling
 
-modeling/conventions
-modeling/scalar
-modeling/gradient
-modeling/vrz
-modeling/vti
+Conventions <modeling/conventions>
+Scalar <modeling/scalar>
+Gradient <modeling/gradient>
+VRZ <modeling/vrz>
+VTI <modeling/vti>
 ```
 
 ```{toctree}
 :maxdepth: 1
 :hidden:
-:caption: Inversion and neural networks
+:caption: Inversion
 
-inversion/fwi
-inversion/dataparallel
-inversion/inr
+FWI <inversion/fwi>
+DataParallel <inversion/dataparallel>
+INR <inversion/inr>
 ```
 
 ```{toctree}
@@ -124,15 +125,15 @@ inversion/inr
 :hidden:
 :caption: Usage
 
-usage
+Usage <usage>
 ```
 
 ```{toctree}
 :maxdepth: 1
 :hidden:
-:caption: Reference and maintenance
+:caption: Reference
 
-faq
-release-notes
-status
+FAQ <faq>
+Release notes <release-notes>
+Status <status>
 ```
