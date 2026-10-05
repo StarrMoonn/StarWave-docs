@@ -74,13 +74,6 @@ def check(root):
         en = pages[root / 'en' / relative]
         if {x for x in zh.ids if x.startswith('sw-section-')} != {x for x in en.ids if x.startswith('sw-section-')}:
             errors.append(f'Localized section anchors differ: {relative}')
-        if relative.parts[0] == 'api':
-            source = (root / 'zh' / relative).read_text(encoding='utf-8')
-            body = source.split('<div class="body" role="main" lang="en">', 1)
-            if len(body) != 2:
-                errors.append(f'Missing English API language boundary: {relative}')
-            elif re.search(r'[\u4e00-\u9fff]', re.sub('<[^>]+>', '', body[1].split('<div class="sphinxsidebar"', 1)[0])):
-                errors.append(f'Chinese remains in shared English API body: {relative}')
         if {x for x in zh.ids if x.startswith('starwave.')} != {x for x in en.ids if x.startswith('starwave.')}:
             errors.append(f'Localized API anchors differ: {relative}')
         redirect = root / relative

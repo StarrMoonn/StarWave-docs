@@ -20,4 +20,4 @@ Scalar, VRZ, and VTI each have a dedicated reference page using the Sphinx Pytho
 
 ## Chinese and English edition
 
-The complete manual is available in Chinese and English, including navigation, search, notices, and all 18 content pages. The Chinese site retains Chinese tutorials and navigation, while the API reference body is English in both versions. Each language has an independent build and search index. Language switching preserves the corresponding page and section, and legacy Chinese links and API anchors remain accessible. API presentation follows Deepwave’s Sphinx/Alabaster organization, adds typed signatures, and retains StarWave’s own return contracts and numerical limitations.
+The complete manual is available in Chinese and English, including navigation, search, notices, and all 18 content pages. Each language has an independent build and search index. Language switching preserves the corresponding page and section, and legacy Chinese links and API anchors remain accessible. API presentation follows Deepwave’s Sphinx/Alabaster organization, adds typed signatures, and retains StarWave’s own return contracts and numerical limitations.

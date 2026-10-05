@@ -38,13 +38,15 @@ def check(root, browser_path=None):
                     page.goto(base + locale + '/api/scalar.html')
                     page.screenshot(path=str(output / f'{locale}-scalar-{size["width"]}.png'), full_page=True)
             page.goto(base + 'zh/api/scalar.html')
-            assert page.locator('.body[lang="en"]').count() == 1
-            assert 'Parameters' in page.locator('.body').inner_text()
-            assert 'Required' in page.locator('.body').inner_text()
+            assert '参数' in page.locator('.body').inner_text()
+            assert '必填' in page.locator('.body').inner_text()
+            assert 'source_amplitudes' in page.locator('.body').inner_text()
             assert '开始使用' in page.locator('.sphinxsidebar').inner_text()
             page.goto(base + 'zh/api/scalar.html#id4')
             page.locator('[data-sw-language="en"]').click()
             assert urlsplit(page.url).path == '/en/api/scalar.html'
+            assert 'Parameters' in page.locator('.body').inner_text()
+            assert 'Required' in page.locator('.body').inner_text()
             assert urlsplit(page.url).fragment == 'sw-section-3'
             assert page.locator('#sw-section-3').count() == 1
             page.locator('[data-sw-language="zh"]').click()

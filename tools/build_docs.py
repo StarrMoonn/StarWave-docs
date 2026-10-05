@@ -21,14 +21,11 @@ def sections(text):
             for sid, heading in SECTION.findall(text)]
 
 
-def add_anchors(text, aliases=None):
-    aliases = aliases or {}
-    existing = set(re.findall(r' id="([^"]+)"', text))
+def add_anchors(text):
     counter = iter(range(10000))
     def insert(match):
         number = next(counter)
-        extra = ''.join(f'<span id="{html.escape(old)}" class="sw-anchor"></span>' for old, target in aliases.items() if target == f'sw-section-{number}' and old not in existing)
-        return (f'<section id="{match[1]}" data-sw-section="sw-section-{number}">{extra}'
+        return (f'<section id="{match[1]}" data-sw-section="sw-section-{number}">'
                 f'<span id="sw-section-{number}" class="sw-anchor"></span>{match[2]}')
     return SECTION.sub(insert, text)
 
@@ -67,19 +64,12 @@ def build(destination):
     shutil.copytree(PROJECT / 'examples', stage / 'examples')
     source_paths = {}
     for locale, source in [('zh', PROJECT / 'docs'), ('en', PROJECT / 'docs' / 'en')]:
-        source_files = {p.relative_to(source): p for p in source.rglob('*.md')
-                        if 'en' not in p.relative_to(source).parts}
-        if locale == 'en':
-            # The English API body is a single source of truth in both locales.
-            source_files.update({Path('api') / p.name: p for p in (PROJECT / 'docs' / 'api').glob('*.md')})
-        source_paths[locale] = sorted(source_files)
-        for relative, original in source_files.items():
+        source_paths[locale] = sorted(p.relative_to(source) for p in source.rglob('*.md')
+                                      if 'en' not in p.relative_to(source).parts)
+        for relative in source_paths[locale]:
             target = stage / locale / relative
             target.parent.mkdir(parents=True, exist_ok=True)
-            content = original.read_text(encoding='utf-8')
-            if locale == 'zh' and relative == Path('index.md'):
-                content = content.replace('\napi/index\n', '\nAPI 参考 <api/index>\n')
-            target.write_text(content, encoding='utf-8')
+            shutil.copyfile(source / relative, target)
         env = dict(os.environ, STARWAVE_DOCS_LANGUAGE=locale)
         subprocess.run([sys.executable, '-m', 'sphinx', '-n', '-W', '--keep-going', '-E',
                         '-b', 'html', '-c', str(PROJECT / 'docs'), '-d',
@@ -87,7 +77,6 @@ def build(destination):
                         str(stage / locale), str(destination / locale)], env=env, check=True)
     assert source_paths['zh'] == source_paths['en'], 'Translated page coverage differs'
     legacy = json.loads((PROJECT / 'tools' / 'legacy_anchors.json').read_text())
-    api_aliases = json.loads((PROJECT / 'tools' / 'api_zh_anchors.json').read_text())
     for path in sorted((destination / 'zh').rglob('*.html')):
         relative = path.relative_to(destination / 'zh').as_posix()
         other = destination / 'en' / relative
@@ -107,19 +96,7 @@ def build(destination):
                 raise ValueError(f"Legacy heading missing/ambiguous: {relative} {entry['title']}")
             mapping[entry['id']] = f'sw-section-{matches[0]}'
         texts[0] = texts[0].replace('aria-label="Main"', 'aria-label="主导航"')
-        if relative.startswith('api/'):
-            # English contents backlinks use numeric IDs that used to name Chinese
-            # sections. Rename only those generated IDs in the Chinese context,
-            # then restore historical IDs at their corresponding real sections.
-            for old in api_aliases.get(relative, {}):
-                if f' id="{old}"' in texts[0]:
-                    texts[0] = texts[0].replace(f' id="{old}"', f' id="sw-toc-{old}"')
-                    texts[0] = texts[0].replace(f'href="#{old}"', f'href="#sw-toc-{old}"')
-            # Translate only Sphinx's generated field labels; shared prose is English.
-            for old, new in [('参数', 'Parameters'), ('返回类型', 'Return type'), ('返回', 'Returns')]:
-                texts[0] = re.sub(r'(<dt class="field-[^"]+">)' + old + r'(?=<span)', r'\g<1>' + new, texts[0])
-            texts[0] = texts[0].replace('<div class="body" role="main">', '<div class="body" role="main" lang="en">')
-        path.write_text(add_anchors(texts[0], api_aliases.get(relative)), encoding='utf-8')
+        path.write_text(add_anchors(texts[0]), encoding='utf-8')
         other.write_text(add_anchors(texts[1]), encoding='utf-8')
         old = destination / relative
         old.parent.mkdir(parents=True, exist_ok=True)

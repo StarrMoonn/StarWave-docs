@@ -37,10 +37,7 @@ def check(wheel_path=None):
     blocks = 0
     for locale, docs in [('zh', project / 'docs'), ('en', project / 'docs' / 'en')]:
         functions = {}
-        paths = list(docs.rglob('*.md'))
-        if locale == 'en':
-            paths.extend((project / 'docs' / 'api').glob('*.md'))
-        for path in sorted(paths):
+        for path in sorted(docs.rglob('*.md')):
             if locale == 'zh' and 'en' in path.relative_to(docs).parts:
                 continue
             text = path.read_text(encoding='utf-8')
@@ -64,7 +61,7 @@ def check(wheel_path=None):
                     assert param.annotation is not None, f'{locale}.{name}.{param.arg}: missing annotation'
                     assert ast.dump(param.annotation) == ast.dump(ast.parse(types[param.arg], mode='eval').body)
                     description = re.search(r'^:param ' + param.arg + r': (.+)$', body, re.M)[1]
-                    if locale == 'zh' and path.parent.name != 'api':
+                    if locale == 'zh':
                         marker = '必填' if default is None else f'默认 `{ast.literal_eval(default)!r}`'
                     else:
                         marker = 'Required' if default is None else f'Default `{ast.literal_eval(default)!r}`'

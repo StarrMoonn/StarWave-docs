@@ -20,4 +20,4 @@ scalar、VRZ、VTI 各自提供独立参考页，以 Sphinx Python 域展示完�
 
 ## 中英双语版
 
-完整手册提供中文与 English，包括导航、搜索、提示与 18 个内容页面；中文站点保留中文教程与导航，API 参考正文统一为英文。各语言独立构建和索引，语言切换保留对应页面与章节；旧中文链接与 API 锚点保持可访问。API 呈现参考 Deepwave 的 Sphinx/Alabaster 结构，增加类型签名，并继续保留 StarWave 自身的返回与数值限制。
+完整手册提供中文与 English，包括导航、搜索、提示与 18 个内容页面。各语言独立构建和索引，语言切换保留对应页面与章节；旧中文链接与 API 锚点保持可访问。API 呈现参考 Deepwave 的 Sphinx/Alabaster 结构，增加类型签名，并继续保留 StarWave 自身的返回与数值限制。
