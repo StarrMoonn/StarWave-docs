@@ -202,11 +202,11 @@
   "inversion/fwi.html": [
     {
       "id": "fwi",
-      "title": "FWI 入门"
+      "title": "简单 FWI 示例"
     },
     {
       "id": "id1",
-      "title": "运行一次更新"
+      "title": "保留的一次更新检查"
     },
     {
       "id": "id2",

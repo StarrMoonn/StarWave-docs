@@ -41,3 +41,21 @@
   .rst-content .sw-page-toc { padding: 16px 18px; }
   .rst-content section { scroll-margin-top: 64px; }
 }
+
+/* Scientific tutorial results stay within the original RTD visual language. */
+.rst-content .sw-run-note { border-left: 3px solid #487eae; background: #f2f6fa; }
+.rst-content .sw-run-note .admonition-title { background: #487eae; }
+.rst-content figure.sw-science-figure { margin: 24px 0 32px; padding: 16px; border: 1px solid #dbe2e8; background: #fff; }
+.rst-content figure.sw-science-figure img { display: block; width: 100%; height: auto; margin: 0 auto; }
+.rst-content figure.sw-science-figure figcaption { margin-top: 14px; padding-top: 12px; border-top: 1px solid #e6eaee; color: #526371; font-size: 14px; line-height: 1.65; }
+.rst-content .math { max-width: 100%; overflow-x: auto; overflow-y: hidden; padding-bottom: 4px; }
+.sw-search-control { position: relative; }
+.wy-side-nav-search .sw-search-control input[type="search"] { min-height: 44px; padding-right: 49px; }
+.wy-side-nav-search .sw-search-submit { position: absolute; right: 2px; top: 2px; width: 42px; height: 40px; display: flex; align-items: center; justify-content: center; padding: 0; background: transparent; color: #3578a6; border: 0; border-radius: 50%; box-shadow: none; cursor: pointer; }
+.sw-search-submit svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.wy-side-nav-search .sw-search-submit:hover { background: #edf4fa; color: #24587c; }
+.wy-side-nav-search .sw-search-submit:focus-visible { outline: 3px solid #f0ad4e; outline-offset: 1px; }
+@media (max-width: 768px) {
+  .rst-content figure.sw-science-figure { padding: 6px; }
+  .rst-content figure.sw-science-figure figcaption { padding: 10px 6px 0; }
+}

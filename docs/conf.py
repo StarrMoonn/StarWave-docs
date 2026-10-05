@@ -12,7 +12,7 @@ copyright = '2026, StarWave contributors'
 version = '2.0'
 release = '2.0.0'
 language = 'zh_CN' if LOCALE == 'zh' else 'en'
-extensions = ['myst_parser', 'sphinx.ext.githubpages']
+extensions = ['myst_parser', 'sphinx.ext.githubpages', 'sphinx.ext.mathjax']
 source_suffix = {'.md': 'markdown'}
 root_doc = 'index'
 exclude_patterns = ['en', 'requirements.txt', '_build', 'Thumbs.db', '.DS_Store']

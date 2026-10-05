@@ -22,14 +22,34 @@ def sections(text):
             for sid, _, heading in SECTION.findall(text)]
 
 
-def add_anchors(text, stable_anchors=None):
+def add_anchors(text, stable_anchors=None, section_numbers=None):
     counter = iter(range(10000))
     def insert(match):
         number = next(counter)
+        section_number = section_numbers[number] if section_numbers else number
         stable = f' data-sw-anchor="{stable_anchors[number]}"' if stable_anchors else ''
-        return (f'<section id="{match[1]}" data-sw-section="sw-section-{number}"{stable}>'
-                f'<span id="sw-section-{number}" class="sw-anchor"></span>{match[2]}{match[3]}')
+        return (f'<section id="{match[1]}" data-sw-section="sw-section-{section_number}"{stable}>'
+                f'<span id="sw-section-{section_number}" class="sw-anchor"></span>{match[2]}{match[3]}')
     return SECTION.sub(insert, text)
+
+
+
+FWI_SECTIONS = ('fwi', 'fwi-run', 'fwi-configuration', 'fwi-loop', 'fwi-metrics', 'fwi-models', 'fwi-limits', 'fwi-wiring')
+FWI_NUMBERS = (0, 4, 5, 2, 6, 7, 3, 1)
+
+
+def canonical_fwi_sections(text, locale):
+    """Preserve original localized and positional FWI bookmarks after expansion."""
+    aliases = {'fwi-wiring': 'id1', 'fwi-loop': 'id2', 'fwi-limits': 'id3'} if locale == 'zh' else {
+        'fwi': 'introduction-to-fwi', 'fwi-wiring': 'run-one-update',
+        'fwi-loop': 'key-points-for-the-loop', 'fwi-limits': 'validation-limits'}
+    counter = iter(FWI_SECTIONS)
+    def replace(match):
+        target = next(counter)
+        alias = f'<span id="{aliases[target]}"></span>' if target in aliases else ''
+        heading = match[3].replace(f'href="#{match[1]}"', f'href="#{target}"')
+        return f'<section id="{target}">{alias}{heading}'
+    return SECTION.sub(replace, text)
 
 
 def add_page_toc(text, locale):
@@ -93,6 +113,7 @@ def build(destination):
             target = stage / locale / relative
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(source / relative, target)
+        shutil.copytree(PROJECT / 'docs' / '_static', stage / locale / '_static')
         env = dict(os.environ, STARWAVE_DOCS_LANGUAGE=locale)
         subprocess.run([sys.executable, '-m', 'sphinx', '-n', '-W', '--keep-going', '-E',
                         '-b', 'html', '-c', str(PROJECT / 'docs'), '-d',
@@ -107,6 +128,8 @@ def build(destination):
         if not other.is_file():
             raise ValueError(f'Missing English counterpart: {relative}')
         texts = [path.read_text(encoding='utf-8'), other.read_text(encoding='utf-8')]
+        if relative == 'inversion/fwi.html':
+            texts = [canonical_fwi_sections(text, locale) for text, locale in zip(texts, ('zh', 'en'))]
         pairs = [sections(text) for text in texts]
         assert len(pairs[0]) == len(pairs[1]), f'Heading parity differs: {relative}'
         mapping = {}
@@ -118,7 +141,8 @@ def build(destination):
             matches = [i for i, (_, title) in enumerate(pairs[0]) if title == entry['title']]
             if len(matches) != 1:
                 raise ValueError(f"Legacy heading missing/ambiguous: {relative} {entry['title']}")
-            mapping[entry['id']] = f'sw-section-{matches[0]}'
+            number = FWI_NUMBERS[matches[0]] if relative == 'inversion/fwi.html' else matches[0]
+            mapping[entry['id']] = f'sw-section-{number}'
         texts[0] = texts[0].replace('aria-label="Main"', 'aria-label="主导航"')
         if relative not in {'usage.html', 'index.html'}:
             texts = [add_page_toc(text, locale) for text, locale in zip(texts, ('zh', 'en'))]
@@ -126,8 +150,11 @@ def build(destination):
         if relative == 'usage.html':
             stable = ['usage'] + re.findall(r'^\(([^)]+)\)=\n#+ ', (PROJECT / 'docs' / 'usage.md').read_text(), re.M)
             assert len(stable) == len(pairs[0]), 'Usage anchors must cover every section'
-        path.write_text(add_anchors(texts[0], stable), encoding='utf-8')
-        other.write_text(add_anchors(texts[1], stable), encoding='utf-8')
+        numbers = FWI_NUMBERS if relative == 'inversion/fwi.html' else None
+        if numbers:
+            stable = FWI_SECTIONS
+        path.write_text(add_anchors(texts[0], stable, numbers), encoding='utf-8')
+        other.write_text(add_anchors(texts[1], stable, numbers), encoding='utf-8')
         old = destination / relative
         old.parent.mkdir(parents=True, exist_ok=True)
         old.write_text(redirect_page(relative, mapping), encoding='utf-8')

@@ -1,0 +1,379 @@
+{
+  "schema_version": 1,
+  "description": "Curated scientific figures rendered from the saved StarWave tutorial results. This manifest contains no raw numerical arrays or execution environment details.",
+  "method": {
+    "renderer": "Matplotlib 3.10.8",
+    "model_axis_order": [
+      "x",
+      "z"
+    ],
+    "record_axis_order": [
+      "shot",
+      "receiver",
+      "time"
+    ],
+    "depth_direction": "increases downward",
+    "time_direction": "increases downward",
+    "image_sampling": "nearest; coordinates at saved grid nodes, bounds extended by half a cell",
+    "curve_sampling": "six recorded evaluation states at 0,5,10,15,20,25 completed updates; straight connecting segments",
+    "amplitude_processing": "raw saved values; no clipping, gain, AGC, smoothing, or per-panel normalization",
+    "velocity_units": "m/s",
+    "space_units": "m",
+    "time_units": "s",
+    "pressure_units": "arbitrary normalized pressure units; not calibrated Pa",
+    "source_forcing_units": "arbitrary normalized pressure units / m^2",
+    "model_color_limits_m_s": [
+      1600,
+      2200
+    ]
+  },
+  "figures": [
+    {
+      "asset": "installation_model.png",
+      "asset_sha256": "ac528d2d9cf7c8568a1600ee236d58076762af347eaf17eaa87597639052e3db",
+      "width_px": 975,
+      "height_px": 1004,
+      "caption": "Uniform 1800 m/s model on a 48 × 40 grid (10 m spacing). One source at (240,50) m; 12 receivers at z=50 m, x=80–410 m every 30 m. Dashed outline encloses active velocity cells. The surrounding model band is fixed.",
+      "scales": {
+        "constant_velocity_m_s": 1800
+      },
+      "units": {
+        "model": "m/s",
+        "axes": "m"
+      },
+      "sources": [
+        {
+          "file": "01_installation/20261005T074148_812321Z/smoke.npz",
+          "sha256": "af066c97fcdc72b3e6d543bd9d6bc035eb699e34690d0657c7cb0e0505b961e3"
+        }
+      ]
+    },
+    {
+      "asset": "installation_gather.png",
+      "asset_sha256": "be0db6c9062ca37541b25266a7f891b8af24c4ecdb0549ad40c2bc7bdbc648bf",
+      "width_px": 1379,
+      "height_px": 1010,
+      "caption": "Smoke receiver gather: 12 receivers × 160 samples, dt=0.001 s, t=0–0.159 s. Full linear symmetric amplitude scale ±25.187145 a.u.; no clipping, gain, or time shift.",
+      "scales": {
+        "amplitude_a_u": [
+          -25.187145233154297,
+          25.187145233154297
+        ]
+      },
+      "units": {
+        "amplitude": "arbitrary normalized pressure unit",
+        "receiver_position": "m",
+        "time": "s"
+      },
+      "sources": [
+        {
+          "file": "01_installation/20261005T074148_812321Z/smoke.npz",
+          "sha256": "af066c97fcdc72b3e6d543bd9d6bc035eb699e34690d0657c7cb0e0505b961e3"
+        }
+      ]
+    },
+    {
+      "asset": "gradient_models.png",
+      "asset_sha256": "2f5568e784e15fb2cd63b72865ee3f4eebb511737b85c367a04f37ae7834c9e5",
+      "width_px": 1297,
+      "height_px": 1580,
+      "caption": "Analytic truth; Starting background. Identical physical velocity color limits 1600–2200 m/s in all panels; no clipping.",
+      "scales": {
+        "velocity_m_s": [
+          1600,
+          2200
+        ]
+      },
+      "units": {
+        "velocity": "m/s",
+        "axes": "m"
+      },
+      "sources": [
+        {
+          "file": "02_forward_gradient/20261005T074216_967038Z/inputs.npz",
+          "sha256": "6cd45861394824d14a309ab1355a49489ee0d19c7a37cbf4c7d86a69970dc569"
+        }
+      ]
+    },
+    {
+      "asset": "acquisition_source.png",
+      "asset_sha256": "371d782e39b27b8eb06f2acc6c19386f5aa95d64a2f1f93f81e9a2a73406e248",
+      "width_px": 1380,
+      "height_px": 1656,
+      "caption": "Three sources at x=160,470,790 m and 38 receivers per shot at x=100–840 m every 20 m; all at z=50 m. Shaded interior is the saved active mask; surrounding fixed band is not a water layer. All three sources use the same fixed 12 Hz Ricker forcing, peak time 0.1 s. Displayed forcing is unscaled; the solver applies −v_source² dt_internal².",
+      "scales": {
+        "source_peak_time_s": 0.1,
+        "source_frequency_hz": 12
+      },
+      "units": {
+        "model_axes": "m",
+        "time": "s",
+        "forcing": "a.u. / m^2"
+      },
+      "sources": [
+        {
+          "file": "02_forward_gradient/20261005T074216_967038Z/inputs.npz",
+          "sha256": "6cd45861394824d14a309ab1355a49489ee0d19c7a37cbf4c7d86a69970dc569"
+        }
+      ]
+    },
+    {
+      "asset": "gradient_gathers.png",
+      "asset_sha256": "6c21b035f4be1c78e69756e705e017a1c9bdbc5028ef85513585ea5cce6c5838",
+      "width_px": 1379,
+      "height_px": 2245,
+      "caption": "Observed, initial predicted, and predicted-minus-observed residual for the middle shot (zero-based shot 1, source x=470 m). All three panels use the same full symmetric ±42.714138 a.u. limits covering all shots. A nearly white residual reflects its much smaller absolute amplitude, not masking. No clipping, gain, or time shift.",
+      "scales": {
+        "amplitude_a_u": [
+          -42.71413803100586,
+          42.71413803100586
+        ],
+        "shot_index": 1
+      },
+      "units": {
+        "amplitude": "arbitrary normalized pressure unit",
+        "receiver_position": "m",
+        "time": "s"
+      },
+      "sources": [
+        {
+          "file": "02_forward_gradient/20261005T074216_967038Z/inputs.npz",
+          "sha256": "6cd45861394824d14a309ab1355a49489ee0d19c7a37cbf4c7d86a69970dc569"
+        },
+        {
+          "file": "02_forward_gradient/20261005T074216_967038Z/forward_gradient.npz",
+          "sha256": "47f226d0f7ad1241c963dd31eec2393e7797cf122d3b1330260085318a30b40f"
+        }
+      ]
+    },
+    {
+      "asset": "gradient_velocity.png",
+      "asset_sha256": "a83c255d500fe77141be975dcfb61b5d9d010ee970c406f1572b398a3d7069c7",
+      "width_px": 1379,
+      "height_px": 845,
+      "caption": "Signed gradient of the observed-RMS-normalized Smooth L1 data loss with respect to velocity. Full symmetric color limits ±1.2770838964×10⁻⁷ (m/s)⁻¹, with true extrema −7.221272×10⁻⁸ and +1.2770839×10⁻⁷. Fixed-cell gradients are exactly zero. No clipping or smoothing; this plot alone is not a full adjoint validation.",
+      "scales": {
+        "gradient_per_m_s": [
+          -1.2770838964115683e-07,
+          1.2770838964115683e-07
+        ]
+      },
+      "units": {
+        "gradient": "(m/s)^-1",
+        "axes": "m"
+      },
+      "sources": [
+        {
+          "file": "02_forward_gradient/20261005T074216_967038Z/inputs.npz",
+          "sha256": "6cd45861394824d14a309ab1355a49489ee0d19c7a37cbf4c7d86a69970dc569"
+        },
+        {
+          "file": "02_forward_gradient/20261005T074216_967038Z/forward_gradient.npz",
+          "sha256": "47f226d0f7ad1241c963dd31eec2393e7797cf122d3b1330260085318a30b40f"
+        }
+      ]
+    },
+    {
+      "asset": "fwi_history.png",
+      "asset_sha256": "b92a4425e677e54d082de462164fad25099854fff166bb70b6d7c8875cca4c43",
+      "width_px": 1380,
+      "height_px": 1694,
+      "caption": "Six separately evaluated model states after 0,5,10,15,20,25 completed updates. Data loss and total objective are absolute values on a linear zero-based scale; the objective adds 10⁻⁴ times unweighted smoothness. Active-cell model RMSE is also linear and zero-based: 30.905369→32.635601 (update 10 maximum)→30.638994 m/s. Lines connect recorded evaluations only; intermediate RMSE values were not saved. A 91.514% data-loss reduction accompanies only a 0.862% endpoint RMSE reduction. This is the last iterate, not certified convergence.",
+      "scales": {
+        "iterations": [
+          0,
+          5,
+          10,
+          15,
+          20,
+          25
+        ],
+        "data_loss": [
+          0.00024799906532280147,
+          8.42527297209017e-05,
+          5.401656744652428e-05,
+          3.88041116821114e-05,
+          2.9449822250171565e-05,
+          2.1045272660558112e-05
+        ],
+        "total_objective": [
+          0.00024799906532280147,
+          8.44275817507878e-05,
+          5.4233080573612826e-05,
+          3.908163691521622e-05,
+          2.9775272877304813e-05,
+          2.140429693099577e-05
+        ],
+        "active_model_rmse_m_s": [
+          30.90536880493164,
+          32.32859420776367,
+          32.63560104370117,
+          32.454124450683594,
+          31.681081771850586,
+          30.638994216918945
+        ]
+      },
+      "units": {
+        "data_loss": "dimensionless observed-RMS-normalized Smooth L1",
+        "total_objective": "dimensionless data loss + 1e-4 times unweighted smoothness",
+        "active_model_rmse": "m/s",
+        "iteration": "completed updates"
+      },
+      "sources": [
+        {
+          "file": "03_simple_fwi/20261005T074246_284695Z/history.json",
+          "sha256": "be78b9c8a3751b834bd8150e84be872b59f8f697b0dcbbceba6e9bcd26afbd12"
+        },
+        {
+          "file": "03_simple_fwi/20261005T074246_284695Z/fwi_results.npz",
+          "sha256": "61512e8a13313070dbed04236db63451db7e5d24b9bf713d558834d202e0b0a4"
+        },
+        {
+          "file": "02_forward_gradient/20261005T074216_967038Z/inputs.npz",
+          "sha256": "6cd45861394824d14a309ab1355a49489ee0d19c7a37cbf4c7d86a69970dc569"
+        }
+      ]
+    },
+    {
+      "asset": "fwi_models.png",
+      "asset_sha256": "c791ddc464d90ac2e6e0f97edb5066c8633a55378a1204fc5079bf0a4a82f3ec",
+      "width_px": 1297,
+      "height_px": 2349,
+      "caption": "Analytic truth; Initial model · update 0; Final model · update 25. Identical physical velocity color limits 1600–2200 m/s in all panels; no clipping.",
+      "scales": {
+        "velocity_m_s": [
+          1600,
+          2200
+        ]
+      },
+      "units": {
+        "velocity": "m/s",
+        "axes": "m"
+      },
+      "sources": [
+        {
+          "file": "03_simple_fwi/20261005T074246_284695Z/fwi_results.npz",
+          "sha256": "61512e8a13313070dbed04236db63451db7e5d24b9bf713d558834d202e0b0a4"
+        },
+        {
+          "file": "02_forward_gradient/20261005T074216_967038Z/inputs.npz",
+          "sha256": "6cd45861394824d14a309ab1355a49489ee0d19c7a37cbf4c7d86a69970dc569"
+        }
+      ]
+    },
+    {
+      "asset": "fwi_model_errors.png",
+      "asset_sha256": "e88993192bad6247001b38ab58e487e51f754f32b09e34e9c92f48d8c8da930a",
+      "width_px": 1314,
+      "height_px": 1599,
+      "caption": "Signed initial-minus-truth and final-minus-truth errors after 25 updates. Both panels share the full symmetric ±156.622925 m/s color scale. Initial extrema are −156.622925/0 m/s; final extrema are −118.265991/+39.791016 m/s. Fixed outer model cells remain unchanged.",
+      "scales": {
+        "velocity_error_m_s": [
+          -156.6229248046875,
+          156.6229248046875
+        ]
+      },
+      "units": {
+        "model_error": "m/s",
+        "axes": "m"
+      },
+      "sources": [
+        {
+          "file": "03_simple_fwi/20261005T074246_284695Z/fwi_results.npz",
+          "sha256": "61512e8a13313070dbed04236db63451db7e5d24b9bf713d558834d202e0b0a4"
+        },
+        {
+          "file": "02_forward_gradient/20261005T074216_967038Z/inputs.npz",
+          "sha256": "6cd45861394824d14a309ab1355a49489ee0d19c7a37cbf4c7d86a69970dc569"
+        }
+      ]
+    },
+    {
+      "asset": "fwi_residuals.png",
+      "asset_sha256": "1604a89b684ccc4f6fa828300d01b611f61cd4e375d83a7f42d0c7334156694c",
+      "width_px": 1380,
+      "height_px": 1713,
+      "caption": "Before/after predicted-minus-observed residuals for zero-based shot 0, source x=160 m. The same full residual-only symmetric ±0.266035795 a.u. color scale is used for all shots and both states. This is a different, finer scale from the ±42.714138 a.u. full-gather view; no clipping, AGC, or amplitude normalization.",
+      "scales": {
+        "residual_amplitude_a_u": [
+          -0.266035795211792,
+          0.266035795211792
+        ],
+        "shot_index": 0
+      },
+      "units": {
+        "amplitude": "arbitrary normalized pressure unit",
+        "receiver_position": "m",
+        "time": "s"
+      },
+      "sources": [
+        {
+          "file": "03_simple_fwi/20261005T074246_284695Z/fwi_results.npz",
+          "sha256": "61512e8a13313070dbed04236db63451db7e5d24b9bf713d558834d202e0b0a4"
+        },
+        {
+          "file": "02_forward_gradient/20261005T074216_967038Z/inputs.npz",
+          "sha256": "6cd45861394824d14a309ab1355a49489ee0d19c7a37cbf4c7d86a69970dc569"
+        }
+      ]
+    },
+    {
+      "asset": "fwi_residuals_shot_1.png",
+      "asset_sha256": "6d0a9c9f338762e7183fa379d11299ec79de93719f7843ebb5143cf52eff9e99",
+      "width_px": 1380,
+      "height_px": 1713,
+      "caption": "Before/after predicted-minus-observed residuals for zero-based shot 1, source x=470 m. The same full residual-only symmetric ±0.266035795 a.u. color scale is used for all shots and both states. This is a different, finer scale from the ±42.714138 a.u. full-gather view; no clipping, AGC, or amplitude normalization.",
+      "scales": {
+        "residual_amplitude_a_u": [
+          -0.266035795211792,
+          0.266035795211792
+        ],
+        "shot_index": 1
+      },
+      "units": {
+        "amplitude": "arbitrary normalized pressure unit",
+        "receiver_position": "m",
+        "time": "s"
+      },
+      "sources": [
+        {
+          "file": "03_simple_fwi/20261005T074246_284695Z/fwi_results.npz",
+          "sha256": "61512e8a13313070dbed04236db63451db7e5d24b9bf713d558834d202e0b0a4"
+        },
+        {
+          "file": "02_forward_gradient/20261005T074216_967038Z/inputs.npz",
+          "sha256": "6cd45861394824d14a309ab1355a49489ee0d19c7a37cbf4c7d86a69970dc569"
+        }
+      ]
+    },
+    {
+      "asset": "fwi_residuals_shot_2.png",
+      "asset_sha256": "8950756f6edcf1549e820f60b19a03ea9afcfa5cfb4609b141fcabadb93a2464",
+      "width_px": 1380,
+      "height_px": 1713,
+      "caption": "Before/after predicted-minus-observed residuals for zero-based shot 2, source x=790 m. The same full residual-only symmetric ±0.266035795 a.u. color scale is used for all shots and both states. This is a different, finer scale from the ±42.714138 a.u. full-gather view; no clipping, AGC, or amplitude normalization.",
+      "scales": {
+        "residual_amplitude_a_u": [
+          -0.266035795211792,
+          0.266035795211792
+        ],
+        "shot_index": 2
+      },
+      "units": {
+        "amplitude": "arbitrary normalized pressure unit",
+        "receiver_position": "m",
+        "time": "s"
+      },
+      "sources": [
+        {
+          "file": "03_simple_fwi/20261005T074246_284695Z/fwi_results.npz",
+          "sha256": "61512e8a13313070dbed04236db63451db7e5d24b9bf713d558834d202e0b0a4"
+        },
+        {
+          "file": "02_forward_gradient/20261005T074216_967038Z/inputs.npz",
+          "sha256": "6cd45861394824d14a309ab1355a49489ee0d19c7a37cbf4c7d86a69970dc569"
+        }
+      ]
+    }
+  ]
+}

@@ -30,6 +30,6 @@ python examples/scalar_demo.py --mode forward --device 0
 
 ## 如何判断执行状态
 
-脚本期望得到 `(1, 16, 256)` 的记录，并检查有限、非全零。该形状是输入契约的预期值；本草稿没有提供已实测的波形图、运行时间或误差基准。finite/nonzero smoke check 也不能证明解或梯度正确。
+脚本期望得到 `(1, 16, 256)` 的记录，并检查有限、非全零。该形状是输入契约的预期值；这个独立 32×32 脚本没有提供实测结果；原创 notebook 的[安装运行检查](installation.md)与[梯度实验](modeling/gradient.md)另有实测记录。finite/nonzero smoke check 也不能证明解或梯度正确。
 
 如遇加载错误先看[常见问题](faq.md)。如需反演，保持相同源单位、网格与采集，继续 [FWI 入门](inversion/fwi.md)。

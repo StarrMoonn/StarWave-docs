@@ -3,10 +3,10 @@
 StarWave 为 PyTorch 提供 CUDA 波传播接口，覆盖二维标量声学、二维 VRZ 与二维/三维声学 VTI。本手册面向使用公开 **2.0.0 wheel** 的用户，从环境安装、小规模正演开始，再介绍梯度与反演接线。
 
 ```{important}
-这是中英双语文档草稿，可通过左侧导航切换语言；手机上先打开导航菜单。示例接口已核验，但示例未在真实 GPU 上完成数值、性能或反演收敛验收。GPU 架构编译覆盖不等于设备实测通过。请先阅读各方程的数值限制。
+本手册的 API 对应公开 2.0.0 wheel。三份原创教程已有 NVIDIA A30 上 StarWave 0.1.0.dev9 的实际运行记录，涵盖小规模 smoke check、梯度与 25 次 FWI 更新；这不等于公开 wheel、完整伴随、收敛或性能验收。请按各页标注的版本和证据范围阅读。
 ```
 
-第一次使用：阅读[安装](installation.md) → [快速入门](quickstart.md) → [模型与采集约定](modeling/conventions.md)。Windows 用户从 [WSL 2](wsl.md) 开始；准备反演的用户继续阅读 [FWI](inversion/fwi.md)。
+第一次使用：阅读[安装](installation.md) → [快速入门](quickstart.md) → [模型与采集约定](modeling/conventions.md)。Windows 用户从 [WSL 2](wsl.md) 开始；查看实际实验：{ref}`安装运行检查 <installation-smoke>` → [简单梯度计算](modeling/gradient.md) → [简单 FWI 示例](inversion/fwi.md)。
 
 | 接口 | 模型与维数 | 默认记录 | 主要区别 |
 |---|---|---|---|
@@ -29,6 +29,7 @@ quickstart
 
 modeling/conventions
 modeling/scalar
+modeling/gradient
 modeling/vrz
 modeling/vti
 ```

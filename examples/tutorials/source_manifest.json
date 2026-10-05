@@ -1,0 +1,288 @@
+{
+  "schema_version": 1,
+  "title": "StarWave original teaching notebooks: public download provenance",
+  "date_utc": "2026-10-05",
+  "public_edition_executed_byte_for_byte": false,
+  "source_statement": "Original independently authored analytic teaching notebooks and paired scripts. Public downloads preserve all numerical, plotting and result-export code cells byte-for-byte; only the environment helper loses two unnecessary reference-development provenance fields.",
+  "measured_results_statement": "Metrics were curated from user-returned executed original notebooks and numerical exports, checked without rerunning the solver. The public edited download files were not executed byte-for-byte. The installed distribution was 0.1.0.dev9; the public 2.0.0 wheel was not tested in this returned run.",
+  "hash_conventions": {
+    "files": "SHA-256 of exact UTF-8 file bytes.",
+    "code_source": "SHA-256 of code-cell sources joined in notebook order with two newline characters.",
+    "cell_source": "SHA-256 of the exact joined UTF-8 source for one cell; zero-based cell indices are retained.",
+    "config": "SHA-256 of JSON with sorted keys, ensure_ascii=false and compact comma/colon separators.",
+    "numerical_config": "CONFIG excluding only output_root and gpu_id; all numerical and algorithm settings retained."
+  },
+  "shared_edits": [
+    "Remove all saved cell outputs/execution counts and replace notebook metadata with a generic Python 3 kernel/language allowlist; clear cell metadata.",
+    "Replace the introductory delivery-stage paragraph with public-edition provenance, measured dev9 environment, non-execution statement and links to both JSON manifests.",
+    "Remove reference_dev_commit and reference_is_not_installed_commit_claim fields from the start_run environment dictionary; retain all environment/GPU checks and numerical code.",
+    "Rewrite the final private return-to-author instructions as generic save-and-reproduce guidance.",
+    "Regenerate paired percent-format scripts from the public notebook cells; executable code bytes and AST match."
+  ],
+  "results_summary_sha256": "608475bd81703672735f0cab88d4a1cc8a9888e22c31f34a68a84e292667a1fd",
+  "original_curated_results_summary_sha256": "1b7d9a4eeb4d081cbf7b8b59bca76236d0895bb18a084b996ce50de9219fb644",
+  "results_summary_edit": "Remove only the unused figures list; numerical values, configurations, recorded environment and limitations are unchanged. Figure curation is maintained separately.",
+  "tutorials": [
+    {
+      "notebook": "01_installation_environment_smoke.ipynb",
+      "script": "01_installation_environment_smoke.py",
+      "experiment": "01_installation",
+      "cell_count": 9,
+      "original_notebook_sha256": "e9082cecfa58f3e32e1787ae28e1f8a3452184dad36256622adcdd03377b0185",
+      "original_script_sha256": "977958ea85edfeb74e25d966d473b70ccf24544811fd3d53751031b2acfa1ba5",
+      "original_code_sha256": "97d0610c4ae377a38b0e2a3df540ec6790a56be8585791e7d1bddcaed1d2cf91",
+      "public_notebook_sha256": "7945e01bf213b0ebd9a2e1c1d7dd24073d87e3684515979a28283b2123245484",
+      "public_script_sha256": "04ce3532f10c3d66da28584113037501131c59537d4890843b7f7ac6d0cc0bb3",
+      "public_code_sha256": "ae618e9fd05dc3efda4d8a780c2649a666b2c0d1c3bbf672c253470a3366cba6",
+      "original_config_sha256": "6bbbbf7576d499ca42082a5b5b1bc400d5482e2abe20ce7c5907888df660f4c8",
+      "result_numerical_config_sha256": "8891220820a4b8c7d0c9a9a7d24f87559acb62916e04d7322210b0be0fe8c403",
+      "edited_source_cells": [
+        {
+          "cell_index": 0,
+          "cell_type": "markdown",
+          "original_source_sha256": "669683b634234f0f74d9dff076695e38559225bf6dee96a5e9b0ccb9cc05459a",
+          "public_source_sha256": "bf7e1e4a0a29791e8e9089c49743cb34fc02488d2332de0cd8aba883431c4da2"
+        },
+        {
+          "cell_index": 1,
+          "cell_type": "markdown",
+          "original_source_sha256": "cec004976caa42ac8474a3addda63819de470cf89b5274c46d9bbe04b460fde7",
+          "public_source_sha256": "5a7866e203e0b9a26c015923ca757264183d7fb833f212b309982e5c1641aa72"
+        },
+        {
+          "cell_index": 3,
+          "cell_type": "code",
+          "original_source_sha256": "1aa33b489dcae8fe03cbd86699f2aa61106b0dc6e349eadf5b06bf352f112066",
+          "public_source_sha256": "cf9fb6ab0d1fe4e98357bfdf236780ef6d37e89944e35c63977869a929c7b1d1"
+        },
+        {
+          "cell_index": 7,
+          "cell_type": "markdown",
+          "original_source_sha256": "d1faa3f3c3934fcf7c4ac8c1a601c446627b5cf108d5369d15f8abeec6ce4572",
+          "public_source_sha256": "b012df14eb8d181d34764e9a2b53b99b9f6ba5d60e07b4217faf979925baa9fc"
+        },
+        {
+          "cell_index": 8,
+          "cell_type": "markdown",
+          "original_source_sha256": "923264c4f4179ad683fdc9059f8cbc903bdc2c3fbd8b731eccd5b4390880f078",
+          "public_source_sha256": "a6900f284a806dc649bf5ebb58a09518af80b0153884eda5abe5f0c63732cb46"
+        }
+      ],
+      "code_cells": [
+        {
+          "cell_index": 3,
+          "role": "helpers",
+          "original_sha256": "1aa33b489dcae8fe03cbd86699f2aa61106b0dc6e349eadf5b06bf352f112066",
+          "public_sha256": "cf9fb6ab0d1fe4e98357bfdf236780ef6d37e89944e35c63977869a929c7b1d1",
+          "original_without_reference_fields_sha256": "cf9fb6ab0d1fe4e98357bfdf236780ef6d37e89944e35c63977869a929c7b1d1"
+        },
+        {
+          "cell_index": 4,
+          "role": "config",
+          "original_sha256": "bd237d5d48f81ce1a71e519ded27094cf441d03796c845cde4781a10d7ebc7f5",
+          "public_sha256": "bd237d5d48f81ce1a71e519ded27094cf441d03796c845cde4781a10d7ebc7f5"
+        },
+        {
+          "cell_index": 5,
+          "role": "smoke",
+          "original_sha256": "f501b77f3a4ed785d278d08ea693731dea56ba2d55a01d2906dd7d67c0dda8a8",
+          "public_sha256": "f501b77f3a4ed785d278d08ea693731dea56ba2d55a01d2906dd7d67c0dda8a8"
+        },
+        {
+          "cell_index": 6,
+          "role": "export",
+          "original_sha256": "47a6641fa3eb17925e3d7557d312cee61f9bd41b99a3dffbbaa70a893fb17716",
+          "public_sha256": "47a6641fa3eb17925e3d7557d312cee61f9bd41b99a3dffbbaa70a893fb17716"
+        }
+      ],
+      "additional_editorial_edits": [
+        "Remove the private-source installation subsection, reword the public-wheel introduction and remove private-source build troubleshooting; preserve published wheel requirements and public upstream links."
+      ]
+    },
+    {
+      "notebook": "02_forward_and_gradient.ipynb",
+      "script": "02_forward_and_gradient.py",
+      "experiment": "02_forward_gradient",
+      "cell_count": 15,
+      "original_notebook_sha256": "d929be30a3d6fb1fab4fd9b6cd149935827f74f89fb764a342140123736c341a",
+      "original_script_sha256": "1d197d7a7dadd8f9a514242af03e7d130826a1093eb6ddf9bd1592736cba5f65",
+      "original_code_sha256": "1f01e86e5c9bcf7b91510804036139b49cafa7d65a5794459405cfa3de586e3e",
+      "public_notebook_sha256": "065c251ee00335e86773f07901b6eeefd514944ea9dc38c34c1e62bbf526104c",
+      "public_script_sha256": "2b4092edf9ab2fcaf89811f564d9a677ec66e01e1dc1000a2af0010fde0fcdd4",
+      "public_code_sha256": "c310d3a773c1ca50ae78bca4e166c97daec1b1c024219adb4bcc55690329b40d",
+      "original_config_sha256": "56736e821321fe61609028e401e9ddeee43779292ce342ca214a36c9e6ae68d7",
+      "result_numerical_config_sha256": "3b5c3b53d6fac88e5cdc402036449d2c16efd769abb9eb244ccc390355605b4b",
+      "edited_source_cells": [
+        {
+          "cell_index": 0,
+          "cell_type": "markdown",
+          "original_source_sha256": "672a02f47a9f046c879fa0db16b0e4117b86b570340dca0dc003e3c0782ed8f6",
+          "public_source_sha256": "b81e8649d7d2be2d78d7714cffeed6421c4903a0415a4d3f9f8330cdf488513b"
+        },
+        {
+          "cell_index": 3,
+          "cell_type": "code",
+          "original_source_sha256": "1aa33b489dcae8fe03cbd86699f2aa61106b0dc6e349eadf5b06bf352f112066",
+          "public_source_sha256": "cf9fb6ab0d1fe4e98357bfdf236780ef6d37e89944e35c63977869a929c7b1d1"
+        },
+        {
+          "cell_index": 14,
+          "cell_type": "markdown",
+          "original_source_sha256": "923264c4f4179ad683fdc9059f8cbc903bdc2c3fbd8b731eccd5b4390880f078",
+          "public_source_sha256": "a6900f284a806dc649bf5ebb58a09518af80b0153884eda5abe5f0c63732cb46"
+        }
+      ],
+      "code_cells": [
+        {
+          "cell_index": 3,
+          "role": "helpers",
+          "original_sha256": "1aa33b489dcae8fe03cbd86699f2aa61106b0dc6e349eadf5b06bf352f112066",
+          "public_sha256": "cf9fb6ab0d1fe4e98357bfdf236780ef6d37e89944e35c63977869a929c7b1d1",
+          "original_without_reference_fields_sha256": "cf9fb6ab0d1fe4e98357bfdf236780ef6d37e89944e35c63977869a929c7b1d1"
+        },
+        {
+          "cell_index": 4,
+          "role": "config",
+          "original_sha256": "e53ec19936edd9e3bcf07ac57cfc38ea9c5ae0c9d3f71fe083a56a63314cfe83",
+          "public_sha256": "e53ec19936edd9e3bcf07ac57cfc38ea9c5ae0c9d3f71fe083a56a63314cfe83"
+        },
+        {
+          "cell_index": 5,
+          "role": "physics_helpers",
+          "original_sha256": "0731e56c44c6a5e25e57e41bd3b3213afcc4a0450aa0671e8a7003bf8f140bfa",
+          "public_sha256": "0731e56c44c6a5e25e57e41bd3b3213afcc4a0450aa0671e8a7003bf8f140bfa"
+        },
+        {
+          "cell_index": 6,
+          "role": "setup",
+          "original_sha256": "6ecdba8a9813d665cbb8d3cca85354bcc68be2020065de393bf8e344a0f6276c",
+          "public_sha256": "6ecdba8a9813d665cbb8d3cca85354bcc68be2020065de393bf8e344a0f6276c"
+        },
+        {
+          "cell_index": 7,
+          "role": "input_plots",
+          "original_sha256": "441246645fd81647c3587565ea3e2963b27d5cbe2885cb8cc8db79402bfac57b",
+          "public_sha256": "441246645fd81647c3587565ea3e2963b27d5cbe2885cb8cc8db79402bfac57b"
+        },
+        {
+          "cell_index": 9,
+          "role": "gradient",
+          "original_sha256": "352c4a94072763279fc45b059e44df3d77942ef14d99b272320f9ea64437b211",
+          "public_sha256": "352c4a94072763279fc45b059e44df3d77942ef14d99b272320f9ea64437b211"
+        },
+        {
+          "cell_index": 10,
+          "role": "result_plots",
+          "original_sha256": "340d08165d83e154cfffc43edce8d98f39f62094a5fca3c9243244960f55b569",
+          "public_sha256": "340d08165d83e154cfffc43edce8d98f39f62094a5fca3c9243244960f55b569"
+        },
+        {
+          "cell_index": 12,
+          "role": "directional_check",
+          "original_sha256": "35b1512c0e24a2765b52fa2ce3f39534d3a820f72ff08ae20cf536ecb7f42ef3",
+          "public_sha256": "35b1512c0e24a2765b52fa2ce3f39534d3a820f72ff08ae20cf536ecb7f42ef3"
+        },
+        {
+          "cell_index": 13,
+          "role": "export",
+          "original_sha256": "e2f924a45cb0f774c47903329d0879171ac881cfdfe77dd12171942894ecda68",
+          "public_sha256": "e2f924a45cb0f774c47903329d0879171ac881cfdfe77dd12171942894ecda68"
+        }
+      ]
+    },
+    {
+      "notebook": "03_simple_fwi.ipynb",
+      "script": "03_simple_fwi.py",
+      "experiment": "03_simple_fwi",
+      "cell_count": 16,
+      "original_notebook_sha256": "5012bb3c7d52df7fda07bb7b0a85b4168226e517a45989693d9b1bb6cb89004c",
+      "original_script_sha256": "7d4390398cf8a296d1f376bccd4faf1670975dcebbafc670eb54656b58044dca",
+      "original_code_sha256": "b68979d61e79175cd1e990cfb12c1a4750c8885686528d75e3ad9b1875ee1329",
+      "public_notebook_sha256": "66e0de4e7650c479ba9904121ab3ed54d17d3489e225956ec030778097866be6",
+      "public_script_sha256": "a7752c20fb9a24ec3f19fe05b4a1b3e7f0ac6393ea9aaf12192a49928ee4091f",
+      "public_code_sha256": "9c648f88f05f8d4bccbe1c5bd586f9ab41b8c5aaf4201d168621c2aac6ae64ae",
+      "original_config_sha256": "995891c359d379adaa264a4a4b845c6c6f9f7c04a9b4cc6e729a146cf553bc0c",
+      "result_numerical_config_sha256": "3faa6e873511b3f2b3784305ac045ea272fb4cde3749c9db38e45838ce746d28",
+      "edited_source_cells": [
+        {
+          "cell_index": 0,
+          "cell_type": "markdown",
+          "original_source_sha256": "51b00aaf3a54de6d53bad9bbad9947a137692f8a3d2bfcf92ae12f73b5da7948",
+          "public_source_sha256": "1d648d42348ea4044e6ef6e571724ac6316be2ea2443536fd0f0e6440cc973eb"
+        },
+        {
+          "cell_index": 3,
+          "cell_type": "code",
+          "original_source_sha256": "1aa33b489dcae8fe03cbd86699f2aa61106b0dc6e349eadf5b06bf352f112066",
+          "public_source_sha256": "cf9fb6ab0d1fe4e98357bfdf236780ef6d37e89944e35c63977869a929c7b1d1"
+        },
+        {
+          "cell_index": 14,
+          "cell_type": "markdown",
+          "original_source_sha256": "94e2652fc803150ba7367031195857d49bb5e294ff3439c78c65183654add4a7",
+          "public_source_sha256": "f200ab82b68e37a27190ae06404b66cb04762fedd43f0db90070149466322e50"
+        },
+        {
+          "cell_index": 15,
+          "cell_type": "markdown",
+          "original_source_sha256": "923264c4f4179ad683fdc9059f8cbc903bdc2c3fbd8b731eccd5b4390880f078",
+          "public_source_sha256": "a6900f284a806dc649bf5ebb58a09518af80b0153884eda5abe5f0c63732cb46"
+        }
+      ],
+      "code_cells": [
+        {
+          "cell_index": 3,
+          "role": "helpers",
+          "original_sha256": "1aa33b489dcae8fe03cbd86699f2aa61106b0dc6e349eadf5b06bf352f112066",
+          "public_sha256": "cf9fb6ab0d1fe4e98357bfdf236780ef6d37e89944e35c63977869a929c7b1d1",
+          "original_without_reference_fields_sha256": "cf9fb6ab0d1fe4e98357bfdf236780ef6d37e89944e35c63977869a929c7b1d1"
+        },
+        {
+          "cell_index": 4,
+          "role": "config",
+          "original_sha256": "5167b1d4a7873b4898acb0db9c4ca92bb7833648c5a86c58ce2c4979cad02759",
+          "public_sha256": "5167b1d4a7873b4898acb0db9c4ca92bb7833648c5a86c58ce2c4979cad02759"
+        },
+        {
+          "cell_index": 5,
+          "role": "physics_helpers",
+          "original_sha256": "0731e56c44c6a5e25e57e41bd3b3213afcc4a0450aa0671e8a7003bf8f140bfa",
+          "public_sha256": "0731e56c44c6a5e25e57e41bd3b3213afcc4a0450aa0671e8a7003bf8f140bfa"
+        },
+        {
+          "cell_index": 6,
+          "role": "setup",
+          "original_sha256": "6ecdba8a9813d665cbb8d3cca85354bcc68be2020065de393bf8e344a0f6276c",
+          "public_sha256": "6ecdba8a9813d665cbb8d3cca85354bcc68be2020065de393bf8e344a0f6276c"
+        },
+        {
+          "cell_index": 8,
+          "role": "parameterization",
+          "original_sha256": "9a05a25b785dbef843fd62594347f6a41676000a1fdb6a3d451d4b9d93e91efd",
+          "public_sha256": "9a05a25b785dbef843fd62594347f6a41676000a1fdb6a3d451d4b9d93e91efd"
+        },
+        {
+          "cell_index": 10,
+          "role": "training",
+          "original_sha256": "6ddc65b38f02f4a85576eee245001d9b859584560ded608c4132e11bc760798c",
+          "public_sha256": "6ddc65b38f02f4a85576eee245001d9b859584560ded608c4132e11bc760798c"
+        },
+        {
+          "cell_index": 12,
+          "role": "result_plots",
+          "original_sha256": "c987267e0592d07a765ab5a9ae36371464d448a225dc9ce71e23d1d6f4a733c7",
+          "public_sha256": "c987267e0592d07a765ab5a9ae36371464d448a225dc9ce71e23d1d6f4a733c7"
+        },
+        {
+          "cell_index": 13,
+          "role": "export",
+          "original_sha256": "6b1aee0b685b804183650d77738a64b0ca43de55ed37eb0b1368b719f92779ae",
+          "public_sha256": "6b1aee0b685b804183650d77738a64b0ca43de55ed37eb0b1368b719f92779ae"
+        }
+      ],
+      "additional_editorial_edits": [
+        "Remove the development-only comparison-branch reference from the controlled-extensions paragraph."
+      ]
+    }
+  ]
+}

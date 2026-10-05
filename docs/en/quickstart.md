@@ -30,6 +30,6 @@ The source signal is a Ricker wavelet explicitly defined in this example. It doe
 
 ## How to assess the run
 
-The script expects records of shape `(1, 16, 256)` and checks that they are finite and not identically zero. This shape is the expected value under the input contract. This draft provides no measured waveform plots, runtimes, or error benchmarks. A finite/nonzero smoke check also cannot establish that the solution or gradients are correct.
+The script expects records of shape `(1, 16, 256)` and checks that they are finite and not identically zero. This shape is the expected value under the input contract. No measured results for this separate 32×32 script are supplied. The original notebook experiments have measured [smoke-test](installation.md) and [gradient](modeling/gradient.md) results. A finite/nonzero smoke check also cannot establish that the solution or gradients are correct.
 
 For loading errors, start with the [FAQ](faq.md). For inversion, keep the same source units, grid, and acquisition setup, and continue to [Introduction to FWI](inversion/fwi.md).

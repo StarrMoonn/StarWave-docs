@@ -1,5 +1,7 @@
 """Check a built documentation site and the deliberately small source package."""
 import ast
+import hashlib
+import struct
 import json
 from html.parser import HTMLParser
 from pathlib import Path
@@ -130,6 +132,36 @@ def check(root):
                 errors.append(f"Missing target: {path.name}: {href}")
             elif url.fragment and target in pages and unquote(url.fragment) not in pages[target].ids:
                 errors.append(f"Missing anchor: {path.name}: {href}")
+    figure_dir = project / 'docs' / '_static' / 'tutorials'
+    figure_manifest = json.loads((figure_dir / 'figure_manifest.json').read_text())
+    listed = set()
+    for figure in figure_manifest['figures']:
+        filename = figure['asset']
+        listed.add(filename)
+        path = figure_dir / filename
+        data = path.read_bytes()
+        if path.parent != figure_dir or not filename.endswith('.png'):
+            errors.append(f'Invalid scientific asset: {filename}')
+        if data[:8] != b'\x89PNG\r\n\x1a\n' or hashlib.sha256(data).hexdigest() != figure['asset_sha256']:
+            errors.append(f'Scientific figure signature/hash mismatch: {filename}')
+        elif struct.unpack('>II', data[16:24]) != (figure['width_px'], figure['height_px']):
+            errors.append(f'Scientific figure dimensions mismatch: {filename}')
+        if not figure.get('caption') or not figure.get('sources') or not figure.get('units'):
+            errors.append(f'Missing scientific figure evidence: {filename}')
+    if listed != {path.name for path in figure_dir.glob('*.png')} or len(listed) != 12:
+        errors.append('Curated scientific figure set differs from manifest')
+    for locale in ('zh', 'en'):
+        for chapter in ('installation', 'modeling/gradient', 'inversion/fwi'):
+            content = (root / locale / (chapter + '.html')).read_text()
+            if '0.1.0.dev9' not in content or '.ipynb' not in content:
+                errors.append(f'Missing tutorial scope/download: {locale}/{chapter}')
+        fwi = pages[root / locale / 'inversion/fwi.html']
+        aliases = {'id1': 'sw-section-1', 'id2': 'sw-section-2', 'id3': 'sw-section-3'} if locale == 'zh' else {
+            'run-one-update': 'sw-section-1', 'key-points-for-the-loop': 'sw-section-2', 'validation-limits': 'sw-section-3'}
+        for alias, target in aliases.items():
+            if fwi.id_sections.get(alias) != target:
+                errors.append(f'Legacy FWI anchor drift: {locale}/{alias}')
+
     # These checks are a guardrail, not a substitute for human content review.
     forbidden = [
         re.compile(r"[A-Za-z]:[\\/](?:Users|home)[\\/]", re.I),
@@ -146,19 +178,21 @@ def check(root):
         if not p.is_file():
             continue
         sources.append(p)
-        if p.name != ".gitignore" and p.suffix not in allowed:
+        is_tutorial_png = p.suffix == ".png" and relative.parts[:3] == ("docs", "_static", "tutorials")
+        is_tutorial_notebook = p.suffix == ".ipynb" and relative.parts[:2] == ("examples", "tutorials")
+        if p.name != ".gitignore" and p.suffix not in allowed and not is_tutorial_png and not is_tutorial_notebook:
             errors.append(f"Unexpected source file: {relative}")
         if p.suffix == ".py":
             try:
                 ast.parse(p.read_text(encoding="utf-8"))
             except SyntaxError as exc:
                 errors.append(f"Python syntax: {relative}: {exc.msg}")
-        if p != Path(__file__).resolve():
+        if p != Path(__file__).resolve() and not is_tutorial_png:
             text = p.read_text(encoding="utf-8")
             if any(pattern.search(text) for pattern in forbidden):
                 errors.append(f"Review restricted content: {relative}")
     for p in root.rglob("*"):
-        if p.is_file() and p.suffix in {".html", ".js", ".txt", ".py", ".css"}:
+        if p.is_file() and p.suffix in {".html", ".js", ".txt", ".py", ".css", ".ipynb", ".json"}:
             if any(pattern.search(p.read_text(encoding="utf-8")) for pattern in forbidden):
                 errors.append(f"Review generated content: {p.relative_to(root)}")
     if (root / "_sources").exists() and any((root / "_sources").rglob("*")):

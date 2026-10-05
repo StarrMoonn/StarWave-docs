@@ -21,7 +21,7 @@ USAGE_TARGETS = tuple(
 TOC_TARGETS = ('scalar', 'vrz', 'vti', 'native-status', 'prepare-native', 'other-exports')
 CHAPTERS = {
     'installation', 'wsl', 'quickstart', 'modeling/conventions',
-    'modeling/scalar', 'modeling/vrz', 'modeling/vti', 'inversion/fwi',
+    'modeling/scalar', 'modeling/gradient', 'modeling/vrz', 'modeling/vti', 'inversion/fwi',
     'inversion/dataparallel', 'inversion/inr', 'usage', 'faq',
     'release-notes', 'status',
 }
@@ -55,6 +55,13 @@ def check_navigation(page, locale, relative):
     search = page.locator('#rtd-search-form input[name="q"]')
     assert search.count() == 1, relative
     assert search.get_attribute('placeholder') == 'Search docs', relative
+    submit = page.locator('#rtd-search-form button[type="submit"]')
+    assert submit.count() == 1 and submit.get_attribute('aria-label'), relative
+    input_box, button_box = search.bounding_box(), submit.bounding_box()
+    if input_box and button_box:
+        assert button_box['x'] > input_box['x'] + input_box['width'] / 2, relative
+        assert button_box['width'] >= 40 and button_box['height'] >= 40, relative
+        assert button_box['x'] + button_box['width'] <= input_box['x'] + input_box['width'], relative
     label = search.evaluate("e => e.getAttribute('aria-label') || Array.from(e.labels || []).map(l => l.textContent).join(' ')")
     assert label and (re.search(r'[\u4e00-\u9fff]', label) if locale == 'zh' else 'search' in label.lower()), (relative, label)
     if page.viewport_size['width'] > 768:
@@ -178,6 +185,47 @@ def check_redirects(page, base):
                     page.remove_listener('request', record)
 
 
+
+def check_tutorials(page, base, locale, output):
+    counts = {'installation': 2, 'modeling/gradient': 4, 'inversion/fwi': 6}
+    for chapter, count in counts.items():
+        page.goto(base + locale + '/' + chapter + '.html', wait_until='networkidle')
+        figures = page.locator('figure.sw-science-figure')
+        assert figures.count() == count, (locale, chapter)
+        for figure in figures.all():
+            img = figure.locator('img')
+            assert img.get_attribute('alt'), (locale, chapter)
+            assert img.evaluate('e => e.complete && e.naturalWidth > 500'), (locale, chapter)
+            assert figure.locator('figcaption').inner_text().strip(), (locale, chapter)
+            assert figure.bounding_box()['width'] <= page.locator('[role="main"]').bounding_box()['width'], (locale, chapter)
+        assert page.locator('a[download][href$=".ipynb"]').count() == 1, (locale, chapter)
+        download_url = page.locator('a[download][href$=".ipynb"]').get_attribute('href')
+        response = page.request.get(__import__('urllib.parse', fromlist=['urljoin']).urljoin(page.url, download_url))
+        assert response.ok, (locale, chapter)
+        notebook = response.json()
+        assert all(not c.get('outputs') and c.get('execution_count') is None for c in notebook['cells'] if c['cell_type'] == 'code')
+        assert '0.1.0.dev9' in page.locator('[role="main"]').inner_text()
+        if chapter == 'inversion/fwi':
+            text = page.locator('[role="main"]').inner_text()
+            assert '91.51%' in text and '0.86%' in text and '30.639' in text
+            assert page.locator('#fwi-metrics').count() == 1
+            page.locator('#fwi-metrics').evaluate("e => e.scrollIntoView({block:'start'})")
+            page.screenshot(path=str(output / f'{locale}-fwi-metrics-{page.viewport_size["width"]}.png'))
+        if chapter == 'installation':
+            page.evaluate('window.scrollTo(0, 0)')
+            open_mobile_menu(page)
+            page.screenshot(path=str(output / f'{locale}-search-icon-{page.viewport_size["width"]}.png'))
+            close_mobile_menu(page)
+    # Old localized and positional bookmarks keep their original meaning.
+    old = {'id1': 'fwi-wiring', 'id2': 'fwi-loop', 'id3': 'fwi-limits'} if locale == 'zh' else {
+        'run-one-update': 'fwi-wiring', 'key-points-for-the-loop': 'fwi-loop', 'validation-limits': 'fwi-limits'}
+    page.goto(base + locale + '/inversion/fwi.html')
+    for alias, target in old.items():
+        assert page.locator(f'[id="{alias}"]').evaluate('e => e.closest("section").id') == target
+    for alias, target in {'sw-section-1': 'fwi-wiring', 'sw-section-2': 'fwi-loop', 'sw-section-3': 'fwi-limits'}.items():
+        assert page.locator(f'[id="{alias}"]').evaluate('e => e.closest("section").id') == target
+
+
 def check_search(page, base):
     for locale in ('en', 'zh'):
         page.goto(base + locale + '/index.html')
@@ -193,6 +241,16 @@ def check_search(page, base):
         page.wait_for_function("expected => document.querySelector('.search-summary')?.textContent.includes(expected)", arg=expected_status)
         links = page.locator('#search-results li a').evaluate_all('(items) => items.map(a => a.href)')
         assert links and all(f'/{locale}/' in urlsplit(link).path and '/api/' not in urlsplit(link).path for link in links), links
+        enter_results = {urlsplit(link).path for link in links}
+        page.goto(base + locale + '/index.html')
+        open_mobile_menu(page)
+        page.locator('#rtd-search-form input[name="q"]').fill('illumination')
+        page.locator('.sw-search-submit').click()
+        page.wait_for_url(f'**/{locale}/search.html?*')
+        page.wait_for_function('document.querySelectorAll("#search-results li").length > 0')
+        page.wait_for_function("expected => document.querySelector('.search-summary')?.textContent.includes(expected)", arg=expected_status)
+        click_results = page.locator('#search-results li a').evaluate_all('(items) => items.map(a => a.href)')
+        assert enter_results == {urlsplit(link).path for link in click_results}, (locale, click_results)
         index = page.evaluate('Search._index')
         assert 'usage' in index['docnames'] and not any(name.startswith('api/') for name in index['docnames']), index['docnames']
         objects = {item[4]: item[0] for item in index['objects'].get('starwave', [])}
@@ -237,6 +295,7 @@ def check(root, browser_path=None):
                             raise AssertionError(f'Horizontal overflow: {relative} at {size}; {wide}')
                     page.goto(base + locale + '/usage.html', wait_until='networkidle')
                     check_usage(page, locale, output)
+                    check_tutorials(page, base, locale, output)
                 check_search(page, base)
             page.goto(base + 'zh/usage.html')
             open_mobile_menu(page)
@@ -288,6 +347,13 @@ def check(root, browser_path=None):
                     plain.locator('[data-sw-language="en"]').click()
                     assert urlsplit(plain.url).path == '/en/usage.html'
                     assert urlsplit(plain.url).fragment == ('usage' if name == 'index' else name)
+            for locale in ('zh', 'en'):
+                plain.goto(base + locale + '/index.html')
+                plain.locator('#rtd-search-form input[name="q"]').fill('gradient')
+                plain.locator('.sw-search-submit').click()
+                assert urlsplit(plain.url).path == f'/{locale}/search.html'
+                assert dict(parse_qsl(urlsplit(plain.url).query))['q'] == 'gradient'
+                # Form navigation works without JS; Sphinx result rendering still requires JS.
             context.close()
             browser.close()
         assert not errors, errors

@@ -2,7 +2,10 @@
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="{{ pathto('search') }}" method="get">
     <label class="sw-visually-hidden" for="sw-doc-search">{{ '搜索文档' if sw_locale == 'zh' else 'Search docs' }}</label>
+    <div class="sw-search-control">
     <input id="sw-doc-search" type="search" name="q" placeholder="Search docs" autocomplete="off" />
+    <button class="sw-search-submit" type="submit" aria-label="{{ '搜索文档' if sw_locale == 'zh' else 'Search docs' }}" title="{{ '搜索文档' if sw_locale == 'zh' else 'Search docs' }}"><svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 4.5 4.5"/></svg></button>
+    </div>
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
