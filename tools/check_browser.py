@@ -67,11 +67,17 @@ def check(root, browser_path=None):
             for locale in ('en', 'zh'):
                 page.goto(base + locale + '/search.html?q=illumination')
                 page.wait_for_function('document.querySelectorAll("#search-results li").length > 0')
+                expected_status = '搜索完成' if locale == 'zh' else 'Search finished'
+                page.wait_for_function("expected => document.querySelector('.search-summary')?.textContent.includes(expected)", arg=expected_status)
                 links = page.locator('#search-results li a').evaluate_all('(items) => items.map(a => a.href)')
                 assert links and all(f'/{locale}/' in urlsplit(link).path for link in links), links
                 other = 'zh' if locale == 'en' else 'en'
                 page.locator(f'[data-sw-language="{other}"]').click()
                 assert urlsplit(page.url).query == 'q=illumination'
+            for locale in ('en', 'zh'):
+                page.goto(base + locale + '/search.html?q=zzzznosuchstarwaveresult')
+                expected_status = '搜索未找到匹配页面' if locale == 'zh' else 'Your search did not match any documents'
+                page.wait_for_function("expected => document.querySelector('.search-summary')?.textContent.includes(expected)", arg=expected_status)
             page.goto(base + 'en/index.html')
             page.keyboard.press('Tab')
             assert page.locator('.skip-link').evaluate('(e) => e === document.activeElement')
