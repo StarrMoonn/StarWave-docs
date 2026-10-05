@@ -6,7 +6,7 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 import re
 import threading
-from urllib.parse import quote, unquote, urlsplit
+from urllib.parse import parse_qsl, quote, unquote, urlsplit
 from playwright.sync_api import sync_playwright
 
 PROJECT = Path(__file__).resolve().parents[1]
@@ -168,7 +168,9 @@ def check_redirects(page, base):
                     page.goto(source, wait_until='load')
                     page.wait_for_url(lambda url: urlsplit(str(url)).path == f'/{locale}/usage.html', wait_until='load')
                     parsed = urlsplit(page.url)
-                    assert parsed.query == query and unquote(parsed.fragment) == target, (source, page.url, target)
+                    # Sphinx may normalize a query space from %20 to + on load.
+                    assert parse_qsl(parsed.query, keep_blank_values=True) == parse_qsl(query, keep_blank_values=True), (source, page.url)
+                    assert unquote(parsed.fragment) == target, (source, page.url, target)
                     assert documents == ['/' + source_path, f'/{locale}/usage.html'], (source, documents)
                     assert page.locator(f'[id="{target}"]').count() == 1, (source, target)
                 finally:
