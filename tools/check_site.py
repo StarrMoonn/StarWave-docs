@@ -1,5 +1,6 @@
 """Check a built documentation site and the deliberately small source package."""
 import ast
+import json
 from html.parser import HTMLParser
 from pathlib import Path
 import re
@@ -34,6 +35,44 @@ def check(root):
         errors.append("Missing HTML output or index.html")
     if not (root / ".nojekyll").is_file():
         errors.append("Missing .nojekyll for portable Pages output")
+    # Each locale must be a complete site with its own index and no source dump.
+    localized = {}
+    for locale in ('zh', 'en'):
+        folder = root / locale
+        localized[locale] = {p.relative_to(folder) for p in folder.rglob('*.html')}
+        for required in ('index.html', 'search.html', 'genindex.html', 'searchindex.js'):
+            if not (folder / required).is_file():
+                errors.append(f'Missing {locale} output: {required}')
+        if (folder / '_sources').exists() and any((folder / '_sources').rglob('*')):
+            errors.append(f'Unexpected {locale} published source directory')
+        for relative in localized[locale]:
+            path = folder / relative
+            content = path.read_text(encoding='utf-8')
+            language = 'zh-CN' if locale == 'zh' else 'en'
+            if f'<html lang="{language}"' not in content:
+                errors.append(f'Wrong document language: {locale}/{relative}')
+            if 'data-sw-language="zh"' not in content or 'data-sw-language="en"' not in content:
+                errors.append(f'Missing language switch: {locale}/{relative}')
+            if locale == 'en' and re.search(r'[\u4e00-\u9fff]', re.sub(r'<a [^>]*data-sw-language="zh"[^>]*>中文</a>', '', content)):
+                errors.append(f'Untranslated Chinese in English HTML: {relative}')
+    if localized['zh'] != localized['en']:
+        errors.append('Localized HTML page coverage differs')
+    for relative in localized['zh'] & localized['en']:
+        zh = pages[root / 'zh' / relative]
+        en = pages[root / 'en' / relative]
+        if {x for x in zh.ids if x.startswith('sw-section-')} != {x for x in en.ids if x.startswith('sw-section-')}:
+            errors.append(f'Localized section anchors differ: {relative}')
+        if {x for x in zh.ids if x.startswith('starwave.')} != {x for x in en.ids if x.startswith('starwave.')}:
+            errors.append(f'Localized API anchors differ: {relative}')
+        redirect = root / relative
+        if not redirect.is_file() or 'location.replace' not in redirect.read_text(encoding='utf-8'):
+            errors.append(f'Missing compatibility route: {relative}')
+    contracts = json.loads((project / 'tools' / 'api_contract.json').read_text())
+    for locale in ('zh', 'en'):
+        for name in contracts:
+            relative = f'api/{name}.html' if name in {'scalar', 'vrz', 'vti'} else 'api/index.html'
+            if f'starwave.{name}' not in pages[root / locale / relative].ids:
+                errors.append(f'Missing public API anchor: {locale}/{name}')
     links = 0
     for path, page in pages.items():
         for href in page.links:
@@ -57,11 +96,11 @@ def check(root):
         re.compile(r"(?:gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,})"),
         re.compile(r"(?:RELEASE_VERIFICATION|MAINTAINER_HANDOFF|HESS_JOINT_VP_WATER_FIX)"),
     ]
-    allowed = {".md", ".py", ".txt", ".css", ".yml", ".yaml"}
+    allowed = {".md", ".py", ".txt", ".css", ".yml", ".yaml", ".html", ".js", ".json"}
     sources = []
     for p in project.rglob("*"):
         relative = p.relative_to(project)
-        if any(part in {".git", ".venv", "_build", "__pycache__"} for part in relative.parts):
+        if any(part in {".git", ".venv", "_build", "_readthedocs", "__pycache__"} for part in relative.parts):
             continue
         if not p.is_file():
             continue

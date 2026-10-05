@@ -30,7 +30,7 @@ vti
 
 ## 原生运行库
 
-```{py:function} starwave.native_status()
+```{py:function} starwave.native_status() -> dict
 
 查询当前运行库状态，不执行编译或传播。
 
@@ -38,7 +38,7 @@ vti
 :rtype: `dict`
 ```
 
-```{py:function} starwave.prepare_native(device_ids)
+```{py:function} starwave.prepare_native(device_ids: list[int] | tuple[int, ...]) -> dict
 
 在主线程验证并预加载已有的原生库，供后续传播或 DataParallel 使用，不执行编译。
 
@@ -46,6 +46,22 @@ vti
 :type device_ids: `list[int] | tuple[int, ...]`
 :returns: 包含原生状态、`selected_device_ids` 与准备消息的字典。初始化成功不是 GPU 数值测试。
 :rtype: `dict`
+```
+
+## 原生库注意事项
+
+`native_status()` 用于排查安装与加载状态；`prepare_native()` 应在主线程、传播或 DataParallel 开始前调用。两者都不编译库，也不替代 GPU 数值验收。示例中的逻辑设备 `0` 必须对当前进程可见。
+
+## 原生库示例
+
+安装公开 wheel 和匹配的 PyTorch 后，可查询状态；后续准备调用要求有可用 CUDA 设备。
+
+```python
+import starwave
+
+status = starwave.native_status()
+print(status)
+prepared = starwave.prepare_native([0])
 ```
 
 ## 其它导出名称与范围

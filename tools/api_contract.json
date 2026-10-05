@@ -1,0 +1,86 @@
+{
+  "vti": {
+    "signature": "(vp, epsilon, delta, rho, grid_spacing, dt, *, source_amplitudes, source_locations, receiver_locations, source_fields=('sH', 'sV'), receiver_fields=('vz',), accuracy=4, pml_freq=25.0, pml_width=20, boundary_buffer=5, memory='boundary', max_vel=None, freq_taper_frac=0.0, time_pad_frac=0.0, time_taper=False)",
+    "types": {
+      "vp": "torch.Tensor",
+      "epsilon": "torch.Tensor",
+      "delta": "torch.Tensor",
+      "rho": "torch.Tensor",
+      "grid_spacing": "float | int | list[float] | tuple[float, ...]",
+      "dt": "float | int",
+      "source_amplitudes": "torch.Tensor",
+      "source_locations": "torch.Tensor",
+      "receiver_locations": "torch.Tensor",
+      "source_fields": "str | list[str] | tuple[str, ...]",
+      "receiver_fields": "str | list[str] | tuple[str, ...]",
+      "accuracy": "int",
+      "pml_freq": "float | int",
+      "pml_width": "int | list[int] | tuple[int, ...]",
+      "boundary_buffer": "int",
+      "memory": "str",
+      "max_vel": "float | int | None",
+      "freq_taper_frac": "float | int",
+      "time_pad_frac": "float | int",
+      "time_taper": "bool"
+    },
+    "return": "tuple[torch.Tensor, ...]"
+  },
+  "vrz": {
+    "signature": "(v, grid_spacing, dt, *, impedance=None, density=None, source_amplitudes, source_locations, receiver_locations, accuracy=8, pml_freq=25.0, pml_width=20, boundary_buffer=5, memory='boundary', max_vel=None, freq_taper_frac=0.0, time_pad_frac=0.0, time_taper=False, illumination=None)",
+    "types": {
+      "v": "torch.Tensor",
+      "grid_spacing": "float | int | list[float] | tuple[float, ...]",
+      "dt": "float | int",
+      "impedance": "torch.Tensor | None",
+      "density": "torch.Tensor | None",
+      "source_amplitudes": "torch.Tensor",
+      "source_locations": "torch.Tensor",
+      "receiver_locations": "torch.Tensor",
+      "accuracy": "int",
+      "pml_freq": "float | int",
+      "pml_width": "int | list[int] | tuple[int, ...]",
+      "boundary_buffer": "int",
+      "memory": "str",
+      "max_vel": "float | int | None",
+      "freq_taper_frac": "float | int",
+      "time_pad_frac": "float | int",
+      "time_taper": "bool",
+      "illumination": "None"
+    },
+    "return": "tuple[torch.Tensor]"
+  },
+  "scalar": {
+    "signature": "(v, grid_spacing, dt, *, source_amplitudes, source_locations, receiver_locations, accuracy=8, pml_freq=25.0, pml_width=20, boundary_buffer=5, memory='boundary', max_vel=None, freq_taper_frac=0.0, time_pad_frac=0.0, time_taper=False, illumination=None)",
+    "types": {
+      "v": "torch.Tensor",
+      "grid_spacing": "float | int | list[float] | tuple[float, ...]",
+      "dt": "float | int",
+      "source_amplitudes": "torch.Tensor",
+      "source_locations": "torch.Tensor",
+      "receiver_locations": "torch.Tensor",
+      "accuracy": "int",
+      "pml_freq": "float | int",
+      "pml_width": "int | list[int] | tuple[int, ...]",
+      "boundary_buffer": "int",
+      "memory": "str",
+      "max_vel": "float | int | None",
+      "freq_taper_frac": "float | int",
+      "time_pad_frac": "float | int",
+      "time_taper": "bool",
+      "illumination": "ScalarIllumination | None"
+    },
+    "return": "tuple[torch.Tensor]"
+  },
+  "native_status": {
+    "signature": "()",
+    "types": {},
+    "return": "dict"
+  },
+  "prepare_native": {
+    "signature": "(device_ids)",
+    "types": {
+      "device_ids": "list[int] | tuple[int, ...]"
+    },
+    "return": "dict"
+  }
+}

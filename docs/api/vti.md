@@ -7,7 +7,7 @@
 
 ## 函数
 
-```{py:function} starwave.vti(vp, epsilon, delta, rho, grid_spacing, dt, *, source_amplitudes, source_locations, receiver_locations, source_fields=('sH', 'sV'), receiver_fields=('vz',), accuracy=4, pml_freq=25.0, pml_width=20, boundary_buffer=5, memory='boundary', max_vel=None, freq_taper_frac=0.0, time_pad_frac=0.0, time_taper=False)
+```{py:function} starwave.vti(vp: torch.Tensor, epsilon: torch.Tensor, delta: torch.Tensor, rho: torch.Tensor, grid_spacing: float | int | list[float] | tuple[float, ...], dt: float | int, *, source_amplitudes: torch.Tensor, source_locations: torch.Tensor, receiver_locations: torch.Tensor, source_fields: str | list[str] | tuple[str, ...]=('sH', 'sV'), receiver_fields: str | list[str] | tuple[str, ...]=('vz',), accuracy: int=4, pml_freq: float | int=25.0, pml_width: int | list[int] | tuple[int, ...]=20, boundary_buffer: int=5, memory: str='boundary', max_vel: float | int | None=None, freq_taper_frac: float | int=0.0, time_pad_frac: float | int=0.0, time_taper: bool=False) -> tuple[torch.Tensor, ...]
 
 传播 Duveneck 型一阶声学 VTI 系统，以 `vp.ndim` 选择二维或三维。输出按所选接收分量排列；四个模型可独立请求一次一阶梯度。固定模型仍参与全部物理计算；本接口不是完整弹性 VTI。
 

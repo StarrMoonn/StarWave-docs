@@ -1,0 +1,27 @@
+{% extends "!layout.html" %}
+{% block extrahead %}
+  {{ super() }}
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="alternate" hreflang="zh-CN" href="{{ sw_zh_url }}" />
+  <link rel="alternate" hreflang="en" href="{{ sw_en_url }}" />
+{% endblock %}
+{% block content %}
+<a class="skip-link" href="#main-content">{{ '跳到正文' if sw_locale == 'zh' else 'Skip to content' }}</a>
+<header class="sw-header">
+  <div class="sw-header-inner">
+    <a class="sw-brand" href="{{ pathto('index') }}">StarWave <span>2.0.0</span></a>
+    <nav class="sw-languages" aria-label="{{ '选择语言' if sw_locale == 'zh' else 'Choose language' }}">
+      <a href="{{ sw_zh_url }}" lang="zh-CN" hreflang="zh-CN" data-sw-language="zh"{% if sw_locale == 'zh' %} aria-current="page"{% endif %}>中文</a>
+      <a href="{{ sw_en_url }}" lang="en" hreflang="en" data-sw-language="en"{% if sw_locale == 'en' %} aria-current="page"{% endif %}>English</a>
+    </nav>
+  </div>
+</header>
+{{ super() }}
+{% endblock %}
+{% block document %}<span id="main-content" tabindex="-1"></span>{{ super() }}{% endblock %}
+{% block footer %}
+<footer class="footer sw-footer">
+  <p>{{ 'StarWave 2.0.0 · 文档草稿。GPU 数值、性能与收敛验收尚未完成。' if sw_locale == 'zh' else 'StarWave 2.0.0 · Draft documentation. GPU numerical, performance and convergence acceptance is pending.' }}</p>
+  <p><a href="{{ pathto('status') }}">{{ '验证状态与参考来源' if sw_locale == 'zh' else 'Validation status and sources' }}</a> · <a href="https://github.com/StarrMoonn/StarWave-docs">{{ '文档仓库' if sw_locale == 'zh' else 'Documentation repository' }}</a></p>
+</footer>
+{% endblock %}

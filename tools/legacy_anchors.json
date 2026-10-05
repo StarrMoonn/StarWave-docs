@@ -1,0 +1,318 @@
+{
+  "quickstart.html": [
+    {
+      "id": "id1",
+      "title": "快速入门：一个合成炮集"
+    },
+    {
+      "id": "id2",
+      "title": "核心代码"
+    },
+    {
+      "id": "id3",
+      "title": "如何判断执行状态"
+    }
+  ],
+  "installation.html": [
+    {
+      "id": "id1",
+      "title": "安装"
+    },
+    {
+      "id": "id2",
+      "title": "运行条件"
+    },
+    {
+      "id": "id3",
+      "title": "新建运行环境"
+    },
+    {
+      "id": "id4",
+      "title": "检查导入与原生库"
+    }
+  ],
+  "status.html": [
+    {
+      "id": "id1",
+      "title": "文档状态与参考来源"
+    },
+    {
+      "id": "id2",
+      "title": "已完成与待完善"
+    },
+    {
+      "id": "id3",
+      "title": "参考来源"
+    }
+  ],
+  "index.html": [
+    {
+      "id": "starwave",
+      "title": "StarWave 使用手册"
+    }
+  ],
+  "wsl.html": [
+    {
+      "id": "windows-wsl-2",
+      "title": "Windows 与 WSL 2"
+    },
+    {
+      "id": "id1",
+      "title": "准备顺序"
+    },
+    {
+      "id": "id2",
+      "title": "常见边界"
+    }
+  ],
+  "release-notes.html": [
+    {
+      "id": "id1",
+      "title": "发布说明"
+    },
+    {
+      "id": "id2",
+      "title": "2.0.0 · 2026-10-05"
+    },
+    {
+      "id": "id3",
+      "title": "本使用手册首稿"
+    },
+    {
+      "id": "api",
+      "title": "API 参考完善"
+    }
+  ],
+  "faq.html": [
+    {
+      "id": "id1",
+      "title": "常见问题"
+    },
+    {
+      "id": "pip-starwave",
+      "title": "为什么 pip 找不到可用的 StarWave 版本？"
+    },
+    {
+      "id": "cuda",
+      "title": "需要编译 CUDA 吗？"
+    },
+    {
+      "id": "import-prepare-native",
+      "title": "import 成功，为什么 prepare_native 失败？"
+    },
+    {
+      "id": "a30-rtx-4060-laptop",
+      "title": "A30 / RTX 4060 Laptop 可以运行吗？"
+    },
+    {
+      "id": "id2",
+      "title": "波形首样本不严格为零，或振幅与另一个软件不同？"
+    },
+    {
+      "id": "id3",
+      "title": "为什么有六点每波长的警告？"
+    },
+    {
+      "id": "id4",
+      "title": "显存不足怎么办？"
+    },
+    {
+      "id": "loss-backward",
+      "title": "loss 有限，为什么 backward 仍失败？"
+    },
+    {
+      "id": "gpu",
+      "title": "文档构建需要 GPU 吗？"
+    }
+  ],
+  "modeling/scalar.html": [
+    {
+      "id": "scalar",
+      "title": "标量声学 scalar"
+    },
+    {
+      "id": "id1",
+      "title": "震源与调用"
+    },
+    {
+      "id": "id2",
+      "title": "梯度与照明"
+    }
+  ],
+  "modeling/conventions.html": [
+    {
+      "id": "id1",
+      "title": "模型、采集与时间约定"
+    },
+    {
+      "id": "id2",
+      "title": "张量形状"
+    },
+    {
+      "id": "id3",
+      "title": "采样与吸收边界"
+    },
+    {
+      "id": "id4",
+      "title": "内存与自动微分"
+    }
+  ],
+  "modeling/vrz.html": [
+    {
+      "id": "vrz",
+      "title": "VRZ：速度与阻抗或密度"
+    },
+    {
+      "id": "scalar",
+      "title": "与 scalar 的相同点和差别"
+    },
+    {
+      "id": "id1",
+      "title": "限制"
+    }
+  ],
+  "modeling/vti.html": [
+    {
+      "id": "vti",
+      "title": "声学 VTI：二维与三维"
+    },
+    {
+      "id": "id1",
+      "title": "源和记录分量"
+    },
+    {
+      "id": "id2",
+      "title": "各向异性与稳定性"
+    }
+  ],
+  "inversion/dataparallel.html": [
+    {
+      "id": "dataparallel",
+      "title": "按炮拆分 DataParallel"
+    },
+    {
+      "id": "id1",
+      "title": "最小接线片段"
+    },
+    {
+      "id": "id2",
+      "title": "使用前检查"
+    }
+  ],
+  "inversion/fwi.html": [
+    {
+      "id": "fwi",
+      "title": "FWI 入门"
+    },
+    {
+      "id": "id1",
+      "title": "运行一次更新"
+    },
+    {
+      "id": "id2",
+      "title": "循环要点"
+    },
+    {
+      "id": "id3",
+      "title": "验证边界"
+    }
+  ],
+  "inversion/inr.html": [
+    {
+      "id": "inr",
+      "title": "INR：用隐式网络表示模型"
+    },
+    {
+      "id": "id1",
+      "title": "单卡计算图"
+    },
+    {
+      "id": "id2",
+      "title": "与多卡结合"
+    }
+  ],
+  "api/scalar.html": [
+    {
+      "id": "scalar",
+      "title": "scalar：二维标量声学"
+    },
+    {
+      "id": "id2",
+      "title": "函数"
+    },
+    {
+      "id": "id3",
+      "title": "震源与自动微分"
+    },
+    {
+      "id": "id4",
+      "title": "示例"
+    },
+    {
+      "id": "id5",
+      "title": "注意事项"
+    }
+  ],
+  "api/vrz.html": [
+    {
+      "id": "vrz",
+      "title": "vrz：二维变密度声学"
+    },
+    {
+      "id": "id2",
+      "title": "函数"
+    },
+    {
+      "id": "id3",
+      "title": "参数化、震源与梯度"
+    },
+    {
+      "id": "id4",
+      "title": "示例"
+    },
+    {
+      "id": "id5",
+      "title": "注意事项"
+    }
+  ],
+  "api/index.html": [
+    {
+      "id": "api",
+      "title": "API 参考"
+    },
+    {
+      "id": "id1",
+      "title": "传播函数速查"
+    },
+    {
+      "id": "id2",
+      "title": "原生运行库"
+    },
+    {
+      "id": "id3",
+      "title": "其它导出名称与范围"
+    }
+  ],
+  "api/vti.html": [
+    {
+      "id": "vti-vti",
+      "title": "vti：二维与三维声学 VTI"
+    },
+    {
+      "id": "id2",
+      "title": "函数"
+    },
+    {
+      "id": "id3",
+      "title": "分量、时间与梯度"
+    },
+    {
+      "id": "id4",
+      "title": "示例"
+    },
+    {
+      "id": "id5",
+      "title": "注意事项"
+    }
+  ]
+}
