@@ -61,6 +61,9 @@ def check_navigation(page, locale, relative):
     if input_box and button_box:
         assert input_box['x'] <= button_box['x'] < input_box['x'] + input_box['width'] / 2, relative
         assert button_box['width'] >= 40 and button_box['height'] >= 40, relative
+        assert abs(button_box['y'] + button_box['height'] / 2 - input_box['y'] - input_box['height'] / 2) <= 1, (relative, input_box, button_box)
+        svg_box = submit.locator('svg').bounding_box()
+        assert svg_box and abs(svg_box['y'] + svg_box['height'] / 2 - input_box['y'] - input_box['height'] / 2) <= 1, (relative, svg_box)
         assert button_box['x'] + button_box['width'] <= input_box['x'] + input_box['width'], relative
     label = search.evaluate("e => e.getAttribute('aria-label') || Array.from(e.labels || []).map(l => l.textContent).join(' ')")
     assert label and (re.search(r'[\u4e00-\u9fff]', label) if locale == 'zh' else 'search' in label.lower()), (relative, label)

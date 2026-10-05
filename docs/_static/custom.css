@@ -52,6 +52,7 @@
 .sw-search-control { position: relative; }
 .wy-side-nav-search .sw-search-control input[type="search"] { min-height: 44px; padding-left: 47px; padding-right: 13px; }
 .wy-side-nav-search .sw-search-submit { position: absolute; left: 2px; top: 2px; width: 42px; height: 40px; display: flex; align-items: center; justify-content: center; padding: 0; background: transparent; color: #3578a6; border: 0; border-radius: 50%; box-shadow: none; cursor: pointer; }
+#rtd-search-form .sw-search-submit { margin: 0; }
 .sw-search-submit svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
 .wy-side-nav-search .sw-search-submit:hover { background: #edf4fa; color: #24587c; }
 .wy-side-nav-search .sw-search-submit:focus-visible { outline: 3px solid #f0ad4e; outline-offset: 1px; }
