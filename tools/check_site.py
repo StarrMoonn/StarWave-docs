@@ -12,18 +12,30 @@ class Page(HTMLParser):
     def __init__(self, text):
         super().__init__(convert_charrefs=True)
         self.ids = set()
+        self.duplicate_ids = set()
+        self.id_sections = {}
+        self.sections = []
         self.links = []
         self.feed(text)
 
     def handle_starttag(self, tag, attrs):
         attrs = dict(attrs)
+        if tag == 'section':
+            self.sections.append(attrs.get('data-sw-section'))
         if "id" in attrs:
+            if attrs['id'] in self.ids:
+                self.duplicate_ids.add(attrs['id'])
             self.ids.add(attrs["id"])
+            self.id_sections[attrs['id']] = self.sections[-1] if self.sections else None
         if tag == "a" and "name" in attrs:
             self.ids.add(attrs["name"])
         for key in ("href", "src"):
             if key in attrs:
                 self.links.append(attrs[key])
+
+    def handle_endtag(self, tag):
+        if tag == 'section' and self.sections:
+            self.sections.pop()
 
 
 def check(root):
@@ -62,11 +74,24 @@ def check(root):
         en = pages[root / 'en' / relative]
         if {x for x in zh.ids if x.startswith('sw-section-')} != {x for x in en.ids if x.startswith('sw-section-')}:
             errors.append(f'Localized section anchors differ: {relative}')
+        if relative.parts[0] == 'api':
+            source = (root / 'zh' / relative).read_text(encoding='utf-8')
+            body = source.split('<div class="body" role="main" lang="en">', 1)
+            if len(body) != 2:
+                errors.append(f'Missing English API language boundary: {relative}')
+            elif re.search(r'[\u4e00-\u9fff]', re.sub('<[^>]+>', '', body[1].split('<div class="sphinxsidebar"', 1)[0])):
+                errors.append(f'Chinese remains in shared English API body: {relative}')
         if {x for x in zh.ids if x.startswith('starwave.')} != {x for x in en.ids if x.startswith('starwave.')}:
             errors.append(f'Localized API anchors differ: {relative}')
         redirect = root / relative
         if not redirect.is_file() or 'location.replace' not in redirect.read_text(encoding='utf-8'):
             errors.append(f'Missing compatibility route: {relative}')
+    aliases = json.loads((project / 'tools' / 'api_zh_anchors.json').read_text())
+    for relative, entries in aliases.items():
+        page = pages[root / 'zh' / relative]
+        for old, target in entries.items():
+            if page.id_sections.get(old) != target:
+                errors.append(f'Misplaced historical API anchor: {relative}#{old}')
     contracts = json.loads((project / 'tools' / 'api_contract.json').read_text())
     for locale in ('zh', 'en'):
         for name in contracts:
@@ -75,6 +100,8 @@ def check(root):
                 errors.append(f'Missing public API anchor: {locale}/{name}')
     links = 0
     for path, page in pages.items():
+        if page.duplicate_ids:
+            errors.append(f'Duplicate IDs: {path.relative_to(root)}: {sorted(page.duplicate_ids)}')
         for href in page.links:
             url = urlsplit(href)
             if url.scheme or url.netloc:

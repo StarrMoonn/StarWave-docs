@@ -3,7 +3,7 @@
 StarWave provides CUDA wave-propagation interfaces for PyTorch, covering 2D scalar acoustics, 2D VRZ, and 2D/3D acoustic VTI. This manual is for users of the public **2.0.0 wheel**. It begins with environment setup and small forward-modeling runs, then introduces gradients and inversion workflows.
 
 ```{important}
-This is a bilingual draft manual; use the language switch at the top of each page. The example interfaces have been checked, but numerical accuracy, performance, and inversion convergence have not been validated on real GPUs. Compiling for a GPU architecture does not establish that the software has passed tests on that device. Read the numerical limitations for each equation first.
+This is a bilingual draft manual; use the language switch at the top of each page. The API reference body is English in both language versions. The example interfaces have been checked, but numerical accuracy, performance, and inversion convergence have not been validated on real GPUs. Compiling for a GPU architecture does not establish that the software has passed tests on that device. Read the numerical limitations for each equation first.
 ```
 
 New users: read [Installation](installation.md) → [Quickstart](quickstart.md) → [Model and acquisition conventions](modeling/conventions.md). Windows users should start with [WSL 2](wsl.md); users preparing for inversion should continue to [FWI](inversion/fwi.md).

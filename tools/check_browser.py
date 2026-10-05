@@ -37,6 +37,11 @@ def check(root, browser_path=None):
                             raise AssertionError(f'Horizontal overflow: {relative} at {size}; {wide}')
                     page.goto(base + locale + '/api/scalar.html')
                     page.screenshot(path=str(output / f'{locale}-scalar-{size["width"]}.png'), full_page=True)
+            page.goto(base + 'zh/api/scalar.html')
+            assert page.locator('.body[lang="en"]').count() == 1
+            assert 'Parameters' in page.locator('.body').inner_text()
+            assert 'Required' in page.locator('.body').inner_text()
+            assert '开始使用' in page.locator('.sphinxsidebar').inner_text()
             page.goto(base + 'zh/api/scalar.html#id4')
             page.locator('[data-sw-language="en"]').click()
             assert urlsplit(page.url).path == '/en/api/scalar.html'

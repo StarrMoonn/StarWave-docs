@@ -1,8 +1,8 @@
-# API 参考
+# API reference
 
-本参考以 StarWave **2.0.0** 公开 wheel 为准。每个传播函数提供真实签名、逐项参数、返回值、梯度范围、注意事项与调用示例。参数类型描述运行时接受的值；签名保留实际关键字边界和默认值。
+This reference targets the public StarWave **2.0.0** wheel. Each propagator includes its actual signature, every parameter, return values, gradient scope, notes, and a call example. Parameter types describe accepted runtime values; signatures retain the actual keyword-only boundaries and defaults.
 
-页面组织参考 [Deepwave 官方 Usage](https://ausargeo.com/deepwave/usage) 的 Sphinx Python API 风格，正文按 StarWave 的实际契约重新编写。两者的参数集合、源单位、返回结构和可微范围不能互换。
+The page organization follows the Sphinx Python API style of the [official Deepwave Usage documentation](https://ausargeo.com/deepwave/usage). All descriptions are newly written from StarWave’s actual contracts. The libraries’ parameter sets, source units, return structures, and differentiability scopes are not interchangeable.
 
 ```{toctree}
 :maxdepth: 2
@@ -12,49 +12,49 @@ vrz
 vti
 ```
 
-## 传播函数速查
+## Propagators at a glance
 
 <span id="starwave.scalar"></span>
 
-- {py:func}`starwave.scalar`：二维标量声学；速度模型 `v`；返回单元素记录元组。
+- {py:func}`starwave.scalar`: 2D scalar acoustics; velocity model `v`; returns a one-element tuple of recordings.
 
 <span id="starwave.vrz"></span>
 
-- {py:func}`starwave.vrz`：二维变密度声学；`v` 加恰好一种 `impedance` / `density` 参数化。
+- {py:func}`starwave.vrz`: 2D variable-density acoustics; `v` plus exactly one `impedance` / `density` parameterization.
 
 <span id="starwave.vti"></span>
 
-- {py:func}`starwave.vti`：二维/三维声学 VTI；`vp, epsilon, delta, rho`；按所选分量顺序返回记录。
+- {py:func}`starwave.vti`: 2D/3D acoustic VTI; `vp, epsilon, delta, rho`; returns recordings in the selected component order.
 
-符号约定：`B` 炮数、`S` 每炮源数、`R` 每炮接收点数、`T` 用户时间采样数、`D` 空间维数。源和接收点使用物理模型的整数网格下标，不是米坐标，不包含 PML 偏移。
+Notation: `B` is the number of shots, `S` the sources per shot, `R` the receivers per shot, `T` the number of user time samples, and `D` the number of spatial dimensions. Sources and receivers use integer grid indices in the physical model, not coordinates in meters, and do not include PML offsets.
 
-## 原生运行库
+## Native runtime
 
 ```{py:function} starwave.native_status() -> dict
 
-查询当前运行库状态，不执行编译或传播。
+Queries current native-library status without compiling or propagating.
 
-:returns: 状态字典；常用条目包括 `library_exists`、`library_loaded`、`torch_version`、`torch_cuda_version` 和 `cuda_available`。存在或加载成功均不代表数值验收通过。
+:returns: Status dictionary. Common entries include `library_exists`, `library_loaded`, `torch_version`, `torch_cuda_version`, and `cuda_available`. Neither existence nor successful loading demonstrates numerical acceptance.
 :rtype: `dict`
 ```
 
 ```{py:function} starwave.prepare_native(device_ids: list[int] | tuple[int, ...]) -> dict
 
-在主线程验证并预加载已有的原生库，供后续传播或 DataParallel 使用，不执行编译。
+Validates and preloads an existing native library on the main thread for subsequent propagation or DataParallel use. Does not compile.
 
-:param device_ids: 必填。非空、无重复、非负的可见逻辑 CUDA 编号；拒绝布尔值。编号按当前进程的设备可见性映射填写。
+:param device_ids: Required. Nonempty, duplicate-free collection of nonnegative visible logical CUDA device IDs; Booleans are rejected. Use the device-visibility mapping of the current process.
 :type device_ids: `list[int] | tuple[int, ...]`
-:returns: 包含原生状态、`selected_device_ids` 与准备消息的字典。初始化成功不是 GPU 数值测试。
+:returns: Dictionary containing native status, `selected_device_ids`, and preparation messages. Successful initialization is not a GPU numerical test.
 :rtype: `dict`
 ```
 
-## 原生库注意事项
+## Native runtime notes
 
-`native_status()` 用于排查安装与加载状态；`prepare_native()` 应在主线程、传播或 DataParallel 开始前调用。两者都不编译库，也不替代 GPU 数值验收。示例中的逻辑设备 `0` 必须对当前进程可见。
+Use `native_status()` to diagnose installation and loading. Call `prepare_native()` on the main thread before propagation or DataParallel begins. Neither function compiles the library or replaces GPU numerical acceptance. Logical device `0` in the example must be visible to the current process.
 
-## 原生库示例
+## Native runtime examples
 
-安装公开 wheel 和匹配的 PyTorch 后，可查询状态；后续准备调用要求有可用 CUDA 设备。
+After installing the public wheel and a matching PyTorch version, query the status. The subsequent preparation call requires an available CUDA device.
 
 ```python
 import starwave
@@ -64,10 +64,10 @@ print(status)
 prepared = starwave.prepare_native([0])
 ```
 
-## 其它导出名称与范围
+## Other exported names and scope
 
-`ScalarIllumination`、`IlluminationFields`、`precondition_gradient` 是已核验导出的 scalar 照明相关名称。本版暂不提供它们的完整生命周期教程；传播函数页会解释 `illumination` 参数的使用边界。
+`ScalarIllumination`, `IlluminationFields`, and `precondition_gradient` are verified exported names related to scalar illumination. This edition does not yet provide a complete lifecycle tutorial for them; the propagator pages explain the usage boundaries of the `illumination` parameter.
 
-StarWave 2.0.0 没有公开 `starwave.Scalar` 包装类。教程中的 Module wrapper 由教程定义；不能将其它库的类名、状态参数、`nt` 或存储选项直接添加到这里的调用中。
+StarWave 2.0.0 has no public `starwave.Scalar` wrapper class. The tutorials define their own Module wrapper. Do not add another library’s class names, state parameters, `nt`, or storage options directly to these calls.
 
-{ref}`genindex`
+{ref}`Index <genindex>`
