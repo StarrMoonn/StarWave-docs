@@ -18,3 +18,8 @@
 .wy-nav-top [data-sw-mobile-menu] i { float: none; }
 .sw-noscript-nav { padding: 12px; margin-left: 300px; }
 @media (max-width: 768px) { .sw-noscript-nav { margin-left: 0; } }
+@media (max-width: 768px) {
+  html.writer-html5 .rst-content dl.field-list { display: block; }
+  html.writer-html5 .rst-content dl.field-list > dt { display: block; padding-left: 0; margin-bottom: .4rem; }
+  html.writer-html5 .rst-content dl.field-list > dd { min-width: 0; margin-left: 0; margin-bottom: 1rem; }
+}
