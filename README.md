@@ -23,7 +23,7 @@ python -m http.server 8000 --directory _build/html --bind 127.0.0.1
 
 Open http://127.0.0.1:8000/zh/ or http://127.0.0.1:8000/en/. `build_docs.py` runs both Sphinx builds with warnings treated as errors. Chinese sources remain in `docs/`; English counterparts are in `docs/en/`. Shared templates, CSS and scripts are in `docs/_templates/` and `docs/_static/`. Do not use a single raw Sphinx command for the published bilingual output.
 
-The homepage introduces differentiable wave propagation with the supplied StarWave logo, three concise capabilities, a PyTorch/autograd fragment, and direct installation, Quickstart and Usage links. It uses a consistent sans-serif typeface without a comparison table. The selected logo SVGs and favicon are unchanged user-provided assets, checked for safe SVG content and hashes; no broader logo license is declared.
+The homepage introduces differentiable wave propagation with the supplied StarWave logo, three concise capabilities, a PyTorch/autograd fragment, and direct installation, Quickstart and Usage links. The large homepage headline is sans-serif; English reading text and smaller headings use a Georgia system stack with a serif fallback, following the Deepwave reading hierarchy at roughly 17px. Code stays monospace. The homepage uses original wave, gradient and network icons instead of a comparison table or numbered feature labels. Small locally served Noto Sans CJK SC glyph subsets keep the Chinese homepage and Usage sans-serif across systems; their full OFL 1.1 license and provenance are included in `docs/_static/fonts/`. English article text follows the requested serif hierarchy; the sidebar retains the RTD theme typography. The selected logo SVGs and favicon are unchanged user-provided assets, checked for safe SVG content and hashes; no broader logo license is declared.
 
 The left sidebar is a flat list of major chapters, with a prominent Search docs field and a left-side clickable submit icon and no expand/collapse buttons. Usage is a single page: its bordered directory jumps to the full scalar, VRZ, VTI, and native-helper documentation below. Other chapters have local page directories.
 
@@ -35,6 +35,8 @@ Each page has an accessible language switch. Section and Python-object anchors s
 - `check_api_docs.py`: all five typed function signatures, types/defaults/descriptions, scalar 16 / VRZ 18 / VTI 20 parameter coverage, return contracts and Python snippets. The checked-in public contract snapshot prevents cross-language agreement from hiding interface drift.
 - `check_tutorial_assets.py`: clean notebook/script parity, numerical-source provenance, safe metadata, configuration and measured-result invariants.
 - Optional `--wheel PATH`: verifies the public 2.0.0 wheel SHA-256 and compares signatures through AST parsing, without importing or running StarWave. Wheels are never part of the source or published site.
+
+Usage uses a 17px naturally wrapping monospace signature, bold 18.7px function names, 15.3px inline code without small red boxes, and clearly aligned parameter/return labels.
 
 Browser regression checks include the homepage logo, desktop/mobile layout, typography, text contrast, keyboard targets, calls to action and screenshots in both languages. They also retain the full documentation regression suite.
 

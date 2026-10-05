@@ -84,6 +84,17 @@ def check_usage(page, locale, output):
     assert len(ids) == len(set(ids)), f'Duplicate Usage IDs: {locale}'
     for target in USAGE_TARGETS:
         assert ids.count(target) == 1, (locale, target)
+    page.evaluate('document.fonts.ready')
+    for signature in main.locator('dt.sig[id^="starwave."]').all():
+        style = signature.evaluate("e => { const s = getComputedStyle(e); return {font:s.fontFamily,size:parseFloat(s.fontSize),line:parseFloat(s.lineHeight),border:s.borderTopWidth,bg:s.backgroundColor}; }")
+        assert 'Consolas' in style['font'] and 'monospace' in style['font'] and style['size'] == 17, style
+        assert style['border'] == '0px' and style['bg'] == 'rgba(0, 0, 0, 0)', style
+        assert abs(signature.locator('.sig-name').evaluate('e => parseFloat(getComputedStyle(e).fontSize)') - 18.7) < .1
+    assert main.locator('code.literal').first.evaluate('e => getComputedStyle(e).borderTopWidth') == '0px'
+    if locale == 'en':
+        assert 'Georgia' in main.locator('#usage').evaluate('e => getComputedStyle(e).fontFamily')
+    else:
+        assert page.evaluate('document.fonts.check(\'400 17px "StarWave Home Sans"\', "参数")')
     definitions = main.locator('dt.sig[id^="starwave."]').evaluate_all('(items) => items.map(e => e.id)')
     assert definitions == [f'starwave.{name}' for name in API_NAMES], definitions
     for name in API_NAMES:
@@ -99,6 +110,8 @@ def check_usage(page, locale, output):
     width = page.viewport_size['width']
     page.evaluate('window.scrollTo(0, 0)')
     page.screenshot(path=str(output / f'{locale}-usage-top-{width}.png'))
+    main.locator('[id="starwave.scalar"]').evaluate("e => e.scrollIntoView({block: 'start'})")
+    page.screenshot(path=str(output / f'{locale}-usage-scalar-signature-{width}.png'))
     # A focused viewport capture makes the actual parameter fields reviewable,
     # rather than shrinking the entire long Usage page into one image.
     fields = page.locator('[id="starwave.scalar"]').locator('..').locator('dl.field-list').first
@@ -192,6 +205,12 @@ def check_redirects(page, base):
 
 def check_homepage(page, base, locale, output):
     page.goto(base + locale + '/index.html', wait_until='networkidle')
+    page.evaluate('document.fonts.ready')
+    if locale == 'zh':
+        assert page.evaluate('document.fonts.check(\'400 16px "StarWave Home Sans"\', "波")')
+        assert page.evaluate('document.fonts.check(\'700 16px "StarWave Home Sans"\', "波")')
+        fonts = page.evaluate('Array.from(document.fonts).filter(f => f.family.includes("StarWave Home Sans")).map(f => f.status)')
+        assert fonts == ['loaded', 'loaded'], fonts
     main = page.locator('[role="main"]')
     assert main.locator('h1').count() == 1
     assert main.locator('table, .sw-api-overview, .important').count() == 0
@@ -207,6 +226,11 @@ def check_homepage(page, base, locale, output):
     assert page.locator('link[rel="shortcut icon"]').get_attribute('href').endswith('starwave-favicon.png')
     capabilities = main.locator('.sw-home-capabilities > div')
     assert capabilities.count() == 3
+    assert main.locator('.sw-capability-icon').count() == 3
+    assert main.locator('.sw-tutorial-icon').count() == 3
+    assert main.locator('.sw-home-footnote, .sw-home-number').count() == 0
+    assert main.locator('.sw-home-next p').count() == 1 and main.locator('.sw-home-next a').count() == 3
+    assert all(size >= 16 for size in main.locator('.sw-home-capabilities p, .sw-home-capabilities a, .sw-path-copy strong, .sw-path-copy > span, .sw-home-next p, .sw-home-next a').evaluate_all('items => items.map(e => parseFloat(getComputedStyle(e).fontSize))'))
     assert main.locator('.sw-home-code pre').count() == 1
     assert 'loss.backward()' in main.locator('.sw-home-code').inner_text()
     assert main.locator('.sw-home-paths a').count() == 3
@@ -215,7 +239,16 @@ def check_homepage(page, base, locale, output):
     for button in main.locator('.sw-button').all():
         assert button.bounding_box()['height'] >= 44
     typography = main.locator('.sw-home-lead, .sw-home-hero h2, .sw-home-capabilities h3').evaluate_all("items => items.map(e => getComputedStyle(e).fontFamily)")
-    assert len(set(typography)) == 1 and 'sans-serif' in typography[0], typography
+    if locale == 'zh':
+        assert len(set(typography)) == 1 and 'sans-serif' in typography[0], typography
+    else:
+        body_font = main.locator('.sw-home-lead').evaluate('e => getComputedStyle(e).fontFamily')
+        heading_font = main.locator('.sw-home-hero h2').evaluate('e => getComputedStyle(e).fontFamily')
+        feature_font = main.locator('.sw-home-capabilities h3').first.evaluate('e => getComputedStyle(e).fontFamily')
+        assert 'Georgia' in body_font and feature_font == body_font, (body_font, feature_font)
+        assert 'sans-serif' in heading_font and 'Georgia' not in heading_font, heading_font
+        assert 'monospace' in main.locator('.sw-home-code pre').evaluate('e => getComputedStyle(e).fontFamily')
+    assert main.locator('.sw-home-hero h2').inner_text() == ('波动物理，\n自动微分。' if locale == 'zh' else 'Wave Physics.\nAutomatic Differentiation.')
     assert main.locator('.sw-home-hero').evaluate("e => getComputedStyle(e).animationName === 'none'")
     if page.viewport_size['width'] <= 600 or 769 <= page.viewport_size['width'] <= 1024:
         tops = capabilities.evaluate_all('items => items.map(e => e.getBoundingClientRect().top)')
@@ -227,7 +260,7 @@ def check_homepage(page, base, locale, output):
     assert page.evaluate("""() => {
         function linear(v) { v /= 255; return v <= .04045 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4; }
         function luminance(s) { const c = s.match(/[0-9.]+/g).slice(0,3).map(Number).map(linear); return .2126*c[0] + .7152*c[1] + .0722*c[2]; }
-        return Array.from(document.querySelectorAll('.sw-home-kicker, .sw-home-lead, .sw-home-number, .sw-home-capabilities p, .sw-home-capabilities a, .sw-home-code-label, .sw-home-code-note, .sw-home-footnote, .sw-home-identity p, .sw-home-paths a > span:first-child, .sw-button')).every(e => {
+        return Array.from(document.querySelectorAll('.sw-home-kicker, .sw-home-lead, .sw-home-capabilities p, .sw-home-capabilities a, .sw-home-code-label, .sw-home-code-note, .sw-home-next p, .sw-home-next a, .sw-home-identity p, .sw-path-copy strong, .sw-path-copy > span, .sw-button')).every(e => {
             const style = getComputedStyle(e);
             const fg = luminance(style.color);
             const bg = e.classList.contains('sw-button-primary') ? luminance(style.backgroundColor) : 1;

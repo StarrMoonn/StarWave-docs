@@ -207,6 +207,27 @@ def check(root):
             if (root / locale / '_static' / 'brand' / name).read_bytes() != (brand_dir / name).read_bytes():
                 errors.append(f'Published brand asset differs: {locale}/{name}')
 
+    font_dir = project / 'docs' / '_static' / 'fonts'
+    font_manifest = json.loads((font_dir / 'manifest.json').read_text())
+    font_names = {'home-sans-sc-regular.woff', 'home-sans-sc-bold.woff'}
+    if {p.name for p in font_dir.iterdir()} != font_names | {'OFL.txt', 'manifest.json'}:
+        errors.append('Unexpected homepage font files')
+    home_source = (project / 'docs' / 'index.md').read_text() + (project / 'docs' / 'usage.md').read_text()
+    chinese = set(re.findall(r'[\u3000-\u303f\u4e00-\u9fff\uff00-\uffef]', home_source))
+    for font in font_manifest['assets']:
+        path = font_dir / font['file']
+        data = path.read_bytes()
+        if path.name not in font_names or data[:4] != b'wOFF' or len(data) > 300000:
+            errors.append('Invalid or oversized homepage font subset')
+        if hashlib.sha256(data).hexdigest() != font['sha256'] or not chinese <= set(font['characters']):
+            errors.append('Homepage font subset needs regeneration')
+        for locale in ('zh', 'en'):
+            if (root / locale / '_static' / 'fonts' / path.name).read_bytes() != data:
+                errors.append(f'Published font differs: {locale}/{path.name}')
+    license_text = (font_dir / 'OFL.txt').read_text()
+    if 'SIL OPEN FONT LICENSE Version 1.1' not in license_text or 'Adobe' not in license_text:
+        errors.append('Missing font license or copyright')
+
     # These checks are a guardrail, not a substitute for human content review.
     forbidden = [
         re.compile(r"[A-Za-z]:[\\/](?:Users|home)[\\/]", re.I),
@@ -225,15 +246,16 @@ def check(root):
         sources.append(p)
         is_tutorial_png = p.suffix == ".png" and relative.parts[:3] == ("docs", "_static", "tutorials")
         is_brand_file = relative.parts[:3] == ("docs", "_static", "brand") and p.name in brand_names
+        is_font_file = relative.parts[:3] == ("docs", "_static", "fonts") and p.name in font_names
         is_tutorial_notebook = p.suffix == ".ipynb" and relative.parts[:2] == ("examples", "tutorials")
-        if p.name != ".gitignore" and p.suffix not in allowed and not is_tutorial_png and not is_tutorial_notebook and not is_brand_file:
+        if p.name != ".gitignore" and p.suffix not in allowed and not is_tutorial_png and not is_tutorial_notebook and not is_brand_file and not is_font_file:
             errors.append(f"Unexpected source file: {relative}")
         if p.suffix == ".py":
             try:
                 ast.parse(p.read_text(encoding="utf-8"))
             except SyntaxError as exc:
                 errors.append(f"Python syntax: {relative}: {exc.msg}")
-        if p != Path(__file__).resolve() and not is_tutorial_png and not (is_brand_file and p.suffix == ".png"):
+        if p != Path(__file__).resolve() and not is_tutorial_png and not (is_brand_file and p.suffix == ".png") and not is_font_file:
             text = p.read_text(encoding="utf-8")
             if any(pattern.search(text) for pattern in forbidden):
                 errors.append(f"Review restricted content: {relative}")

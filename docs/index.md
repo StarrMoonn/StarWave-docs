@@ -4,7 +4,7 @@
 <div class="sw-home-hero">
   <div class="sw-home-intro">
     <p class="sw-home-kicker">可微分波传播 · PyTorch · CUDA</p>
-    <h2>让波动物理融入<br><span>可微分计算。</span></h2>
+    <h2>波动物理，<br><span>自动微分。</span></h2>
     <p class="sw-home-lead">从一次波场模拟，到一次模型更新。StarWave 将波传播与 PyTorch 的自动微分连接起来，让正演、全波形反演与神经网络模型表示，在同一条计算链路中协同工作。</p>
     <nav class="sw-home-actions" aria-label="开始使用 StarWave">
       <a class="sw-button sw-button-primary" href="installation.html">安装 StarWave <span aria-hidden="true">↗</span></a>
@@ -25,19 +25,19 @@
 ```{raw} html
 <div class="sw-home-capabilities">
   <div>
-    <span class="sw-home-number" aria-hidden="true">01 / PROPAGATE</span>
+    <svg class="sw-capability-icon" viewBox="0 0 96 64" width="96" height="64" aria-hidden="true" focusable="false"><path d="M10 33h13c5 0 5-18 10-18s7 36 12 36 5-30 10-30 6 12 11 12h20"/><path class="sw-icon-soft" d="M14 46h10m39 0h19M18 56h12m28 0h19"/></svg>
     <h3>用波场，连接模型与观测</h3>
     <p>CUDA 波传播覆盖二维标量声学、二维 VRZ 与二维/三维声学 VTI，为不同介质参数化提供清晰的建模入口。</p>
     <a href="usage.html#propagators">探索传播接口 <span aria-hidden="true">→</span></a>
   </div>
   <div>
-    <span class="sw-home-number" aria-hidden="true">02 / DIFFERENTIATE</span>
+    <svg class="sw-capability-icon" viewBox="0 0 96 64" width="96" height="64" aria-hidden="true" focusable="false"><path d="M12 17h56a13 13 0 0 1 0 26H20m10-10L20 43l10 10"/><path class="sw-icon-soft" d="M42 27v7m12-12v12m12-7v7"/><circle cx="12" cy="17" r="4"/></svg>
     <h3>让梯度，参与每一次更新</h3>
     <p>将模拟记录接入 PyTorch 损失函数，经 autograd 回传模型梯度。沿用熟悉的优化器，构建自己的 FWI 实验。</p>
     <a href="modeling/gradient.html">查看梯度实验 <span aria-hidden="true">→</span></a>
   </div>
   <div>
-    <span class="sw-home-number" aria-hidden="true">03 / CONNECT</span>
+    <svg class="sw-capability-icon" viewBox="0 0 96 64" width="96" height="64" aria-hidden="true" focusable="false"><path class="sw-icon-soft" d="m18 15 27 17-27 17m0-34 27 0 30 17-30 17H18m27-34v34m0-17h30"/><circle cx="18" cy="15" r="5"/><circle cx="18" cy="49" r="5"/><circle cx="45" cy="15" r="5"/><circle cx="45" cy="32" r="5"/><circle cx="45" cy="49" r="5"/><circle cx="75" cy="32" r="7"/></svg>
     <h3>让模型表示，有更多可能</h3>
     <p>模型可以来自网格参数，也可以来自用户定义的隐式神经表示（INR）。通过可微分链路，探索物理与学习的结合。</p>
     <a href="inversion/inr.html">了解 INR 实验接线 <span aria-hidden="true">→</span></a>
@@ -80,11 +80,11 @@ loss.backward()
 
 ```{raw} html
 <div class="sw-home-paths">
-  <a href="installation.html#installation-smoke"><span>01</span><strong>安装与运行检查</strong><span aria-hidden="true">→</span></a>
-  <a href="modeling/gradient.html"><span>02</span><strong>计算模型梯度</strong><span aria-hidden="true">→</span></a>
-  <a href="inversion/fwi.html"><span>03</span><strong>完成一次简单 FWI 实验</strong><span aria-hidden="true">→</span></a>
+  <a href="installation.html#installation-smoke"><span class="sw-path-icon"><svg class="sw-tutorial-icon" viewBox="0 0 96 64" width="96" height="64" aria-hidden="true" focusable="false"><rect x="14" y="13" width="66" height="43" rx="5"/><path d="m25 26 9 7-9 7m19 0h14"/><path class="sw-icon-soft" d="M14 21h66"/></svg></span><span class="sw-path-copy"><strong>安装与运行检查</strong><span>准备环境，运行第一个合成炮集。</span></span><span aria-hidden="true">→</span></a>
+  <a href="modeling/gradient.html"><span class="sw-path-icon"><svg class="sw-tutorial-icon" viewBox="0 0 96 64" width="96" height="64" aria-hidden="true" focusable="false"><path class="sw-icon-soft" d="M16 53V13m0 40h65"/><path d="m24 43 15-17 15 8 23-19m-13 0h13v13"/></svg></span><span class="sw-path-copy"><strong>计算模型梯度</strong><span>从观测差异，走到模型的更新方向。</span></span><span aria-hidden="true">→</span></a>
+  <a href="inversion/fwi.html"><span class="sw-path-icon"><svg class="sw-tutorial-icon" viewBox="0 0 96 64" width="96" height="64" aria-hidden="true" focusable="false"><path d="M23 22a24 24 0 0 1 43-1m0 0V10m0 11H55M70 44a24 24 0 0 1-43 1m0 0v11m0-11h11"/><path class="sw-icon-soft" d="M37 33h7l4-10 5 20 4-10h7"/></svg></span><span class="sw-path-copy"><strong>尝试全波形反演</strong><span>将正演、目标函数与优化器连接起来。</span></span><span aria-hidden="true">→</span></a>
 </div>
-<p class="sw-home-footnote">本手册对应公开 2.0.0 接口；教程展示的 A30 实测结果来自 0.1.0.dev9。运行条件与验证范围见<a href="status.html">文档状态</a>。Windows 用户请从 <a href="wsl.html">WSL 2</a> 开始。</p>
+<div class="sw-home-next"><p>从小模型开始，把你的想法带入下一次反演实验。</p><a href="quickstart.html">打开快速入门 →</a><a href="wsl.html">Windows / WSL 2 →</a><a href="status.html">文档与验证范围 →</a></div>
 ```
 
 ```{toctree}

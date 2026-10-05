@@ -4,7 +4,7 @@
 <div class="sw-home-hero">
   <div class="sw-home-intro">
     <p class="sw-home-kicker">Differentiable waves · PyTorch · CUDA</p>
-    <h2>Wave physics.<br><span>Ready for gradients.</span></h2>
+    <h2>Wave Physics.<br><span>Automatic Differentiation.</span></h2>
     <p class="sw-home-lead">From a simulated wavefield to a model update. StarWave connects wave propagation with PyTorch autograd, bringing forward modeling, full-waveform inversion, and neural model representations into one differentiable workflow.</p>
     <nav class="sw-home-actions" aria-label="Get started with StarWave">
       <a class="sw-button sw-button-primary" href="installation.html">Install StarWave <span aria-hidden="true">↗</span></a>
@@ -25,19 +25,19 @@
 ```{raw} html
 <div class="sw-home-capabilities">
   <div>
-    <span class="sw-home-number" aria-hidden="true">01 / PROPAGATE</span>
+    <svg class="sw-capability-icon" viewBox="0 0 96 64" width="96" height="64" aria-hidden="true" focusable="false"><path d="M10 33h13c5 0 5-18 10-18s7 36 12 36 5-30 10-30 6 12 11 12h20"/><path class="sw-icon-soft" d="M14 46h10m39 0h19M18 56h12m28 0h19"/></svg>
     <h3>Connect models to observations</h3>
     <p>CUDA wave propagation for 2D scalar acoustics, 2D VRZ, and 2D/3D acoustic VTI. Clear entry points for different descriptions of the medium.</p>
     <a href="usage.html#propagators">Explore the propagators <span aria-hidden="true">→</span></a>
   </div>
   <div>
-    <span class="sw-home-number" aria-hidden="true">02 / DIFFERENTIATE</span>
+    <svg class="sw-capability-icon" viewBox="0 0 96 64" width="96" height="64" aria-hidden="true" focusable="false"><path d="M12 17h56a13 13 0 0 1 0 26H20m10-10L20 43l10 10"/><path class="sw-icon-soft" d="M42 27v7m12-12v12m12-7v7"/><circle cx="12" cy="17" r="4"/></svg>
     <h3>Put gradients to work</h3>
     <p>Connect simulated records to a PyTorch loss and backpropagate model gradients. Build FWI experiments with the optimizers you already use.</p>
     <a href="modeling/gradient.html">See the gradient experiment <span aria-hidden="true">→</span></a>
   </div>
   <div>
-    <span class="sw-home-number" aria-hidden="true">03 / CONNECT</span>
+    <svg class="sw-capability-icon" viewBox="0 0 96 64" width="96" height="64" aria-hidden="true" focusable="false"><path class="sw-icon-soft" d="m18 15 27 17-27 17m0-34 27 0 30 17-30 17H18m27-34v34m0-17h30"/><circle cx="18" cy="15" r="5"/><circle cx="18" cy="49" r="5"/><circle cx="45" cy="15" r="5"/><circle cx="45" cy="32" r="5"/><circle cx="45" cy="49" r="5"/><circle cx="75" cy="32" r="7"/></svg>
     <h3>Explore new model representations</h3>
     <p>Start with grid parameters or a user-defined implicit neural representation (INR). Connect physics and learning through a differentiable model.</p>
     <a href="inversion/inr.html">Explore experimental INR wiring <span aria-hidden="true">→</span></a>
@@ -80,11 +80,11 @@ loss.backward()
 
 ```{raw} html
 <div class="sw-home-paths">
-  <a href="installation.html#installation-smoke"><span>01</span><strong>Install and check a forward run</strong><span aria-hidden="true">→</span></a>
-  <a href="modeling/gradient.html"><span>02</span><strong>Compute a model gradient</strong><span aria-hidden="true">→</span></a>
-  <a href="inversion/fwi.html"><span>03</span><strong>Run a simple FWI experiment</strong><span aria-hidden="true">→</span></a>
+  <a href="installation.html#installation-smoke"><span class="sw-path-icon"><svg class="sw-tutorial-icon" viewBox="0 0 96 64" width="96" height="64" aria-hidden="true" focusable="false"><rect x="14" y="13" width="66" height="43" rx="5"/><path d="m25 26 9 7-9 7m19 0h14"/><path class="sw-icon-soft" d="M14 21h66"/></svg></span><span class="sw-path-copy"><strong>Install and run</strong><span>Set up your environment and simulate a shot gather.</span></span><span aria-hidden="true">→</span></a>
+  <a href="modeling/gradient.html"><span class="sw-path-icon"><svg class="sw-tutorial-icon" viewBox="0 0 96 64" width="96" height="64" aria-hidden="true" focusable="false"><path class="sw-icon-soft" d="M16 53V13m0 40h65"/><path d="m24 43 15-17 15 8 23-19m-13 0h13v13"/></svg></span><span class="sw-path-copy"><strong>Follow the gradient</strong><span>Connect the data residual to a model update direction.</span></span><span aria-hidden="true">→</span></a>
+  <a href="inversion/fwi.html"><span class="sw-path-icon"><svg class="sw-tutorial-icon" viewBox="0 0 96 64" width="96" height="64" aria-hidden="true" focusable="false"><path d="M23 22a24 24 0 0 1 43-1m0 0V10m0 11H55M70 44a24 24 0 0 1-43 1m0 0v11m0-11h11"/><path class="sw-icon-soft" d="M37 33h7l4-10 5 20 4-10h7"/></svg></span><span class="sw-path-copy"><strong>Build an inversion</strong><span>Bring propagation, a loss, and an optimizer together.</span></span><span aria-hidden="true">→</span></a>
 </div>
-<p class="sw-home-footnote">This manual describes the public 2.0.0 interfaces. The measured A30 tutorial results use 0.1.0.dev9; see <a href="status.html">documentation status</a> for requirements and validation scope. On Windows, start with <a href="wsl.html">WSL 2</a>.</p>
+<div class="sw-home-next"><p>Start with a small model. Bring your own ideas to the next inversion experiment.</p><a href="quickstart.html">Open the Quickstart →</a><a href="wsl.html">Windows / WSL 2 →</a><a href="status.html">Documentation and validation scope →</a></div>
 ```
 
 ```{toctree}

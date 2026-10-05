@@ -1,3 +1,6 @@
+/* Locally served OFL glyph subsets keep the Chinese homepage sans-serif. */
+@font-face { font-family: "StarWave Home Sans"; src: url("fonts/home-sans-sc-regular.woff") format("woff"); font-style: normal; font-weight: 100 500; font-display: swap; unicode-range: U+3000-303F, U+4E00-9FFF, U+FF00-FFEF; }
+@font-face { font-family: "StarWave Home Sans"; src: url("fonts/home-sans-sc-bold.woff") format("woff"); font-style: normal; font-weight: 501 900; font-display: swap; unicode-range: U+3000-303F, U+4E00-9FFF, U+FF00-FFEF; }
 /* Original Read the Docs presentation, with small bilingual/accessibility fixes. */
 .wy-nav-content { max-width: 1040px; }
 .rst-content table.docutils td { white-space: normal; }
@@ -68,42 +71,47 @@
 .wy-side-nav-search > a.sw-sidebar-brand:focus-visible { outline: 3px solid #f0ad4e; outline-offset: 5px; }
 
 /* The homepage has its own restrained product introduction; chapters keep RTD. */
-.rst-content #starwave, .rst-content #starwave-user-manual { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif; color: #243c4b; line-height: 1.8; }
+.rst-content #starwave, .rst-content #starwave-user-manual { font-family: "StarWave Home Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif; color: #243c4b; line-height: 1.8; }
 .rst-content #starwave :is(h1, h2, h3), .rst-content #starwave-user-manual :is(h1, h2, h3) { font-family: inherit; color: #102d40; }
 .rst-content #starwave > h1, .rst-content #starwave-user-manual > h1 { margin: 6px 0 26px; font-size: 13px; font-weight: 600; letter-spacing: .04em; color: #5d7080; }
 .rst-content .sw-home-hero { display: grid; grid-template-columns: minmax(0, 1fr) 230px; gap: 34px; align-items: center; padding: 4px 0 42px; margin-bottom: 34px; border-bottom: 1px solid #dce7ed; }
-.rst-content .sw-home-kicker { margin: 0 0 18px; color: #15627c; font-size: 12px; font-weight: 650; letter-spacing: .035em; }
+.rst-content .sw-home-kicker { margin: 0 0 18px; color: #15627c; font-size: 14px; font-weight: 650; letter-spacing: .035em; }
 .rst-content .sw-home-hero h2 { margin: 0 0 22px; font-size: clamp(30px, 2.8vw, 40px); line-height: 1.3; font-weight: 750; letter-spacing: -.035em; }
 .rst-content .sw-home-hero h2 span { color: #087c96; }
 .rst-content .sw-home-lead { margin: 0 0 26px; font-size: 16px; line-height: 1.9; color: #405866; }
 .rst-content .sw-home-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
-.rst-content .sw-button { display: inline-flex; justify-content: center; align-items: center; gap: 13px; min-height: 44px; padding: 9px 15px; border: 1px solid #bbced9; border-radius: 5px; color: #174b65; font-size: 14px; line-height: 1.5; font-weight: 600; text-decoration: none; }
+.rst-content .sw-button { display: inline-flex; justify-content: center; align-items: center; gap: 13px; min-height: 44px; padding: 9px 15px; border: 1px solid #bbced9; border-radius: 5px; color: #174b65; font-size: 16px; line-height: 1.5; font-weight: 600; text-decoration: none; }
 .rst-content .sw-button-primary { background: #0a536f; border-color: #0a536f; color: #fff; }
 .rst-content .sw-button:hover { border-color: #087c96; background: #edf7fa; color: #134e65; }
 .rst-content .sw-button-primary:hover { background: #083e56; border-color: #083e56; color: #fff; }
-.rst-content .sw-home-api-link { padding: 10px 0; font-size: 14px; font-weight: 600; color: #155b77; }
+.rst-content .sw-home-api-link { padding: 10px 0; font-size: 16px; font-weight: 600; color: #155b77; }
 .rst-content .sw-home-identity { padding: 22px 0; text-align: center; background: radial-gradient(ellipse at center, #eef9fb 0%, rgba(238,249,251,0) 68%); }
 .rst-content .sw-home-logo { display: block; width: 100%; height: auto; }
 .rst-content .sw-home-identity p { margin: 18px 0 0; font-size: 9px; letter-spacing: .23em; color: #536e7e; }
 .rst-content #starwave > section > h2, .rst-content #starwave-user-manual > section > h2 { margin: 36px 0 24px; font-size: 24px; line-height: 1.5; font-weight: 650; letter-spacing: -.025em; }
 .rst-content .sw-home-capabilities { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; margin: 0 0 42px; }
 .rst-content .sw-home-capabilities > div { border-top: 2px solid #d6e7ed; padding-top: 16px; }
-.rst-content .sw-home-number { display: block; margin-bottom: 16px; color: #43758b; font-size: 10px; font-weight: 650; letter-spacing: .09em; }
-.rst-content .sw-home-capabilities h3 { margin: 0 0 12px; font-size: 17px; line-height: 1.55; font-weight: 650; }
-.rst-content .sw-home-capabilities p { margin-bottom: 14px; color: #49606d; font-size: 14px; line-height: 1.85; }
-.rst-content .sw-home-capabilities a { font-size: 13px; line-height: 1.7; color: #155b77; font-weight: 600; }
+.rst-content .sw-capability-icon { display: block; width: 84px; height: 56px; margin: 0 0 20px; fill: none; stroke: #087c96; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+.rst-content .sw-icon-soft { stroke: #81b5c4; }
+.rst-content .sw-home-capabilities h3 { margin: 0 0 14px; font-size: 20px; line-height: 1.55; font-weight: 650; }
+.rst-content .sw-home-capabilities p { margin-bottom: 18px; color: #49606d; font-size: 16px; line-height: 1.85; }
+.rst-content .sw-home-capabilities a { font-size: 16px; line-height: 1.7; color: #155b77; font-weight: 600; }
 .rst-content .sw-home-code { margin: 24px 0 12px; border: 1px solid #d7e3ea; border-radius: 6px; overflow: hidden; background: #f7fafc; }
-.rst-content .sw-home-code-label { margin: 0; padding: 11px 18px; border-bottom: 1px solid #d7e3ea; color: #386478; font-size: 12px; letter-spacing: .015em; }
+.rst-content .sw-home-code-label { margin: 0; padding: 11px 18px; border-bottom: 1px solid #d7e3ea; color: #386478; font-size: 14px; letter-spacing: .015em; }
 .rst-content .sw-home-code div[class^="highlight"] { margin: 0; border: 0; background: transparent; }
 .rst-content .sw-home-code .highlight { background: transparent; }
 .rst-content .sw-home-code pre { padding: 18px; font-size: 13px; line-height: 1.7; }
-.rst-content .sw-home-code-note { margin: 12px 0 36px; color: #5b6d79; font-size: 12px; line-height: 1.8; }
+.rst-content .sw-home-code-note { margin: 12px 0 36px; color: #5b6d79; font-size: 14px; line-height: 1.8; }
 .rst-content .sw-home-paths { border-top: 1px solid #dce7ed; margin-bottom: 24px; }
-.rst-content .sw-home-paths a { display: grid; grid-template-columns: 30px 1fr 20px; align-items: center; gap: 12px; padding: 17px 0; border-bottom: 1px solid #dce7ed; color: #174f68; font-size: 15px; }
+ .rst-content .sw-home-paths a { display: grid; grid-template-columns: 52px minmax(0, 1fr) 20px; align-items: center; gap: 18px; padding: 24px 0; border-bottom: 1px solid #dce7ed; color: #174f68; font-size: 17px; }
 .rst-content .sw-home-paths a:hover { background: #f4f9fb; }
-.rst-content .sw-home-paths a > span:first-child { color: #5b727f; font-size: 11px; }
-.rst-content .sw-home-paths strong { font-weight: 550; }
-.rst-content .sw-home-footnote { margin: 26px 0; color: #60727e; font-size: 12px; line-height: 1.9; }
+.rst-content .sw-path-icon { display: flex; align-items: center; justify-content: center; width: 52px; height: 52px; border-radius: 10px; background: #edf6f9; }
+.rst-content .sw-tutorial-icon { width: 48px; height: 36px; fill: none; stroke: #087c96; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+.rst-content .sw-path-copy strong { display: block; font-size: 18px; font-weight: 650; }
+.rst-content .sw-path-copy > span { display: block; margin-top: 4px; font-size: 16px; line-height: 1.65; color: #49606d; }
+.rst-content .sw-home-next { margin: 32px 0; padding: 22px 24px; border-radius: 6px; background: #f0f7fa; }
+.rst-content .sw-home-next p { margin: 0 0 12px; color: #244e63; font-size: 17px; line-height: 1.8; }
+.rst-content .sw-home-next a { display: inline-block; margin: 8px 22px 0 0; font-size: 16px; color: #155b77; }
 .rst-content #starwave a:focus-visible, .rst-content #starwave-user-manual a:focus-visible { outline: 3px solid #d58b22; outline-offset: 4px; }
 @media (max-width: 1100px) and (min-width: 769px) {
   .rst-content .sw-home-hero { grid-template-columns: minmax(0, 1fr) 180px; gap: 22px; }
@@ -118,7 +126,58 @@
   .rst-content .sw-home-actions { gap: 10px; }
   .rst-content .sw-button { padding: 9px 12px; }
   .rst-content .sw-home-capabilities { grid-template-columns: minmax(0, 1fr); gap: 26px; }
-  .rst-content .sw-home-capabilities p { font-size: 15px; }
-  .rst-content .sw-home-number { margin-bottom: 10px; }
+  .rst-content .sw-home-capabilities p { font-size: 16px; }
+  .rst-content .sw-home-paths a { grid-template-columns: 42px minmax(0, 1fr) 16px; gap: 12px; }
+  .rst-content .sw-path-icon { width: 42px; height: 46px; }
+  .rst-content .sw-tutorial-icon { width: 40px; height: 32px; }
+  .rst-content .sw-home-next { padding: 18px; }
   .rst-content #starwave > section > h2, .rst-content #starwave-user-manual > section > h2 { font-size: 22px; }
+}
+
+/* English reading type follows the requested serif / sans-serif hierarchy.
+   Georgia follows the Deepwave reading face; serif is the system fallback. */
+html[lang="en"] .rst-content [role="main"] { font-family: Georgia, serif; font-size: 17px; line-height: 1.4; }
+html[lang="en"] .rst-content [role="main"] :is(h2, h3, h4, h5, h6) { font-family: Georgia, serif; }
+html[lang="en"] .rst-content [role="main"] h1 { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", sans-serif; }
+html[lang="en"] .rst-content #starwave-user-manual { font-family: Georgia, serif; }
+html[lang="en"] .rst-content #starwave-user-manual .sw-home-hero h2 { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", sans-serif; }
+html[lang="en"] .rst-content .sw-home-lead { font-size: 17px; line-height: 1.6; }
+html[lang="en"] .rst-content #starwave-user-manual > section > h2 { font-size: 30.6px; font-weight: 400; }
+html[lang="en"] .rst-content .sw-home-capabilities h3 { font-size: 25.5px; font-weight: 400; }
+html[lang="en"] .rst-content .sw-home-capabilities p { font-size: 17px; line-height: 1.6; }
+html[lang="en"] .rst-content .sw-home-capabilities a { font-size: 17px; }
+html[lang="en"] .rst-content .sw-home-code-note { font-size: 16px; }
+html[lang="en"] .rst-content .sw-path-copy strong { font-size: 20px; }
+html[lang="en"] .rst-content .sw-path-copy > span { font-size: 17px; }
+html[lang="en"] .rst-content .sw-home-next p { font-size: 18px; }
+html[lang="en"] .rst-content .sw-home-next a { font-size: 17px; }
+html[lang="en"] .rst-content pre { font-family: Consolas, Menlo, "DejaVu Sans Mono", "Bitstream Vera Sans Mono", monospace; font-size: 15.3px; line-height: 1.5; }
+
+/* Usage: an unboxed, naturally wrapping reference in the Deepwave rhythm. */
+.rst-content #usage { font-size: 17px; line-height: 1.4; color: #333; }
+html[lang="zh-CN"] .rst-content #usage { font-family: "StarWave Home Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif; line-height: 1.65; }
+.rst-content #usage dl.py > dt.sig { display: block; margin: 0 0 12px; padding: 0; border: 0; border-radius: 0; background: transparent; color: #333; font-family: Consolas, Menlo, "DejaVu Sans Mono", "Bitstream Vera Sans Mono", monospace; font-size: 17px; font-weight: 400; line-height: 1.4; white-space: normal; overflow-wrap: anywhere; }
+.rst-content #usage .sig .sig-name { font-size: 18.7px; font-weight: 700; }
+.rst-content #usage .sig .sig-prename { font-size: 17px; font-weight: 400; }
+.rst-content #usage .sig .sig-param { font-size: 17px; font-weight: 400; font-style: italic; white-space: normal; }
+.rst-content #usage .sig .sig-paren { font-size: 20.4px; }
+.rst-content #usage .sig .pre { white-space: normal; overflow-wrap: anywhere; }
+.rst-content #usage dl.py > dd { margin-left: 30px; }
+.rst-content #usage p { font-size: 17px; line-height: inherit; margin-bottom: 20px; }
+.rst-content #usage code.literal { padding: 0; border: 0; background: transparent; color: inherit; font-family: Consolas, Menlo, "DejaVu Sans Mono", "Bitstream Vera Sans Mono", monospace; font-size: 15.3px; }
+.rst-content #usage pre { font-family: Consolas, Menlo, "DejaVu Sans Mono", "Bitstream Vera Sans Mono", monospace; font-size: 15.3px; line-height: 1.3; }
+html.writer-html5 .rst-content #usage dl.field-list { display: grid; grid-template-columns: max-content minmax(0, 1fr); column-gap: 14px; row-gap: 12px; margin: 20px 0 28px; }
+html.writer-html5 .rst-content #usage dl.field-list > dt { padding: 0; margin: 0; border: 0; background: transparent; color: #333; font-family: inherit; font-size: 17px; line-height: inherit; font-weight: 700; }
+html.writer-html5 .rst-content #usage dl.field-list > dd { min-width: 0; margin: 0; padding: 0; font-size: 17px; line-height: inherit; }
+.rst-content #usage dl.field-list > dd ul { margin-left: 20px; margin-bottom: 0; }
+.rst-content #usage dl.field-list > dd li { margin-bottom: 12px; }
+.rst-content #usage dl.field-list > dd > ul > li > p > strong:first-child { font-family: Consolas, Menlo, "DejaVu Sans Mono", "Bitstream Vera Sans Mono", monospace; font-size: 15.3px; }
+html[lang="en"] .rst-content #usage h2 { font-size: 30.6px; font-weight: 400; line-height: 1.25; margin: 30px 0 14px; }
+html[lang="en"] .rst-content #usage h3 { font-size: 25.5px; font-weight: 400; line-height: 1.3; margin: 30px 0 12px; }
+html[lang="zh-CN"] .rst-content #usage :is(h2, h3) { font-family: inherit; }
+@media (max-width: 768px) {
+  .rst-content #usage dl.py > dd { margin-left: 0; }
+  html.writer-html5 .rst-content #usage dl.field-list { display: block; }
+  html.writer-html5 .rst-content #usage dl.field-list > dt { margin-bottom: 10px; }
+  html.writer-html5 .rst-content #usage dl.field-list > dd { margin-bottom: 22px; }
 }
