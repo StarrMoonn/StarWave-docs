@@ -180,7 +180,7 @@ receiver_amplitudes, = starwave.vrz(
 )
 ```
 
-若选择阻抗参数化，将 `density=rho` 替换为 `impedance=Z`，不要同时保留两者。更多背景见[VRZ 建模说明](modeling/vrz.md)。完整独立 GPU 算例仍待补充。
+若选择阻抗参数化，将 `density=rho` 替换为 `impedance=Z`，不要同时保留两者。更多背景见{ref}`VRZ 建模说明 <wave-vrz>`。完整独立 GPU 算例仍待补充。
 
 (vrz-notes)=
 ### 注意事项
@@ -272,7 +272,7 @@ stress_h, velocity_z = starwave.vti(
 )
 ```
 
-本例为二维输入；三维需同时使用 `[nx,ny,nz]` 四模型、三维坐标和相应间距。省略 `receiver_fields` 时只返回 `vz`，应使用单变量元组解包。VTI 没有 `illumination` 参数。完整独立 GPU 算例仍待补充，见[VTI 建模说明](modeling/vti.md)。
+本例为二维输入；三维需同时使用 `[nx,ny,nz]` 四模型、三维坐标和相应间距。省略 `receiver_fields` 时只返回 `vz`，应使用单变量元组解包。VTI 没有 `illumination` 参数。完整独立 GPU 算例仍待补充，见{ref}`VTI 建模说明 <wave-vti>`。
 
 (vti-notes)=
 ### 注意事项

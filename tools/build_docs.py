@@ -45,6 +45,22 @@ USAGE_SECTIONS = ('usage', 'propagators', 'scalar', 'scalar-details',
                   'vti-examples', 'vti-notes', 'native-runtime', 'native-status',
                   'prepare-native', 'native-notes', 'native-examples', 'other-exports')
 USAGE_NUMBERS = (0, 1, 2, 4, 5, 6, 7, 9, 10, 11, 12, 14, 15, 16, 17, 18, 19, 20, 21, 22)
+MODELING_FRAGMENTS = {'modeling/vrz.md', 'modeling/vti.md'}
+WAVE_SECTIONS = ('wave-propagation', 'wave-vrz', 'wave-vrz-details', 'wave-vrz-limits',
+                 'wave-vti', 'wave-vti-details', 'wave-vti-limits')
+
+
+def canonical_wave_sections(text):
+    """Give the combined page stable, bilingual destinations for legacy routes."""
+    assert len(sections(text)) == len(WAVE_SECTIONS), 'Wave propagation section structure changed'
+    targets = iter(WAVE_SECTIONS)
+    def replace(match):
+        target = next(targets)
+        aliases = dict.fromkeys([match[1], *re.findall(r'<span id="([^"]+)"', match[2])])
+        spans = ''.join(f'<span id="{alias}"></span>' for alias in aliases if alias != target)
+        heading = match[3].replace(f'href="#{match[1]}"', f'href="#{target}"')
+        return f'<section id="{target}">{spans}{heading}'
+    return SECTION.sub(replace, text)
 
 
 def canonical_usage_sections(text, locale):
@@ -138,6 +154,9 @@ def build(destination):
             target = stage / locale / relative
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(source / relative, target)
+        # Keep these files available to MyST include, but publish their content
+        # only once, in Wave propagation. Old URLs are emitted as redirects.
+        source_paths[locale] = [p for p in source_paths[locale] if p.as_posix() not in MODELING_FRAGMENTS]
         shutil.copytree(PROJECT / 'docs' / '_static', stage / locale / '_static')
         env = dict(os.environ, STARWAVE_DOCS_LANGUAGE=locale)
         subprocess.run([sys.executable, '-m', 'sphinx', '-n', '-W', '--keep-going', '-E',
@@ -157,6 +176,8 @@ def build(destination):
             texts = [canonical_fwi_sections(text, locale) for text, locale in zip(texts, ('zh', 'en'))]
         if relative == 'usage.html':
             texts = [canonical_usage_sections(text, locale) for text, locale in zip(texts, ('zh', 'en'))]
+        if relative == 'modeling/wave-propagation.html':
+            texts = [canonical_wave_sections(text) for text in texts]
         pairs = [sections(text) for text in texts]
         assert len(pairs[0]) == len(pairs[1]), f'Heading parity differs: {relative}'
         mapping = {}
@@ -183,6 +204,8 @@ def build(destination):
         if relative == 'inversion/fwi.html':
             numbers = FWI_NUMBERS
             stable = FWI_SECTIONS
+        if relative == 'modeling/wave-propagation.html':
+            stable = WAVE_SECTIONS
         path.write_text(add_anchors(texts[0], stable, numbers), encoding='utf-8')
         other.write_text(add_anchors(texts[1], stable, numbers), encoding='utf-8')
         old = destination / relative
@@ -195,6 +218,16 @@ def build(destination):
             old = destination / relative
             old.parent.mkdir(parents=True, exist_ok=True)
             old.write_text(redirect_page(relative, route['fragments'], target_relative='usage.html',
+                                         locale='zh' if source == 'root' else source,
+                                         default_fragment=route['default']), encoding='utf-8')
+    modeling_redirects = json.loads((PROJECT / 'tools' / 'modeling_redirects.json').read_text())
+    for source, routes in modeling_redirects.items():
+        for relative, route in routes.items():
+            relative = relative if source == 'root' else source + '/' + relative
+            old = destination / relative
+            old.parent.mkdir(parents=True, exist_ok=True)
+            old.write_text(redirect_page(relative, route['fragments'],
+                                         target_relative='modeling/wave-propagation.html',
                                          locale='zh' if source == 'root' else source,
                                          default_fragment=route['default']), encoding='utf-8')
     (destination / '.nojekyll').touch()

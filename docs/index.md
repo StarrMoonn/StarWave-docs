@@ -84,7 +84,7 @@ loss.backward()
   <a href="modeling/gradient.html"><span class="sw-path-icon"><svg class="sw-tutorial-icon" viewBox="0 0 96 64" width="96" height="64" aria-hidden="true" focusable="false"><path class="sw-icon-soft" d="M16 53V13m0 40h65"/><path d="m24 43 15-17 15 8 23-19m-13 0h13v13"/></svg></span><span class="sw-path-copy"><strong>计算模型梯度</strong><span>从观测差异，走到模型的更新方向。</span></span><span aria-hidden="true">→</span></a>
   <a href="inversion/fwi.html"><span class="sw-path-icon"><svg class="sw-tutorial-icon" viewBox="0 0 96 64" width="96" height="64" aria-hidden="true" focusable="false"><path d="M23 22a24 24 0 0 1 43-1m0 0V10m0 11H55M70 44a24 24 0 0 1-43 1m0 0v11m0-11h11"/><path class="sw-icon-soft" d="M37 33h7l4-10 5 20 4-10h7"/></svg></span><span class="sw-path-copy"><strong>尝试全波形反演</strong><span>将正演、目标函数与优化器连接起来。</span></span><span aria-hidden="true">→</span></a>
 </div>
-<div class="sw-home-next"><p>从小模型开始，把你的想法带入下一次反演实验。</p><a href="quickstart.html">打开快速入门 →</a><a href="wsl.html">Windows / WSL 2 →</a><a href="status.html">文档与验证范围 →</a></div>
+<div class="sw-home-next"><p>从小模型开始，把你的想法带入下一次反演实验。</p><a href="quickstart.html">打开快速入门 →</a><a href="wsl.html">Windows / WSL →</a><a href="status.html">文档与验证范围 →</a></div>
 ```
 
 ```{toctree}
@@ -94,6 +94,7 @@ loss.backward()
 
 关于 StarWave <about>
 安装 <installation>
+Docker <docker>
 WSL <wsl>
 快速入门 <quickstart>
 ```
@@ -101,13 +102,13 @@ WSL <wsl>
 ```{toctree}
 :maxdepth: 1
 :hidden:
-:caption: 正演
+:caption: 正演模拟
 
 基本约定 <modeling/conventions>
+观测系统 <modeling/acquisition>
 标量声学 <modeling/scalar>
 梯度 <modeling/gradient>
-VRZ <modeling/vrz>
-VTI <modeling/vti>
+波传播 <modeling/wave-propagation>
 ```
 
 ```{toctree}

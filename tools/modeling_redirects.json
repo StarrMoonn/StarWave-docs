@@ -1,0 +1,74 @@
+{
+  "zh": {
+    "modeling/vrz.html": {
+      "default": "wave-vrz",
+      "fragments": {
+        "vrz": "wave-vrz",
+        "sw-section-0": "wave-vrz",
+        "scalar": "wave-vrz-details",
+        "sw-section-1": "wave-vrz-details",
+        "id1": "wave-vrz-limits",
+        "sw-section-2": "wave-vrz-limits"
+      }
+    },
+    "modeling/vti.html": {
+      "default": "wave-vti",
+      "fragments": {
+        "vti": "wave-vti",
+        "sw-section-0": "wave-vti",
+        "id1": "wave-vti-details",
+        "sw-section-1": "wave-vti-details",
+        "id2": "wave-vti-limits",
+        "sw-section-2": "wave-vti-limits"
+      }
+    }
+  },
+  "en": {
+    "modeling/vrz.html": {
+      "default": "wave-vrz",
+      "fragments": {
+        "vrz-velocity-and-impedance-or-density": "wave-vrz",
+        "sw-section-0": "wave-vrz",
+        "similarities-to-and-differences-from-scalar": "wave-vrz-details",
+        "sw-section-1": "wave-vrz-details",
+        "limitations": "wave-vrz-limits",
+        "sw-section-2": "wave-vrz-limits"
+      }
+    },
+    "modeling/vti.html": {
+      "default": "wave-vti",
+      "fragments": {
+        "acoustic-vti-two-and-three-dimensions": "wave-vti",
+        "sw-section-0": "wave-vti",
+        "source-and-recorded-components": "wave-vti-details",
+        "sw-section-1": "wave-vti-details",
+        "anisotropy-and-stability": "wave-vti-limits",
+        "sw-section-2": "wave-vti-limits"
+      }
+    }
+  },
+  "root": {
+    "modeling/vrz.html": {
+      "default": "wave-vrz",
+      "fragments": {
+        "vrz": "wave-vrz",
+        "sw-section-0": "wave-vrz",
+        "scalar": "wave-vrz-details",
+        "sw-section-1": "wave-vrz-details",
+        "id1": "wave-vrz-limits",
+        "sw-section-2": "wave-vrz-limits"
+      }
+    },
+    "modeling/vti.html": {
+      "default": "wave-vti",
+      "fragments": {
+        "vti": "wave-vti",
+        "sw-section-0": "wave-vti",
+        "id1": "wave-vti-details",
+        "sw-section-1": "wave-vti-details",
+        "id2": "wave-vti-limits",
+        "sw-section-2": "wave-vti-limits"
+      }
+    }
+  }
+}

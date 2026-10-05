@@ -1,8 +1,8 @@
 # StarWave-docs · 中文 / English
 
-StarWave 2.0.0 双语使用手册，基于 Sphinx、Read the Docs 主题和 MyST Markdown。完整中文和英文版本各含 17 个内容页面，覆盖安装、正演、反演及 API；每种语言独立构建、导航和搜索。API 采用 Deepwave 风格的类型签名、参数、返回、注意事项及示例组织，所有说明针对 StarWave 原创编写。
+StarWave 2.0.0 双语使用手册，基于 Sphinx、Read the Docs 主题和 MyST Markdown。完整中文和英文版本各含 18 个内容页面，覆盖安装、正演、反演及 API；每种语言独立构建、导航和搜索。API 采用 Deepwave 风格的类型签名、参数、返回、注意事项及示例组织，所有说明针对 StarWave 原创编写。
 
-Bilingual user documentation for StarWave 2.0.0, built with Sphinx, the Read the Docs theme, and MyST Markdown. Each language contains the complete 17-page manual and a separate search index. The API presentation takes organizational cues from Deepwave while preserving StarWave’s own public contracts.
+Bilingual user documentation for StarWave 2.0.0, built with Sphinx, the Read the Docs theme, and MyST Markdown. Each language contains the complete 18-page manual and a separate search index. The API presentation takes organizational cues from Deepwave while preserving StarWave’s own public contracts.
 
 ## 构建 / Build
 
@@ -25,9 +25,9 @@ Open http://127.0.0.1:8000/zh/ or http://127.0.0.1:8000/en/. `build_docs.py` run
 
 The homepage introduces differentiable wave propagation with the supplied StarWave logo, three concise capabilities, a PyTorch/autograd fragment, and direct installation, Quickstart and Usage links. The large homepage headline is sans-serif; English reading text and smaller headings use a Georgia system stack with a serif fallback, following the Deepwave reading hierarchy at roughly 17px. Code stays monospace. The homepage uses original wave, gradient and network icons instead of a comparison table or numbered feature labels. Small locally served Noto Sans CJK SC glyph subsets keep the Chinese homepage and Usage sans-serif across systems; their full OFL 1.1 license and provenance are included in `docs/_static/fonts/`. English article text follows the requested serif hierarchy; the sidebar retains the RTD theme typography. The selected logo SVGs and favicon are unchanged user-provided assets, checked for safe SVG content and hashes; no broader logo license is declared.
 
-The left sidebar uses short, single-line chapter labels and includes an About StarWave overview with SWEEP/Deepwave attribution. It is a flat list of major chapters, with a prominent Search docs field and a left-side clickable submit icon and no expand/collapse buttons. Usage is a single page: its bordered directory jumps to the full scalar, VRZ, VTI, and native-helper documentation below. Other chapters have local page directories.
+The left sidebar uses short, single-line chapter labels and includes an About StarWave overview with SWEEP/Deepwave attribution. It is a flat list of major chapters, with a prominent Search docs field and a left-side clickable submit icon and no expand/collapse buttons. Usage is a single page: its bordered directory jumps to the full scalar, VRZ, VTI, and native-helper documentation below. Forward Modeling includes an Acquisition guide with an original two-shot geometry diagram and a combined Wave propagation chapter whose VRZ/VTI text comes from single-source includes. Docker has an explicitly unreleased installation placeholder; no container image or command is advertised. Other chapters have local page directories.
 
-Each page has an accessible language switch. Section and Python-object anchors survive switching; the original root-level URLs, including `/api/scalar.html`, redirect to their corresponding Chinese pages (old API pages now map directly to Usage) while retaining query parameters and mapped legacy fragments. Without JavaScript, compatibility pages expose links to both languages. Search runs entirely in the selected language’s static index.
+Each page has an accessible language switch. Section and Python-object anchors survive switching; the original root-level URLs, including `/api/scalar.html`, redirect to their corresponding Chinese pages (old API pages now map directly to Usage) while retaining query parameters and mapped legacy fragments. Original VRZ/VTI modeling URLs also redirect to their sections within Wave propagation, without duplicate search entries. Without JavaScript, compatibility pages expose links to both languages. Search runs entirely in the selected language’s static index.
 
 ## 检查 / Checks
 
@@ -36,7 +36,7 @@ Each page has an accessible language switch. Section and Python-object anchors s
 - `check_tutorial_assets.py`: clean notebook/script parity, numerical-source provenance, safe metadata, configuration and measured-result invariants.
 - Optional `--wheel PATH`: verifies the public 2.0.0 wheel SHA-256 and compares signatures through AST parsing, without importing or running StarWave. Wheels are never part of the source or published site.
 
-Usage uses a 40.8px regular Georgia page title and single 30.6px Scalar Function, VRZ Function, and VTI Function headings in both languages. Parameter names, types, defaults, and prose all use 17px text. Signatures retain 17px naturally wrapping monospace text and bold 18.7px function names; code blocks and inline code outside API fields retain their separate 15.3px size. Original section bookmarks, positional aliases, language switching, and legacy API routes are preserved.
+Usage uses a 40.8px regular Georgia page title and single 30.6px Scalar Function, VRZ Function, and VTI Function headings in both languages. Parameter names, types, defaults, and prose all use 17px text. Signatures retain 17px naturally wrapping monospace text and bold 18.7px function names; the propagator overview uses matching 17px API links, dimension tokens, and notation with consistent baselines. Code blocks and other inline code outside API fields retain their separate 15.3px size. Original section bookmarks, positional aliases, language switching, and legacy API routes are preserved.
 
 Browser regression checks include the homepage logo, desktop/mobile layout, typography, text contrast, keyboard targets, calls to action and screenshots in both languages. They also retain the full documentation regression suite.
 

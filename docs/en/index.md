@@ -84,7 +84,7 @@ loss.backward()
   <a href="modeling/gradient.html"><span class="sw-path-icon"><svg class="sw-tutorial-icon" viewBox="0 0 96 64" width="96" height="64" aria-hidden="true" focusable="false"><path class="sw-icon-soft" d="M16 53V13m0 40h65"/><path d="m24 43 15-17 15 8 23-19m-13 0h13v13"/></svg></span><span class="sw-path-copy"><strong>Follow the gradient</strong><span>Connect the data residual to a model update direction.</span></span><span aria-hidden="true">→</span></a>
   <a href="inversion/fwi.html"><span class="sw-path-icon"><svg class="sw-tutorial-icon" viewBox="0 0 96 64" width="96" height="64" aria-hidden="true" focusable="false"><path d="M23 22a24 24 0 0 1 43-1m0 0V10m0 11H55M70 44a24 24 0 0 1-43 1m0 0v11m0-11h11"/><path class="sw-icon-soft" d="M37 33h7l4-10 5 20 4-10h7"/></svg></span><span class="sw-path-copy"><strong>Build an inversion</strong><span>Bring propagation, a loss, and an optimizer together.</span></span><span aria-hidden="true">→</span></a>
 </div>
-<div class="sw-home-next"><p>Start with a small model. Bring your own ideas to the next inversion experiment.</p><a href="quickstart.html">Open the Quickstart →</a><a href="wsl.html">Windows / WSL 2 →</a><a href="status.html">Documentation and validation scope →</a></div>
+<div class="sw-home-next"><p>Start with a small model. Bring your own ideas to the next inversion experiment.</p><a href="quickstart.html">Open the Quickstart →</a><a href="wsl.html">Windows / WSL →</a><a href="status.html">Documentation and validation scope →</a></div>
 ```
 
 ```{toctree}
@@ -94,6 +94,7 @@ loss.backward()
 
 About StarWave <about>
 Installation <installation>
+Docker <docker>
 WSL <wsl>
 Quickstart <quickstart>
 ```
@@ -101,13 +102,13 @@ Quickstart <quickstart>
 ```{toctree}
 :maxdepth: 1
 :hidden:
-:caption: Modeling
+:caption: Forward Modeling
 
 Conventions <modeling/conventions>
+Acquisition <modeling/acquisition>
 Scalar <modeling/scalar>
 Gradient <modeling/gradient>
-VRZ <modeling/vrz>
-VTI <modeling/vti>
+Wave propagation <modeling/wave-propagation>
 ```
 
 ```{toctree}

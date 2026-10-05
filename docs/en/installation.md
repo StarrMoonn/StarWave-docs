@@ -1,5 +1,11 @@
 # Installation
 
+**Installation channels**
+
+- **PyPI**: the public wheel is available. Follow the instructions below to install StarWave 2.0.0.
+- **Source**: available only to users with authorized source access. Follow the instructions provided with that source.
+- **[Docker](docker.md)**: preparing; no StarWave container image has been published yet.
+
 ## Runtime requirements
 
 | Component | StarWave 2.0.0 wheel requirement |

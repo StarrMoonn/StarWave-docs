@@ -1,6 +1,6 @@
 # Acoustic VTI: Two and Three Dimensions
 
-`starwave.vti` is a Duveneck-type acoustic VTI interface, not a full elastic-wave interface. Its four model parameters are `vp`, `epsilon`, `delta`, and `rho`. Each can be independently selected for training through `requires_grad`; fixed parameters still participate in forward propagation.
+`starwave.vti` is a Duveneck-type acoustic VTI (vertical transverse isotropy) interface, not a full elastic-wave interface. Its four model parameters are `vp`, `epsilon`, `delta`, and `rho`. Each can be independently selected for training through `requires_grad`; fixed parameters still participate in forward propagation.
 
 | Model | Condition | Typical units |
 |---|---|---|

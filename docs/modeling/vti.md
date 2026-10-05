@@ -1,6 +1,6 @@
 # 声学 VTI：二维与三维
 
-`starwave.vti` 是 Duveneck 型声学 VTI 接口，不是完整弹性波接口。四个模型参数是 `vp`、`epsilon`、`delta`、`rho`，可独立通过 `requires_grad` 选择训练；固定参数仍参与正演。
+`starwave.vti` 是 Duveneck 型声学 VTI（垂直对称轴的横向各向同性）接口，不是完整弹性波接口。四个模型参数是 `vp`、`epsilon`、`delta`、`rho`，可独立通过 `requires_grad` 选择训练；固定参数仍参与正演。
 
 | 模型 | 条件 | 典型单位 |
 |---|---|---|

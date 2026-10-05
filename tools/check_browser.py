@@ -21,8 +21,8 @@ USAGE_TARGETS = tuple(
 TOC_TARGETS = ('scalar', 'vrz', 'vti', 'native-status', 'prepare-native', 'other-exports')
 USAGE_SECTIONS = tuple(target for target in USAGE_TARGETS if not target.endswith('-function'))
 CHAPTERS = {
-    'about', 'installation', 'wsl', 'quickstart', 'modeling/conventions',
-    'modeling/scalar', 'modeling/gradient', 'modeling/vrz', 'modeling/vti', 'inversion/fwi',
+    'about', 'installation', 'docker', 'wsl', 'quickstart', 'modeling/conventions',
+    'modeling/scalar', 'modeling/gradient', 'modeling/acquisition', 'modeling/wave-propagation', 'inversion/fwi',
     'inversion/dataparallel', 'inversion/inr', 'usage', 'faq',
     'release-notes', 'status',
 }
@@ -49,7 +49,12 @@ def check_navigation(page, locale, relative):
     paths = {urlsplit(link['href']).path for link in links}
     expected = {f'/{locale}/{chapter}.html' for chapter in CHAPTERS}
     assert expected <= paths, f'Missing chapters on {relative}: {expected - paths}'
-    assert not any('/api/' in path for path in paths), relative
+    assert not any('/api/' in path or path.endswith(('/modeling/vrz.html', '/modeling/vti.html')) for path in paths), relative
+    wave_links = [link for link in links if urlsplit(link['href']).path == f'/{locale}/modeling/wave-propagation.html']
+    assert len(wave_links) == 1 and wave_links[0]['text'] == ('波传播' if locale == 'zh' else 'Wave propagation'), (relative, wave_links)
+    captions = nav.locator('.caption-text').all_text_contents()
+    assert ('正演模拟' if locale == 'zh' else 'Forward Modeling') in captions, (relative, captions)
+    assert next(link['text'] for link in links if urlsplit(link['href']).path == f'/{locale}/wsl.html') == 'WSL'
     usage = [link for link in links if urlsplit(link['href']).path == f'/{locale}/usage.html']
     assert len(usage) == 1 and usage[0]['text'] == 'Usage', usage
     assert all(not urlsplit(link['href']).fragment for link in links), relative
@@ -100,6 +105,35 @@ def check_usage(page, locale, output):
         assert abs(heading.evaluate('e => parseFloat(getComputedStyle(e).fontSize)') - 30.6) < .01
         assert 'Georgia' in heading.evaluate('e => getComputedStyle(e).fontFamily')
     assert not main.locator('h3').evaluate_all("items => items.some(e => ['Function', '函数'].includes(e.firstChild.textContent.trim()))")
+    overview = main.locator('#propagators')
+    assert overview.locator('code.xref').all_text_contents() == ['starwave.scalar()', 'starwave.vrz()', 'starwave.vti()']
+    assert overview.locator(':scope > p code.literal').all_text_contents() == ['B', 'S', 'R', 'T', 'D']
+    overview_rows = overview.locator('p').evaluate_all("""items => items.map(p => {
+        const prose = getComputedStyle(p);
+        return {size: prose.fontSize, line: prose.lineHeight,
+                codes: Array.from(p.querySelectorAll('a, code, code span')).map(e => {
+                    const s = getComputedStyle(e);
+                    return {text:e.textContent, size:s.fontSize, line:s.lineHeight, vertical:s.verticalAlign};
+                })};
+    })""")
+    assert len(overview_rows) == 4
+    assert len({row['line'] for row in overview_rows}) == 1, (locale, overview_rows)
+    assert all(row['size'] == '17px' and all(code['size'] == row['size'] and code['line'] == row['line'] and code['vertical'] == 'baseline' for code in row['codes']) for row in overview_rows), (locale, overview_rows)
+    if locale == 'en':
+        dimensions = overview.locator('code.literal').filter(has_text=re.compile(r'^2D(?:/3D)?$'))
+        assert dimensions.all_text_contents() == ['2D', '2D', '2D/3D']
+        # Inspect the rendered font metrics: dimension numerals must have lining
+        # figures rather than a descending old-style 3 beside the uppercase D.
+        metrics = dimensions.first.evaluate("""e => {
+            const s = getComputedStyle(e), ctx = document.createElement('canvas').getContext('2d');
+            ctx.font = `${s.fontStyle} ${s.fontWeight} ${s.fontSize} ${s.fontFamily}`;
+            return {font:s.fontFamily, variant:s.fontVariantNumeric,
+                    glyphs:Array.from('23D').map(c => { const m=ctx.measureText(c);
+                        return {ascent:m.actualBoundingBoxAscent, descent:m.actualBoundingBoxDescent}; })};
+        }""")
+        assert 'monospace' in metrics['font'] and metrics['variant'] == 'lining-nums', metrics
+        assert max(g['ascent'] for g in metrics['glyphs']) - min(g['ascent'] for g in metrics['glyphs']) <= 2, metrics
+        assert all(g['descent'] <= 1 for g in metrics['glyphs']), metrics
     for name, count in (('scalar', 16), ('vrz', 18), ('vti', 20), ('prepare_native', 1)):
         parameters = main.locator(f'dt[id="starwave.{name}"]').locator('..').locator('dl.field-list > dd').first.locator('p')
         assert parameters.count() == count, (locale, name, parameters.count())
@@ -135,6 +169,8 @@ def check_usage(page, locale, output):
     width = page.viewport_size['width']
     page.evaluate('window.scrollTo(0, 0)')
     page.screenshot(path=str(output / f'{locale}-usage-top-{width}.png'))
+    overview.locator('h2').evaluate("e => e.scrollIntoView({block: 'start'})")
+    page.screenshot(path=str(output / f'{locale}-usage-overview-{width}.png'))
     for name in ('scalar', 'vrz', 'vti'):
         main.locator(f'#{name} > h2').evaluate("e => e.scrollIntoView({block: 'start'})")
         page.screenshot(path=str(output / f'{locale}-usage-{name}-heading-{width}.png'))
@@ -207,34 +243,37 @@ def check_heading_language_switches(page, base):
 
 
 def check_redirects(page, base):
-    redirects = json.loads((PROJECT / 'tools' / 'api_redirects.json').read_text())
-    for source_locale in ('root', 'zh', 'en'):
-        locale = 'zh' if source_locale == 'root' else source_locale
-        prefix = '' if source_locale == 'root' else source_locale + '/'
-        for relative, spec in redirects[source_locale].items():
-            source_path = prefix + relative
-            fragments = {'': spec['default']} | spec['fragments']
-            for old, target in fragments.items():
-                query = 'q=source%20amplitudes&from=legacy'
-                source = base + source_path + '?' + query + ('#' + quote(old) if old else '')
-                documents = []
+    suites = (('api_redirects.json', 'usage.html'),
+              ('modeling_redirects.json', 'modeling/wave-propagation.html'))
+    for filename, target_relative in suites:
+        redirects = json.loads((PROJECT / 'tools' / filename).read_text())
+        for source_locale in ('root', 'zh', 'en'):
+            locale = 'zh' if source_locale == 'root' else source_locale
+            prefix = '' if source_locale == 'root' else source_locale + '/'
+            for relative, spec in redirects[source_locale].items():
+                source_path = prefix + relative
+                fragments = {'': spec['default']} | spec['fragments']
+                for old, target in fragments.items():
+                    query = 'q=source%20amplitudes&from=legacy'
+                    source = base + source_path + '?' + query + ('#' + quote(old) if old else '')
+                    documents = []
 
-                def record(request):
-                    if request.is_navigation_request() and request.frame == page.main_frame:
-                        documents.append(urlsplit(request.url).path)
+                    def record(request):
+                        if request.is_navigation_request() and request.frame == page.main_frame:
+                            documents.append(urlsplit(request.url).path)
 
-                page.on('request', record)
-                try:
-                    page.goto(source, wait_until='load')
-                    page.wait_for_url(lambda url: urlsplit(str(url)).path == f'/{locale}/usage.html', wait_until='load')
-                    parsed = urlsplit(page.url)
-                    # Sphinx may normalize a query space from %20 to + on load.
-                    assert parse_qsl(parsed.query, keep_blank_values=True) == parse_qsl(query, keep_blank_values=True), (source, page.url)
-                    assert unquote(parsed.fragment) == target, (source, page.url, target)
-                    assert documents == ['/' + source_path, f'/{locale}/usage.html'], (source, documents)
-                    assert page.locator(f'[id="{target}"]').count() == 1, (source, target)
-                finally:
-                    page.remove_listener('request', record)
+                    page.on('request', record)
+                    try:
+                        page.goto(source, wait_until='load')
+                        page.wait_for_url(lambda url: urlsplit(str(url)).path == f'/{locale}/{target_relative}', wait_until='load')
+                        parsed = urlsplit(page.url)
+                        # Sphinx may normalize a query space from %20 to + on load.
+                        assert parse_qsl(parsed.query, keep_blank_values=True) == parse_qsl(query, keep_blank_values=True), (source, page.url)
+                        assert unquote(parsed.fragment) == target, (source, page.url, target)
+                        assert documents == ['/' + source_path, f'/{locale}/{target_relative}'], (source, documents)
+                        assert page.locator(f'[id="{target}"]').count() == 1, (source, target)
+                    finally:
+                        page.remove_listener('request', record)
 
 
 
@@ -266,6 +305,7 @@ def check_homepage(page, base, locale, output):
     assert main.locator('.sw-tutorial-icon').count() == 3
     assert main.locator('.sw-home-footnote, .sw-home-number').count() == 0
     assert main.locator('.sw-home-next p').count() == 1 and main.locator('.sw-home-next a').count() == 3
+    assert main.locator('.sw-home-next a[href="wsl.html"]').inner_text() == 'Windows / WSL →'
     assert all(size >= 16 for size in main.locator('.sw-home-capabilities p, .sw-home-capabilities a, .sw-path-copy strong, .sw-path-copy > span, .sw-home-next p, .sw-home-next a').evaluate_all('items => items.map(e => parseFloat(getComputedStyle(e).fontSize))'))
     assert main.locator('.sw-home-code pre').count() == 1
     assert 'loss.backward()' in main.locator('.sw-home-code').inner_text()
@@ -362,6 +402,41 @@ def check_tutorials(page, base, locale, output):
         assert page.locator(f'[id="{alias}"]').evaluate('e => e.closest("section").id') == target
 
 
+def check_forward_modeling(page, base, locale, output):
+    width = page.viewport_size['width']
+    page.goto(base + locale + '/modeling/wave-propagation.html', wait_until='networkidle')
+    targets = ['wave-propagation', 'wave-vrz', 'wave-vrz-details', 'wave-vrz-limits',
+               'wave-vti', 'wave-vti-details', 'wave-vti-limits']
+    assert page.locator('[role="main"] section[data-sw-anchor]').evaluate_all('items => items.map(e => e.dataset.swAnchor)') == targets
+    toc = page.locator('.sw-page-toc')
+    assert toc.locator('a').evaluate_all('items => items.map(e => e.getAttribute("href"))') == ['#' + target for target in targets[1:]]
+    assert 'starwave.vrz' in page.locator('#wave-vrz').inner_text()
+    assert 'starwave.vti' in page.locator('#wave-vti').inner_text()
+    page.screenshot(path=str(output / f'{locale}-wave-propagation-{width}.png'))
+    for target in targets[1:]:
+        page.goto(base + locale + '/modeling/wave-propagation.html?from=modeling#' + target)
+        other = 'en' if locale == 'zh' else 'zh'
+        open_mobile_menu(page)
+        page.locator(f'[data-sw-language="{other}"]').click()
+        assert urlsplit(page.url).path == f'/{other}/modeling/wave-propagation.html'
+        assert urlsplit(page.url).fragment == target and urlsplit(page.url).query == 'from=modeling'
+    page.goto(base + locale + '/modeling/acquisition.html', wait_until='networkidle')
+    figure = page.locator('figure img')
+    assert figure.count() == 1 and figure.get_attribute('alt')
+    assert figure.evaluate('e => e.complete && e.naturalWidth > 0')
+    assert figure.bounding_box()['width'] <= page.locator('[role="main"]').bounding_box()['width']
+    assert page.locator('.highlight-python').count() == 2
+    figure.evaluate("e => e.scrollIntoView({block:'center'})")
+    page.screenshot(path=str(output / f'{locale}-acquisition-{width}.png'))
+    page.goto(base + locale + '/docker.html', wait_until='networkidle')
+    main = page.locator('[role="main"]')
+    assert main.locator('svg[role="img"] title').count() == 1
+    assert ('尚未发布' if locale == 'zh' else 'Unreleased') in main.inner_text()
+    assert main.locator('pre').count() == 0
+    assert main.locator('a[href="installation.html"]').count() >= 1
+    page.screenshot(path=str(output / f'{locale}-docker-{width}.png'))
+
+
 def check_search(page, base):
     for locale in ('en', 'zh'):
         page.goto(base + locale + '/index.html')
@@ -389,6 +464,8 @@ def check_search(page, base):
         assert enter_results == {urlsplit(link).path for link in click_results}, (locale, click_results)
         index = page.evaluate('Search._index')
         assert 'usage' in index['docnames'] and not any(name.startswith('api/') for name in index['docnames']), index['docnames']
+        assert {'modeling/wave-propagation', 'modeling/acquisition', 'docker'} <= set(index['docnames'])
+        assert not {'modeling/vrz', 'modeling/vti'} & set(index['docnames'])
         objects = {item[4]: item[0] for item in index['objects'].get('starwave', [])}
         assert set(API_NAMES) <= objects.keys(), objects
         assert all(index['docnames'][objects[name]] == 'usage' for name in API_NAMES), objects
@@ -420,7 +497,7 @@ def check(root, browser_path=None):
                 page.set_viewport_size(size)
                 for locale in ('zh', 'en'):
                     for path in sorted((root / locale).rglob('*.html')):
-                        if path.relative_to(root / locale).parts[0] == 'api':
+                        if path.relative_to(root / locale).parts[0] == 'api' or path.relative_to(root / locale).as_posix() in {'modeling/vrz.html', 'modeling/vti.html'}:
                             continue  # Compatibility pages are tested separately.
                         relative = path.relative_to(root).as_posix()
                         page.goto(base + relative, wait_until='networkidle')
@@ -433,6 +510,7 @@ def check(root, browser_path=None):
                     check_usage(page, locale, output)
                     check_tutorials(page, base, locale, output)
                     check_homepage(page, base, locale, output)
+                    check_forward_modeling(page, base, locale, output)
                 check_search(page, base)
             # Narrow phones and the smallest desktop sidebar layouts exercise
             # the homepage breakpoints without duplicating the entire API suite.
@@ -446,6 +524,8 @@ def check(root, browser_path=None):
                     open_mobile_menu(page)
                     check_navigation(page, locale, 'usage.html')
                     close_mobile_menu(page)
+                    check_forward_modeling(page, base, locale, output)
+                    assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), (locale, size)
             page.set_viewport_size({'width': 390, 'height': 844})
             page.goto(base + 'zh/usage.html')
             open_mobile_menu(page)
@@ -497,6 +577,11 @@ def check(root, browser_path=None):
                     plain.locator('[data-sw-language="en"]').click()
                     assert urlsplit(plain.url).path == '/en/usage.html'
                     assert urlsplit(plain.url).fragment == ('usage' if name == 'index' else name)
+                for name in ('vrz', 'vti'):
+                    plain.goto(base + f'{prefix}modeling/{name}.html')
+                    plain.locator('[data-sw-language="en"]').click()
+                    assert urlsplit(plain.url).path == '/en/modeling/wave-propagation.html'
+                    assert urlsplit(plain.url).fragment == 'wave-' + name
             for locale in ('zh', 'en'):
                 plain.goto(base + locale + '/index.html')
                 assert plain.locator('.sw-home-logo').is_visible()

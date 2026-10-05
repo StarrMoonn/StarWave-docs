@@ -166,6 +166,9 @@ html[lang="zh-CN"] .rst-content #usage { font-family: "StarWave Home Sans", -app
 .rst-content #usage dl.py > dd { margin-left: 30px; }
 .rst-content #usage p { font-size: 17px; line-height: inherit; margin-bottom: 20px; }
 .rst-content #usage code.literal { padding: 0; border: 0; background: transparent; color: inherit; font-family: Consolas, Menlo, "DejaVu Sans Mono", "Bitstream Vera Sans Mono", monospace; font-size: 15.3px; }
+/* The overview reads as one consistent line, including API links and notation. */
+.rst-content #usage #propagators :is(ul, li, p) { line-height: inherit; }
+.rst-content #usage #propagators code.literal { font-size: inherit; line-height: inherit; vertical-align: baseline; font-variant-numeric: lining-nums; }
 .rst-content #usage pre { font-family: Consolas, Menlo, "DejaVu Sans Mono", "Bitstream Vera Sans Mono", monospace; font-size: 15.3px; line-height: 1.3; }
 html.writer-html5 .rst-content #usage dl.field-list { display: grid; grid-template-columns: max-content minmax(0, 1fr); column-gap: 14px; row-gap: 12px; margin: 20px 0 28px; }
 html.writer-html5 .rst-content #usage dl.field-list > dt { padding: 0; margin: 0; border: 0; background: transparent; color: #333; font-family: inherit; font-size: 17px; line-height: inherit; font-weight: 700; }

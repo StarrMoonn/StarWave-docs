@@ -95,6 +95,18 @@ def check(root):
                 if target not in canonical.ids:
                     errors.append(f'Invalid legacy API target: {source}/{relative} -> {target}')
     contracts = json.loads((project / 'tools' / 'api_contract.json').read_text())
+    modeling_redirects = json.loads((project / 'tools' / 'modeling_redirects.json').read_text())
+    for source, routes in modeling_redirects.items():
+        locale = 'zh' if source == 'root' else source
+        canonical = pages[root / locale / 'modeling/wave-propagation.html']
+        for relative, route in routes.items():
+            path = root / relative if source == 'root' else root / source / relative
+            content = path.read_text(encoding='utf-8')
+            if 'location.replace' not in content or 'noindex, follow' not in content or 'wave-propagation.html' not in content:
+                errors.append(f'Missing canonical modeling redirect: {source}/{relative}')
+            for target in {route['default'], *route['fragments'].values()}:
+                if target not in canonical.ids:
+                    errors.append(f'Invalid legacy modeling target: {source}/{relative} -> {target}')
     for locale in ('zh', 'en'):
         usage = root / locale / 'usage.html'
         content = usage.read_text(encoding='utf-8')
@@ -124,6 +136,11 @@ def check(root):
         docnames = json.loads(index.removeprefix('Search.setIndex(').removesuffix(')'))['docnames']
         if 'usage' not in docnames or any(name.startswith('api/') for name in docnames):
             errors.append(f'API search entries are duplicated or missing: {locale}')
+        if not {'modeling/wave-propagation', 'modeling/acquisition', 'docker'} <= set(docnames) or {'modeling/vrz', 'modeling/vti'} & set(docnames):
+            errors.append(f'Modeling search entries are duplicated or missing: {locale}')
+        combined = (root / locale / 'modeling/wave-propagation.html').read_text()
+        if len(re.findall(r'data-sw-anchor="wave-[^"]+"', combined)) != 7:
+            errors.append(f'Incomplete combined modeling sections: {locale}')
     links = 0
     for path, page in pages.items():
         if page.duplicate_ids:
@@ -216,6 +233,27 @@ def check(root):
             if (root / locale / '_static' / 'brand' / name).read_bytes() != (brand_dir / name).read_bytes():
                 errors.append(f'Published brand asset differs: {locale}/{name}')
 
+    diagram = project / 'docs' / '_static' / 'diagrams' / 'acquisition.svg'
+    try:
+        svg = ET.fromstring(diagram.read_bytes())
+        if svg.tag.rsplit('}', 1)[-1] != 'svg' or not svg.get('viewBox'):
+            errors.append('Invalid acquisition diagram root or dimensions')
+        if not any(e.tag.rsplit('}', 1)[-1] == 'title' and e.text for e in svg.iter()):
+            errors.append('Missing accessible acquisition diagram title')
+        for element in svg.iter():
+            if element.tag.rsplit('}', 1)[-1] in {'script', 'foreignObject', 'image', 'use'}:
+                errors.append('Unsafe acquisition diagram element')
+            for key, value in element.attrib.items():
+                if key.lower().startswith('on') or ('href' in key.lower() and not value.startswith('#')):
+                    errors.append('External or active acquisition diagram attribute')
+                if 'url(' in value and not re.fullmatch(r'url\(#[A-Za-z0-9_-]+\)', value):
+                    errors.append('External acquisition diagram reference')
+        for locale in ('zh', 'en'):
+            if (root / locale / '_static' / 'diagrams' / diagram.name).read_bytes() != diagram.read_bytes():
+                errors.append(f'Published acquisition diagram differs: {locale}')
+    except (FileNotFoundError, ET.ParseError):
+        errors.append('Missing or invalid acquisition diagram')
+
     font_dir = project / 'docs' / '_static' / 'fonts'
     font_manifest = json.loads((font_dir / 'manifest.json').read_text())
     font_names = {'home-sans-sc-regular.woff', 'home-sans-sc-bold.woff'}
@@ -260,8 +298,9 @@ def check(root):
         is_tutorial_png = p.suffix == ".png" and relative.parts[:3] == ("docs", "_static", "tutorials")
         is_brand_file = relative.parts[:3] == ("docs", "_static", "brand") and p.name in brand_names
         is_font_file = relative.parts[:3] == ("docs", "_static", "fonts") and p.name in font_names
+        is_diagram_file = relative.as_posix() == 'docs/_static/diagrams/acquisition.svg'
         is_tutorial_notebook = p.suffix == ".ipynb" and relative.parts[:2] == ("examples", "tutorials")
-        if p.name != ".gitignore" and p.suffix not in allowed and not is_tutorial_png and not is_tutorial_notebook and not is_brand_file and not is_font_file:
+        if p.name != ".gitignore" and p.suffix not in allowed and not is_tutorial_png and not is_tutorial_notebook and not is_brand_file and not is_font_file and not is_diagram_file:
             errors.append(f"Unexpected source file: {relative}")
         if p.suffix == ".py":
             try:

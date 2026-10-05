@@ -19,11 +19,11 @@ The page organization follows the Sphinx Python API style of the [official Deepw
 (propagators)=
 ## Propagators at a glance
 
-- {py:func}`starwave.scalar`: 2D scalar acoustics; velocity model `v`; returns a one-element tuple of recordings.
+- {py:func}`starwave.scalar`: `2D` scalar acoustics; velocity model `v`; returns a one-element tuple of recordings.
 
-- {py:func}`starwave.vrz`: 2D variable-density acoustics; `v` plus exactly one `impedance` / `density` parameterization.
+- {py:func}`starwave.vrz`: `2D` variable-density acoustics; `v` plus exactly one `impedance` / `density` parameterization.
 
-- {py:func}`starwave.vti`: 2D/3D acoustic VTI; `vp, epsilon, delta, rho`; returns recordings in the selected component order.
+- {py:func}`starwave.vti`: `2D/3D` acoustic VTI; `vp, epsilon, delta, rho`; returns recordings in the selected component order.
 
 Notation: `B` is the number of shots, `S` the sources per shot, `R` the receivers per shot, `T` the number of user time samples, and `D` the number of spatial dimensions. Sources and receivers use integer grid indices in the physical model, not coordinates in meters, and do not include PML offsets.
 
@@ -180,7 +180,7 @@ receiver_amplitudes, = starwave.vrz(
 )
 ```
 
-For the impedance parameterization, replace `density=rho` with `impedance=Z`; do not keep both. See [VRZ modeling](modeling/vrz.md) for more background. A complete standalone GPU example remains to be added.
+For the impedance parameterization, replace `density=rho` with `impedance=Z`; do not keep both. See {ref}`VRZ modeling <wave-vrz>` for more background. A complete standalone GPU example remains to be added.
 
 (vrz-notes)=
 ### Notes
@@ -272,7 +272,7 @@ stress_h, velocity_z = starwave.vti(
 )
 ```
 
-This example uses 2D inputs. A 3D call needs all four models shaped `[nx,ny,nz]`, 3D coordinates, and matching spacing. Omitting `receiver_fields` returns only `vz`, so use single-variable tuple unpacking. VTI has no `illumination` parameter. A complete standalone GPU example remains to be added; see [VTI modeling](modeling/vti.md).
+This example uses 2D inputs. A 3D call needs all four models shaped `[nx,ny,nz]`, 3D coordinates, and matching spacing. Omitting `receiver_fields` returns only `vz`, so use single-variable tuple unpacking. VTI has no `illumination` parameter. A complete standalone GPU example remains to be added; see {ref}`VTI modeling <wave-vti>`.
 
 (vti-notes)=
 ### Notes

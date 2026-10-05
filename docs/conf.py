@@ -15,7 +15,8 @@ language = 'zh_CN' if LOCALE == 'zh' else 'en'
 extensions = ['myst_parser', 'sphinx.ext.githubpages', 'sphinx.ext.mathjax']
 source_suffix = {'.md': 'markdown'}
 root_doc = 'index'
-exclude_patterns = ['en', 'requirements.txt', '_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = ['en', 'requirements.txt', '_build', 'Thumbs.db', '.DS_Store',
+                    'modeling/vrz.md', 'modeling/vti.md']
 myst_enable_extensions = ['colon_fence', 'fieldlist']
 myst_heading_anchors = 3
 nitpicky = True
