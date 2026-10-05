@@ -234,104 +234,85 @@
   "api/scalar.html": [
     {
       "id": "scalar",
-      "title": "scalar：二维标量声学",
-      "target": "sw-section-0"
+      "title": "scalar：二维标量声学"
     },
     {
       "id": "id2",
-      "title": "函数",
-      "target": "sw-section-1"
+      "title": "函数"
     },
     {
       "id": "id3",
-      "title": "震源与自动微分",
-      "target": "sw-section-2"
+      "title": "震源与自动微分"
     },
     {
       "id": "id4",
-      "title": "示例",
-      "target": "sw-section-3"
+      "title": "示例"
     },
     {
       "id": "id5",
-      "title": "注意事项",
-      "target": "sw-section-4"
+      "title": "注意事项"
     }
   ],
   "api/vrz.html": [
     {
       "id": "vrz",
-      "title": "vrz：二维变密度声学",
-      "target": "sw-section-0"
+      "title": "vrz：二维变密度声学"
     },
     {
       "id": "id2",
-      "title": "函数",
-      "target": "sw-section-1"
+      "title": "函数"
     },
     {
       "id": "id3",
-      "title": "参数化、震源与梯度",
-      "target": "sw-section-2"
+      "title": "参数化、震源与梯度"
     },
     {
       "id": "id4",
-      "title": "示例",
-      "target": "sw-section-3"
+      "title": "示例"
     },
     {
       "id": "id5",
-      "title": "注意事项",
-      "target": "sw-section-4"
+      "title": "注意事项"
     }
   ],
   "api/index.html": [
     {
       "id": "api",
-      "title": "API 参考",
-      "target": "sw-section-0"
+      "title": "API 参考"
     },
     {
       "id": "id1",
-      "title": "传播函数速查",
-      "target": "sw-section-1"
+      "title": "传播函数速查"
     },
     {
       "id": "id2",
-      "title": "原生运行库",
-      "target": "sw-section-2"
+      "title": "原生运行库"
     },
     {
       "id": "id3",
-      "title": "其它导出名称与范围",
-      "target": "sw-section-5"
+      "title": "其它导出名称与范围"
     }
   ],
   "api/vti.html": [
     {
       "id": "vti-vti",
-      "title": "vti：二维与三维声学 VTI",
-      "target": "sw-section-0"
+      "title": "vti：二维与三维声学 VTI"
     },
     {
       "id": "id2",
-      "title": "函数",
-      "target": "sw-section-1"
+      "title": "函数"
     },
     {
       "id": "id3",
-      "title": "分量、时间与梯度",
-      "target": "sw-section-2"
+      "title": "分量、时间与梯度"
     },
     {
       "id": "id4",
-      "title": "示例",
-      "target": "sw-section-3"
+      "title": "示例"
     },
     {
       "id": "id5",
-      "title": "注意事项",
-      "target": "sw-section-4"
+      "title": "注意事项"
     }
   ]
 }

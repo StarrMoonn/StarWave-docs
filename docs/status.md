@@ -16,7 +16,7 @@
 ## 参考来源
 
 - [StarWave 2.0.0 PyPI](https://pypi.org/project/starwave/2.0.0/)：公开发行要求与限制。
-- [Deepwave API 文档](https://ausargeo.com/deepwave/usage)：参考 API 组织与 Sphinx/Alabaster 呈现，StarWave 说明均为原创。
+- [Deepwave API 文档](https://ausargeo.com/deepwave/usage)：参考 API 内容组织，站点保留 Read the Docs 主题，StarWave 说明均为原创。
 - [PyFWI 文档](https://pyfwi.readthedocs.io/en/latest/)：仅参考手册导航组织。
 - [PyTorch 历史版本安装](https://pytorch.org/get-started/previous-versions/) 与 [DataParallel](https://docs.pytorch.org/docs/stable/generated/torch.nn.DataParallel.html)。
 - [Microsoft WSL 安装](https://learn.microsoft.com/en-us/windows/wsl/install) 与 [NVIDIA WSL 用户指南](https://docs.nvidia.com/cuda/wsl-user-guide/index.html)。

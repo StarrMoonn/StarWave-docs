@@ -10,6 +10,12 @@ from playwright.sync_api import sync_playwright
 PROJECT = Path(__file__).resolve().parents[1]
 
 
+def open_mobile_menu(page):
+    if page.viewport_size['width'] <= 768 and not page.locator('.wy-nav-side').evaluate("e => e.classList.contains('shift')"):
+        page.locator('[data-sw-mobile-menu]').click()
+        page.wait_for_function("document.querySelector('[data-sw-mobile-menu]').getAttribute('aria-expanded') === 'true'")
+
+
 def check(root, browser_path=None):
     handler = partial(SimpleHTTPRequestHandler, directory=str(root))
     server = ThreadingHTTPServer(('127.0.0.1', 0), handler)
@@ -31,6 +37,9 @@ def check(root, browser_path=None):
                         relative = path.relative_to(root).as_posix()
                         page.goto(base + relative, wait_until='networkidle')
                         assert page.locator('[data-sw-language]').count() == 2, relative
+                        assert page.locator('.wy-nav-side .caption-text').filter(has_text='Usage / API').count() == 1, relative
+                        assert page.locator('.wy-nav-side a').filter(has_text='starwave.native_status').count() == 1, relative
+                        assert page.locator('.wy-nav-side a').filter(has_text='starwave.prepare_native').count() == 1, relative
                         if not page.evaluate('document.documentElement.scrollWidth <= innerWidth'):
                             page.screenshot(path=str(output / f'overflow-{locale}-{path.stem}-{size["width"]}.png'), full_page=True)
                             wide = page.evaluate("""Array.from(document.querySelectorAll('body *')).filter(e => e.getBoundingClientRect().right > innerWidth).map(e => ({tag:e.tagName, classes:e.className, text:e.textContent.slice(0,120)})).slice(-12)""")
@@ -38,17 +47,25 @@ def check(root, browser_path=None):
                     page.goto(base + locale + '/api/scalar.html')
                     page.screenshot(path=str(output / f'{locale}-scalar-{size["width"]}.png'), full_page=True)
             page.goto(base + 'zh/api/scalar.html')
-            assert '参数' in page.locator('.body').inner_text()
-            assert '必填' in page.locator('.body').inner_text()
-            assert 'source_amplitudes' in page.locator('.body').inner_text()
-            assert '开始使用' in page.locator('.sphinxsidebar').inner_text()
+            open_mobile_menu(page)
+            page.screenshot(path=str(output / 'zh-mobile-navigation.png'))
+            page.locator('[data-sw-mobile-menu]').click()
+            page.wait_for_function("document.querySelector('[data-sw-mobile-menu]').getAttribute('aria-expanded') === 'false'")
+            open_mobile_menu(page)
+            page.locator('[data-sw-mobile-menu]').click()
+            assert '参数' in page.locator('[role="main"]').inner_text()
+            assert '必填' in page.locator('[role="main"]').inner_text()
+            assert 'source_amplitudes' in page.locator('[role="main"]').inner_text()
+            assert '开始使用' in page.locator('.wy-nav-side').inner_text()
             page.goto(base + 'zh/api/scalar.html#id4')
+            open_mobile_menu(page)
             page.locator('[data-sw-language="en"]').click()
             assert urlsplit(page.url).path == '/en/api/scalar.html'
-            assert 'Parameters' in page.locator('.body').inner_text()
-            assert 'Required' in page.locator('.body').inner_text()
+            assert 'Parameters' in page.locator('[role="main"]').inner_text()
+            assert 'Required' in page.locator('[role="main"]').inner_text()
             assert urlsplit(page.url).fragment == 'sw-section-3'
             assert page.locator('#sw-section-3').count() == 1
+            open_mobile_menu(page)
             page.locator('[data-sw-language="zh"]').click()
             assert urlsplit(page.url).path == '/zh/api/scalar.html'
             assert urlsplit(page.url).fragment == 'sw-section-3'
@@ -59,6 +76,7 @@ def check(root, browser_path=None):
             for name in ('scalar', 'vrz', 'vti'):
                 page.goto(base + f'api/{name}.html#starwave.{name}')
                 page.wait_for_url(f'**/zh/api/{name}.html#starwave.{name}')
+                open_mobile_menu(page)
                 page.locator('[data-sw-language="en"]').click()
                 assert page.locator(f'[id="starwave.{name}"]').count() == 1
                 assert urlsplit(page.url).fragment == f'starwave.{name}'
@@ -72,6 +90,7 @@ def check(root, browser_path=None):
                 links = page.locator('#search-results li a').evaluate_all('(items) => items.map(a => a.href)')
                 assert links and all(f'/{locale}/' in urlsplit(link).path for link in links), links
                 other = 'zh' if locale == 'en' else 'en'
+                open_mobile_menu(page)
                 page.locator(f'[data-sw-language="{other}"]').click()
                 assert urlsplit(page.url).query == 'q=illumination'
             for locale in ('en', 'zh'):

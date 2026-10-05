@@ -21,21 +21,20 @@ myst_heading_anchors = 3
 nitpicky = True
 # These annotations describe accepted public values, rather than local objects.
 nitpick_ignore = [('py:class', x) for x in ('torch.Tensor', 'ScalarIllumination')]
-html_theme = 'alabaster'
+html_theme = 'sphinx_rtd_theme'
 html_theme_options = {
-    'description': 'CUDA 波传播 · PyTorch' if LOCALE == 'zh' else 'CUDA wave propagation · PyTorch',
-    'fixed_sidebar': False, 'sidebar_collapse': False,
-    'show_powered_by': False, 'show_related': False,
+    'collapse_navigation': False,
+    'navigation_depth': 3,
+    'style_nav_header_background': '#17354c',
 }
-html_sidebars = {'**': ['about.html', 'navigation.html', 'searchbox.html']}
 html_static_path = [str(CONF_DIR / '_static')]
 templates_path = [str(CONF_DIR / '_templates')]
-html_css_files = []  # Alabaster loads custom.css once.
+html_css_files = ['custom.css']
 html_js_files = ['language.js']
 html_title = 'StarWave 2.0.0 使用手册' if LOCALE == 'zh' else 'StarWave 2.0.0 User Guide'
 html_show_sourcelink = False
 html_copy_source = False
-html_show_sphinx = False
+html_show_sphinx = True
 html_last_updated_fmt = None
 html_search_language = language
 html_baseurl = f'https://starrmoonn.github.io/StarWave-docs/{LOCALE}/'

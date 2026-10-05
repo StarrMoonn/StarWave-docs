@@ -10,7 +10,7 @@
 
 ## 本使用手册首稿
 
-新增安装/WSL、合成 scalar 示例、三类方程使用说明、FWI/DataParallel/INR 入门、API 索引与 FAQ。初稿采用 Sphinx + Read the Docs 主题，可输出到 GitHub Pages 或其它静态服务器；当前双语版已改用 Alabaster。
+新增安装/WSL、合成 scalar 示例、三类方程使用说明、FWI/DataParallel/INR 入门、API 索引与 FAQ。初稿采用 Sphinx + Read the Docs 主题，可输出到 GitHub Pages 或其它静态服务器；当前双语版保留这一初始模板。
 
 本手册首稿不附带 CUDA 实现、传播 Python 实现、私人实验数据或内部记录。待完成的教程与验收见[文档状态](status.md)。
 
@@ -20,4 +20,4 @@ scalar、VRZ、VTI 各自提供独立参考页，以 Sphinx Python 域展示完�
 
 ## 中英双语版
 
-完整手册提供中文与 English，包括导航、搜索、提示与 18 个内容页面。各语言独立构建和索引，语言切换保留对应页面与章节；旧中文链接与 API 锚点保持可访问。API 呈现参考 Deepwave 的 Sphinx/Alabaster 结构，增加类型签名，并继续保留 StarWave 自身的返回与数值限制。
+完整手册提供中文与 English，包括导航、搜索、提示与 18 个内容页面。各语言独立构建和索引，语言切换保留对应页面与章节；旧中文链接与 API 锚点保持可访问。站点保留最初的 PyFWI / Read the Docs 模板，API 内容组织参考 Deepwave 的 Sphinx 结构，增加类型签名，并继续保留 StarWave 自身的返回与数值限制。

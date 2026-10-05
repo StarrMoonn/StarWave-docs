@@ -17,7 +17,7 @@ SECTION = re.compile(r'<section id="([^"]+)">\s*(<h[1-6]\b.*?</h[1-6]>)', re.S)
 
 
 def sections(text):
-    return [(sid, html.unescape(re.sub('<[^>]+>', '', heading)).removesuffix('¶').strip())
+    return [(sid, html.unescape(re.sub('<[^>]+>', '', re.sub(r'<a[^>]*class="headerlink"[^>]*>.*?</a>', '', heading))).strip())
             for sid, heading in SECTION.findall(text)]
 
 

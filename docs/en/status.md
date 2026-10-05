@@ -16,7 +16,7 @@
 ## References
 
 - [StarWave 2.0.0 on PyPI](https://pypi.org/project/starwave/2.0.0/): public release requirements and limitations.
-- [Deepwave API documentation](https://ausargeo.com/deepwave/usage): consulted for API organization and Sphinx/Alabaster presentation; all StarWave descriptions are original.
+- [Deepwave API documentation](https://ausargeo.com/deepwave/usage): consulted for API content organization; the site retains the Read the Docs theme; all StarWave descriptions are original.
 - [PyFWI documentation](https://pyfwi.readthedocs.io/en/latest/): consulted only for manual navigation structure.
 - [PyTorch previous-version installation instructions](https://pytorch.org/get-started/previous-versions/) and [DataParallel](https://docs.pytorch.org/docs/stable/generated/torch.nn.DataParallel.html).
 - [Microsoft WSL installation](https://learn.microsoft.com/en-us/windows/wsl/install) and the [NVIDIA WSL user guide](https://docs.nvidia.com/cuda/wsl-user-guide/index.html).

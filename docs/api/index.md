@@ -30,6 +30,8 @@ vti
 
 ## 原生运行库
 
+### starwave.native_status
+
 ```{py:function} starwave.native_status() -> dict
 
 查询当前运行库状态，不执行编译或传播。
@@ -37,6 +39,8 @@ vti
 :returns: 状态字典；常用条目包括 `library_exists`、`library_loaded`、`torch_version`、`torch_cuda_version` 和 `cuda_available`。存在或加载成功均不代表数值验收通过。
 :rtype: `dict`
 ```
+
+### starwave.prepare_native
 
 ```{py:function} starwave.prepare_native(device_ids: list[int] | tuple[int, ...]) -> dict
 

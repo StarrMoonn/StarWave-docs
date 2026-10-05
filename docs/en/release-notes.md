@@ -10,7 +10,7 @@ Use [PyPI 2.0.0](https://pypi.org/project/starwave/2.0.0/) as the public release
 
 ## First draft of this user manual
 
-Adds installation and WSL guidance, a synthetic scalar example, usage guidance for all three equation types, introductions to FWI/DataParallel/INR, an API index, and an FAQ. The first draft used Sphinx with the Read the Docs theme and could be deployed to GitHub Pages or another static server. The current bilingual edition uses Alabaster.
+Adds installation and WSL guidance, a synthetic scalar example, usage guidance for all three equation types, introductions to FWI/DataParallel/INR, an API index, and an FAQ. The first draft used Sphinx with the Read the Docs theme and could be deployed to GitHub Pages or another static server. The current bilingual edition retains that original template.
 
 The first draft of this manual includes no CUDA implementation, Python propagation implementation, private experimental data, or internal records. See [Documentation status](status.md) for tutorials and validation work still to be completed.
 
@@ -20,4 +20,4 @@ Scalar, VRZ, and VTI each have a dedicated reference page using the Sphinx Pytho
 
 ## Chinese and English edition
 
-The complete manual is available in Chinese and English, including navigation, search, notices, and all 18 content pages. Each language has an independent build and search index. Language switching preserves the corresponding page and section, and legacy Chinese links and API anchors remain accessible. API presentation follows Deepwave’s Sphinx/Alabaster organization, adds typed signatures, and retains StarWave’s own return contracts and numerical limitations.
+The complete manual is available in Chinese and English, including navigation, search, notices, and all 18 content pages. Each language has an independent build and search index. Language switching preserves the corresponding page and section, and legacy Chinese links and API anchors remain accessible. The site retains the original PyFWI / Read the Docs template. API content follows Deepwave’s Sphinx organization, adds typed signatures, and retains StarWave’s own return contracts and numerical limitations.

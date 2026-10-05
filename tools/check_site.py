@@ -61,11 +61,11 @@ def check(root):
             path = folder / relative
             content = path.read_text(encoding='utf-8')
             language = 'zh-CN' if locale == 'zh' else 'en'
-            if f'<html lang="{language}"' not in content:
+            if not re.search(r'<html\b[^>]*\blang="' + language + r'"', content):
                 errors.append(f'Wrong document language: {locale}/{relative}')
             if 'data-sw-language="zh"' not in content or 'data-sw-language="en"' not in content:
                 errors.append(f'Missing language switch: {locale}/{relative}')
-            if locale == 'en' and re.search(r'[\u4e00-\u9fff]', re.sub(r'<a [^>]*data-sw-language="zh"[^>]*>中文</a>', '', content)):
+            if locale == 'en' and re.search(r'[\u4e00-\u9fff]', re.sub(r'<a [^>]*lang="zh-CN"[^>]*>中文</a>', '', content)):
                 errors.append(f'Untranslated Chinese in English HTML: {relative}')
     if localized['zh'] != localized['en']:
         errors.append('Localized HTML page coverage differs')

@@ -30,6 +30,8 @@ Notation: `B` is the number of shots, `S` the sources per shot, `R` the receiver
 
 ## Native runtime
 
+### starwave.native_status
+
 ```{py:function} starwave.native_status() -> dict
 
 Queries current native-library status without compiling or propagating.
@@ -37,6 +39,8 @@ Queries current native-library status without compiling or propagating.
 :returns: Status dictionary. Common entries include `library_exists`, `library_loaded`, `torch_version`, `torch_cuda_version`, and `cuda_available`. Neither existence nor successful loading demonstrates numerical acceptance.
 :rtype: `dict`
 ```
+
+### starwave.prepare_native
 
 ```{py:function} starwave.prepare_native(device_ids: list[int] | tuple[int, ...]) -> dict
 

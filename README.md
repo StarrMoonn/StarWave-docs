@@ -1,8 +1,8 @@
 # StarWave-docs · 中文 / English
 
-StarWave 2.0.0 双语使用手册，基于 Sphinx、Alabaster 和 MyST Markdown。完整中文和英文版本各含 18 个内容页面，覆盖安装、正演、反演及 API；每种语言独立构建、导航和搜索。API 采用 Deepwave 风格的类型签名、参数、返回、注意事项及示例组织，所有说明针对 StarWave 原创编写。
+StarWave 2.0.0 双语使用手册，基于 Sphinx、Read the Docs 主题和 MyST Markdown。完整中文和英文版本各含 18 个内容页面，覆盖安装、正演、反演及 API；每种语言独立构建、导航和搜索。API 采用 Deepwave 风格的类型签名、参数、返回、注意事项及示例组织，所有说明针对 StarWave 原创编写。
 
-Bilingual user documentation for StarWave 2.0.0, built with Sphinx, Alabaster, and MyST Markdown. Each language contains the complete 18-page manual and a separate search index. The API presentation takes organizational cues from Deepwave while preserving StarWave’s own public contracts.
+Bilingual user documentation for StarWave 2.0.0, built with Sphinx, the Read the Docs theme, and MyST Markdown. Each language contains the complete 18-page manual and a separate search index. The API presentation takes organizational cues from Deepwave while preserving StarWave’s own public contracts.
 
 ## 构建 / Build
 
