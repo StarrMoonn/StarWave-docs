@@ -35,6 +35,7 @@ div.sphinxsidebar input[type=submit] { padding: 7px 10px; min-height: 36px; }
 pre { padding: 16px; line-height: 1.55; font-size: 13px; background: #f5f7f9; border: 1px solid var(--sw-line); border-radius: 4px; overflow-x: auto; }
 code, pre { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
 code { overflow-wrap: anywhere; }
+code.literal span.pre { white-space: normal; overflow-wrap: anywhere; }
 dl.py > dt.sig { display: block; background: #f0f5f9; border-top: 3px solid #7c9db5; padding: 15px 17px; font-size: 13px; line-height: 1.9; overflow-wrap: anywhere; white-space: normal; }
 dl.py > dt.sig .sig-param { white-space: normal; }
 dl.py > dd { margin: 20px 0 0; }

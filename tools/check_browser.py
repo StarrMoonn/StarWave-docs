@@ -31,7 +31,10 @@ def check(root, browser_path=None):
                         relative = path.relative_to(root).as_posix()
                         page.goto(base + relative, wait_until='networkidle')
                         assert page.locator('[data-sw-language]').count() == 2, relative
-                        assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), f'Horizontal overflow: {relative} at {size}'
+                        if not page.evaluate('document.documentElement.scrollWidth <= innerWidth'):
+                            page.screenshot(path=str(output / f'overflow-{locale}-{path.stem}-{size["width"]}.png'), full_page=True)
+                            wide = page.evaluate("""Array.from(document.querySelectorAll('body *')).filter(e => e.getBoundingClientRect().right > innerWidth).map(e => ({tag:e.tagName, classes:e.className, text:e.textContent.slice(0,120)})).slice(-12)""")
+                            raise AssertionError(f'Horizontal overflow: {relative} at {size}; {wide}')
                     page.goto(base + locale + '/api/scalar.html')
                     page.screenshot(path=str(output / f'{locale}-scalar-{size["width"]}.png'), full_page=True)
             page.goto(base + 'zh/api/scalar.html#id4')
