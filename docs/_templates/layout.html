@@ -10,7 +10,11 @@
 {{ super() }}
 {% endblock %}
 {% block sidebartitle %}
-{{ super() }}
+<a class="sw-sidebar-brand" href="{{ pathto('index') }}" aria-label="{{ 'StarWave 首页' if sw_locale == 'zh' else 'StarWave home' }}">
+  <img src="{{ pathto('_static/brand/starwave-icon-white.svg', 1) }}" width="36" height="36" alt="">
+  <span>StarWave</span>
+</a>
+{% include "searchbox.html" %}
 <nav class="sw-languages" aria-label="{{ '选择语言' if sw_locale == 'zh' else 'Choose language' }}">
   <a href="{{ sw_zh_url }}" lang="zh-CN" hreflang="zh-CN" data-sw-language="zh"{% if sw_locale == 'zh' %} aria-current="page"{% endif %}>中文</a>
   <span aria-hidden="true">|</span>

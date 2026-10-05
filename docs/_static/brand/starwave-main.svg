@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="950" height="645" viewBox="0 0 950 645" role="img" aria-labelledby="title desc">
+<title id="title">StarWave — primary stacked logo</title><desc id="desc">Vector reconstruction from the approved raster concept. Bezier path outlines and reconstructed gradients; not original vector source. Raster texture is simplified. All lettering is outlined.</desc>
+<defs>
+<linearGradient id="starBase" x1="76" y1="150" x2="446" y2="249" gradientUnits="userSpaceOnUse">
+ <stop offset="0" stop-color="#061B36"/><stop offset=".48" stop-color="#034372"/><stop offset="1" stop-color="#05AACA"/>
+</linearGradient>
+<linearGradient id="starTop" x1="256" y1="23" x2="256" y2="260" gradientUnits="userSpaceOnUse">
+ <stop offset="0" stop-color="#092655" stop-opacity=".98"/><stop offset=".55" stop-color="#092655" stop-opacity=".3"/><stop offset="1" stop-color="#092655" stop-opacity="0"/>
+</linearGradient>
+<linearGradient id="waveBand" x1="75" y1="260" x2="439" y2="260" gradientUnits="userSpaceOnUse">
+ <stop offset="0" stop-color="#168DB9"/><stop offset=".16" stop-color="#075789"/><stop offset=".47" stop-color="#007AA5"/><stop offset=".53" stop-color="#09A7BB"/><stop offset=".76" stop-color="#07638D"/><stop offset="1" stop-color="#04364D"/>
+</linearGradient>
+<linearGradient id="waveShade" x1="256" y1="165" x2="256" y2="297" gradientUnits="userSpaceOnUse">
+ <stop offset="0" stop-color="#003A5F" stop-opacity=".65"/><stop offset=".75" stop-color="#003A5F" stop-opacity="0"/><stop offset="1" stop-color="#05A9B9" stop-opacity=".12"/>
+</linearGradient>
+<linearGradient id="layer2" x1="124" y1="314" x2="390" y2="314" gradientUnits="userSpaceOnUse">
+ <stop offset="0" stop-color="#B1D9DD"/><stop offset=".22" stop-color="#52ACC1"/><stop offset=".52" stop-color="#0180A1"/><stop offset=".84" stop-color="#075073"/><stop offset="1" stop-color="#061D33"/>
+</linearGradient>
+<linearGradient id="layer3" x1="161" y1="346" x2="353" y2="346" gradientUnits="userSpaceOnUse">
+ <stop offset="0" stop-color="#B8DADF"/><stop offset=".2" stop-color="#84BFC9"/><stop offset=".5" stop-color="#4A9BAF"/><stop offset=".81" stop-color="#196385"/><stop offset="1" stop-color="#072D47"/>
+</linearGradient>
+<linearGradient id="layer4" x1="191" y1="382" x2="323" y2="382" gradientUnits="userSpaceOnUse">
+ <stop offset="0" stop-color="#BDD8DB"/><stop offset=".45" stop-color="#A1C7CE"/><stop offset=".76" stop-color="#70A7B6"/><stop offset="1" stop-color="#36748E"/>
+</linearGradient>
+<linearGradient id="layer5" x1="223" y1="421" x2="292" y2="421" gradientUnits="userSpaceOnUse">
+ <stop offset="0" stop-color="#BED1D5"/><stop offset=".53" stop-color="#A7BEC7"/><stop offset="1" stop-color="#789DAE"/>
+</linearGradient>
+<linearGradient id="wordBlue" x1="560" y1="15" x2="560" y2="145" gradientUnits="userSpaceOnUse">
+ <stop offset="0" stop-color="#087DAA"/><stop offset="1" stop-color="#005372"/>
+</linearGradient>
+<linearGradient id="appBg" x1=".08" y1="0" x2=".9" y2="1">
+ <stop offset="0" stop-color="#24374D"/><stop offset=".42" stop-color="#081D31"/><stop offset="1" stop-color="#031421"/>
+</linearGradient>
+<radialGradient id="appGlow" cx=".4" cy=".28" r=".73">
+ <stop offset="0" stop-color="#224A64" stop-opacity=".34"/><stop offset="1" stop-color="#224A64" stop-opacity="0"/>
+</radialGradient>
+
+<linearGradient id="appStarBase" x1="76" y1="150" x2="446" y2="249" gradientUnits="userSpaceOnUse">
+ <stop offset="0" stop-color="#126EA8"/><stop offset=".48" stop-color="#168DBD"/><stop offset="1" stop-color="#1ABBD1"/>
+</linearGradient>
+<linearGradient id="appStarTop" x1="256" y1="23" x2="256" y2="260" gradientUnits="userSpaceOnUse">
+ <stop offset="0" stop-color="#64B8F2" stop-opacity=".96"/><stop offset=".5" stop-color="#429CD6" stop-opacity=".35"/><stop offset="1" stop-color="#1B83B2" stop-opacity="0"/>
+</linearGradient>
+<linearGradient id="appWaveBand" x1="75" y1="260" x2="439" y2="260" gradientUnits="userSpaceOnUse">
+ <stop offset="0" stop-color="#2198C0"/><stop offset=".5" stop-color="#42C6D2"/><stop offset="1" stop-color="#167693"/>
+</linearGradient>
+<linearGradient id="appWaveShade" x1="256" y1="165" x2="256" y2="297" gradientUnits="userSpaceOnUse">
+ <stop offset="0" stop-color="#06537B" stop-opacity=".25"/><stop offset=".7" stop-color="#06537B" stop-opacity="0"/><stop offset="1" stop-color="#32BED0" stop-opacity=".08"/>
+</linearGradient>
+<linearGradient id="appLayer2" x1="124" y1="314" x2="390" y2="314" gradientUnits="userSpaceOnUse">
+ <stop offset="0" stop-color="#74D3D9"/><stop offset=".5" stop-color="#55C0CF"/><stop offset="1" stop-color="#245D7F"/>
+</linearGradient>
+<linearGradient id="appLayer3" x1="161" y1="346" x2="353" y2="346" gradientUnits="userSpaceOnUse">
+ <stop offset="0" stop-color="#8BCED6"/><stop offset=".5" stop-color="#68B3C4"/><stop offset="1" stop-color="#376F8D"/>
+</linearGradient>
+<linearGradient id="appLayer4" x1="191" y1="382" x2="323" y2="382" gradientUnits="userSpaceOnUse">
+ <stop offset="0" stop-color="#9DC9D2"/><stop offset=".5" stop-color="#7FAFBF"/><stop offset="1" stop-color="#457C97"/>
+</linearGradient>
+<linearGradient id="appLayer5" x1="223" y1="421" x2="292" y2="421" gradientUnits="userSpaceOnUse">
+ <stop offset="0" stop-color="#9ABFC9"/><stop offset=".5" stop-color="#86AEBD"/><stop offset="1" stop-color="#5C8CA3"/>
+</linearGradient>
+</defs><g transform="translate(218,6)"><path d="M256 23 C246 49 235 82 222 113 C207 150 194 175 169 191 C136 212 77 231 25 241 C22 241.6 22 243 26 244 C79 251 124 246 155 232 C170 225 177 217 186 218 C197 219 207 235 217 255 C225 235 232 204 239 178 L247 148 C250 138 253 134 257 134 C265 134 269 146 273 163 L286 217 C290 233 293 246 297 255 C307 235 317 218 327 218 C336 218 344 224 356 231 C389 249 441 252 488 244 C492 243 492 241 488 240 C434 226 377 210 344 189 C319 173 307 151 294 121 C279 86 268 51 259 25 C258 22 257 21 256 23 Z" fill="url(#starBase)"/><path d="M256 23 C246 49 235 82 222 113 C207 150 194 175 169 191 C136 212 77 231 25 241 C22 241.6 22 243 26 244 C79 251 124 246 155 232 C170 225 177 217 186 218 C197 219 207 235 217 255 C225 235 232 204 239 178 L247 148 C250 138 253 134 257 134 C265 134 269 146 273 163 L286 217 C290 233 293 246 297 255 C307 235 317 218 327 218 C336 218 344 224 356 231 C389 249 441 252 488 244 C492 243 492 241 488 240 C434 226 377 210 344 189 C319 173 307 151 294 121 C279 86 268 51 259 25 C258 22 257 21 256 23 Z" fill="url(#starTop)"/><path d="M75 259 C109 266 141 255 164 242 C175 235 180 231 185 234 C192 238 200 259 207 269 C212 277 220 278 226 271 C238 258 248 196 257 163 C262 184 268 211 274 237 C279 256 285 274 295 275 C307 276 313 259 320 245 C325 234 329 231 335 235 C365 257 400 266 439 259 L419 268 C389 276 351 279 322 285 C297 292 278 297 257 297 C234 297 213 293 192 287 C157 279 128 276 109 274 Z" fill="url(#waveBand)"/><path d="M75 259 C109 266 141 255 164 242 C175 235 180 231 185 234 C192 238 200 259 207 269 C212 277 220 278 226 271 C238 258 248 196 257 163 C262 184 268 211 274 237 C279 256 285 274 295 275 C307 276 313 259 320 245 C325 234 329 231 335 235 C365 257 400 266 439 259 L419 268 C389 276 351 279 322 285 C297 292 278 297 257 297 C234 297 213 293 192 287 C157 279 128 276 109 274 Z" fill="url(#waveShade)"/><path d="M124 282 C166 290 212 315 257 315 C302 315 344 289 390 282 L365 300 C332 310 291 343 257 343 C222 343 188 319 148 301 Z" fill="url(#layer2)"/><path d="M161 312 C191 325 222 351 257 351 C294 351 326 322 353 312 L335 335 C309 349 283 377 257 377 C231 377 208 357 182 339 Z" fill="url(#layer3)"/><path d="M191 350 C213 366 235 385 257 385 C280 385 302 365 323 350 L307 375 C291 392 274 410 257 410 C240 410 221 390 207 372 Z" fill="url(#layer4)"/><path d="M223 401 C235 413 247 418 257 418 C269 418 281 411 292 401 L278 425 C270 438 264 444 257 444 C249 444 243 437 236 425 Z" fill="url(#layer5)"/></g><g transform="translate(47,457)"><path d="M119 15 H70 C46 15 31 31 31 53 C31 74 44 84 68 92 L83 97 C98 102 106 108 106 116 C106 123 98 126 84 126 H34 V145 H82 C111 145 128 132 128 109 C128 89 112 81 89 73 L72 67 C59 63 53 58 53 50 C53 40 61 33 73 33 H119 Z M145 25 H166 V54 H198 V73 H166 V111 C166 122 171 127 181 127 C186 127 190 126 194 125 V143 C187 145 181 146 175 146 C155 146 145 136 145 113 Z M207 145 L246 54 H267 L307 145 H284 L257 77 L229 145 Z M319 54 H340 V72 C346 60 357 52 374 53 V74 H367 C349 74 340 86 340 104 V145 H319 Z" fill="#071B2B" fill-rule="evenodd"/><path d="M381 15 H404 L430 110 L459 15 H475 L503 110 L532 15 H555 L516 145 H494 L467 55 L439 145 H418 Z M559 62 C572 56 584 53 598 53 C621 53 634 67 634 91 V145 H613 V132 C605 142 593 147 580 147 C562 147 551 136 551 119 C551 101 566 89 589 89 C598 89 606 90 613 93 V89 C613 77 606 72 595 72 C585 72 576 75 568 79 Z M613 107 C606 105 599 103 590 103 C578 103 572 109 572 118 C572 127 578 132 587 132 C602 132 613 123 613 110 Z M640 54 H663 L689 120 L714 54 H738 L700 145 H678 Z M827 106 H760 C762 122 773 129 788 129 C799 129 807 125 815 120 L829 134 C818 143 804 147 788 147 C758 147 738 128 738 101 C738 73 757 53 784 53 C810 53 827 73 827 100 Z M760 91 H806 C804 77 797 70 784 70 C772 70 763 78 760 91 Z" fill="url(#wordBlue)" fill-rule="evenodd"/></g></svg>

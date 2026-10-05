@@ -7,6 +7,7 @@ from html.parser import HTMLParser
 from pathlib import Path
 import re
 import sys
+import xml.etree.ElementTree as ET
 from urllib.parse import unquote, urlsplit
 
 
@@ -162,6 +163,50 @@ def check(root):
             if fwi.id_sections.get(alias) != target:
                 errors.append(f'Legacy FWI anchor drift: {locale}/{alias}')
 
+    # Only the selected, unchanged public logo assets may enter the site.
+    brand_dir = project / 'docs' / '_static' / 'brand'
+    brand_manifest = json.loads((brand_dir / 'manifest.json').read_text())
+    brand_names = {'starwave-main.svg', 'starwave-icon-white.svg', 'starwave-favicon.png'}
+    if {asset['file'] for asset in brand_manifest['assets']} != brand_names:
+        errors.append('Unexpected brand manifest entries')
+    if {p.name for p in brand_dir.iterdir()} != brand_names | {'manifest.json'}:
+        errors.append('Unexpected brand files')
+    for asset in brand_manifest['assets']:
+        path = brand_dir / asset['file']
+        if path.name not in brand_names or path.parent != brand_dir:
+            errors.append('Invalid brand asset path')
+            continue
+        data = path.read_bytes()
+        if hashlib.sha256(data).hexdigest() != asset['sha256']:
+            errors.append(f'Brand asset changed: {path.name}')
+        if path.suffix == '.svg':
+            try:
+                svg = ET.fromstring(data)
+                for element in svg.iter():
+                    tag = element.tag.rsplit('}', 1)[-1]
+                    if tag in {'script', 'foreignObject', 'image', 'use', 'style'}:
+                        errors.append(f'Unsafe SVG element: {path.name}/{tag}')
+                    for key, value in element.attrib.items():
+                        if key.lower().startswith('on') or ('href' in key.lower() and not value.startswith('#')):
+                            errors.append(f'External or active SVG attribute: {path.name}/{key}')
+                        if 'url(' in value and not re.fullmatch(r'url\(#[A-Za-z0-9_-]+\)', value):
+                            errors.append(f'External SVG reference: {path.name}/{key}')
+            except ET.ParseError:
+                errors.append(f'Invalid brand SVG: {path.name}')
+        elif data[:8] != b'\x89PNG\r\n\x1a\n' or struct.unpack('>II', data[16:24]) != (32, 32):
+            errors.append('Favicon is not the selected 32px PNG')
+    for locale in ('zh', 'en'):
+        homepage = (root / locale / 'index.html').read_text()
+        if 'sw-api-overview' in homepage or '<table' in homepage:
+            errors.append(f'Removed homepage comparison returned: {locale}')
+        if not all(x in homepage for x in ['sw-home-hero', 'sw-home-logo', 'sw-home-capabilities', 'sw-home-code', 'sw-home-paths']):
+            errors.append(f'Incomplete product homepage: {locale}')
+        if 'sw-sidebar-brand' not in homepage or 'starwave-favicon.png' not in homepage:
+            errors.append(f'Missing brand navigation or favicon: {locale}')
+        for name in brand_names:
+            if (root / locale / '_static' / 'brand' / name).read_bytes() != (brand_dir / name).read_bytes():
+                errors.append(f'Published brand asset differs: {locale}/{name}')
+
     # These checks are a guardrail, not a substitute for human content review.
     forbidden = [
         re.compile(r"[A-Za-z]:[\\/](?:Users|home)[\\/]", re.I),
@@ -179,15 +224,16 @@ def check(root):
             continue
         sources.append(p)
         is_tutorial_png = p.suffix == ".png" and relative.parts[:3] == ("docs", "_static", "tutorials")
+        is_brand_file = relative.parts[:3] == ("docs", "_static", "brand") and p.name in brand_names
         is_tutorial_notebook = p.suffix == ".ipynb" and relative.parts[:2] == ("examples", "tutorials")
-        if p.name != ".gitignore" and p.suffix not in allowed and not is_tutorial_png and not is_tutorial_notebook:
+        if p.name != ".gitignore" and p.suffix not in allowed and not is_tutorial_png and not is_tutorial_notebook and not is_brand_file:
             errors.append(f"Unexpected source file: {relative}")
         if p.suffix == ".py":
             try:
                 ast.parse(p.read_text(encoding="utf-8"))
             except SyntaxError as exc:
                 errors.append(f"Python syntax: {relative}: {exc.msg}")
-        if p != Path(__file__).resolve() and not is_tutorial_png:
+        if p != Path(__file__).resolve() and not is_tutorial_png and not (is_brand_file and p.suffix == ".png"):
             text = p.read_text(encoding="utf-8")
             if any(pattern.search(text) for pattern in forbidden):
                 errors.append(f"Review restricted content: {relative}")

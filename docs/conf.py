@@ -31,6 +31,7 @@ html_theme_options = {
 html_static_path = [str(CONF_DIR / '_static')]
 templates_path = [str(CONF_DIR / '_templates')]
 html_css_files = ['custom.css']
+html_favicon = str(CONF_DIR / '_static' / 'brand' / 'starwave-favicon.png')
 html_js_files = ['language.js']
 html_title = 'StarWave 2.0.0 使用手册' if LOCALE == 'zh' else 'StarWave 2.0.0 User Guide'
 html_show_sourcelink = False

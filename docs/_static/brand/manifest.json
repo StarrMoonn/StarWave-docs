@@ -1,0 +1,17 @@
+{
+  "description": "User-provided StarWave logo assets, used unchanged for this documentation site. SVGs are the supplied vector reconstructions; no broader license is asserted.",
+  "assets": [
+    {
+      "file": "starwave-main.svg",
+      "sha256": "ed639f1caace9e5525d63dc31a3abf447d18e72d6c0f5b9c98d91dfec7ef1b55"
+    },
+    {
+      "file": "starwave-icon-white.svg",
+      "sha256": "10575511b0a981ad5be19fd87f31d245b78765bb7304c5a855ee7fbaa5b76fd0"
+    },
+    {
+      "file": "starwave-favicon.png",
+      "sha256": "47453dcece257b3b6bb3f5164775258abb5c1d65a5aff10647b8278538072ce7"
+    }
+  ]
+}

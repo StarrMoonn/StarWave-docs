@@ -190,30 +190,67 @@ def check_redirects(page, base):
 
 
 
-def check_home_overview(page, base, locale, output):
+def check_homepage(page, base, locale, output):
     page.goto(base + locale + '/index.html', wait_until='networkidle')
-    overview = page.locator('.sw-api-overview')
-    assert overview.count() == 1
-    assert overview.locator('tbody tr').count() == 3
-    assert overview.locator('thead th[scope="col"]').count() == 4
-    assert overview.locator('tbody th[scope="row"]').count() == 3
-    names = overview.locator('tbody th code').all_text_contents()
-    assert names == ['starwave.scalar', 'starwave.vrz', 'starwave.vti'], names
-    cells = overview.locator('tbody td').evaluate_all("items => items.map(e => ({font:parseFloat(getComputedStyle(e).fontSize),align:getComputedStyle(e).verticalAlign,label:e.dataset.label,text:e.textContent,display:getComputedStyle(e).display}))")
-    assert all(c['font'] >= 16 and c['align'] == 'top' and c['label'] for c in cells), cells
-    identifiers = overview.locator('code').evaluate_all("items => items.map(e => ({font:parseFloat(getComputedStyle(e).fontSize),space:getComputedStyle(e).whiteSpace,lines:e.getClientRects().length}))")
-    assert all(c['font'] >= 15 and c['space'] == 'nowrap' and c['lines'] == 1 for c in identifiers), identifiers
-    assert 'impedance' in cells[3]['text'] and 'density' in cells[3]['text']
-    assert all(name in cells[6]['text'] for name in ['vp', 'epsilon', 'delta', 'rho'])
-    assert page.locator('[role="main"] .important').count() == 0
-    if page.viewport_size['width'] <= 1100:
-        assert all(c['display'] == 'grid' for c in cells), cells
+    main = page.locator('[role="main"]')
+    assert main.locator('h1').count() == 1
+    assert main.locator('table, .sw-api-overview, .important').count() == 0
+    assert main.locator('.toctree-wrapper a').count() == 0
+    logo = main.locator('.sw-home-logo')
+    assert logo.count() == 1 and logo.get_attribute('alt') == 'StarWave'
+    assert logo.evaluate('e => e.complete && e.naturalWidth === 950 && e.naturalHeight === 645')
+    box = logo.bounding_box()
+    assert box and 150 <= box['width'] <= 240, box
+    assert abs(box['width'] / box['height'] - 950 / 645) < .01, box
+    sidebar_logo = page.locator('.sw-sidebar-brand img')
+    assert sidebar_logo.evaluate('e => e.complete && e.naturalWidth === 512')
+    assert page.locator('link[rel="shortcut icon"]').get_attribute('href').endswith('starwave-favicon.png')
+    capabilities = main.locator('.sw-home-capabilities > div')
+    assert capabilities.count() == 3
+    assert main.locator('.sw-home-code pre').count() == 1
+    assert 'loss.backward()' in main.locator('.sw-home-code').inner_text()
+    assert main.locator('.sw-home-paths a').count() == 3
+    actions = main.locator('.sw-home-actions a')
+    assert actions.evaluate_all("items => items.map(e => e.getAttribute('href'))") == ['installation.html', 'quickstart.html', 'usage.html']
+    for button in main.locator('.sw-button').all():
+        assert button.bounding_box()['height'] >= 44
+    typography = main.locator('.sw-home-lead, .sw-home-hero h2, .sw-home-capabilities h3').evaluate_all("items => items.map(e => getComputedStyle(e).fontFamily)")
+    assert len(set(typography)) == 1 and 'sans-serif' in typography[0], typography
+    assert main.locator('.sw-home-hero').evaluate("e => getComputedStyle(e).animationName === 'none'")
+    if page.viewport_size['width'] <= 600 or 769 <= page.viewport_size['width'] <= 1024:
+        tops = capabilities.evaluate_all('items => items.map(e => e.getBoundingClientRect().top)')
+        assert tops == sorted(set(tops)), tops
     else:
-        for row in overview.locator('tbody tr').all():
-            tops = row.locator('th,td').evaluate_all('items => items.map(e => e.getBoundingClientRect().top)')
-            assert max(tops) - min(tops) <= 1, tops
-    overview.evaluate("e => e.scrollIntoView({block:'start'})")
-    page.screenshot(path=str(output / f'{locale}-homepage-overview-{page.viewport_size["width"]}.png'))
+        tops = capabilities.evaluate_all('items => items.map(e => e.getBoundingClientRect().top)')
+        assert max(tops) - min(tops) <= 1, tops
+    # Verify contrast for the custom homepage's solid text/background pairs.
+    assert page.evaluate("""() => {
+        function linear(v) { v /= 255; return v <= .04045 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4; }
+        function luminance(s) { const c = s.match(/[0-9.]+/g).slice(0,3).map(Number).map(linear); return .2126*c[0] + .7152*c[1] + .0722*c[2]; }
+        return Array.from(document.querySelectorAll('.sw-home-kicker, .sw-home-lead, .sw-home-number, .sw-home-capabilities p, .sw-home-capabilities a, .sw-home-code-label, .sw-home-code-note, .sw-home-footnote, .sw-home-identity p, .sw-home-paths a > span:first-child, .sw-button')).every(e => {
+            const style = getComputedStyle(e);
+            const fg = luminance(style.color);
+            const bg = e.classList.contains('sw-button-primary') ? luminance(style.backgroundColor) : 1;
+            return (Math.max(fg,bg)+.05)/(Math.min(fg,bg)+.05) >= 4.5;
+        });
+    }"""), f'Homepage contrast failed: {locale}'
+    assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), f'Homepage overflow: {locale}'
+    width = page.viewport_size['width']
+    page.screenshot(path=str(output / f'{locale}-homepage-{width}.png'))
+    page.screenshot(path=str(output / f'{locale}-homepage-full-{width}.png'), full_page=True)
+    # Core buttons must navigate and retain normal Back behavior.
+    for target in ('installation', 'quickstart', 'usage'):
+        page.locator(f'.sw-home-actions a[href="{target}.html"]').click()
+        assert urlsplit(page.url).path == f'/{locale}/{target}.html'
+        page.go_back()
+        assert urlsplit(page.url).path == f'/{locale}/index.html'
+    other = 'zh' if locale == 'en' else 'en'
+    page.goto(base + locale + '/index.html?from=home#home-workflow')
+    open_mobile_menu(page)
+    page.locator(f'[data-sw-language="{other}"]').click()
+    assert urlsplit(page.url).path == f'/{other}/index.html'
+    assert urlsplit(page.url).fragment == 'sw-section-2'
+    assert urlsplit(page.url).query == 'from=home'
 
 
 def check_tutorials(page, base, locale, output):
@@ -326,8 +363,15 @@ def check(root, browser_path=None):
                     page.goto(base + locale + '/usage.html', wait_until='networkidle')
                     check_usage(page, locale, output)
                     check_tutorials(page, base, locale, output)
-                    check_home_overview(page, base, locale, output)
+                    check_homepage(page, base, locale, output)
                 check_search(page, base)
+            # Narrow phones and the smallest desktop sidebar layouts exercise
+            # the homepage breakpoints without duplicating the entire API suite.
+            for size in ({'width': 320, 'height': 740}, {'width': 820, 'height': 900}, {'width': 1024, 'height': 900}):
+                page.set_viewport_size(size)
+                for locale in ('zh', 'en'):
+                    check_homepage(page, base, locale, output)
+            page.set_viewport_size({'width': 390, 'height': 844})
             page.goto(base + 'zh/usage.html')
             open_mobile_menu(page)
             page.screenshot(path=str(output / 'zh-mobile-navigation.png'))
@@ -379,6 +423,10 @@ def check(root, browser_path=None):
                     assert urlsplit(plain.url).path == '/en/usage.html'
                     assert urlsplit(plain.url).fragment == ('usage' if name == 'index' else name)
             for locale in ('zh', 'en'):
+                plain.goto(base + locale + '/index.html')
+                assert plain.locator('.sw-home-logo').is_visible()
+                plain.locator('.sw-home-actions a[href="quickstart.html"]').click()
+                assert urlsplit(plain.url).path == f'/{locale}/quickstart.html'
                 plain.goto(base + locale + '/index.html')
                 plain.locator('#rtd-search-form input[name="q"]').fill('gradient')
                 plain.locator('.sw-search-submit').click()
