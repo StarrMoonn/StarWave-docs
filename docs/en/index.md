@@ -2,17 +2,21 @@
 
 StarWave provides CUDA wave-propagation interfaces for PyTorch, covering 2D scalar acoustics, 2D VRZ, and 2D/3D acoustic VTI. This manual is for users of the public **2.0.0 wheel**. It begins with environment setup and small forward-modeling runs, then introduces gradients and inversion workflows.
 
-```{important}
-The API reference targets the public 2.0.0 wheel. Three original tutorials now include measured NVIDIA A30 runs using StarWave 0.1.0.dev9: a small smoke check, gradients, and 25 FWI updates. These do not validate the public wheel, complete adjoint correctness, convergence, or performance. Read each page’s version and evidence scope.
-```
-
 New users: read [Installation](installation.md) → [Quickstart](quickstart.md) → [Model and acquisition conventions](modeling/conventions.md). Windows users should start with [WSL 2](wsl.md); explore the measured experiments: {ref}`installation smoke test <installation-smoke>` → [Simple Gradient Computation](modeling/gradient.md) → [Simple FWI Example](inversion/fwi.md).
 
-| Interface | Models and dimensions | Default recording | Main distinctions |
-|---|---|---|---|
-| `starwave.scalar` | `v`, 2D | pressure-like | Equal grid spacing; scalar acoustics |
-| `starwave.vrz` | `v` and either `impedance` or `density`, 2D | pressure-like | Exactly one of the two medium parameters is required |
-| `starwave.vti` | `vp, epsilon, delta, rho`, 2D/3D | `vz` | Acoustic VTI; supports different grid spacings along each axis |
+```{raw} html
+<div class="sw-api-overview" aria-label="Propagation interface comparison">
+<table role="table">
+<colgroup><col class="sw-col-interface"><col class="sw-col-model"><col class="sw-col-record"><col class="sw-col-detail"></colgroup>
+<thead role="rowgroup"><tr role="row"><th scope="col" role="columnheader">Interface</th><th scope="col" role="columnheader">Models and dimensions</th><th scope="col" role="columnheader">Default recording</th><th scope="col" role="columnheader">Main distinctions</th></tr></thead>
+<tbody role="rowgroup">
+<tr role="row"><th scope="row" role="rowheader"><a href="usage.html#starwave.scalar"><code>starwave.scalar</code></a></th><td role="cell" data-label="Models and dimensions"><span class="sw-field-value"><code>v</code>, 2D</span></td><td role="cell" data-label="Default recording"><span class="sw-field-value">pressure-like</span></td><td role="cell" data-label="Main distinctions"><span class="sw-field-value">Equal grid spacing; scalar acoustics</span></td></tr>
+<tr role="row"><th scope="row" role="rowheader"><a href="usage.html#starwave.vrz"><code>starwave.vrz</code></a></th><td role="cell" data-label="Models and dimensions"><span class="sw-field-value"><code>v</code> and either <code>impedance</code> or <code>density</code>, 2D</span></td><td role="cell" data-label="Default recording"><span class="sw-field-value">pressure-like</span></td><td role="cell" data-label="Main distinctions"><span class="sw-field-value">Exactly one of the two medium parameters is required</span></td></tr>
+<tr role="row"><th scope="row" role="rowheader"><a href="usage.html#starwave.vti"><code>starwave.vti</code></a></th><td role="cell" data-label="Models and dimensions"><span class="sw-field-value"><code>vp</code>, <code>epsilon</code>, <code>delta</code>, <code>rho</code>, 2D/3D</span></td><td role="cell" data-label="Default recording"><span class="sw-field-value"><code>vz</code></span></td><td role="cell" data-label="Main distinctions"><span class="sw-field-value">Acoustic VTI; supports different grid spacings along each axis</span></td></tr>
+</tbody>
+</table>
+</div>
+```
 
 ```{toctree}
 :maxdepth: 1

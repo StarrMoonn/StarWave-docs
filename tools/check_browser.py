@@ -59,7 +59,7 @@ def check_navigation(page, locale, relative):
     assert submit.count() == 1 and submit.get_attribute('aria-label'), relative
     input_box, button_box = search.bounding_box(), submit.bounding_box()
     if input_box and button_box:
-        assert button_box['x'] > input_box['x'] + input_box['width'] / 2, relative
+        assert input_box['x'] <= button_box['x'] < input_box['x'] + input_box['width'] / 2, relative
         assert button_box['width'] >= 40 and button_box['height'] >= 40, relative
         assert button_box['x'] + button_box['width'] <= input_box['x'] + input_box['width'], relative
     label = search.evaluate("e => e.getAttribute('aria-label') || Array.from(e.labels || []).map(l => l.textContent).join(' ')")
@@ -186,6 +186,33 @@ def check_redirects(page, base):
 
 
 
+
+def check_home_overview(page, base, locale, output):
+    page.goto(base + locale + '/index.html', wait_until='networkidle')
+    overview = page.locator('.sw-api-overview')
+    assert overview.count() == 1
+    assert overview.locator('tbody tr').count() == 3
+    assert overview.locator('thead th[scope="col"]').count() == 4
+    assert overview.locator('tbody th[scope="row"]').count() == 3
+    names = overview.locator('tbody th code').all_text_contents()
+    assert names == ['starwave.scalar', 'starwave.vrz', 'starwave.vti'], names
+    cells = overview.locator('tbody td').evaluate_all("items => items.map(e => ({font:parseFloat(getComputedStyle(e).fontSize),align:getComputedStyle(e).verticalAlign,label:e.dataset.label,text:e.textContent,display:getComputedStyle(e).display}))")
+    assert all(c['font'] >= 16 and c['align'] == 'top' and c['label'] for c in cells), cells
+    identifiers = overview.locator('code').evaluate_all("items => items.map(e => ({font:parseFloat(getComputedStyle(e).fontSize),space:getComputedStyle(e).whiteSpace,lines:e.getClientRects().length}))")
+    assert all(c['font'] >= 15 and c['space'] == 'nowrap' and c['lines'] == 1 for c in identifiers), identifiers
+    assert 'impedance' in cells[3]['text'] and 'density' in cells[3]['text']
+    assert all(name in cells[6]['text'] for name in ['vp', 'epsilon', 'delta', 'rho'])
+    assert page.locator('[role="main"] .important').count() == 0
+    if page.viewport_size['width'] <= 1100:
+        assert all(c['display'] == 'grid' for c in cells), cells
+    else:
+        for row in overview.locator('tbody tr').all():
+            tops = row.locator('th,td').evaluate_all('items => items.map(e => e.getBoundingClientRect().top)')
+            assert max(tops) - min(tops) <= 1, tops
+    overview.evaluate("e => e.scrollIntoView({block:'start'})")
+    page.screenshot(path=str(output / f'{locale}-homepage-overview-{page.viewport_size["width"]}.png'))
+
+
 def check_tutorials(page, base, locale, output):
     counts = {'installation': 2, 'modeling/gradient': 4, 'inversion/fwi': 6}
     for chapter, count in counts.items():
@@ -296,6 +323,7 @@ def check(root, browser_path=None):
                     page.goto(base + locale + '/usage.html', wait_until='networkidle')
                     check_usage(page, locale, output)
                     check_tutorials(page, base, locale, output)
+                    check_home_overview(page, base, locale, output)
                 check_search(page, base)
             page.goto(base + 'zh/usage.html')
             open_mobile_menu(page)
