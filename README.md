@@ -1,8 +1,8 @@
 # StarWave-docs · 中文 / English
 
-StarWave 2.0.0 双语使用手册，基于 Sphinx、Read the Docs 主题和 MyST Markdown。完整中文和英文版本各含 18 个内容页面，覆盖安装、正演、反演及 API；每种语言独立构建、导航和搜索。API 采用 Deepwave 风格的类型签名、参数、返回、注意事项及示例组织，所有说明针对 StarWave 原创编写。
+StarWave 2.0.0 双语使用手册，基于 Sphinx、Read the Docs 主题和 MyST Markdown。完整中文和英文版本各含 15 个内容页面，覆盖安装、正演、反演及 API；每种语言独立构建、导航和搜索。API 采用 Deepwave 风格的类型签名、参数、返回、注意事项及示例组织，所有说明针对 StarWave 原创编写。
 
-Bilingual user documentation for StarWave 2.0.0, built with Sphinx, the Read the Docs theme, and MyST Markdown. Each language contains the complete 18-page manual and a separate search index. The API presentation takes organizational cues from Deepwave while preserving StarWave’s own public contracts.
+Bilingual user documentation for StarWave 2.0.0, built with Sphinx, the Read the Docs theme, and MyST Markdown. Each language contains the complete 15-page manual and a separate search index. The API presentation takes organizational cues from Deepwave while preserving StarWave’s own public contracts.
 
 ## 构建 / Build
 
@@ -22,7 +22,9 @@ python -m http.server 8000 --directory _build/html --bind 127.0.0.1
 
 Open http://127.0.0.1:8000/zh/ or http://127.0.0.1:8000/en/. `build_docs.py` runs both Sphinx builds with warnings treated as errors. Chinese sources remain in `docs/`; English counterparts are in `docs/en/`. Shared templates, CSS and scripts are in `docs/_templates/` and `docs/_static/`. Do not use a single raw Sphinx command for the published bilingual output.
 
-Each page has an accessible language switch. Section and Python-object anchors survive switching; the original root-level URLs, including `/api/scalar.html`, redirect to their corresponding Chinese pages while retaining query parameters and mapped legacy fragments. Without JavaScript, compatibility pages expose links to both languages. Search runs entirely in the selected language’s static index.
+The left sidebar is a flat list of major chapters, with a prominent Search docs field and no expand/collapse buttons. Usage is a single page: its bordered directory jumps to the full scalar, VRZ, VTI, and native-helper documentation below. Other chapters have local page directories.
+
+Each page has an accessible language switch. Section and Python-object anchors survive switching; the original root-level URLs, including `/api/scalar.html`, redirect to their corresponding Chinese pages (old API pages now map directly to Usage) while retaining query parameters and mapped legacy fragments. Without JavaScript, compatibility pages expose links to both languages. Search runs entirely in the selected language’s static index.
 
 ## 检查 / Checks
 

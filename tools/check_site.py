@@ -79,18 +79,39 @@ def check(root):
         redirect = root / relative
         if not redirect.is_file() or 'location.replace' not in redirect.read_text(encoding='utf-8'):
             errors.append(f'Missing compatibility route: {relative}')
-    aliases = json.loads((project / 'tools' / 'api_zh_anchors.json').read_text())
-    for relative, entries in aliases.items():
-        page = pages[root / 'zh' / relative]
-        for old, target in entries.items():
-            if page.id_sections.get(old) != target:
-                errors.append(f'Misplaced historical API anchor: {relative}#{old}')
+    api_redirects = json.loads((project / 'tools' / 'api_redirects.json').read_text())
+    for source, routes in api_redirects.items():
+        locale = 'zh' if source == 'root' else source
+        canonical = pages[root / locale / 'usage.html']
+        for relative, route in routes.items():
+            path = root / relative if source == 'root' else root / source / relative
+            content = path.read_text(encoding='utf-8')
+            if 'location.replace' not in content or 'noindex, follow' not in content:
+                errors.append(f'Missing noindex API redirect: {source}/{relative}')
+            for target in {route['default'], *route['fragments'].values()}:
+                if target not in canonical.ids:
+                    errors.append(f'Invalid legacy API target: {source}/{relative} -> {target}')
     contracts = json.loads((project / 'tools' / 'api_contract.json').read_text())
     for locale in ('zh', 'en'):
+        usage = root / locale / 'usage.html'
+        content = usage.read_text(encoding='utf-8')
         for name in contracts:
-            relative = f'api/{name}.html' if name in {'scalar', 'vrz', 'vti'} else 'api/index.html'
-            if f'starwave.{name}' not in pages[root / locale / relative].ids:
+            if f'starwave.{name}' not in pages[usage].ids:
                 errors.append(f'Missing public API anchor: {locale}/{name}')
+        if not re.search(r'<h1>Usage<a', content):
+            errors.append(f'Wrong Usage title: {locale}')
+        if 'Usage / API' in content or 'toctree-l2' in content:
+            errors.append(f'Navigation is not flat: {locale}')
+        anchors = re.findall(r'data-sw-anchor="([^"]+)"', content)
+        if len(anchors) != 23 or len(set(anchors)) != 23 or any(anchor not in pages[usage].ids for anchor in anchors):
+            errors.append(f'Missing or invalid stable Usage section metadata: {locale}')
+        other = pages[root / ('en' if locale == 'zh' else 'zh') / 'usage.html']
+        if any(anchor not in other.ids for anchor in anchors):
+            errors.append(f'Usage section cannot switch language: {locale}')
+        index = (root / locale / 'searchindex.js').read_text(encoding='utf-8')
+        docnames = json.loads(index.removeprefix('Search.setIndex(').removesuffix(')'))['docnames']
+        if 'usage' not in docnames or any(name.startswith('api/') for name in docnames):
+            errors.append(f'API search entries are duplicated or missing: {locale}')
     links = 0
     for path, page in pages.items():
         if page.duplicate_ids:

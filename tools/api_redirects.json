@@ -1,0 +1,275 @@
+{
+  "zh": {
+    "api/scalar.html": {
+      "default": "scalar",
+      "fragments": {
+        "scalar": "scalar",
+        "sw-section-0": "scalar",
+        "id1": "scalar",
+        "id6": "scalar",
+        "id7": "scalar",
+        "id8": "scalar",
+        "id9": "scalar",
+        "id2": "scalar-function",
+        "sw-section-1": "scalar-function",
+        "starwave.scalar": "starwave.scalar",
+        "id3": "scalar-details",
+        "sw-section-2": "scalar-details",
+        "id4": "scalar-examples",
+        "sw-section-3": "scalar-examples",
+        "id5": "scalar-notes",
+        "sw-section-4": "scalar-notes"
+      }
+    },
+    "api/vrz.html": {
+      "default": "vrz",
+      "fragments": {
+        "vrz": "vrz",
+        "sw-section-0": "vrz",
+        "id1": "vrz",
+        "id6": "vrz",
+        "id7": "vrz",
+        "id8": "vrz",
+        "id9": "vrz",
+        "id2": "vrz-function",
+        "sw-section-1": "vrz-function",
+        "starwave.vrz": "starwave.vrz",
+        "id3": "vrz-details",
+        "sw-section-2": "vrz-details",
+        "id4": "vrz-examples",
+        "sw-section-3": "vrz-examples",
+        "id5": "vrz-notes",
+        "sw-section-4": "vrz-notes"
+      }
+    },
+    "api/vti.html": {
+      "default": "vti",
+      "fragments": {
+        "vti-vti": "vti",
+        "sw-section-0": "vti",
+        "id1": "vti",
+        "id6": "vti",
+        "id7": "vti",
+        "id8": "vti",
+        "id9": "vti",
+        "id2": "vti-function",
+        "sw-section-1": "vti-function",
+        "starwave.vti": "starwave.vti",
+        "id3": "vti-details",
+        "sw-section-2": "vti-details",
+        "id4": "vti-examples",
+        "sw-section-3": "vti-examples",
+        "id5": "vti-notes",
+        "sw-section-4": "vti-notes"
+      }
+    },
+    "api/index.html": {
+      "default": "usage",
+      "fragments": {
+        "api": "usage",
+        "sw-section-0": "usage",
+        "id1": "propagators",
+        "sw-section-1": "propagators",
+        "starwave.scalar": "starwave.scalar",
+        "starwave.vrz": "starwave.vrz",
+        "starwave.vti": "starwave.vti",
+        "id2": "native-runtime",
+        "sw-section-2": "native-runtime",
+        "starwave-native-status": "native-status",
+        "sw-section-3": "native-status",
+        "starwave.native_status": "starwave.native_status",
+        "starwave-prepare-native": "prepare-native",
+        "sw-section-4": "prepare-native",
+        "starwave.prepare_native": "starwave.prepare_native",
+        "id3": "native-notes",
+        "sw-section-5": "native-notes",
+        "id4": "native-examples",
+        "sw-section-6": "native-examples",
+        "id5": "other-exports",
+        "sw-section-7": "other-exports"
+      }
+    }
+  },
+  "en": {
+    "api/scalar.html": {
+      "default": "scalar",
+      "fragments": {
+        "scalar-2d-scalar-acoustics": "scalar",
+        "sw-section-0": "scalar",
+        "on-this-page": "scalar",
+        "id1": "scalar",
+        "id2": "scalar",
+        "id3": "scalar",
+        "id4": "scalar",
+        "function": "scalar-function",
+        "sw-section-1": "scalar-function",
+        "starwave.scalar": "starwave.scalar",
+        "sources-and-autograd": "scalar-details",
+        "sw-section-2": "scalar-details",
+        "examples": "scalar-examples",
+        "sw-section-3": "scalar-examples",
+        "notes": "scalar-notes",
+        "sw-section-4": "scalar-notes"
+      }
+    },
+    "api/vrz.html": {
+      "default": "vrz",
+      "fragments": {
+        "vrz-2d-variable-density-acoustics": "vrz",
+        "sw-section-0": "vrz",
+        "on-this-page": "vrz",
+        "id1": "vrz",
+        "id2": "vrz",
+        "id3": "vrz",
+        "id4": "vrz",
+        "function": "vrz-function",
+        "sw-section-1": "vrz-function",
+        "starwave.vrz": "starwave.vrz",
+        "parameterization-sources-and-gradients": "vrz-details",
+        "sw-section-2": "vrz-details",
+        "examples": "vrz-examples",
+        "sw-section-3": "vrz-examples",
+        "notes": "vrz-notes",
+        "sw-section-4": "vrz-notes"
+      }
+    },
+    "api/vti.html": {
+      "default": "vti",
+      "fragments": {
+        "vti-2d-and-3d-acoustic-vti": "vti",
+        "sw-section-0": "vti",
+        "on-this-page": "vti",
+        "id1": "vti",
+        "id2": "vti",
+        "id3": "vti",
+        "id4": "vti",
+        "function": "vti-function",
+        "sw-section-1": "vti-function",
+        "starwave.vti": "starwave.vti",
+        "components-timing-and-gradients": "vti-details",
+        "sw-section-2": "vti-details",
+        "examples": "vti-examples",
+        "sw-section-3": "vti-examples",
+        "notes": "vti-notes",
+        "sw-section-4": "vti-notes"
+      }
+    },
+    "api/index.html": {
+      "default": "usage",
+      "fragments": {
+        "api-reference": "usage",
+        "sw-section-0": "usage",
+        "propagators-at-a-glance": "propagators",
+        "sw-section-1": "propagators",
+        "starwave.scalar": "starwave.scalar",
+        "starwave.vrz": "starwave.vrz",
+        "starwave.vti": "starwave.vti",
+        "native-runtime": "native-runtime",
+        "sw-section-2": "native-runtime",
+        "starwave-native-status": "native-status",
+        "sw-section-3": "native-status",
+        "starwave.native_status": "starwave.native_status",
+        "starwave-prepare-native": "prepare-native",
+        "sw-section-4": "prepare-native",
+        "starwave.prepare_native": "starwave.prepare_native",
+        "native-runtime-notes": "native-notes",
+        "sw-section-5": "native-notes",
+        "native-runtime-examples": "native-examples",
+        "sw-section-6": "native-examples",
+        "other-exported-names-and-scope": "other-exports",
+        "sw-section-7": "other-exports"
+      }
+    }
+  },
+  "root": {
+    "api/scalar.html": {
+      "default": "scalar",
+      "fragments": {
+        "scalar": "scalar",
+        "sw-section-0": "scalar",
+        "id1": "scalar",
+        "id6": "scalar",
+        "id7": "scalar",
+        "id8": "scalar",
+        "id9": "scalar",
+        "id2": "scalar-function",
+        "sw-section-1": "scalar-function",
+        "starwave.scalar": "starwave.scalar",
+        "id3": "scalar-details",
+        "sw-section-2": "scalar-details",
+        "id4": "scalar-examples",
+        "sw-section-3": "scalar-examples",
+        "id5": "scalar-notes",
+        "sw-section-4": "scalar-notes"
+      }
+    },
+    "api/vrz.html": {
+      "default": "vrz",
+      "fragments": {
+        "vrz": "vrz",
+        "sw-section-0": "vrz",
+        "id1": "vrz",
+        "id6": "vrz",
+        "id7": "vrz",
+        "id8": "vrz",
+        "id9": "vrz",
+        "id2": "vrz-function",
+        "sw-section-1": "vrz-function",
+        "starwave.vrz": "starwave.vrz",
+        "id3": "vrz-details",
+        "sw-section-2": "vrz-details",
+        "id4": "vrz-examples",
+        "sw-section-3": "vrz-examples",
+        "id5": "vrz-notes",
+        "sw-section-4": "vrz-notes"
+      }
+    },
+    "api/vti.html": {
+      "default": "vti",
+      "fragments": {
+        "vti-vti": "vti",
+        "sw-section-0": "vti",
+        "id1": "vti",
+        "id6": "vti",
+        "id7": "vti",
+        "id8": "vti",
+        "id9": "vti",
+        "id2": "vti-function",
+        "sw-section-1": "vti-function",
+        "starwave.vti": "starwave.vti",
+        "id3": "vti-details",
+        "sw-section-2": "vti-details",
+        "id4": "vti-examples",
+        "sw-section-3": "vti-examples",
+        "id5": "vti-notes",
+        "sw-section-4": "vti-notes"
+      }
+    },
+    "api/index.html": {
+      "default": "usage",
+      "fragments": {
+        "api": "usage",
+        "sw-section-0": "usage",
+        "id1": "propagators",
+        "sw-section-1": "propagators",
+        "starwave.scalar": "starwave.scalar",
+        "starwave.vrz": "starwave.vrz",
+        "starwave.vti": "starwave.vti",
+        "id2": "native-runtime",
+        "sw-section-2": "native-runtime",
+        "starwave-native-status": "native-status",
+        "sw-section-3": "native-status",
+        "starwave.native_status": "starwave.native_status",
+        "starwave-prepare-native": "prepare-native",
+        "sw-section-4": "prepare-native",
+        "starwave.prepare_native": "starwave.prepare_native",
+        "id3": "other-exports",
+        "sw-section-5": "native-notes",
+        "id4": "native-examples",
+        "sw-section-6": "native-examples",
+        "id5": "other-exports",
+        "sw-section-7": "other-exports"
+      }
+    }
+  }
+}

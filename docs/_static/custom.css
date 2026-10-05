@@ -23,3 +23,21 @@
   html.writer-html5 .rst-content dl.field-list > dt { display: block; padding-left: 0; margin-bottom: .4rem; }
   html.writer-html5 .rst-content dl.field-list > dd { min-width: 0; margin-left: 0; margin-bottom: 1rem; }
 }
+
+/* A flat chapter list: section navigation belongs beside the page content. */
+.wy-menu-vertical .toctree-expand { display: none !important; }
+.wy-side-nav-search { padding-top: 24px; padding-bottom: 18px; }
+.wy-side-nav-search > a { margin-bottom: 20px; }
+.wy-side-nav-search input[type="search"] { width: 100%; min-height: 38px; padding: 9px 13px; border: 1px solid #d6dce2; border-radius: 50px; background: #fff; color: #404040; font-size: 14px; box-shadow: inset 0 1px 2px rgba(0,0,0,.08); }
+.wy-side-nav-search input[type="search"]:focus { outline: 3px solid #f0ad4e; outline-offset: 2px; }
+.sw-visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+.rst-content .sw-page-toc { padding: 18px 24px; margin: 0 0 28px; border: 1px solid #d3d6d8; background: #fff; }
+.rst-content .sw-page-toc > :last-child, .rst-content .sw-page-toc ul { margin-bottom: 0; }
+.rst-content .sw-page-toc li { margin-bottom: 4px; }
+.rst-content .sw-page-toc a { text-decoration: underline; text-underline-offset: 2px; }
+.rst-content #usage h2 { margin-top: 36px; padding-top: 4px; }
+.rst-content section { scroll-margin-top: 20px; }
+@media (max-width: 768px) {
+  .rst-content .sw-page-toc { padding: 16px 18px; }
+  .rst-content section { scroll-margin-top: 64px; }
+}

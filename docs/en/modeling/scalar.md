@@ -17,7 +17,7 @@ records = starwave.scalar(
 )[0]
 ```
 
-This snippet requires prepared inputs. For a complete standalone program, see the [Quickstart](../quickstart.md). For individual parameters and defaults, see the [scalar API reference](../api/scalar.md).
+This snippet requires prepared inputs. For a complete standalone program, see the [Quickstart](../quickstart.md). For individual parameters and defaults, see the {ref}`scalar API reference <scalar>`.
 
 ## Gradients and illumination
 

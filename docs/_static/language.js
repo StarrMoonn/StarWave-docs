@@ -23,16 +23,6 @@ document.addEventListener('DOMContentLoaded', () => {
     new MutationObserver(updateMenuState).observe(sidebar, {attributes: true, attributeFilter: ['class']});
     updateMenuState();
   }
-  if (document.documentElement.lang === 'zh-CN') {
-    // The theme adds these buttons after DOMContentLoaded via jQuery.ready.
-    const navigation = document.querySelector('.wy-menu-vertical');
-    const translateToggles = () => navigation?.querySelectorAll('.toctree-expand').forEach(button => {
-      button.title = '展开或折叠菜单';
-      button.setAttribute('aria-label', '展开或折叠菜单');
-    });
-    if (navigation) new MutationObserver(translateToggles).observe(navigation, {childList: true, subtree: true});
-    translateToggles();
-  }
   function destination(link) {
     const target = new URL(link.getAttribute('href'), window.location.href);
     target.search = window.location.search;
@@ -45,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // Python object anchors are identical in both independently built locales.
       if (element && !id.startsWith('starwave.')) {
         const section = element.closest('section[data-sw-section]');
-        if (section) target.hash = section.dataset.swSection;
+        if (section) target.hash = section.dataset.swAnchor || section.dataset.swSection;
       }
     }
     return target.href;

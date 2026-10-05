@@ -15,7 +15,7 @@ StarWave 为 PyTorch 提供 CUDA 波传播接口，覆盖二维标量声学、�
 | `starwave.vti` | `vp, epsilon, delta, rho`，2D/3D | `vz` | 声学 VTI；支持各轴不同网格间距 |
 
 ```{toctree}
-:maxdepth: 2
+:maxdepth: 1
 :caption: 开始使用
 
 installation
@@ -24,7 +24,7 @@ quickstart
 ```
 
 ```{toctree}
-:maxdepth: 2
+:maxdepth: 1
 :caption: 正演建模
 
 modeling/conventions
@@ -34,7 +34,7 @@ modeling/vti
 ```
 
 ```{toctree}
-:maxdepth: 2
+:maxdepth: 1
 :caption: 反演与神经网络
 
 inversion/fwi
@@ -43,14 +43,14 @@ inversion/inr
 ```
 
 ```{toctree}
-:maxdepth: 3
-:caption: Usage / API
+:maxdepth: 1
+:caption: Usage
 
-api/index
+usage
 ```
 
 ```{toctree}
-:maxdepth: 2
+:maxdepth: 1
 :caption: 参考与维护
 
 faq

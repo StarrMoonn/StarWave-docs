@@ -15,7 +15,7 @@ New users: read [Installation](installation.md) → [Quickstart](quickstart.md) 
 | `starwave.vti` | `vp, epsilon, delta, rho`, 2D/3D | `vz` | Acoustic VTI; supports different grid spacings along each axis |
 
 ```{toctree}
-:maxdepth: 2
+:maxdepth: 1
 :caption: Getting started
 
 installation
@@ -24,7 +24,7 @@ quickstart
 ```
 
 ```{toctree}
-:maxdepth: 2
+:maxdepth: 1
 :caption: Forward modeling
 
 modeling/conventions
@@ -34,7 +34,7 @@ modeling/vti
 ```
 
 ```{toctree}
-:maxdepth: 2
+:maxdepth: 1
 :caption: Inversion and neural networks
 
 inversion/fwi
@@ -43,14 +43,14 @@ inversion/inr
 ```
 
 ```{toctree}
-:maxdepth: 3
-:caption: Usage / API
+:maxdepth: 1
+:caption: Usage
 
-api/index
+usage
 ```
 
 ```{toctree}
-:maxdepth: 2
+:maxdepth: 1
 :caption: Reference and maintenance
 
 faq

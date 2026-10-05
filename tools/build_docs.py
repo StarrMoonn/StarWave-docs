@@ -6,6 +6,7 @@ import argparse
 import html
 import json
 import os
+import posixpath
 from pathlib import Path
 import re
 import shutil
@@ -13,44 +14,66 @@ import subprocess
 import sys
 
 PROJECT = Path(__file__).resolve().parents[1]
-SECTION = re.compile(r'<section id="([^"]+)">\s*(<h[1-6]\b.*?</h[1-6]>)', re.S)
+SECTION = re.compile(r'<section id="([^"]+)">\s*((?:<span id="[^"]+"></span>\s*)*)(<h[1-6]\b.*?</h[1-6]>)', re.S)
 
 
 def sections(text):
     return [(sid, html.unescape(re.sub('<[^>]+>', '', re.sub(r'<a[^>]*class="headerlink"[^>]*>.*?</a>', '', heading))).strip())
-            for sid, heading in SECTION.findall(text)]
+            for sid, _, heading in SECTION.findall(text)]
 
 
-def add_anchors(text):
+def add_anchors(text, stable_anchors=None):
     counter = iter(range(10000))
     def insert(match):
         number = next(counter)
-        return (f'<section id="{match[1]}" data-sw-section="sw-section-{number}">'
-                f'<span id="sw-section-{number}" class="sw-anchor"></span>{match[2]}')
+        stable = f' data-sw-anchor="{stable_anchors[number]}"' if stable_anchors else ''
+        return (f'<section id="{match[1]}" data-sw-section="sw-section-{number}"{stable}>'
+                f'<span id="sw-section-{number}" class="sw-anchor"></span>{match[2]}{match[3]}')
     return SECTION.sub(insert, text)
 
 
-def redirect_page(relative, mapping):
-    prefix = '../' * (len(Path(relative).parts) - 1)
-    zh, en = prefix + 'zh/' + relative, prefix + 'en/' + relative
+def add_page_toc(text, locale):
+    """Keep headings in the article rather than expandable sidebar branches."""
+    headings = sections(text)
+    if len(headings) < 2:
+        return text
+    label = '本页内容' if locale == 'zh' else 'On this page'
+    links = ''.join(f'<li><a href="#{html.escape(sid, quote=True)}">{html.escape(title)}</a></li>'
+                    for sid, title in headings[1:])
+    toc = f'<nav class="sw-page-toc" aria-label="{label}"><p><strong>{label}</strong></p><ul>{links}</ul></nav>'
+    return SECTION.sub(lambda match: match[0] + toc, text, count=1)
+
+
+def redirect_page(relative, mapping, *, target_relative=None, locale='zh', default_fragment=''):
+    target_relative = target_relative or relative
+    parent = posixpath.dirname(relative)
+    targets = {lang: posixpath.relpath(lang + '/' + target_relative, parent or '.')
+               for lang in ('zh', 'en')}
+    target = targets[locale]
+    zh = targets['zh'] + ('#' + default_fragment if default_fragment else '')
+    en = targets['en'] + ('#' + default_fragment if default_fragment else '')
+    title = '文档已迁移' if locale == 'zh' else 'Documentation moved'
+    language = 'zh-CN' if locale == 'zh' else 'en'
+    message = '请使用下方链接继续阅读。' if locale == 'zh' else 'Use the links below to continue reading.'
     # Location.replace keeps compatibility URLs out of browser history.
     return f'''<!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8">
+<html lang="{language}"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>StarWave · 中文 / English</title>
-<link rel="canonical" href="{zh}">
+<meta name="robots" content="noindex, follow">
+<title>{title} · StarWave</title>
+<link rel="canonical" href="{target}">
 <script>
 const fragments = {json.dumps(mapping, ensure_ascii=True)};
 let fragment = location.hash.slice(1);
 try {{ fragment = decodeURIComponent(fragment); }} catch (_) {{}}
-const target = new URL({json.dumps(zh)}, location.href);
+const target = new URL({json.dumps(target)}, location.href);
 target.search = location.search;
-target.hash = fragments[fragment] || fragment;
+target.hash = fragments[fragment] || fragment || {json.dumps(default_fragment)};
 location.replace(target.href);
 </script></head><body>
-<h1>StarWave 2.0.0</h1>
-<p>文档已迁移至双语站点。Documentation is now available in two languages.</p>
-<p><a href="{zh}" lang="zh-CN">继续阅读中文</a> · <a href="{en}" lang="en">Continue in English</a></p>
+<h1>{title}</h1>
+<p>{message}</p>
+<p><a href="{zh}" lang="zh-CN" data-sw-language="zh">中文</a> · <a href="{en}" lang="en" data-sw-language="en">Continue in English</a></p>
 </body></html>'''
 
 
@@ -77,8 +100,9 @@ def build(destination):
                         str(stage / locale), str(destination / locale)], env=env, check=True)
     assert source_paths['zh'] == source_paths['en'], 'Translated page coverage differs'
     legacy = json.loads((PROJECT / 'tools' / 'legacy_anchors.json').read_text())
-    for path in sorted((destination / 'zh').rglob('*.html')):
-        relative = path.relative_to(destination / 'zh').as_posix()
+    pages = {path.with_suffix('.html').as_posix() for path in source_paths['zh']} | {'genindex.html', 'search.html'}
+    for relative in sorted(pages):
+        path = destination / 'zh' / relative
         other = destination / 'en' / relative
         if not other.is_file():
             raise ValueError(f'Missing English counterpart: {relative}')
@@ -96,11 +120,26 @@ def build(destination):
                 raise ValueError(f"Legacy heading missing/ambiguous: {relative} {entry['title']}")
             mapping[entry['id']] = f'sw-section-{matches[0]}'
         texts[0] = texts[0].replace('aria-label="Main"', 'aria-label="主导航"')
-        path.write_text(add_anchors(texts[0]), encoding='utf-8')
-        other.write_text(add_anchors(texts[1]), encoding='utf-8')
+        if relative not in {'usage.html', 'index.html'}:
+            texts = [add_page_toc(text, locale) for text, locale in zip(texts, ('zh', 'en'))]
+        stable = None
+        if relative == 'usage.html':
+            stable = ['usage'] + re.findall(r'^\(([^)]+)\)=\n#+ ', (PROJECT / 'docs' / 'usage.md').read_text(), re.M)
+            assert len(stable) == len(pairs[0]), 'Usage anchors must cover every section'
+        path.write_text(add_anchors(texts[0], stable), encoding='utf-8')
+        other.write_text(add_anchors(texts[1], stable), encoding='utf-8')
         old = destination / relative
         old.parent.mkdir(parents=True, exist_ok=True)
         old.write_text(redirect_page(relative, mapping), encoding='utf-8')
+    api_redirects = json.loads((PROJECT / 'tools' / 'api_redirects.json').read_text())
+    for source, routes in api_redirects.items():
+        for relative, route in routes.items():
+            relative = relative if source == 'root' else source + '/' + relative
+            old = destination / relative
+            old.parent.mkdir(parents=True, exist_ok=True)
+            old.write_text(redirect_page(relative, route['fragments'], target_relative='usage.html',
+                                         locale='zh' if source == 'root' else source,
+                                         default_fragment=route['default']), encoding='utf-8')
     (destination / '.nojekyll').touch()
     print(f'Built {len(source_paths["zh"])} pages per language with independent search indexes and legacy routes.')
 

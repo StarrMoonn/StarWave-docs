@@ -24,8 +24,9 @@ nitpick_ignore = [('py:class', x) for x in ('torch.Tensor', 'ScalarIllumination'
 html_theme = 'sphinx_rtd_theme'
 html_theme_options = {
     'collapse_navigation': False,
-    'navigation_depth': 3,
-    'style_nav_header_background': '#17354c',
+    'navigation_depth': 1,
+    'titles_only': True,
+    'style_nav_header_background': '#487eae',
 }
 html_static_path = [str(CONF_DIR / '_static')]
 templates_path = [str(CONF_DIR / '_templates')]

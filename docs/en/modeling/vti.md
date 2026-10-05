@@ -28,7 +28,7 @@ stress_h, velocity_z = starwave.vti(
 )
 ```
 
-Valid inputs must be prepared before running this call snippet. Velocities are located at positive half-grid offsets along their corresponding axes, while stresses are located at grid centers. The interface does not perform spatial interpolation for the user. Outputs are aligned to nominal user times, but this does not make stress and velocity the same physical quantity. See the [VTI API reference](../api/vti.md) for individual parameters and return ordering.
+Valid inputs must be prepared before running this call snippet. Velocities are located at positive half-grid offsets along their corresponding axes, while stresses are located at grid centers. The interface does not perform spatial interpolation for the user. Outputs are aligned to nominal user times, but this does not make stress and velocity the same physical quantity. See the {ref}`VTI API reference <vti>` for individual parameters and return ordering.
 
 ## Anisotropy and stability
 

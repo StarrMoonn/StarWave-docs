@@ -12,7 +12,7 @@ records = starwave.vrz(
 )[0]
 ```
 
-`rho` 与 `v` 应具有相同形状、dtype 和设备。另一种参数化是将 `density=rho` 替换为 `impedance=Z`。这是调用片段，输入与原生库需预先准备。完整参数说明见 [VRZ API 参考](../api/vrz.md)。
+`rho` 与 `v` 应具有相同形状、dtype 和设备。另一种参数化是将 `density=rho` 替换为 `impedance=Z`。这是调用片段，输入与原生库需预先准备。完整参数说明见 {ref}`VRZ API 参考 <vrz>`。
 
 ## 与 scalar 的相同点和差别
 

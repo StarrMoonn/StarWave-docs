@@ -1,0 +1,10 @@
+{%- if 'singlehtml' not in builder %}
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="{{ pathto('search') }}" method="get">
+    <label class="sw-visually-hidden" for="sw-doc-search">{{ '搜索文档' if sw_locale == 'zh' else 'Search docs' }}</label>
+    <input id="sw-doc-search" type="search" name="q" placeholder="Search docs" autocomplete="off" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+{%- endif %}

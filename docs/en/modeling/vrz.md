@@ -12,7 +12,7 @@ records = starwave.vrz(
 )[0]
 ```
 
-`rho` and `v` should have the same shape, dtype, and device. For the alternative parameterization, replace `density=rho` with `impedance=Z`. This is a call snippet; inputs and the native library must be prepared beforehand. See the [VRZ API reference](../api/vrz.md) for full parameter descriptions.
+`rho` and `v` should have the same shape, dtype, and device. For the alternative parameterization, replace `density=rho` with `impedance=Z`. This is a call snippet; inputs and the native library must be prepared beforehand. See the {ref}`VRZ API reference <vrz>` for full parameter descriptions.
 
 ## Similarities to and differences from scalar
 
