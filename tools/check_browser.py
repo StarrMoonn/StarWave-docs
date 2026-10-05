@@ -61,7 +61,8 @@ def check_navigation(page, locale, relative):
         assert search.is_visible(), relative
         box = search.bounding_box()
         sidebar = page.locator('.wy-nav-side').bounding_box()
-        assert box['y'] < 400 and box['width'] >= 150 and box['height'] >= 32, box
+        assert 0 <= box['y'] < 400 and box['y'] + box['height'] <= page.viewport_size['height'], box
+        assert box['width'] >= 150 and box['height'] >= 32, box
         assert sidebar['x'] <= box['x'] < sidebar['x'] + sidebar['width'], box
 
 
@@ -221,7 +222,7 @@ def check(root, browser_path=None):
             browser = playwright.chromium.launch(**options)
             page = browser.new_page(viewport={'width': 1440, 'height': 1000})
             page.on('pageerror', lambda error: errors.append(str(error)))
-            for size in ({'width': 1440, 'height': 1000}, {'width': 390, 'height': 844}):
+            for size in ({'width': 1440, 'height': 1000}, {'width': 1180, 'height': 760}, {'width': 390, 'height': 844}):
                 page.set_viewport_size(size)
                 for locale in ('zh', 'en'):
                     for path in sorted((root / locale).rglob('*.html')):

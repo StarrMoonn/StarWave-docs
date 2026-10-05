@@ -26,7 +26,7 @@
 
 /* A flat chapter list: section navigation belongs beside the page content. */
 .wy-menu-vertical .toctree-expand { display: none !important; }
-.wy-side-nav-search { padding-top: 24px; padding-bottom: 18px; }
+.wy-side-nav-search { position: sticky; top: 0; z-index: 2; padding-top: 24px; padding-bottom: 18px; }
 .wy-side-nav-search > a { margin-bottom: 20px; }
 .wy-side-nav-search input[type="search"] { width: 100%; min-height: 38px; padding: 9px 13px; border: 1px solid #d6dce2; border-radius: 50px; background: #fff; color: #404040; font-size: 14px; box-shadow: inset 0 1px 2px rgba(0,0,0,.08); }
 .wy-side-nav-search input[type="search"]:focus { outline: 3px solid #f0ad4e; outline-offset: 2px; }
