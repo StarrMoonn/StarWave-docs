@@ -383,8 +383,11 @@ def check_homepage(page, base, locale, output):
     # Core buttons must navigate and retain normal Back behavior.
     for target in ('installation', 'quickstart', 'usage'):
         page.locator(f'.sw-home-actions a[href="{target}.html"]').click()
+        page.wait_for_url(base + locale + '/' + target + '.html')
         assert urlsplit(page.url).path == f'/{locale}/{target}.html'
         page.go_back()
+        # Back can resolve before a same-document history transition settles.
+        page.wait_for_url(base + locale + '/index.html')
         assert urlsplit(page.url).path == f'/{locale}/index.html'
     other = 'zh' if locale == 'en' else 'en'
     page.goto(base + locale + '/index.html?from=home#home-workflow')
