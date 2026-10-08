@@ -612,7 +612,18 @@ def check(root, browser_path=None):
                     check_homepage(page, base, locale, output)
                     page.goto(base + locale + '/usage.html', wait_until='networkidle')
                     check_usage(page, locale, output)
-                    assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), (locale, size)
+                    if not page.evaluate('document.documentElement.scrollWidth <= innerWidth'):
+                        wide_text = page.evaluate('''() => {
+                            const walker = document.createTreeWalker(document.querySelector('.rst-content'), NodeFilter.SHOW_TEXT);
+                            const result = [];
+                            for (let node; (node = walker.nextNode());) {
+                                const range = document.createRange(); range.selectNodeContents(node);
+                                if ([...range.getClientRects()].some(r => r.right > innerWidth + .5))
+                                    result.push({text:node.textContent.slice(0,160), tag:node.parentElement.tagName});
+                            }
+                            return result.slice(0,30);
+                        }''')
+                        raise AssertionError(f'Usage overflow: {locale} {size}; {wide_text}')
                     open_mobile_menu(page)
                     check_navigation(page, locale, 'usage.html')
                     close_mobile_menu(page)
