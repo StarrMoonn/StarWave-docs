@@ -205,3 +205,7 @@ html[lang="zh-CN"] .rst-content #usage :is(h2, h3) { font-family: inherit; }
 @media print {
   .rst-content .sw-pdf-viewer { display: none; }
 }
+
+/* Keep fully qualified API names within the generated index columns. */
+.rst-content table.genindextable { table-layout: fixed; }
+.rst-content table.genindextable td { overflow-wrap: anywhere; }
