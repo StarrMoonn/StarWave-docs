@@ -217,3 +217,7 @@ html[lang="zh-CN"] .rst-content #usage :is(h2, h3) { font-family: inherit; }
 .rst-content .sw-reconstruction-scroll img { display: block; width: 100%; min-width: 640px; max-width: none; height: auto; }
 .rst-content .sw-reconstruction-figure figcaption { margin-top: 12px; color: #526371; font-size: 15px; line-height: 1.6; }
 .rst-content #reconstruction .math { max-width: 100%; overflow-x: auto; overflow-y: hidden; }
+
+/* Inline formulas must also stay inside narrow article/list content boxes. */
+.rst-content #reconstruction span.math { display: inline-block; max-width: 100%; vertical-align: middle; overflow-x: auto; overflow-y: hidden; }
+.rst-content #reconstruction code.literal { white-space: normal; overflow-wrap: anywhere; }

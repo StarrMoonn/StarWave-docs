@@ -195,7 +195,7 @@ H=d\,\mathbf1[\lambda\text{ or }\mu]
 ## 支持范围与数值验证
 
 - **原生执行：** CUDA 二维／三维、`float32`／`float64`、精度阶数 2／4／6／8，`storage_mode="device"`、无压缩、`python_backend=False`。每个物理方向的尺寸必须大于两倍差分半径。详见 {ref}`API 限制 <elastic-notes>`。
-- **时间采样：** CFL 子步倍率为 {math}`q` 时，材料梯度步长为 {math}`s=q\,\texttt{model\_gradient\_sampling\_interval}`，权重为 {math}`\kappa_n=s\mathbf1[n\bmod s=0]`。边界记录、状态／源伴随与 PML 时间滤波仍按每个实际内部步推进。与原生 `full` 对齐，指遵循同一套采样材料梯度约定；当 {math}`s>1` 时，不能据此声称等同于全部内部步的材料自动微分。
+- **时间采样：** CFL 子步倍率为 {math}`q` 时，记 `model_gradient_sampling_interval` 为 {math}`I`，材料梯度步长为 {math}`s=qI`，权重为 {math}`\kappa_n=s\mathbf1[n\bmod s=0]`。边界记录、状态／源伴随与 PML 时间滤波仍按每个实际内部步推进。与原生 `full` 对齐，指遵循同一套采样材料梯度约定；当 {math}`s>1` 时，不能据此声称等同于全部内部步的材料自动微分。
 - **时间尾部：** 当前路径推进完整步长分组，即 {math}`N=\lfloor N_\mathrm{requested}/s\rfloor s`，余下内部接收行先补零，再进入前端降采样。没有完整分组的边界情况不是受支持的空操作，不应依赖它。
 - **表面与求导：** 弹性 API 没有通用 `free_surface` 开关；某侧 PML 设为零本身不等于无牵引自由表面。密度求导还要求有效交错浮力非零。原生高阶导数不受支持；正演回调是只读观察器，边界模式不支持反向回调。
 
