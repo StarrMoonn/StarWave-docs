@@ -829,6 +829,7 @@ def check(root, browser_path=None):
             browser = playwright.chromium.launch(**options)
             page = browser.new_page(viewport={'width': 1440, 'height': 1000})
             page.on('pageerror', lambda error: errors.append(str(error)))
+            check_scalar3d_examples(page, base, output)
             for size in ({'width': 1440, 'height': 1000}, {'width': 1180, 'height': 760}, {'width': 390, 'height': 844}):
                 page.set_viewport_size(size)
                 for locale in ('zh', 'en'):
@@ -896,8 +897,10 @@ def check(root, browser_path=None):
             assert urlsplit(page.url).path == '/zh/usage.html'
             assert urlsplit(page.url).fragment == 'scalar-examples'
             page.go_back()
+            page.wait_for_url(base + 'en/usage.html?q=illumination#scalar-examples')
             assert urlsplit(page.url).path == '/en/usage.html'
             page.go_forward()
+            page.wait_for_url(base + 'zh/usage.html?q=illumination#scalar-examples')
             assert urlsplit(page.url).path == '/zh/usage.html'
             for name in API_NAMES:
                 page.goto(base + f'zh/usage.html#starwave.{name}')
@@ -957,7 +960,6 @@ def check(root, browser_path=None):
                 assert dict(parse_qsl(urlsplit(plain.url).query))['q'] == 'gradient'
                 # Form navigation works without JS; Sphinx result rendering still requires JS.
             context.close()
-            check_scalar3d_examples(page, base, output)
             browser.close()
         assert not errors, errors
         print('PASS: flat desktop/mobile navigation, Usage TOC and API fields, reconstruction figures and readable scrolling, search, direct legacy routes, language anchors, history, keyboard, PDF preview/download, and no-JS fallback.')
