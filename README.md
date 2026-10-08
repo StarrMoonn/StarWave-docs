@@ -1,8 +1,8 @@
 # StarWave-docs · 中文 / English
 
-StarWave 4.0.0 双语使用手册，基于 Sphinx、Read the Docs 主题和 MyST Markdown。完整中文和英文版本各含 19 个内容页面，覆盖安装、正演、反演、API 与演示文稿；每种语言独立构建、导航和搜索。API 采用 Deepwave 风格的类型签名、参数、返回、注意事项及示例组织，所有说明针对 StarWave 原创编写。
+StarWave 4.0.0 双语使用手册，基于 Sphinx、Read the Docs 主题和 MyST Markdown。完整中文和英文版本各含 20 个内容页面，覆盖安装、正演、反演、API 与演示文稿；每种语言独立构建、导航和搜索。API 采用 Deepwave 风格的类型签名、参数、返回、注意事项及示例组织，所有说明针对 StarWave 原创编写。
 
-Bilingual user documentation for StarWave 4.0.0, built with Sphinx, the Read the Docs theme, and MyST Markdown. Each language contains the complete 19-page manual and a separate search index. The API presentation takes organizational cues from Deepwave while preserving StarWave’s own public contracts.
+Bilingual user documentation for StarWave 4.0.0, built with Sphinx, the Read the Docs theme, and MyST Markdown. Each language contains the complete 20-page manual and a separate search index. The API presentation takes organizational cues from Deepwave while preserving StarWave’s own public contracts.
 
 ## 构建 / Build
 
@@ -68,3 +68,7 @@ The Presentation chapter publishes only the approved original 30-slide watermark
 ## Elastic documentation maintenance · 2026-10-08
 
 The existing single-page Usage now documents the published V11 / 4.0.0 elastic contract, explicit material conversions, and the separate elastic preparation helper. Source/wheel signature parity and exact return order were reviewed without executing GPU propagation. Existing scalar/VRZ/VTI API content, historical tutorial assets, styling, attribution and compatibility anchors are preserved. Review scope and the published wheel hash are recorded in each language's Status and Release Notes pages. Use `python tools/check_api_docs.py --wheel PATH_TO_4.0.0_WHEEL` for optional local archive verification; do not commit the wheel.
+
+## Wavefield Reconstruction chapter
+
+The bilingual Forward Modeling navigation now includes Reconstruction / 波场反传重建. The chapter derives the pinned 4.0.0 elastic boundary method, distinguishes forward reconstruction from the discrete adjoint, documents the physical velocity/traction tape and temporal-filter transpose, and gives exact payload formulas with sampling and validation limits. Four original vector schematics per language are reproducible with `tools/draw_reconstruction.py`; outlined text keeps labels consistent without a network font dependency. Keyboard-scrollable figure regions preserve readable labels on narrow screens. No software source or measured GPU results were changed.

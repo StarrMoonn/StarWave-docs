@@ -55,6 +55,24 @@ WAVE_SECTIONS = ('wave-propagation', 'wave-vrz', 'wave-vrz-details', 'wave-vrz-l
                  'wave-vti', 'wave-vti-details', 'wave-vti-limits')
 
 
+RECONSTRUCTION_SECTIONS = ('reconstruction', 'reconstruction-state', 'reconstruction-tape',
+                           'reconstruction-reverse', 'reconstruction-gradient',
+                           'reconstruction-memory', 'reconstruction-scope',
+                           'reconstruction-references')
+
+def canonical_reconstruction_sections(text):
+    """Keep all bilingual theory sections directly addressable."""
+    assert len(sections(text)) == len(RECONSTRUCTION_SECTIONS), 'Reconstruction section structure changed'
+    targets = iter(RECONSTRUCTION_SECTIONS)
+    def replace(match):
+        target = next(targets)
+        aliases = dict.fromkeys([match[1], *re.findall(r'<span id="([^"]+)"', match[2])])
+        spans = ''.join(f'<span id="{alias}"></span>' for alias in aliases if alias != target)
+        heading = match[3].replace(f'href="#{match[1]}"', f'href="#{target}"')
+        return f'<section id="{target}">{spans}{heading}'
+    return SECTION.sub(replace, text)
+
+
 def canonical_wave_sections(text):
     """Give the combined page stable, bilingual destinations for legacy routes."""
     assert len(sections(text)) == len(WAVE_SECTIONS), 'Wave propagation section structure changed'
@@ -183,6 +201,8 @@ def build(destination):
             texts = [canonical_usage_sections(text, locale) for text, locale in zip(texts, ('zh', 'en'))]
         if relative == 'modeling/wave-propagation.html':
             texts = [canonical_wave_sections(text) for text in texts]
+        if relative == 'modeling/reconstruction.html':
+            texts = [canonical_reconstruction_sections(text) for text in texts]
         pairs = [sections(text) for text in texts]
         assert len(pairs[0]) == len(pairs[1]), f'Heading parity differs: {relative}'
         mapping = {}
@@ -212,6 +232,8 @@ def build(destination):
             stable = FWI_SECTIONS
         if relative == 'modeling/wave-propagation.html':
             stable = WAVE_SECTIONS
+        if relative == 'modeling/reconstruction.html':
+            stable = RECONSTRUCTION_SECTIONS
         path.write_text(add_anchors(texts[0], stable, numbers), encoding='utf-8')
         other.write_text(add_anchors(texts[1], stable, numbers), encoding='utf-8')
         old = destination / relative

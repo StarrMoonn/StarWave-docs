@@ -34,6 +34,16 @@ jobs:
           name: documentation-browser-qa
           path: _build/qa
       - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: reconstruction-browser-qa
+          path: |
+            _build/qa/*-reconstruction-top-1440.png
+            _build/qa/*-reconstruction-*-figure-1440.png
+            _build/qa/*-reconstruction-*-figure-320.png
+            _build/qa/*-reconstruction-*-scroll-end-320.png
+            _build/qa/*-reconstruction-*-figure-390-nojs.png
+      - uses: actions/upload-artifact@v4
         with:
           name: documentation-html
           path: _build/html

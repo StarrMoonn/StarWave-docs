@@ -209,3 +209,11 @@ html[lang="zh-CN"] .rst-content #usage :is(h2, h3) { font-family: inherit; }
 /* Keep fully qualified API names within the generated index columns. */
 .rst-content table.genindextable { table-layout: fixed; }
 .rst-content table.genindextable td { overflow-wrap: anywhere; }
+
+/* Original reconstruction schematics retain readable labels on small screens. */
+.rst-content .sw-reconstruction-figure { margin: 28px 0 32px; }
+.rst-content .sw-reconstruction-scroll { width: 100%; overflow-x: auto; border: 1px solid #dbe5ea; border-radius: 6px; background: #fff; }
+.rst-content .sw-reconstruction-scroll:focus-visible { outline: 3px solid #d58b22; outline-offset: 3px; }
+.rst-content .sw-reconstruction-scroll img { display: block; width: 100%; min-width: 640px; max-width: none; height: auto; }
+.rst-content .sw-reconstruction-figure figcaption { margin-top: 12px; color: #526371; font-size: 15px; line-height: 1.6; }
+.rst-content #reconstruction .math { max-width: 100%; overflow-x: auto; overflow-y: hidden; }

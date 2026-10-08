@@ -459,6 +459,8 @@ Final states have shape `[B,*propagation_domain_including_PML]`, without finite-
 (elastic-memory)=
 ### Storage and gradient sampling
 
+For the reconstruction order, material gradients and storage formulas, see {ref}`Wavefield Reconstruction <reconstruction>`.
+
 - `memory="full"` is the default, supporting 2D/3D CPU/CUDA float32/float64. Native `storage_mode="device"` stores histories on the current device; `"cpu"` uses host storage for CUDA and is normalized to device storage for CPU models; `"disk"` uses storage_path. `storage_compression=True` is lossy.
 - `storage_mode="none"` disables propagation-history contributions to material gradients and cannot provide full material gradients for inversion. Material-dependent force-source scaling can still contribute partial gradients. Trainable materials trigger a warning; source/initial-state gradients are a separate path.
 - `memory="boundary"` is a StarWave extension: CUDA only, with `python_backend=False`, `storage_mode="device"` and `storage_compression=False`. Every cropped physical extent must exceed accuracy; active staggered buoyancy must be nonzero when its gradient is requested. CPU, offload and compression are unsupported, with no automatic full fallback. Memory/speed benefits depend on domain shape, PML and sampling.

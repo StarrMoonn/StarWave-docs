@@ -26,10 +26,16 @@ USAGE_TARGETS = tuple(
                        'native-examples', 'prepare-elastic', 'other-exports')
 TOC_TARGETS = ('scalar', 'vrz', 'vti', 'elastic', 'elastic-conversions',
                'native-status', 'prepare-native', 'prepare-elastic', 'other-exports')
+RECONSTRUCTION_SECTIONS = ('reconstruction', 'reconstruction-state',
+                           'reconstruction-tape', 'reconstruction-reverse',
+                           'reconstruction-gradient', 'reconstruction-memory',
+                           'reconstruction-scope', 'reconstruction-references')
+RECONSTRUCTION_FIGURES = ('flow', 'domain', 'timeline', 'memory')
 USAGE_SECTIONS = tuple(target for target in USAGE_TARGETS if not target.endswith('-function'))
 CHAPTERS = {
     'about', 'presentation', 'installation', 'docker', 'wsl', 'quickstart', 'modeling/conventions',
-    'modeling/scalar', 'modeling/gradient', 'modeling/acquisition', 'modeling/wave-propagation', 'inversion/fwi',
+    'modeling/scalar', 'modeling/gradient', 'modeling/acquisition', 'modeling/wave-propagation',
+    'modeling/reconstruction', 'inversion/fwi',
     'inversion/dataparallel', 'inversion/inr', 'usage', 'faq',
     'release-notes', 'status',
 }
@@ -59,6 +65,13 @@ def check_navigation(page, locale, relative):
     assert not any('/api/' in path or path.endswith(('/modeling/vrz.html', '/modeling/vti.html')) for path in paths), relative
     wave_links = [link for link in links if urlsplit(link['href']).path == f'/{locale}/modeling/wave-propagation.html']
     assert len(wave_links) == 1 and wave_links[0]['text'] == ('波传播' if locale == 'zh' else 'Wave propagation'), (relative, wave_links)
+    reconstruction_links = [link for link in links if urlsplit(link['href']).path == f'/{locale}/modeling/reconstruction.html']
+    assert len(reconstruction_links) == 1 and reconstruction_links[0]['text'] == ('波场反传重建' if locale == 'zh' else 'Reconstruction'), (relative, reconstruction_links)
+    reconstruction_group = nav.locator('a').filter(has_text=re.compile(r'^(波场反传重建|Reconstruction)$')).evaluate("""e => {
+        const list = e.closest('ul');
+        return list?.previousElementSibling?.textContent.trim();
+    }""")
+    assert reconstruction_group == ('正演模拟' if locale == 'zh' else 'Forward Modeling'), (relative, reconstruction_group)
     captions = nav.locator('.caption-text').all_text_contents()
     assert ('正演模拟' if locale == 'zh' else 'Forward Modeling') in captions, (relative, captions)
     assert next(link['text'] for link in links if urlsplit(link['href']).path == f'/{locale}/wsl.html') == 'WSL'
@@ -473,6 +486,152 @@ def check_forward_modeling(page, base, locale, output):
     page.screenshot(path=str(output / f'{locale}-docker-{width}.png'))
 
 
+def check_reconstruction(page, base, locale, output, suffix=''):
+    """Exercise the manual chapter and readable, locally scrollable diagrams."""
+    page.goto(base + locale + '/modeling/reconstruction.html', wait_until='networkidle')
+    page.evaluate('document.fonts.ready')
+    main = page.locator('[role="main"]')
+    title = '波场反传重建' if locale == 'zh' else 'Wavefield Reconstruction'
+    assert main.locator('h1').count() == 1
+    assert main.locator('h1').evaluate('e => e.firstChild.textContent.trim()') == title
+    sections = main.locator('section[data-sw-anchor]')
+    assert sections.evaluate_all('items => items.map(e => e.dataset.swAnchor)') == list(RECONSTRUCTION_SECTIONS)
+    assert sections.evaluate_all('items => items.every(e => e.id === e.dataset.swAnchor)')
+    assert len(main.inner_text()) >= (1400 if locale == 'zh' else 3500)
+    toc = main.locator('.sw-page-toc')
+    assert toc.count() == 1 and toc.is_visible()
+    assert toc.locator('a').evaluate_all('items => items.map(e => e.getAttribute("href"))') == [
+        '#' + target for target in RECONSTRUCTION_SECTIONS[1:]]
+    for target in RECONSTRUCTION_SECTIONS[1:]:
+        toc.locator(f'a[href="#{target}"]').click()
+        assert urlsplit(page.url).fragment == target
+        assert main.locator(f'section[id="{target}"]').count() == 1
+    width = page.viewport_size['width']
+    page.evaluate('window.scrollTo(0, 0)')
+    page.screenshot(path=str(output / f'{locale}-reconstruction-top-{width}{suffix}.png'))
+    figures = main.locator('figure.sw-reconstruction-figure')
+    assert figures.count() == len(RECONSTRUCTION_FIGURES)
+    for name, figure in zip(RECONSTRUCTION_FIGURES, figures.all()):
+        img = figure.locator('img')
+        assert img.count() == 1
+        # Native lazy loading may leave later diagrams unfetched even after
+        # networkidle. Trigger visibility, then wait for this exact image; the
+        # same path also runs in the JavaScript-disabled browser context.
+        figure.evaluate("e => e.scrollIntoView({block:'start'})")
+        page.wait_for_function('img => img.complete && img.naturalWidth > 0 && img.naturalHeight > 0',
+                               arg=img.element_handle())
+        expected = f'/{locale}/_static/reconstruction/{name}-{locale}.svg'
+        source = img.evaluate('e => e.currentSrc || e.src')
+        assert urlsplit(source).path == expected and urlsplit(source).netloc == urlsplit(base).netloc
+        assert img.evaluate('e => e.complete && e.naturalWidth > 0 && e.naturalHeight > 0')
+        alt = img.get_attribute('alt') or ''
+        assert len(alt) >= (20 if locale == 'zh' else 40)
+        assert bool(re.search(r'[\u4e00-\u9fff]', alt)) == (locale == 'zh')
+        caption = figure.locator('figcaption')
+        assert caption.count() == 1 and caption.is_visible()
+        assert len(caption.inner_text().strip()) >= (40 if locale == 'zh' else 100)
+        assert caption.evaluate('e => parseFloat(getComputedStyle(e).fontSize) >= 14')
+        assert bool(re.search(r'[\u4e00-\u9fff]', caption.inner_text())) == (locale == 'zh')
+        response = page.request.get(source)
+        assert response.ok and 'image/svg+xml' in response.headers.get('content-type', '')
+        original = PROJECT / 'docs' / '_static' / 'reconstruction' / f'{name}-{locale}.svg'
+        assert response.body() == original.read_bytes(), (locale, name)
+        # Measure label size in the original SVG coordinate system, accounting
+        # for transforms and the displayed image scale. Outlined glyphs retain
+        # accessible label/font metadata so font-independent diagrams are also
+        # tested rather than becoming an uninspectable bitmap.
+        metrics = img.evaluate("""async img => {
+            const text = await (await fetch(img.currentSrc || img.src)).text();
+            const svg = new DOMParser().parseFromString(text, 'image/svg+xml').documentElement;
+            const holder = document.createElement('div');
+            holder.style.cssText = 'position:absolute;left:-100000px;top:0;visibility:hidden;';
+            document.body.append(holder);
+            try {
+                holder.append(document.importNode(svg, true));
+                const mounted = holder.querySelector('svg');
+                const box = mounted.viewBox.baseVal;
+                mounted.style.cssText = `width:${box.width}px;height:${box.height}px;max-width:none;`;
+                holder.style.width = `${box.width}px`;
+                const ratio = img.getBoundingClientRect().width / box.width;
+                const canvas = mounted.getBoundingClientRect();
+                const labels = Array.from(mounted.querySelectorAll('text, tspan, g[aria-label][data-font-size]'))
+                    .filter(e => e.matches('g') || Array.from(e.childNodes).some(n => n.nodeType === Node.TEXT_NODE && n.textContent.trim()));
+                return labels.map(e => {
+                    const matrix = e.getScreenCTM();
+                    const scale = Math.min(Math.hypot(matrix.a, matrix.b), Math.hypot(matrix.c, matrix.d));
+                    const nominal = parseFloat(e.dataset.fontSize || getComputedStyle(e).fontSize);
+                    const bounds = e.getBBox();
+                    const rendered = e.getBoundingClientRect();
+                    return {label:e.getAttribute('aria-label') || e.textContent,
+                            size:nominal * scale * ratio,
+                            outlined:!e.matches('g') || Boolean(e.querySelector('path[d]')),
+                            geometry:bounds.width > 0 && bounds.height > 0,
+                            contained:rendered.left >= canvas.left - 1 && rendered.right <= canvas.right + 1 &&
+                                      rendered.top >= canvas.top - 1 && rendered.bottom <= canvas.bottom + 1};
+                });
+            } finally { holder.remove(); }
+        }""")
+        assert len(metrics) >= 4 and all(label['size'] >= 12 and label['outlined'] and label['geometry'] and label['contained'] for label in metrics), (locale, name, width, metrics)
+        assert figure.evaluate('e => e.getBoundingClientRect().width <= e.closest("[role=main]").getBoundingClientRect().width + 1')
+        scroll = figure.locator('.sw-reconstruction-scroll')
+        assert scroll.count() == 1
+        assert scroll.get_attribute('role') == 'region' and scroll.get_attribute('tabindex') == '0'
+        label = scroll.get_attribute('aria-label') or ''
+        assert label and bool(re.search(r'[\u4e00-\u9fff]', label)) == (locale == 'zh')
+        assert scroll.evaluate("e => ['auto', 'scroll'].includes(getComputedStyle(e).overflowX)")
+        assert scroll.evaluate('e => e.getBoundingClientRect().left >= 0 && e.getBoundingClientRect().right <= innerWidth + 1')
+        assert caption.evaluate('e => e.getBoundingClientRect().left >= 0 && e.getBoundingClientRect().right <= innerWidth + 1 && e.scrollWidth <= e.clientWidth + 1')
+        if scroll.evaluate('e => e.scrollWidth > e.clientWidth + 1'):
+            # Merely hiding overflow passes a page-width check but loses content.
+            # Verify full horizontal reach and keyboard operation instead.
+            dimensions = scroll.evaluate('e => ({width:e.clientWidth, total:e.scrollWidth})')
+            scroll.evaluate('e => e.scrollLeft = e.scrollWidth')
+            assert scroll.evaluate('e => e.scrollLeft') >= dimensions['total'] - dimensions['width'] - 1
+            figure.evaluate("e => e.scrollIntoView({block:'start'})")
+            page.screenshot(path=str(output / f'{locale}-reconstruction-{name}-scroll-end-{width}{suffix}.png'))
+            scroll.evaluate('e => e.scrollLeft = 0')
+            scroll.focus()
+            scroll.press('ArrowRight')
+            page.wait_for_function("() => document.activeElement?.classList.contains('sw-reconstruction-scroll') && document.activeElement.scrollLeft > 0")
+            scroll.evaluate('e => e.scrollLeft = 0')
+        figure.evaluate("e => e.scrollIntoView({block:'start'})")
+        page.screenshot(path=str(output / f'{locale}-reconstruction-{name}-{width}{suffix}.png'))
+        # A full element capture keeps every caption reviewable without shrinking
+        # the entire long chapter into a single unreadable image.
+        figure.screenshot(path=str(output / f'{locale}-reconstruction-{name}-figure-{width}{suffix}.png'))
+    assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), (locale, width)
+    # Real links in both directions remain useful with JavaScript disabled.
+    api_links = main.locator('a[href="../usage.html#elastic"], a[href="../usage.html#elastic-memory"], a[href="../usage.html#starwave.elastic"]')
+    assert api_links.count() >= 1
+    api_links.first.click()
+    assert urlsplit(page.url).path == f'/{locale}/usage.html'
+    assert urlsplit(page.url).fragment in {'elastic', 'elastic-memory', 'starwave.elastic'}
+    backlink = page.locator('#elastic-memory a[href="modeling/reconstruction.html"], #elastic-memory a[href^="modeling/reconstruction.html#"]')
+    assert backlink.count() >= 1
+    backlink.first.click()
+    assert urlsplit(page.url).path == f'/{locale}/modeling/reconstruction.html'
+    assert urlsplit(page.url).fragment in ('', *RECONSTRUCTION_SECTIONS)
+
+
+def check_reconstruction_language_switches(page, base):
+    for locale in ('zh', 'en'):
+        other = 'en' if locale == 'zh' else 'zh'
+        for target in RECONSTRUCTION_SECTIONS:
+            source = base + locale + '/modeling/reconstruction.html?from=reconstruction#' + target
+            page.goto(source)
+            open_mobile_menu(page)
+            page.locator(f'[data-sw-language="{other}"]').click()
+            assert urlsplit(page.url).path == f'/{other}/modeling/reconstruction.html'
+            assert urlsplit(page.url).fragment == target
+            assert urlsplit(page.url).query == 'from=reconstruction'
+            assert page.locator(f'section[id="{target}"][data-sw-anchor="{target}"]').count() == 1
+            page.go_back()
+            page.wait_for_url(source)
+            assert urlsplit(page.url).fragment == target
+            page.go_forward()
+            page.wait_for_url(base + other + '/modeling/reconstruction.html?from=reconstruction#' + target)
+
+
 def check_presentation(page, base, locale, output):
     """Check the same-origin viewer plus usable mobile and no-JS alternatives."""
     page.goto(base + locale + '/presentation.html', wait_until='networkidle')
@@ -546,7 +705,7 @@ def check_search(page, base):
         assert enter_results == {urlsplit(link).path for link in click_results}, (locale, click_results)
         index = page.evaluate('Search._index')
         assert 'usage' in index['docnames'] and not any(name.startswith('api/') for name in index['docnames']), index['docnames']
-        assert {'modeling/wave-propagation', 'modeling/acquisition', 'docker', 'presentation'} <= set(index['docnames'])
+        assert {'modeling/wave-propagation', 'modeling/acquisition', 'modeling/reconstruction', 'docker', 'presentation'} <= set(index['docnames'])
         assert not {'modeling/vrz', 'modeling/vti'} & set(index['docnames'])
         # Sphinx groups dotted functions under starwave.common rather than
         # starwave. Preserve all original search assertions and cover both.
@@ -602,6 +761,7 @@ def check(root, browser_path=None):
                     check_tutorials(page, base, locale, output)
                     check_homepage(page, base, locale, output)
                     check_forward_modeling(page, base, locale, output)
+                    check_reconstruction(page, base, locale, output)
                     check_presentation(page, base, locale, output)
                 check_search(page, base)
             # Narrow phones and the smallest desktop sidebar layouts exercise
@@ -628,6 +788,7 @@ def check(root, browser_path=None):
                     check_navigation(page, locale, 'usage.html')
                     close_mobile_menu(page)
                     check_forward_modeling(page, base, locale, output)
+                    check_reconstruction(page, base, locale, output)
                     assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), (locale, size)
             page.set_viewport_size({'width': 390, 'height': 844})
             page.goto(base + 'zh/usage.html')
@@ -660,6 +821,7 @@ def check(root, browser_path=None):
                 assert urlsplit(page.url).fragment == f'starwave.{name}'
                 assert page.locator(f'[id="starwave.{name}"]').count() == 1
             check_heading_language_switches(page, base)
+            check_reconstruction_language_switches(page, base)
             check_redirects(page, base)
             page.goto(base + 'en/index.html')
             page.keyboard.press('Tab')
@@ -692,7 +854,12 @@ def check(root, browser_path=None):
                 for size in ({'width': 1440, 'height': 1000}, {'width': 390, 'height': 844}):
                     plain.set_viewport_size(size)
                     check_presentation(plain, base, locale, output)
+                    check_reconstruction(plain, base, locale, output, suffix='-nojs')
                 plain.set_viewport_size({'width': 1440, 'height': 1000})
+                plain.goto(base + locale + '/modeling/reconstruction.html')
+                other = 'en' if locale == 'zh' else 'zh'
+                plain.locator(f'[data-sw-language="{other}"]').click()
+                assert urlsplit(plain.url).path == f'/{other}/modeling/reconstruction.html'
                 plain.goto(base + locale + '/index.html')
                 assert plain.locator('.sw-home-logo').is_visible()
                 plain.locator('.sw-home-actions a[href="quickstart.html"]').click()
@@ -706,7 +873,7 @@ def check(root, browser_path=None):
             context.close()
             browser.close()
         assert not errors, errors
-        print('PASS: flat desktop/mobile navigation, Usage TOC and API fields, search, direct legacy routes, language anchors, history, keyboard, PDF preview/download, and no-JS fallback.')
+        print('PASS: flat desktop/mobile navigation, Usage TOC and API fields, reconstruction figures and readable scrolling, search, direct legacy routes, language anchors, history, keyboard, PDF preview/download, and no-JS fallback.')
     finally:
         server.shutdown()
         server.server_close()

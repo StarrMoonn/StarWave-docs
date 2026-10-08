@@ -3,6 +3,7 @@ import ast
 import hashlib
 import struct
 import json
+import math
 from html.parser import HTMLParser
 from pathlib import Path
 import re
@@ -11,6 +12,242 @@ import xml.etree.ElementTree as ET
 from urllib.parse import unquote, urlsplit
 from build_docs import USAGE_SECTIONS, USAGE_NUMBERS
 from check_presentation_asset import ASSET_PATH, check as check_presentation
+
+
+RECONSTRUCTION_SECTIONS = ('reconstruction', 'reconstruction-state',
+                           'reconstruction-tape', 'reconstruction-reverse',
+                           'reconstruction-gradient', 'reconstruction-memory',
+                           'reconstruction-scope', 'reconstruction-references')
+RECONSTRUCTION_FIGURES = ('flow', 'domain', 'timeline', 'memory')
+RECONSTRUCTION_ASSETS = {f'{name}-{locale}.svg'
+                         for name in RECONSTRUCTION_FIGURES for locale in ('zh', 'en')}
+
+
+class HTMLTree(HTMLParser):
+    """Small, dependency-free tree for semantic checks of generated HTML."""
+    VOID = {'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input',
+            'link', 'meta', 'param', 'source', 'track', 'wbr'}
+
+    def __init__(self, text):
+        super().__init__(convert_charrefs=True)
+        self.root = ET.Element('document')
+        self.stack = [self.root]
+        self.feed(text)
+
+    def handle_starttag(self, tag, attrs):
+        node = ET.SubElement(self.stack[-1], tag, dict(attrs))
+        if tag not in self.VOID:
+            self.stack.append(node)
+
+    def handle_startendtag(self, tag, attrs):
+        ET.SubElement(self.stack[-1], tag, dict(attrs))
+
+    def handle_endtag(self, tag):
+        for index in range(len(self.stack) - 1, 0, -1):
+            if self.stack[index].tag == tag:
+                del self.stack[index:]
+                break
+
+    def handle_data(self, data):
+        parent = self.stack[-1]
+        if len(parent):
+            parent[-1].tail = (parent[-1].tail or '') + data
+        else:
+            parent.text = (parent.text or '') + data
+
+
+def element_text(element):
+    return ' '.join(''.join(element.itertext()).split()) if element is not None else ''
+
+
+def reconstruction_svg_errors(data, name, locale):
+    """Validate original vector diagrams without executing or loading resources."""
+    errors = []
+    try:
+        text = data.decode('utf-8')
+        if re.search(r'<!DOCTYPE|<!ENTITY|<\?(?!xml\s)', text, re.I):
+            errors.append(f'Active or external SVG declaration: {name}')
+        svg = ET.fromstring(data)
+    except (ET.ParseError, UnicodeDecodeError):
+        return [f'Invalid reconstruction SVG: {name}']
+    if svg.tag != '{http://www.w3.org/2000/svg}svg':
+        errors.append(f'Invalid reconstruction SVG root: {name}')
+    try:
+        box = [float(n) for n in re.split(r'[\s,]+', svg.get('viewBox', '').strip())]
+        if len(box) != 4 or not all(math.isfinite(n) for n in box) or min(box[2:]) <= 0:
+            raise ValueError
+    except ValueError:
+        errors.append(f'Invalid reconstruction SVG viewBox: {name}')
+    ids = [element.get('id') for element in svg.iter() if element.get('id')]
+    if len(ids) != len(set(ids)):
+        errors.append(f'Duplicate reconstruction SVG IDs: {name}')
+    labelled = svg.get('aria-labelledby', '').split()
+    if svg.get('role') != 'img' or not labelled or any(target not in ids for target in labelled):
+        errors.append(f'Missing accessible reconstruction SVG name: {name}')
+    for tag in ('title', 'desc'):
+        nodes = svg.findall('{http://www.w3.org/2000/svg}' + tag)
+        value = element_text(nodes[0]) if len(nodes) == 1 else ''
+        if not value or not nodes[0].get('id') or nodes[0].get('id') not in labelled:
+            errors.append(f'Missing accessible reconstruction SVG {tag}: {name}')
+        if value and bool(re.search(r'[\u4e00-\u9fff]', value)) != (locale == 'zh'):
+            errors.append(f'Unlocalized reconstruction SVG {tag}: {name}')
+    # A strict vector-only allowlist excludes scripts, images, embedded HTML,
+    # animation and external resources. Local marker/clip/glyph reuse is safe.
+    allowed = {'svg', 'g', 'defs', 'title', 'desc', 'path', 'rect', 'circle',
+               'ellipse', 'line', 'polyline', 'polygon', 'text', 'tspan', 'marker',
+               'pattern', 'clipPath', 'mask', 'linearGradient', 'radialGradient',
+               'stop', 'style', 'use'}
+    labels = []
+    for element in svg.iter():
+        tag = element.tag.rsplit('}', 1)[-1]
+        if not element.tag.startswith('{http://www.w3.org/2000/svg}') or tag not in allowed:
+            errors.append(f'Unsafe reconstruction SVG element: {name}/{tag}')
+        if tag == 'style':
+            style = element_text(element)
+            if '\\' in style or re.search(r'@import|expression\s*\(', style, re.I):
+                errors.append(f'Active reconstruction SVG style: {name}')
+            for target in re.findall(r'url\s*\((.*?)\)', style, re.I):
+                if not re.fullmatch(r'#[A-Za-z_][A-Za-z0-9_.:-]*', target) or target[1:] not in ids:
+                    errors.append(f'External reconstruction SVG style reference: {name}')
+        for key, value in element.attrib.items():
+            local_key = key.rsplit('}', 1)[-1].lower()
+            if local_key.startswith('on') or local_key in {'src', 'base'}:
+                errors.append(f'Active reconstruction SVG attribute: {name}/{key}')
+            if local_key == 'href' and (not value.startswith('#') or value[1:] not in ids):
+                errors.append(f'External or missing reconstruction SVG reference: {name}/{key}')
+            if (local_key == 'style' and '\\' in value) or re.search(r'expression\s*\(|@import', value, re.I):
+                errors.append(f'Active reconstruction SVG style: {name}/{key}')
+            for target in re.findall(r'url\s*\((.*?)\)', value, re.I):
+                if not re.fullmatch(r'#[A-Za-z_][A-Za-z0-9_.:-]*', target) or target[1:] not in ids:
+                    errors.append(f'External reconstruction SVG reference: {name}/{key}')
+        if tag == 'text' and element_text(element):
+            labels.append(element_text(element))
+        if tag == 'g' and element.get('aria-label') and element.get('data-font-size'):
+            labels.append(element.get('aria-label'))
+            try:
+                size = float(element.get('data-font-size'))
+                if not math.isfinite(size) or size <= 0 or not any(
+                        node.tag.rsplit('}', 1)[-1] == 'path' and node.get('d')
+                        for node in element.iter()):
+                    raise ValueError
+            except ValueError:
+                errors.append(f'Invalid outlined reconstruction label: {name}')
+    if len(labels) < 4:
+        errors.append(f'Missing meaningful reconstruction SVG labels: {name}')
+    if locale == 'en' and any(re.search(r'[\u4e00-\u9fff]', value) for value in labels):
+        errors.append(f'Chinese labels in English reconstruction SVG: {name}')
+    if locale == 'zh' and not any(re.search(r'[\u4e00-\u9fff]', value) for value in labels):
+        errors.append(f'Missing Chinese reconstruction SVG labels: {name}')
+    return errors
+
+
+def check_reconstruction(project, root):
+    """Guard the bilingual chapter, original figures, and API round-trip links."""
+    errors = []
+    assets = project / 'docs' / '_static' / 'reconstruction'
+    if not assets.is_dir() or {path.name for path in assets.iterdir()} != RECONSTRUCTION_ASSETS:
+        errors.append('Unexpected or incomplete reconstruction asset set')
+    seen_assets = {}
+    for name in sorted(RECONSTRUCTION_ASSETS):
+        path = assets / name
+        if not path.is_file():
+            errors.append(f'Missing reconstruction SVG: {name}')
+            continue
+        data = path.read_bytes()
+        digest = hashlib.sha256(data).hexdigest()
+        if digest in seen_assets:
+            errors.append(f'Repeated reconstruction SVG content: {name}/{seen_assets[digest]}')
+        seen_assets[digest] = name
+        errors.extend(reconstruction_svg_errors(data, name, path.stem.rsplit('-', 1)[-1]))
+        for locale in ('zh', 'en'):
+            published = root / locale / '_static' / 'reconstruction' / name
+            if not published.is_file() or published.read_bytes() != data:
+                errors.append(f'Published reconstruction SVG differs: {locale}/{name}')
+    for locale in ('zh', 'en'):
+        chapter = root / locale / 'modeling' / 'reconstruction.html'
+        if not chapter.is_file():
+            errors.append(f'Missing reconstruction chapter: {locale}')
+            continue
+        tree = HTMLTree(chapter.read_text()).root
+        main = tree.find('.//*[@role="main"]')
+        if main is None:
+            errors.append(f'Missing reconstruction article: {locale}')
+            continue
+        title = '波场反传重建' if locale == 'zh' else 'Wavefield Reconstruction'
+        headings = main.findall('.//h1')
+        if len(headings) != 1 or (headings[0].text or '').strip() != title:
+            errors.append(f'Wrong reconstruction title: {locale}')
+        sections = main.findall('.//section')
+        if tuple(section.get('data-sw-anchor') for section in sections) != RECONSTRUCTION_SECTIONS:
+            errors.append(f'Missing stable reconstruction sections: {locale}')
+        for section, target in zip(sections, RECONSTRUCTION_SECTIONS):
+            if section.get('id') != target:
+                errors.append(f'Reconstruction ID/anchor mismatch: {locale}/{target}')
+            heading = next((e for e in section if re.fullmatch('h[1-6]', e.tag)), None)
+            if heading is None or not any(a.get('href') == '#' + target for a in heading.iter('a')):
+                errors.append(f'Missing reconstruction heading permalink: {locale}/{target}')
+            body = ' '.join(element_text(e) for e in section if e.tag not in {'section', 'nav', 'span', 'h1', 'h2', 'h3'})
+            if len(body) < (60 if locale == 'zh' else 140):
+                errors.append(f'Incomplete reconstruction explanation: {locale}/{target}')
+        if len(element_text(main)) < (1400 if locale == 'zh' else 3500):
+            errors.append(f'Reconstruction chapter lacks substantive text: {locale}')
+        tocs = [nav for nav in main.iter('nav') if 'sw-page-toc' in nav.get('class', '').split()]
+        if len(tocs) != 1 or [a.get('href') for a in tocs[0].iter('a')] != ['#' + target for target in RECONSTRUCTION_SECTIONS[1:]]:
+            errors.append(f'Invalid reconstruction local TOC: {locale}')
+        figures = [figure for figure in main.iter('figure') if 'sw-reconstruction-figure' in figure.get('class', '').split()]
+        if len(figures) != 4:
+            errors.append(f'Incomplete reconstruction figures: {locale}')
+        for figure, name in zip(figures, RECONSTRUCTION_FIGURES):
+            images = figure.findall('.//img')
+            if len(images) != 1:
+                errors.append(f'Invalid reconstruction figure image: {locale}/{name}')
+                continue
+            image = images[0]
+            source = urlsplit(image.get('src', ''))
+            expected = root / locale / '_static' / 'reconstruction' / f'{name}-{locale}.svg'
+            if source.scheme or source.netloc or (chapter.parent / unquote(source.path)).resolve() != expected:
+                errors.append(f'Nonlocal or wrong reconstruction figure: {locale}/{name}')
+            alt = image.get('alt', '').strip()
+            caption = element_text(figure.find('figcaption'))
+            for field, value, minimum in (('alt', alt, 20 if locale == 'zh' else 40),
+                                           ('caption', caption, 40 if locale == 'zh' else 100)):
+                if len(value) < minimum or bool(re.search(r'[\u4e00-\u9fff]', value)) != (locale == 'zh'):
+                    errors.append(f'Missing detailed localized reconstruction {field}: {locale}/{name}')
+        usage = root / locale / 'usage.html'
+        if usage.is_file():
+            usage_tree = HTMLTree(usage.read_text()).root
+            memory = usage_tree.find('.//section[@id="elastic-memory"]')
+            if memory is None or not any(
+                    urlsplit(a.get('href', '')).path == 'modeling/reconstruction.html'
+                    and urlsplit(a.get('href', '')).fragment in ('', *RECONSTRUCTION_SECTIONS)
+                    for a in memory.iter('a')):
+                errors.append(f'Missing Usage elastic reconstruction backlink: {locale}')
+        if not any(urlsplit(a.get('href', '')).path == '../usage.html'
+                   and urlsplit(a.get('href', '')).fragment in {'elastic', 'elastic-memory', 'starwave.elastic'}
+                   for a in main.iter('a')):
+            errors.append(f'Missing reconstruction elastic Usage link: {locale}')
+        expected_label = '波场反传重建' if locale == 'zh' else 'Reconstruction'
+        sidebar = next((e for e in tree.iter('div') if 'wy-menu-vertical' in e.get('class', '').split()), None)
+        sidebar_links = [] if sidebar is None else [a for a in sidebar.iter('a')
+            if not urlsplit(a.get('href', '')).scheme and not urlsplit(a.get('href', '')).netloc
+            and ((chapter.parent / unquote(urlsplit(a.get('href', '')).path)).resolve()
+                 if urlsplit(a.get('href', '')).path else chapter) == chapter]
+        if len(sidebar_links) != 1 or element_text(sidebar_links[0]) != expected_label:
+            errors.append(f'Missing or mislabeled reconstruction sidebar chapter: {locale}')
+        if sidebar is not None:
+            group = None
+            found = False
+            for child in sidebar:
+                if child.tag == 'p' and 'caption' in child.get('class', '').split():
+                    group = element_text(child)
+                if child.tag == 'ul' and any(a in sidebar_links for a in child.iter('a')):
+                    found = group == ('正演模拟' if locale == 'zh' else 'Forward Modeling')
+            if not found:
+                errors.append(f'Reconstruction is not under Forward Modeling: {locale}')
+        references = main.find('.//section[@id="reconstruction-references"]')
+        if references is None or not any(urlsplit(a.get('href', '')).scheme == 'https' for a in references.iter('a')):
+            errors.append(f'Missing reconstruction reference links: {locale}')
+    return errors
 
 
 class Page(HTMLParser):
@@ -48,6 +285,7 @@ def check(root):
     root = root.resolve()
     errors = []
     errors.extend(check_presentation(root))
+    errors.extend(check_reconstruction(project, root))
     pages = {p: Page(p.read_text(encoding="utf-8")) for p in root.rglob("*.html")}
     if not pages or not (root / "index.html").is_file():
         errors.append("Missing HTML output or index.html")
@@ -143,7 +381,7 @@ def check(root):
         docnames = json.loads(index.removeprefix('Search.setIndex(').removesuffix(')'))['docnames']
         if 'usage' not in docnames or any(name.startswith('api/') for name in docnames):
             errors.append(f'API search entries are duplicated or missing: {locale}')
-        if not {'modeling/wave-propagation', 'modeling/acquisition', 'docker', 'presentation'} <= set(docnames) or {'modeling/vrz', 'modeling/vti'} & set(docnames):
+        if not {'modeling/wave-propagation', 'modeling/acquisition', 'modeling/reconstruction', 'docker', 'presentation'} <= set(docnames) or {'modeling/vrz', 'modeling/vti'} & set(docnames):
             errors.append(f'Modeling search entries are duplicated or missing: {locale}')
         combined = (root / locale / 'modeling/wave-propagation.html').read_text()
         if len(re.findall(r'data-sw-anchor="wave-[^"]+"', combined)) != 7:
@@ -306,9 +544,10 @@ def check(root):
         is_brand_file = relative.parts[:3] == ("docs", "_static", "brand") and p.name in brand_names
         is_font_file = relative.parts[:3] == ("docs", "_static", "fonts") and p.name in font_names
         is_diagram_file = relative.as_posix() == 'docs/_static/diagrams/acquisition.svg'
+        is_reconstruction_file = relative.parts[:3] == ('docs', '_static', 'reconstruction') and p.name in RECONSTRUCTION_ASSETS
         is_tutorial_notebook = p.suffix == ".ipynb" and relative.parts[:2] == ("examples", "tutorials")
         is_presentation = p == ASSET_PATH
-        if p.name not in {".gitignore", ".gitattributes"} and p.suffix not in allowed and not is_tutorial_png and not is_tutorial_notebook and not is_brand_file and not is_font_file and not is_diagram_file and not is_presentation:
+        if p.name not in {".gitignore", ".gitattributes"} and p.suffix not in allowed and not is_tutorial_png and not is_tutorial_notebook and not is_brand_file and not is_font_file and not is_diagram_file and not is_reconstruction_file and not is_presentation:
             errors.append(f"Unexpected source file: {relative}")
         if p.suffix == ".py":
             try:

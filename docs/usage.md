@@ -459,6 +459,8 @@ stress_h, velocity_z = starwave.vti(
 (elastic-memory)=
 ### 存储与梯度采样
 
+边界重建的时间顺序、材料梯度和存储公式见{ref}`波场反传重建 <reconstruction>`。
+
 - `memory="full"` 是默认值，二维/三维支持 CPU/CUDA、float32/float64。原生 `storage_mode="device"` 在当前设备保存历史；CUDA 下 `"cpu"` 使用主机存储，CPU 模型下会归一为 device；`"disk"` 使用 storage_path。`storage_compression=True` 是有损压缩。
 - `storage_mode="none"` 会关闭传播历史对材料梯度的贡献，不能用于完整材料梯度反演；力源的材料缩放链仍可能产生部分梯度。存在可训练材料时会提示，源/初始状态梯度是另一条路径。
 - `memory="boundary"` 是 StarWave 扩展：仅 CUDA，要求 `python_backend=False`、`storage_mode="device"`、`storage_compression=False`。裁剪后每个物理维度须大于 accuracy；请求 buoyancy 梯度时，有效交错 buoyancy 不能为零。无 CPU/offload/压缩或自动 full 回退。内存/速度收益随域形状、PML 与采样而变。
