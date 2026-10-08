@@ -245,3 +245,4 @@ html[lang="zh-CN"] .rst-content .sw-example-page h2 { font-family: inherit; }
 .sw-example-downloads button { font: inherit; cursor: pointer; }
 .sw-example-downloads button[disabled] { opacity: .6; cursor: wait; }
 .sw-example-downloads [hidden] { display: none !important; }
+html[lang="en"] .rst-content [role="main"] .sw-example-page > h1 { font-family: Georgia, serif; }
