@@ -219,8 +219,6 @@ def build(destination):
             number = FWI_NUMBERS[matches[0]] if relative == 'inversion/fwi.html' else matches[0]
             mapping[entry['id']] = f'sw-section-{number}'
         texts[0] = texts[0].replace('aria-label="Main"', 'aria-label="主导航"')
-        if relative.startswith('examples/'):
-            texts = [text.replace('<section ', '<section class="sw-example-page" ', 1) for text in texts]
         if relative not in {'usage.html', 'index.html'}:
             texts = [add_page_toc(text, locale) for text, locale in zip(texts, ('zh', 'en'))]
         stable = None
@@ -239,8 +237,11 @@ def build(destination):
         if relative == 'modeling/reconstruction.html':
             stable = RECONSTRUCTION_SECTIONS
             numbers = RECONSTRUCTION_NUMBERS
-        path.write_text(add_anchors(texts[0], stable, numbers), encoding='utf-8')
-        other.write_text(add_anchors(texts[1], stable, numbers), encoding='utf-8')
+        rendered = [add_anchors(text, stable, numbers) for text in texts]
+        if relative.startswith('examples/'):
+            rendered = [text.replace('<section ', '<section class="sw-example-page" ', 1) for text in rendered]
+        path.write_text(rendered[0], encoding='utf-8')
+        other.write_text(rendered[1], encoding='utf-8')
         old = destination / relative
         old.parent.mkdir(parents=True, exist_ok=True)
         old.write_text(redirect_page(relative, mapping), encoding='utf-8')

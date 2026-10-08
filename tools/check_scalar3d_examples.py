@@ -76,6 +76,9 @@ def check(root):
    captions=[] if nav is None else [element_text(e) for e in nav.iter('span') if 'caption-text' in e.get('class','').split()]
    if captions.count('Example')!=1 or captions.index('Example')+1>=len(captions) or captions[captions.index('Example')+1]!='Usage':errors.append('Example must immediately precede Usage: '+locale+'/'+name)
    if main is None:errors.append('Missing example article');continue
+   sections=list(main.iter('section'))
+   toc=[nav for nav in main.iter('nav') if 'sw-page-toc' in nav.get('class','').split()]
+   if not sections or sections[0].get('data-sw-section')!='sw-section-0' or len(toc)!=1 or len(list(toc[0].iter('a')))!=len(sections)-1:errors.append('Example native table of contents/anchors differ: '+locale+'/'+name)
    figs=[f for f in main.iter('figure') if 'sw-example-figure' in f.get('class','').split()]
    if name in CASES:
     if len(figs)!=7:errors.append('Missing seven Scalar3D figure types: '+locale+'/'+name)
