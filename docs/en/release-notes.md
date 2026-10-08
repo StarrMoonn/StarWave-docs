@@ -1,5 +1,15 @@
 # Release Notes
 
+## 4.0.0 · 2026-10-07
+
+The public [StarWave 4.0.0 wheel](https://pypi.org/project/starwave/4.0.0/) corresponds to V11 and adds `starwave.elastic(lamb, mu, buoyancy, ...)` with a Deepwave 0.0.27-derived backend, 2D/3D, orders 2/4/6/8 and complete state/receiver returns. Convert materials explicitly through `starwave.common`; elastic uses the separate `prepare_elastic` helper. Scalar remains 2D, and the scalar/VRZ/VTI public signatures and defaults are preserved.
+
+## Elastic API documentation review · 2026-10-08
+
+Added Elastic Function within the existing Usage page, covering 62 parameters, 16/31 return order, axes and a minimal example, plus both material conversions and prepare_elastic. The review targets the published 4.0.0 wheel and distinguishes full/boundary modes, sampling intervals, survey_pad and existing validation scopes. Installation pins and bilingual API checks are updated; existing scalar/VRZ/VTI prose, historical tutorial values, attribution, typography and navigation are preserved.
+
+This is documentation-only maintenance, with no propagation runtime or release artifact changes and no GPU numerical/performance execution. Sources, wheel hash and acceptance limits are recorded in [Status](status.md).
+
 ## 2.0.0 · 2026-10-05
 
 Public release of prebuilt Linux x86_64 wheels. This version improves the fused paths for VTI 2D/3D boundary backward. The public Python API and defaults remain unchanged. The move to version 2.0 does not add new scalar/VRZ capabilities. Changes in floating-point operation order mean that bitwise equality with the previous version should not be required.

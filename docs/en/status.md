@@ -1,5 +1,17 @@
 # Documentation Status and References
 
+## V11 / 4.0.0 Elastic API review · 2026-10-08
+
+The published [StarWave 4.0.0](https://pypi.org/project/starwave/4.0.0/) wheel is the authority for the added interface. All 62 elastic parameters, both conversion helpers and prepare_elastic were checked for types, order, defaults and calling boundaries; the existing five API signatures are unchanged in this wheel. Bilingual builds and local link/anchor checks include the new APIs, and Python examples are checked as Python 3.10 syntax. Documentation builds neither import nor execute StarWave.
+
+Public wheel SHA-256:
+
+```text
+9f64f2677c54af5b2bd1c48e509a24c7d40eb0257d9e86267e721d3f61eaa954
+```
+
+Publication checks passed Python 3.10–3.12 installation and 2D/3D CPU/host checks of the public wheel. User-supplied RTX 4060 source-test reports are separate evidence. This update did not rerun a GPU and does not claim public-wheel target-GPU numerical, A30, multi-GPU, long-FWI or performance acceptance. The original tutorials and 2.0.0 documentation baseline remain below; their historical results are not relabeled as new 4.0.0 experiments.
+
 ## Completed and pending work
 
 | Content | Current status |

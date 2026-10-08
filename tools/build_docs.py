@@ -42,9 +42,14 @@ FWI_NUMBERS = (0, 4, 5, 2, 6, 7, 3, 1)
 USAGE_SECTIONS = ('usage', 'propagators', 'scalar', 'scalar-details',
                   'scalar-examples', 'scalar-notes', 'vrz', 'vrz-details',
                   'vrz-examples', 'vrz-notes', 'vti', 'vti-details',
-                  'vti-examples', 'vti-notes', 'native-runtime', 'native-status',
-                  'prepare-native', 'native-notes', 'native-examples', 'other-exports')
-USAGE_NUMBERS = (0, 1, 2, 4, 5, 6, 7, 9, 10, 11, 12, 14, 15, 16, 17, 18, 19, 20, 21, 22)
+                  'vti-examples', 'vti-notes', 'elastic', 'elastic-axes',
+                  'elastic-returns', 'elastic-memory', 'elastic-examples',
+                  'elastic-notes', 'elastic-conversions', 'native-runtime',
+                  'native-status', 'prepare-native', 'native-notes',
+                  'native-examples', 'prepare-elastic', 'other-exports')
+# New content receives new numbers even when inserted before older sections.
+USAGE_NUMBERS = (0, 1, 2, 4, 5, 6, 7, 9, 10, 11, 12, 14, 15, 16,
+                 23, 24, 25, 26, 27, 28, 29, 17, 18, 19, 20, 21, 30, 22)
 MODELING_FRAGMENTS = {'modeling/vrz.md', 'modeling/vti.md'}
 WAVE_SECTIONS = ('wave-propagation', 'wave-vrz', 'wave-vrz-details', 'wave-vrz-limits',
                  'wave-vti', 'wave-vti-details', 'wave-vti-limits')
@@ -197,8 +202,9 @@ def build(destination):
         stable = None
         if relative == 'usage.html':
             stable = USAGE_SECTIONS
-            source_sections = ['usage'] + re.findall(r'^\(([^)]+)\)=\n#+ ', (PROJECT / 'docs' / 'usage.md').read_text(), re.M)
-            assert source_sections == list(stable), 'Usage source order differs from stable section map'
+            for source in (PROJECT / 'docs', PROJECT / 'docs' / 'en'):
+                source_sections = ['usage'] + re.findall(r'^\(([^)]+)\)=\n#+ ', (source / 'usage.md').read_text(), re.M)
+                assert source_sections == list(stable), f'Usage source order differs from stable section map: {source.name}'
             assert len(stable) == len(pairs[0]), 'Usage anchors must cover every section'
         numbers = USAGE_NUMBERS if relative == 'usage.html' else None
         if relative == 'inversion/fwi.html':

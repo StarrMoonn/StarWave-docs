@@ -6,7 +6,7 @@ Check that you are using Linux x86_64, Python 3.10–3.12, and glibc ≥2.35, an
 
 ## Do I need to compile CUDA code?
 
-The public 2.0.0 wheel does not require compilation or an nvcc installation. Propagation still requires a compatible GPU, driver, and runtime libraries. If integrity or compatibility checks fail, reinstall the corresponding wheel in the same environment and restart Python. Do not expect the documentation project to contain private build tools.
+The public 4.0.0 wheel does not require compilation or an nvcc installation. Scalar/VRZ/VTI and elastic boundary require a compatible GPU and driver; elastic full also runs on CPU. If integrity or compatibility checks fail, reinstall the corresponding wheel in the same environment and restart Python. Do not expect the documentation project to contain private build tools.
 
 ## Why does prepare_native fail even though import succeeds?
 

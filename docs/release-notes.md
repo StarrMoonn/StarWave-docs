@@ -1,5 +1,15 @@
 # 发布说明
 
+## 4.0.0 · 2026-10-07
+
+公开 [StarWave 4.0.0 wheel](https://pypi.org/project/starwave/4.0.0/) 对应 V11，新增基于 Deepwave 0.0.27 派生后端的 `starwave.elastic(lamb, mu, buoyancy, ...)`，支持二维/三维、2/4/6/8 阶及完整状态/记录返回。材料转换通过 `starwave.common` 显式完成；elastic 使用独立的 `prepare_elastic`。原有 scalar 仍为二维，scalar/VRZ/VTI 的公开签名与默认值保留。
+
+## Elastic API 文档维护 · 2026-10-08
+
+在原 Usage 单页内新增 Elastic Function、62 项参数、16/31 返回顺序、轴序和最小示例，并补充两种材料转换与 prepare_elastic。核对对象为 4.0.0 发布 wheel；审阅明确区分 full/boundary、采样间隔、survey_pad 和已有验证范围。同步安装版本与双语 API 契约检查，保留原 scalar/VRZ/VTI 正文、历史教程数值、版权署名、字体和导航。
+
+本次仅维护文档，不修改传播运行时或发行产物，也未执行 GPU 数值/性能测试。核对来源、wheel 哈希与验收边界见[文档状态](status.md)。
+
 ## 2.0.0 · 2026-10-05
 
 公开发行 Linux x86_64 预编译 wheel。该版本改进 VTI 二维/三维 boundary backward 的融合路径；公开 Python API 与默认值不变，scalar/VRZ 不因版本号升为 2.0 而增加新能力。浮点运算顺序变化意味着不能要求与前版逐位相同。

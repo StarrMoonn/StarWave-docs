@@ -1,6 +1,6 @@
 # Windows 与 WSL 2
 
-StarWave 2.0.0 没有原生 Windows wheel。在 Windows 上运行传播需要 WSL 2 的 Linux 用户环境、可用的 NVIDIA GPU 和支持 WSL GPU 计算的 Windows NVIDIA 驱动。
+StarWave 4.0.0 没有原生 Windows wheel。在 Windows 上运行 CUDA 传播需要 WSL 2 的 Linux 用户环境、可用的 NVIDIA GPU 和支持 WSL GPU 计算的 Windows NVIDIA 驱动。
 
 ## 准备顺序
 

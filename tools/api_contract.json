@@ -82,5 +82,100 @@
       "device_ids": "list[int] | tuple[int, ...]"
     },
     "return": "dict"
+  },
+  "elastic": {
+    "signature": "(lamb, mu, buoyancy, grid_spacing, dt, source_amplitudes_z=None, source_amplitudes_y=None, source_amplitudes_x=None, source_amplitudes_p=None, source_locations_z=None, source_locations_y=None, source_locations_x=None, source_locations_p=None, receiver_locations_z=None, receiver_locations_y=None, receiver_locations_x=None, receiver_locations_p=None, accuracy=4, pml_width=20, pml_freq=None, max_vel=None, survey_pad=None, vz_0=None, vy_0=None, vx_0=None, sigmazz_0=None, sigmayz_0=None, sigmaxz_0=None, sigmayy_0=None, sigmaxy_0=None, sigmaxx_0=None, m_vzz_0=None, m_vzy_0=None, m_vzx_0=None, m_vyz_0=None, m_vxz_0=None, m_vyy_0=None, m_vyx_0=None, m_vxy_0=None, m_vxx_0=None, m_sigmazzz_0=None, m_sigmayzy_0=None, m_sigmaxzx_0=None, m_sigmayzz_0=None, m_sigmaxzz_0=None, m_sigmayyy_0=None, m_sigmaxyy_0=None, m_sigmaxyx_0=None, m_sigmaxxx_0=None, origin=None, nt=None, model_gradient_sampling_interval=1, freq_taper_frac=0.0, time_pad_frac=0.0, time_taper=False, forward_callback=None, callback_frequency=1, python_backend=False, storage_mode='device', storage_path='.', storage_compression=False, *, memory='full')",
+    "types": {
+      "lamb": "torch.Tensor",
+      "mu": "torch.Tensor",
+      "buoyancy": "torch.Tensor",
+      "grid_spacing": "Union[float, Sequence[float]]",
+      "dt": "float",
+      "source_amplitudes_z": "Optional[torch.Tensor]",
+      "source_amplitudes_y": "Optional[torch.Tensor]",
+      "source_amplitudes_x": "Optional[torch.Tensor]",
+      "source_amplitudes_p": "Optional[torch.Tensor]",
+      "source_locations_z": "Optional[torch.Tensor]",
+      "source_locations_y": "Optional[torch.Tensor]",
+      "source_locations_x": "Optional[torch.Tensor]",
+      "source_locations_p": "Optional[torch.Tensor]",
+      "receiver_locations_z": "Optional[torch.Tensor]",
+      "receiver_locations_y": "Optional[torch.Tensor]",
+      "receiver_locations_x": "Optional[torch.Tensor]",
+      "receiver_locations_p": "Optional[torch.Tensor]",
+      "accuracy": "int",
+      "pml_width": "Union[int, Sequence[int]]",
+      "pml_freq": "Optional[float]",
+      "max_vel": "Optional[float]",
+      "survey_pad": "Optional[Union[int, Sequence[Optional[int]]]]",
+      "vz_0": "Optional[torch.Tensor]",
+      "vy_0": "Optional[torch.Tensor]",
+      "vx_0": "Optional[torch.Tensor]",
+      "sigmazz_0": "Optional[torch.Tensor]",
+      "sigmayz_0": "Optional[torch.Tensor]",
+      "sigmaxz_0": "Optional[torch.Tensor]",
+      "sigmayy_0": "Optional[torch.Tensor]",
+      "sigmaxy_0": "Optional[torch.Tensor]",
+      "sigmaxx_0": "Optional[torch.Tensor]",
+      "m_vzz_0": "Optional[torch.Tensor]",
+      "m_vzy_0": "Optional[torch.Tensor]",
+      "m_vzx_0": "Optional[torch.Tensor]",
+      "m_vyz_0": "Optional[torch.Tensor]",
+      "m_vxz_0": "Optional[torch.Tensor]",
+      "m_vyy_0": "Optional[torch.Tensor]",
+      "m_vyx_0": "Optional[torch.Tensor]",
+      "m_vxy_0": "Optional[torch.Tensor]",
+      "m_vxx_0": "Optional[torch.Tensor]",
+      "m_sigmazzz_0": "Optional[torch.Tensor]",
+      "m_sigmayzy_0": "Optional[torch.Tensor]",
+      "m_sigmaxzx_0": "Optional[torch.Tensor]",
+      "m_sigmayzz_0": "Optional[torch.Tensor]",
+      "m_sigmaxzz_0": "Optional[torch.Tensor]",
+      "m_sigmayyy_0": "Optional[torch.Tensor]",
+      "m_sigmaxyy_0": "Optional[torch.Tensor]",
+      "m_sigmaxyx_0": "Optional[torch.Tensor]",
+      "m_sigmaxxx_0": "Optional[torch.Tensor]",
+      "origin": "Optional[Sequence[int]]",
+      "nt": "Optional[int]",
+      "model_gradient_sampling_interval": "int",
+      "freq_taper_frac": "float",
+      "time_pad_frac": "float",
+      "time_taper": "bool",
+      "forward_callback": "Optional[common.Callback]",
+      "callback_frequency": "int",
+      "python_backend": "Union[Literal['eager', 'jit', 'compile'], bool]",
+      "storage_mode": "Literal['device', 'cpu', 'disk', 'none']",
+      "storage_path": "str",
+      "storage_compression": "bool",
+      "memory": "Literal['full', 'boundary']"
+    },
+    "return": "Tuple[torch.Tensor, ...]"
+  },
+  "common.vpvsrho_to_lambmubuoyancy": {
+    "signature": "(vp, vs, rho, eps=1e-15)",
+    "types": {
+      "vp": "torch.Tensor",
+      "vs": "torch.Tensor",
+      "rho": "torch.Tensor",
+      "eps": "float"
+    },
+    "return": "Tuple[torch.Tensor, torch.Tensor, torch.Tensor]"
+  },
+  "common.lambmubuoyancy_to_vpvsrho": {
+    "signature": "(lamb, mu, buoyancy, eps=1e-15)",
+    "types": {
+      "lamb": "torch.Tensor",
+      "mu": "torch.Tensor",
+      "buoyancy": "torch.Tensor",
+      "eps": "float"
+    },
+    "return": "Tuple[torch.Tensor, torch.Tensor, torch.Tensor]"
+  },
+  "prepare_elastic": {
+    "signature": "(device_ids=None)",
+    "types": {
+      "device_ids": "list[int] | tuple[int, ...] | None"
+    },
+    "return": "dict"
   }
 }

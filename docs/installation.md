@@ -2,24 +2,24 @@
 
 **安装渠道**
 
-- **PyPI**：公开 wheel 已发布，按下文安装 StarWave 2.0.0。
+- **PyPI**：公开 wheel 已发布，按下文安装 StarWave 4.0.0。
 - **源码**：仅供已获源码授权的用户使用，按随源码提供的说明安装。
 - **[Docker](docker.md)**：准备中，目前尚未发布 StarWave 容器镜像。
 
 ## 运行条件
 
-| 项目 | StarWave 2.0.0 wheel 要求 |
+| 项目 | StarWave 4.0.0 wheel 要求 |
 |---|---|
 | 系统 | Linux x86_64，glibc ≥ 2.35 |
 | C++ 运行库 | libstdc++ 提供 GLIBCXX_3.4.30 / CXXABI_1.3.13 或更新符号 |
 | Python | 3.10–3.12 |
 | PyTorch / NumPy | PyTorch 2.5.x；NumPy ≥ 1.23 |
-| GPU | NVIDIA CUDA GPU；传播没有 CPU 后备实现 |
+| GPU | scalar/VRZ/VTI 与 elastic boundary 需要 NVIDIA CUDA；elastic full 支持 CPU |
 | 编译目标 | SASS 70/75/80/86/89/90 与 compute80 PTX |
 
-安装预编译 wheel 不需要 nvcc 或本地 CUDA Toolkit。Linux 驱动保守目标为 520.61.05 或更新，同时必须支持实际 GPU；WSL 使用 Windows 主机驱动，见 [WSL 说明](wsl.md)。A30 与 RTX 4060 Laptop 属于编译目标覆盖范围；公开 2.0.0 wheel 的实机数值与性能测试仍待完成。下文另列开发版 A30 实测记录。
+安装预编译 wheel 不需要 nvcc 或本地 CUDA Toolkit。Linux 驱动保守目标为 520.61.05 或更新，同时必须支持实际 GPU；WSL 使用 Windows 主机驱动，见 [WSL 说明](wsl.md)。A30 与 RTX 4060 Laptop 属于编译目标覆盖范围；公开 4.0.0 wheel 的实机数值与性能测试仍待完成。下文另列开发版 A30 实测记录。
 
-以上版本信息来自 [PyPI 2.0.0 发布说明](https://pypi.org/project/starwave/2.0.0/)。公开发行仅有 Linux wheel，没有 sdist；原生 Windows、macOS、ARM 主机不能直接使用这一 wheel。
+以上版本信息来自 [PyPI 4.0.0 发布说明](https://pypi.org/project/starwave/4.0.0/)。公开发行仅有 Linux wheel，没有 sdist；原生 Windows、macOS、ARM 主机不能直接使用这一 wheel。
 
 ## 新建运行环境
 
@@ -30,7 +30,7 @@ python3.12 -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
 python -m pip install torch==2.5.1 --index-url https://download.pytorch.org/whl/cu118
-python -m pip install --only-binary=starwave starwave==2.0.0
+python -m pip install --only-binary=starwave starwave==4.0.0
 python -m pip check
 ```
 
@@ -57,6 +57,8 @@ starwave.prepare_native([0])
 文档站本身的构建环境独立于计算环境；仅阅读或构建文档不需要 GPU。
 
 
+弹性传播使用独立准备入口：GPU 主线程调用 `starwave.prepare_elastic([0])`，CPU 调用 `starwave.prepare_elastic()` 并选择 `memory="full"`。完整参数与 vp/vs/rho 转换见 {ref}`Elastic Function <elastic>`。公开 4.0.0 wheel 的安装与 CPU/主机检查已通过；GPU、DataParallel 与长程 FWI 验收范围见[文档状态](status.md)。
+
 (installation-smoke)=
 ## Notebook 01：实际运行检查
 
@@ -71,7 +73,7 @@ python -m jupyter lab
 
 ```{admonition} 实测环境 · 2026-10-05
 :class: sw-run-note
-NVIDIA A30 · Python 3.10.18 · PyTorch 2.5.1 / CUDA 11.8 · 安装的 StarWave 版本 **0.1.0.dev9**。以下服务器结果验证的是这个开发版环境的小规模流程，不能据此宣称上述公开 **2.0.0 wheel** 已通过实机验收。
+NVIDIA A30 · Python 3.10.18 · PyTorch 2.5.1 / CUDA 11.8 · 安装的 StarWave 版本 **0.1.0.dev9**。以下服务器结果验证的是这个开发版环境的小规模流程，不能据此宣称公开 **2.0.0 或 4.0.0 wheel** 已通过实机验收。
 ```
 
 ## 小规模实验设计

@@ -9,6 +9,7 @@ import re
 import sys
 import xml.etree.ElementTree as ET
 from urllib.parse import unquote, urlsplit
+from build_docs import USAGE_SECTIONS, USAGE_NUMBERS
 from check_presentation_asset import ASSET_PATH, check as check_presentation
 
 
@@ -120,13 +121,17 @@ def check(root):
         if 'Usage / API' in content or 'toctree-l2' in content:
             errors.append(f'Navigation is not flat: {locale}')
         anchors = re.findall(r'data-sw-anchor="([^"]+)"', content)
-        if len(anchors) != 20 or len(set(anchors)) != 20 or any(anchor not in pages[usage].ids for anchor in anchors):
+        if tuple(anchors) != USAGE_SECTIONS or len(set(anchors)) != 28 or any(anchor not in pages[usage].ids for anchor in anchors):
             errors.append(f'Missing or invalid stable Usage section metadata: {locale}')
+        for anchor, number in zip(USAGE_SECTIONS, USAGE_NUMBERS):
+            if pages[usage].id_sections.get(anchor) != f'sw-section-{number}':
+                errors.append(f'Usage positional anchor drift: {locale}/{anchor}')
         aliases = json.loads((project / 'tools' / 'usage_anchors.json').read_text())[locale]
         for alias, target in aliases.items():
             if alias not in pages[usage].ids or pages[usage].id_sections.get(alias) != pages[usage].id_sections.get(target):
                 errors.append(f'Legacy Usage anchor drift: {locale}/{alias} -> {target}')
-        for name, label in (('scalar', 'Scalar Function'), ('vrz', 'VRZ Function'), ('vti', 'VTI Function')):
+        for name, label in (('scalar', 'Scalar Function'), ('vrz', 'VRZ Function'),
+                            ('vti', 'VTI Function'), ('elastic', 'Elastic Function')):
             if content.count(f'<h2>{label}<a') != 1:
                 errors.append(f'Missing or repeated Usage function heading: {locale}/{name}')
         if re.search(r'<h3>(?:Function|函数)<a', content):

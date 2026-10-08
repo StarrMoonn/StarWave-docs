@@ -1,6 +1,6 @@
 # Windows and WSL 2
 
-StarWave 2.0.0 has no native Windows wheel. Running propagation on Windows requires a WSL 2 Linux user environment, an available NVIDIA GPU, and a Windows NVIDIA driver that supports GPU computing in WSL.
+StarWave 4.0.0 has no native Windows wheel. Running CUDA propagation on Windows requires a WSL 2 Linux user environment, an available NVIDIA GPU, and a Windows NVIDIA driver that supports GPU computing in WSL.
 
 ## Setup order
 

@@ -2,24 +2,24 @@
 
 **Installation channels**
 
-- **PyPI**: the public wheel is available. Follow the instructions below to install StarWave 2.0.0.
+- **PyPI**: the public wheel is available. Follow the instructions below to install StarWave 4.0.0.
 - **Source**: available only to users with authorized source access. Follow the instructions provided with that source.
 - **[Docker](docker.md)**: preparing; no StarWave container image has been published yet.
 
 ## Runtime requirements
 
-| Component | StarWave 2.0.0 wheel requirement |
+| Component | StarWave 4.0.0 wheel requirement |
 |---|---|
 | Operating system | Linux x86_64, glibc ≥ 2.35 |
 | C++ runtime | libstdc++ providing GLIBCXX_3.4.30 / CXXABI_1.3.13 symbols or newer |
 | Python | 3.10–3.12 |
 | PyTorch / NumPy | PyTorch 2.5.x; NumPy ≥ 1.23 |
-| GPU | NVIDIA CUDA GPU; propagation has no CPU fallback |
+| GPU | NVIDIA CUDA for scalar/VRZ/VTI and elastic boundary; elastic full also supports CPU |
 | Compilation targets | SASS 70/75/80/86/89/90 and compute80 PTX |
 
-Installing the prebuilt wheel does not require nvcc or a local CUDA Toolkit. A conservative target for the Linux driver is 520.61.05 or newer, and the driver must also support the actual GPU. WSL uses the Windows host driver; see the [WSL guidance](wsl.md). The A30 and RTX 4060 Laptop are covered by the compilation targets; device-level numerical and performance tests of the public 2.0.0 wheel are still pending. A separate development-version A30 run is documented below.
+Installing the prebuilt wheel does not require nvcc or a local CUDA Toolkit. A conservative target for the Linux driver is 520.61.05 or newer, and the driver must also support the actual GPU. WSL uses the Windows host driver; see the [WSL guidance](wsl.md). The A30 and RTX 4060 Laptop are covered by the compilation targets; device-level numerical and performance tests of the public 4.0.0 wheel are still pending. A separate development-version A30 run is documented below.
 
-The version information above comes from the [PyPI 2.0.0 release description](https://pypi.org/project/starwave/2.0.0/). The public release contains only Linux wheels, with no sdist. This wheel cannot be used directly on native Windows, macOS, or ARM hosts.
+The version information above comes from the [PyPI 4.0.0 release description](https://pypi.org/project/starwave/4.0.0/). The public release contains only Linux wheels, with no sdist. This wheel cannot be used directly on native Windows, macOS, or ARM hosts.
 
 ## Create a runtime environment
 
@@ -30,7 +30,7 @@ python3.12 -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
 python -m pip install torch==2.5.1 --index-url https://download.pytorch.org/whl/cu118
-python -m pip install --only-binary=starwave starwave==2.0.0
+python -m pip install --only-binary=starwave starwave==4.0.0
 python -m pip check
 ```
 
@@ -57,6 +57,8 @@ In a fresh Python process, before the first native preparation, the wheel should
 The documentation site's build environment is separate from the computational runtime environment. Reading or building the documentation does not require a GPU.
 
 
+Elastic uses a separate preparation entry point: call `starwave.prepare_elastic([0])` on the GPU main thread, or `starwave.prepare_elastic()` with `memory="full"` for CPU. See {ref}`Elastic Function <elastic>` for parameters and vp/vs/rho conversion. Published 4.0.0 wheel installation and CPU/host checks passed; GPU, DataParallel and long-FWI acceptance scopes are listed in [Status](status.md).
+
 (installation-smoke)=
 ## Notebook 01: Executed smoke test
 
@@ -71,7 +73,7 @@ Select the corresponding CUDA kernel and run every cell from the beginning. Each
 
 ```{admonition} Measured environment · 2026-10-05
 :class: sw-run-note
-NVIDIA A30 · Python 3.10.18 · PyTorch 2.5.1 / CUDA 11.8 · installed StarWave **0.1.0.dev9**. The server results below check a small workflow in this development-version environment. They do not establish device validation of the public **2.0.0 wheel** described above.
+NVIDIA A30 · Python 3.10.18 · PyTorch 2.5.1 / CUDA 11.8 · installed StarWave **0.1.0.dev9**. The server results below check a small workflow in this development-version environment. They do not establish device validation of the public **2.0.0 or 4.0.0 wheel**.
 ```
 
 ## Small experiment design
