@@ -239,7 +239,7 @@ def build(destination):
             numbers = RECONSTRUCTION_NUMBERS
         rendered = [add_anchors(text, stable, numbers) for text in texts]
         if relative.startswith('examples/'):
-            rendered = [text.replace('<section ', '<section class="sw-example-page" ', 1) for text in rendered]
+            rendered = [text.replace('<section id=', '<section class="sw-example-page" id=', 1) for text in rendered]
         path.write_text(rendered[0], encoding='utf-8')
         other.write_text(rendered[1], encoding='utf-8')
         old = destination / relative

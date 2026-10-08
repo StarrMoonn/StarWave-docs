@@ -77,6 +77,8 @@ def check(root):
    if captions.count('Example')!=1 or captions.index('Example')+1>=len(captions) or captions[captions.index('Example')+1]!='Usage':errors.append('Example must immediately precede Usage: '+locale+'/'+name)
    if main is None:errors.append('Missing example article');continue
    sections=list(main.iter('section'))
+   styled=[section for section in sections if 'sw-example-page' in section.get('class','').split()]
+   if len(styled)!=1 or styled[0] is not sections[0] or styled[0].find('h1') is None:errors.append('Example style is not attached to the article root: '+locale+'/'+name)
    toc=[nav for nav in main.iter('nav') if 'sw-page-toc' in nav.get('class','').split()]
    if not sections or sections[0].get('data-sw-section')!='sw-section-0' or len(toc)!=1 or len(list(toc[0].iter('a')))!=len(sections)-1:errors.append('Example native table of contents/anchors differ: '+locale+'/'+name)
    figs=[f for f in main.iter('figure') if 'sw-example-figure' in f.get('class','').split()]
