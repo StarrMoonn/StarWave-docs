@@ -1,8 +1,8 @@
 # StarWave-docs · 中文 / English
 
-StarWave 4.0.0 双语使用手册，基于 Sphinx、Read the Docs 主题和 MyST Markdown。完整中文和英文版本各含 20 个内容页面，覆盖安装、正演、反演、API 与演示文稿；每种语言独立构建、导航和搜索。API 采用 Deepwave 风格的类型签名、参数、返回、注意事项及示例组织，所有说明针对 StarWave 原创编写。
+StarWave 5.0.0 双语使用手册，基于 Sphinx、Read the Docs 主题和 MyST Markdown。完整中文和英文版本各含 20 个内容页面，覆盖安装、正演、反演、API 与演示文稿；每种语言独立构建、导航和搜索。API 采用 Deepwave 风格的类型签名、参数、返回、注意事项及示例组织，所有说明针对 StarWave 原创编写。
 
-Bilingual user documentation for StarWave 4.0.0, built with Sphinx, the Read the Docs theme, and MyST Markdown. Each language contains the complete 20-page manual and a separate search index. The API presentation takes organizational cues from Deepwave while preserving StarWave’s own public contracts.
+Bilingual user documentation for StarWave 5.0.0, built with Sphinx, the Read the Docs theme, and MyST Markdown. Each language contains the complete 20-page manual and a separate search index. The API presentation takes organizational cues from Deepwave while preserving StarWave’s own public contracts.
 
 ## 构建 / Build
 
@@ -35,7 +35,7 @@ Each page has an accessible language switch. Section and Python-object anchors s
 - `check_presentation_asset.py` (also run by `check_site.py`): the reviewed PDF's SHA-256, exactly 30 slides, an image hash for each reviewed watermark-bearing page, absence of active PDF actions or embedded files, and a strict publication allowlist. These checks preserve the independently reviewed pixels; they do not claim to recognize a watermark automatically.
 - `check_api_docs.py`: all nine typed function signatures, types/defaults/descriptions, scalar 16 / VRZ 18 / VTI 20 / elastic 62 parameter coverage, two four-parameter material conversions and prepare_elastic, return contracts and Python snippets. The checked-in public contract snapshot prevents cross-language agreement from hiding interface drift.
 - `check_tutorial_assets.py`: clean notebook/script parity, numerical-source provenance, safe metadata, configuration and measured-result invariants.
-- Optional `--wheel PATH`: verifies the public 4.0.0 wheel SHA-256 and compares signatures through AST parsing, without importing or running StarWave. Wheels are never part of the source or published site.
+- Optional `--wheel PATH`: verifies the public 5.0.0 wheel SHA-256 and compares signatures through AST parsing, without importing or running StarWave. Wheels are never part of the source or published site.
 
 Usage uses a 40.8px regular Georgia page title and single 30.6px Scalar Function, VRZ Function, VTI Function, and Elastic Function headings in both languages. Parameter names, types, defaults, and prose all use 17px text. Signatures retain 17px naturally wrapping monospace text and bold 18.7px function names; the propagator overview uses matching 17px API links, dimension tokens, and notation with consistent baselines. Code blocks and other inline code outside API fields retain their separate 15.3px size. Original section bookmarks, positional aliases, language switching, and legacy API routes are preserved.
 
@@ -59,7 +59,7 @@ The browser checks cover desktop/mobile layout, section and API switching, legac
 
 ## 内容边界 / Scope
 
-This repository contains documentation, original synthetic usage examples and build tooling. It contains no propagation implementation, binary libraries, private datasets or internal records. It neither imports StarWave through autodoc nor publishes source pages. Public 4.0.0 API signatures are verified; The three original tutorials now include measured A30 / StarWave 0.1.0.dev9 results and clean notebook downloads. Public-wheel GPU validation, full adjoint correctness, performance, multi-GPU operation, and FWI convergence remain unvalidated. See the manual’s documentation-status page.
+This repository contains documentation, original synthetic usage examples and build tooling. It contains no propagation implementation, binary libraries, private datasets or internal records. It neither imports StarWave through autodoc nor publishes source pages. Public 5.0.0 API signatures are verified; The three original tutorials now include measured A30 / StarWave 0.1.0.dev9 results and clean notebook downloads. Public-wheel GPU validation, full adjoint correctness, performance, multi-GPU operation, and FWI convergence remain unvalidated. See the manual’s documentation-status page.
 
 No new software or documentation license is declared on behalf of the owners.
 
@@ -67,8 +67,12 @@ The Presentation chapter publishes only the approved original 30-slide watermark
 
 ## Elastic documentation maintenance · 2026-10-08
 
-The existing single-page Usage now documents the published V11 / 4.0.0 elastic contract, explicit material conversions, and the separate elastic preparation helper. Source/wheel signature parity and exact return order were reviewed without executing GPU propagation. Existing scalar/VRZ/VTI API content, historical tutorial assets, styling, attribution and compatibility anchors are preserved. Review scope and the published wheel hash are recorded in each language's Status and Release Notes pages. Use `python tools/check_api_docs.py --wheel PATH_TO_4.0.0_WHEEL` for optional local archive verification; do not commit the wheel.
+The existing single-page Usage now documents the published V11 / 4.0.0 elastic contract, explicit material conversions, and the separate elastic preparation helper. Source/wheel signature parity and exact return order were reviewed without executing GPU propagation. Existing scalar/VRZ/VTI API content, historical tutorial assets, styling, attribution and compatibility anchors are preserved. Review scope and the published wheel hash are recorded in each language's Status and Release Notes pages. Use `python tools/check_api_docs.py --wheel PATH_TO_5.0.0_WHEEL` for optional local archive verification; do not commit the wheel.
 
 ## Wavefield Reconstruction chapter
 
 The bilingual Forward Modeling navigation now includes Reconstruction / 波场反传重建. The chapter derives the pinned 4.0.0 elastic boundary method, distinguishes forward reconstruction from the discrete adjoint, documents the physical velocity/traction tape and temporal-filter transpose, and gives exact payload formulas with sampling and validation limits. Four original vector schematics per language are reproducible with `tools/draw_reconstruction.py`; outlined text keeps labels consistent without a network font dependency. Keyboard-scrollable figure regions preserve readable labels on narrow screens. No software source or measured GPU results were changed.
+
+## Scalar3D API update · 2026-10-08
+
+The 5.0.0 manual adds source-verified 2D/3D scalar dispatch, model-axis coordinates, one-element receiver tuple returns, first-order velocity gradients in 2D/3D and source-waveform gradients in 3D, temporal-resampling adjoint semantics, and radius-M six-face boundary storage with internal terminal pressure fields. Scalar exposes no public initial/final states, and 2D sources remain fixed. The nine public signatures match the SHA-256-pinned 5.0.0 wheel. Existing VRZ, VTI and Elastic contract bodies, historical tutorial evidence and legacy anchors are preserved. New source-build example results are a separate documentation deliverable and are not claimed as wheel GPU validation.

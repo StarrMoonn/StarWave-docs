@@ -1,5 +1,13 @@
 # Release Notes
 
+## 5.0.0 / V12 · 2026-10-08
+
+The public [StarWave 5.0.0 wheel](https://pypi.org/project/starwave/5.0.0/) extends `starwave.scalar` without changing its signature: `v.ndim` selects 2D/3D, and 3D supports unequal spacing, orders 2/4/6/8, Radius-M six-face pressure reconstruction, and one first-order velocity/source backward. `full` retains `Lap(u)` volume history at each internal step. Coordinates directly index the model in its own axis order. The result remains the one-element `(receiver_amplitudes,)` tuple with `[B,R,T]` recordings.
+
+2D scalar behavior and fixed sources are preserved, as are VRZ, VTI, Deepwave elastic, and their examples. 3D requires CUDA FP32; illumination remains 2D scalar only. PML/model-extension gradient limits still apply, and boundary mode does not guarantee production-scale 3D memory fit. The public package version is 5.0.0; the private-source version is not a PyPI installation target.
+
+This maintenance synchronizes bilingual Usage, installation, model conventions, Scalar3D reconstruction, and runnable call fragments, with API checks against the 5.0.0 wheel. It changes no propagation implementation and ran no GPU numerical, long-FWI, multi-GPU, or performance tests. See [Status](status.md) for publication and historical tutorial evidence.
+
 ## 4.0.0 · 2026-10-07
 
 The public [StarWave 4.0.0 wheel](https://pypi.org/project/starwave/4.0.0/) corresponds to V11 and adds `starwave.elastic(lamb, mu, buoyancy, ...)` with a Deepwave 0.0.27-derived backend, 2D/3D, orders 2/4/6/8 and complete state/receiver returns. Convert materials explicitly through `starwave.common`; elastic uses the separate `prepare_elastic` helper. Scalar remains 2D, and the scalar/VRZ/VTI public signatures and defaults are preserved.

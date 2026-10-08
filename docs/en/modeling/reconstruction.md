@@ -1,6 +1,8 @@
 (reconstruction)=
 # Wavefield Reconstruction
 
+This chapter first explains 5.0.0 Scalar3D Radius-M six-face pressure reconstruction, followed by the existing elastic derivation.
+
 StarWave's elastic `memory="boundary"` mode reconstructs the forward physical fields while the loss gradient travels backward. It replaces time histories of volume-wide material derivatives with a **boundary tape and a terminal physical state**. This chapter explains the native 2D/3D method in the 4.0.0 source contract. For arguments and runnable call patterns, see {ref}`Elastic Function <elastic>` and its {ref}`memory options <elastic-memory>`.
 
 **Reconstruction and adjoint propagation have different jobs.** Reconstruction recovers earlier forward values. The adjoint carries the sensitivity of a loss to those values. They meet at matching time levels to accumulate model gradients. Neither task is equivalent to playing the receiver traces backward.
@@ -13,6 +15,34 @@ StarWave's elastic `memory="boundary"` mode reconstructs the forward physical fi
   <figcaption>Figure 1. Data flow of the native boundary method. The saved forward information supplies reconstruction, while loss cotangents of records or terminal outputs drive the adjoint. Both trajectories run through decreasing time indices; they are separate fields with separate roles.</figcaption>
 </figure>
 ```
+
+
+(reconstruction-scalar3d)=
+## Scalar3D: Radius-M six-face pressure reconstruction
+
+Public 5.0.0 uses a separate pressure-reconstruction path for 3D `starwave.scalar`. Its pressure storage differs from the elastic velocity/traction tape discussed below; the formulas in this section apply only to scalar3D. See {ref}`Scalar Function <scalar>` for model axes, source units, temporal resampling, and calls.
+
+Let `M=accuracy//2` be the stencil radius, `a=pml_width`, `b=boundary_buffer`, and {math}`n_x,n_y,n_z` the model-axis sizes. Padding on each side is {math}`p=a+b+M`, giving runtime sizes {math}`L_i=n_i+2p`. Each of the six independent pressure faces is exactly M cells wide, with tangential sizes {math}`Q_i=L_i-2(a+M)=n_i+2b`. Public source/receiver coordinates still index the physical model directly, without adding p manually.
+
+At every internal step, the low/high z, low/high y, and low/high x pressure faces are stored. Two final full padded pressure fields seed the reverse second-order time recurrence. Face values supply the interior stencil without directly inverting all dissipative PML states. Reconstructed forward pressure and a separate adjoint meet at matching time levels to accumulate velocity gradients. This is neither reversed playback of receiver traces nor reuse of the elastic staggered velocity/stress updates below.
+
+Let B be the shot count and N the internal step count after CFL resampling (`N=T*r`), with e=4 bytes per FP32 element. These are the main allocated saved payloads, not GPU peak memory:
+
+```{math}
+\begin{aligned}
+M_{\mathrm{faces}} &= eBN\,2M\,(Q_yQ_z+Q_xQ_z+Q_xQ_y),\\
+M_{\mathrm{terminal}} &= 2eB L_xL_yL_z,\\
+M_{\mathrm{full}} &= eBN L_xL_yL_z.
+\end{aligned}
+```
+
+The six faces are allocated separately, so overlapping strips are counted separately in the first expression. Boundary mode saves the first two terms. Full mode saves the third, an unscaled `Lap(u)` history rather than every pressure/PML state. Both retain history only when backpropagation is needed; current 3D source-only gradients also allocate the chosen history. With fixed PML, buffer, and order, boundary time history grows with surface area and full with volume, but boundary still grows linearly with duration and shots.
+
+Models, source/receiver arrays, propagation pressure, adjoints, reconstruction workspaces, gradients, and the autograd graph require additional memory. CPML auxiliary state uses directional slabs, which does not eliminate volume-sized work fields. Native signed 32-bit indexing and CUDA launch-grid limits also constrain actual dimensions; oversized requests are rejected. There is no CPU/disk offload, compression, automatic full fallback, or public checkpoint/restart state.
+
+Both modes require CUDA FP32 on the default stream, support orders 2/4/6/8, and permit one first-order backward per forward. Velocity and source gradients include the source-location `-v²*internal_dt²` factor and the actual temporal-resampling transposes, with CFL/PML setup fixed. Model edges retain replicate-forward/crop-backward; full does not supply the complete transpose of extension. 3D illumination is unsupported.
+
+These are source/public-wheel storage and interface contracts; this documentation update did not rerun a GPU. Compare full/boundary records, velocity gradients, source gradients, and measured peak memory for each real configuration, and check long-time stability separately. Neither six-face reconstruction nor compilation-target coverage establishes production-scale memory fit or GPU numerical acceptance.
 
 (reconstruction-state)=
 ## The staggered elastic state

@@ -69,7 +69,38 @@
       "time_taper": "bool",
       "illumination": "ScalarIllumination | None"
     },
-    "return": "tuple[torch.Tensor]"
+    "return": "tuple[torch.Tensor]",
+    "semantics": {
+      "reviewed_public_version": "5.0.0",
+      "model_dimensions": [
+        2,
+        3
+      ],
+      "coordinate_order": "Direct input-model axis indices; 3D examples use [x,y,z].",
+      "spacing_by_dimension": {
+        "2": "one scalar or two equal positive values",
+        "3": "one scalar or three positive per-axis values; unequal allowed"
+      },
+      "pml_faces_by_dimension": {
+        "2": 4,
+        "3": 6
+      },
+      "pml_width_policy": "equal positive integers on all faces",
+      "source_gradient_by_dimension": {
+        "2": false,
+        "3": true
+      },
+      "illumination_by_dimension": {
+        "2": "ScalarIllumination or None",
+        "3": "None only"
+      },
+      "boundary_face_width_3d": "accuracy // 2",
+      "boundary_terminal_pressure_fields_3d": 2,
+      "full_history_3d": "unscaled Lap(u) over the padded volume per internal step",
+      "source_only_history_3d": true,
+      "public_return_shape": "[B,R,T]",
+      "one_backward_per_forward": true
+    }
   },
   "native_status": {
     "signature": "()",

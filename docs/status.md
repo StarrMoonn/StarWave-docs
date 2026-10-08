@@ -1,5 +1,19 @@
 # 文档状态与参考来源
 
+## V12 / 5.0.0 Scalar3D API 核对 · 2026-10-08
+
+当前安装版本为公开 [StarWave 5.0.0](https://pypi.org/project/starwave/5.0.0/)。同一个 `starwave.scalar` 签名按 `v.ndim` 选择二维/三维。三维支持逐轴不等间距、2/4/6/8 阶、Radius-M 六面 boundary 或 full、一次一阶速度与源梯度；二维源仍固定，三维 illumination 不支持。原有 VRZ、VTI 和 Deepwave elastic 契约保留。
+
+本次独立读取公开 wheel，并核对 SHA-256、九个公开签名、参数默认值、类型和返回契约；还将 scalar、三维包装/保存布局、输入验证和时间采样模块逐字节与本次授权源码核对。双语文档与调用片段按 Python 3.10 语法检查，不在文档构建时加载或运行 StarWave。
+
+5.0.0 公开 wheel SHA-256：
+
+```text
+bf159a6544cdc1ab12c99e22578ec40ed56e0d3011ae71be9fc8ecb04f9c2bff
+```
+
+发布记录确认 Python 3.10–3.12 安装检查及公开 wheel 独立下载/安装核验。CPU/主机检查不能代表 scalar3D CPU 传播，因为该路径只支持 CUDA。用户提供的源版本 GPU 报告属于另行标明的历史证据；本次文档维护未重跑 GPU，不宣称公开 wheel 的 A30、多 GPU、长程 FWI、峰值显存或性能已验收。下列 4.0.0、2.0.0 与 0.1.0.dev9 记录保留各自原始版本，不能改标为 5.0.0 新实验。
+
 ## V11 / 4.0.0 Elastic API 核对 · 2026-10-08
 
 [StarWave 4.0.0](https://pypi.org/project/starwave/4.0.0/) 的发布 wheel 为本次新增接口的依据。62 项 elastic 参数、两个转换函数和 prepare_elastic 已逐项核对类型、顺序、默认值与调用边界；原有五个 API 签名在该 wheel 中保持不变。双语构建与本地链接/锚点检查包含新接口，Python 示例按 3.10 语法检查。没有在文档构建中导入或执行 StarWave。
@@ -18,6 +32,7 @@
 |---|---|
 | 中英双语导航、安装与 WSL 指引 | 已完整翻译；另附 A30 / 0.1.0.dev9 的小规模运行记录，公开 wheel 仍待实测 |
 | scalar / VRZ / VTI API 参考 | 单页 Usage；54 项参数的签名、默认值、类型、shape/单位与约束已核对 |
+| Scalar3D / 5.0.0 | API、Radius-M 存储契约与独立小例子已补充；本次未运行 GPU |
 | 原创三份教学 notebook | 服务器返回执行结果无错误；运行产物哈希及数组已核验 |
 | scalar 正演、梯度与 25 次 FWI 更新 | A30 / 0.1.0.dev9 实测；数据拟合改善明显，模型恢复改善仅 0.86% |
 | 原有 32 × 32 接线脚本 | 保留并通过语法检查；该独立配置没有附实测结果 |
@@ -36,7 +51,7 @@
 - [Microsoft WSL 安装](https://learn.microsoft.com/en-us/windows/wsl/install) 与 [NVIDIA WSL 用户指南](https://docs.nvidia.com/cuda/wsl-user-guide/index.html)。
 - [Sphinx](https://www.sphinx-doc.org/en/master/usage/quickstart.html)、[GitHub Pages 自定义工作流](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages) 和 [RTD 配置说明](https://docs.readthedocs.com/platform/stable/config-file/v2.html)。
 
-API 核对基于发布 wheel 的 Python 接口签名与授权使用说明；文档重新组织为入门内容，不包含软件实现。公开 wheel SHA-256：
+以下为历史 2.0.0 文档基线：API 核对基于当时发布 wheel 的 Python 接口签名与授权使用说明；文档重新组织为入门内容，不包含软件实现。公开 wheel SHA-256：
 
 ```text
 6622b863c76db1ba708622048377f3de4447609ff7295d1705b8145884ce06db

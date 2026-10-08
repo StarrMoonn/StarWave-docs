@@ -1,5 +1,13 @@
 # 发布说明
 
+## 5.0.0 / V12 · 2026-10-08
+
+公开 [StarWave 5.0.0 wheel](https://pypi.org/project/starwave/5.0.0/) 在原签名上扩展 `starwave.scalar`：二维/三维由 `v.ndim` 选择，三维支持不等间距、2/4/6/8 阶、Radius-M 六面压力重建，以及一次一阶速度与源梯度。`full` 保留逐内部步 `Lap(u)` 体积历史。三维模型按自身轴序给出，坐标直接索引；输出仍为单元素 `(receiver_amplitudes,)`，记录 `[B,R,T]`。
+
+二维 scalar 行为与固定源约定保留，VRZ、VTI、Deepwave elastic 及其示例没有随此版本改变。三维要求 CUDA FP32，illumination 仅支持二维 scalar。PML/扩边梯度限制仍适用，boundary 不保证生产规模三维一定放得下显存。公开版本为 5.0.0，不应安装私有源码编号作为 PyPI 版本。
+
+本次维护同步双语 Usage、安装、模型约定、Scalar3D 重建和可运行调用片段，并以 5.0.0 wheel 核对 API。没有修改传播实现，也没有在文档维护中执行 GPU 数值、长程 FWI、多卡或性能测试。发布与历史教程证据见[文档状态](status.md)。
+
 ## 4.0.0 · 2026-10-07
 
 公开 [StarWave 4.0.0 wheel](https://pypi.org/project/starwave/4.0.0/) 对应 V11，新增基于 Deepwave 0.0.27 派生后端的 `starwave.elastic(lamb, mu, buoyancy, ...)`，支持二维/三维、2/4/6/8 阶及完整状态/记录返回。材料转换通过 `starwave.common` 显式完成；elastic 使用独立的 `prepare_elastic`。原有 scalar 仍为二维，scalar/VRZ/VTI 的公开签名与默认值保留。

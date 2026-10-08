@@ -8,8 +8,8 @@ from pathlib import Path
 import re
 import zipfile
 
-# Public 4.0.0 artifact, independently matched to the publication receipt.
-WHEEL_SHA256 = '9f64f2677c54af5b2bd1c48e509a24c7d40eb0257d9e86267e721d3f61eaa954'
+# Public 5.0.0 artifact, independently matched to the publication receipt.
+WHEEL_SHA256 = 'bf159a6544cdc1ab12c99e22578ec40ed56e0d3011ae71be9fc8ecb04f9c2bff'
 MODULES = {
     'scalar': 'starwave/scalar.py', 'vrz': 'starwave/vrz.py',
     'vti': 'starwave/vti.py', 'native_status': 'starwave/_native.py',
@@ -76,10 +76,52 @@ def arguments_without_annotations(args):
     return ast.dump(args)
 
 
+def check_scalar3d_examples(project, contract):
+    """Check runnable wiring against the reviewed semantic ledger, not numerics."""
+    semantics = contract['semantics']
+    assert semantics['reviewed_public_version'] == '5.0.0'
+    assert semantics['model_dimensions'] == [2, 3]
+    assert semantics['source_gradient_by_dimension'] == {'2': False, '3': True}
+    assert semantics['pml_faces_by_dimension'] == {'2': 4, '3': 6}
+    assert semantics['boundary_face_width_3d'] == 'accuracy // 2'
+    assert semantics['boundary_terminal_pressure_fields_3d'] == 2
+    assert semantics['source_only_history_3d'] is True
+    assert semantics['illumination_by_dimension']['3'] == 'None only'
+    examples = []
+    for locale in ('zh', 'en'):
+        docs = project / 'docs' / ('en' if locale == 'en' else '')
+        text = (docs / 'usage.md').read_text(encoding='utf-8')
+        section = text.split('(scalar-3d-example)=', 1)[1].split('(scalar-notes)=', 1)[0]
+        code = re.search(r'^```python\n(.*?)^```', section, re.M | re.S)[1]
+        examples.append(code)
+        tree = parse_python(code)
+        calls = [node for node in ast.walk(tree) if isinstance(node, ast.Call)]
+        scalar_calls = [node for node in calls if ast.unparse(node.func) == 'starwave.scalar']
+        assert len(scalar_calls) == 1, f'{locale}: expected one standalone 3D scalar call'
+        values = {item.arg: item.value for item in scalar_calls[0].keywords}
+        expected = {param.arg for param in parse_signature(contract['signature']).args.kwonlyargs}
+        assert set(values) == expected | {'grid_spacing', 'dt'}, f'{locale}: 3D example optional arguments incomplete'
+        spacing = ast.literal_eval(values['grid_spacing'])
+        assert len(spacing) == 3 and min(spacing) > 0 and len(set(spacing)) > 1
+        accuracy = ast.literal_eval(values['accuracy'])
+        assert accuracy in (2, 4, 6, 8)
+        assert ast.literal_eval(values['boundary_buffer']) >= accuracy // 2 + 1
+        assert ast.literal_eval(values['pml_width']) > 0
+        assert ast.literal_eval(values['memory']) == 'boundary'
+        assert ast.literal_eval(values['illumination']) is None
+        models = [node for node in calls if ast.unparse(node.func) == 'torch.full']
+        assert len(models) == 1 and len(ast.literal_eval(models[0].args[0])) == 3
+        assert any(item.arg == 'requires_grad' and ast.literal_eval(item.value) is True for item in models[0].keywords)
+        assert any(isinstance(node.func, ast.Attribute) and node.func.attr == 'requires_grad_' for node in calls)
+        assert any(isinstance(node.func, ast.Attribute) and node.func.attr == 'backward' for node in calls)
+    assert examples[0] == examples[1], 'Bilingual 3D runnable snippets differ'
+
+
 def check(wheel_path=None):
     project = Path(__file__).resolve().parents[1]
     contracts = json.loads((project / 'tools' / 'api_contract.json').read_text())
     assert set(contracts) == set(MODULES), 'Public contract inventory changed'
+    check_scalar3d_examples(project, contracts['scalar'])
     languages = {}
     blocks = 0
     for locale, docs in [('zh', project / 'docs'), ('en', project / 'docs' / 'en')]:
@@ -127,7 +169,7 @@ def check(wheel_path=None):
         assert ast.dump(languages['zh'][name]) == ast.dump(languages['en'][name]), f'{name}: language signature mismatch'
     if wheel_path:
         wheel_path = Path(wheel_path)
-        assert hashlib.sha256(wheel_path.read_bytes()).hexdigest() == WHEEL_SHA256, 'Not the verified 4.0.0 wheel'
+        assert hashlib.sha256(wheel_path.read_bytes()).hexdigest() == WHEEL_SHA256, 'Not the verified 5.0.0 wheel'
         with zipfile.ZipFile(wheel_path) as wheel:
             for name, module in MODULES.items():
                 actual = wheel_function(wheel, module, name.rsplit('.', 1)[-1])
@@ -138,10 +180,10 @@ def check(wheel_path=None):
                     assert contracts[name]['return'] == ast.unparse(actual.returns), f'{name}: return type differs from public wheel'
     counts = {name: len(parameter_defaults(languages['zh'][name])) for name in MODULES}
     print(f'PASS: both languages: typed signatures, descriptions/defaults {counts}, {len(MODULES)} return contracts; {blocks} Python blocks parsed as Python 3.10.')
-    print(f'PASS: {len(MODULES)} signatures match verified public 4.0.0 wheel.' if wheel_path else 'PASS: public 4.0.0 contract snapshot; optional --wheel verifies the published archive.')
+    print(f'PASS: {len(MODULES)} signatures match verified public 5.0.0 wheel.' if wheel_path else 'PASS: public 5.0.0 contract snapshot; optional --wheel verifies the published archive.')
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--wheel', help='Public StarWave 4.0.0 wheel (read only, never imported)')
+    parser.add_argument('--wheel', help='Public StarWave 5.0.0 wheel (read only, never imported)')
     check(parser.parse_args().wheel)

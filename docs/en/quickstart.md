@@ -1,5 +1,7 @@
 # Quickstart: A Synthetic Shot Gather
 
+This page retains the 2D introductory wiring. For public 5.0.0 3D models, unequal spacing, and first-order velocity/source gradients, see the {ref}`3D scalar call <scalar-3d-example>`; both dimensions use the same function signature.
+
 The goal is to check the connections between the model, source, acquisition geometry, and recorded tensor. The example creates a small 32×32 velocity model, one shot with one source, and 16 receivers. It downloads no data, saves no results, and performs no compilation.
 
 First complete [installation and native library preparation](installation.md), then download {download}`scalar_demo.py <../examples/scalar_demo.py>`.

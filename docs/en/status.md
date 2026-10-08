@@ -1,5 +1,19 @@
 # Documentation Status and References
 
+## V12 / 5.0.0 Scalar3D API review · 2026-10-08
+
+The current installation target is public [StarWave 5.0.0](https://pypi.org/project/starwave/5.0.0/). The unchanged `starwave.scalar` signature selects 2D/3D from `v.ndim`. 3D supports unequal per-axis spacing, orders 2/4/6/8, Radius-M six-face boundary or full memory, and one first-order velocity/source backward. 2D sources remain fixed; 3D illumination is unsupported. Existing VRZ, VTI, and Deepwave elastic contracts are preserved.
+
+This update independently read the public wheel and checked its SHA-256, nine public signatures, parameter defaults/types, and return contracts. Scalar, the 3D wrapper/storage layout, validation, and temporal-sampling modules were also byte-matched to the authorized source. Bilingual documentation and call fragments are checked with Python 3.10 syntax; the documentation build does not load or execute StarWave.
+
+Public 5.0.0 wheel SHA-256:
+
+```text
+bf159a6544cdc1ab12c99e22578ec40ed56e0d3011ae71be9fc8ecb04f9c2bff
+```
+
+Publication records confirm Python 3.10–3.12 installation checks and independent public-wheel download/install verification. CPU/host checks do not imply scalar3D CPU propagation: that path is CUDA-only. User-provided source-version GPU reports are separately identified historical evidence. This documentation update did not rerun a GPU and makes no public-wheel A30, multi-GPU, long-FWI, peak-memory, or performance acceptance claim. The 4.0.0, 2.0.0, and 0.1.0.dev9 records below retain their original versions rather than being relabeled as new 5.0.0 experiments.
+
 ## V11 / 4.0.0 Elastic API review · 2026-10-08
 
 The published [StarWave 4.0.0](https://pypi.org/project/starwave/4.0.0/) wheel is the authority for the added interface. All 62 elastic parameters, both conversion helpers and prepare_elastic were checked for types, order, defaults and calling boundaries; the existing five API signatures are unchanged in this wheel. Bilingual builds and local link/anchor checks include the new APIs, and Python examples are checked as Python 3.10 syntax. Documentation builds neither import nor execute StarWave.
@@ -18,6 +32,7 @@ Publication checks passed Python 3.10–3.12 installation and 2D/3D CPU/host che
 |---|---|
 | Chinese and English navigation, installation, and WSL guidance | Fully translated; a separate A30 / 0.1.0.dev9 smoke run is documented, while public-wheel device tests remain pending |
 | scalar / VRZ / VTI API reference | Single Usage page; signatures, defaults, types, shapes/units, and constraints checked for 54 parameters |
+| Scalar3D / 5.0.0 | API, Radius-M storage contract, and a standalone small example added; no GPU run in this update |
 | Three original teaching notebooks | Returned executed notebooks contain no errors; artifact hashes and arrays checked |
 | Scalar forward, gradients, and 25 FWI updates | Measured A30 / 0.1.0.dev9 run; data fit improves substantially, model recovery only 0.86% |
 | Original 32 × 32 wiring script | Retained and syntax-checked; this separate configuration has no attached measured results |
@@ -36,7 +51,7 @@ Publication checks passed Python 3.10–3.12 installation and 2D/3D CPU/host che
 - [Microsoft WSL installation](https://learn.microsoft.com/en-us/windows/wsl/install) and the [NVIDIA WSL user guide](https://docs.nvidia.com/cuda/wsl-user-guide/index.html).
 - [Sphinx](https://www.sphinx-doc.org/en/master/usage/quickstart.html), [GitHub Pages custom workflows](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages), and the [RTD configuration reference](https://docs.readthedocs.com/platform/stable/config-file/v2.html).
 
-API checks are based on the released wheel's Python interface signatures and authorized usage documentation. The documentation has been reorganized as introductory material and does not include the software implementation. Public wheel SHA-256:
+The following is the historical 2.0.0 documentation baseline: API checks were based on that released wheel's Python interface signatures and authorized usage documentation. The documentation has been reorganized as introductory material and does not include the software implementation. Public wheel SHA-256:
 
 ```text
 6622b863c76db1ba708622048377f3de4447609ff7295d1705b8145884ce06db

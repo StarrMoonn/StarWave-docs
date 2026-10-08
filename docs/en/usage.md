@@ -15,14 +15,14 @@
 - [Other exported names and scope](#other-exports)
 ```
 
-This reference targets the public StarWave **4.0.0** wheel, adding the V11 Deepwave-backend elastic API while preserving the existing scalar, VRZ and VTI contracts. Each propagator includes its actual signature, every parameter, return values, gradient scope, notes, and a call example. Parameter types describe accepted runtime values; signatures retain the actual keyword-only boundaries and defaults.
+This reference targets the public StarWave **5.0.0** wheel (V12). `starwave.scalar` now selects 2D or 3D from the model dimension; the existing scalar2D, VRZ, VTI, and elastic contracts are preserved. Each propagator includes its actual signature, every parameter, return values, gradient scope, notes, and a call example. Parameter types describe accepted runtime values; signatures retain the actual keyword-only boundaries and defaults.
 
 The page organization follows the Sphinx Python API style of the [official Deepwave Usage documentation](https://ausargeo.com/deepwave/usage). All descriptions are newly written from StarWave’s actual contracts. The libraries’ parameter sets, source units, return structures, and differentiability scopes are not interchangeable.
 
 (propagators)=
 ## Propagators at a glance
 
-- {py:func}`starwave.scalar`: `2D` scalar acoustics; velocity model `v`; returns a one-element tuple of recordings.
+- {py:func}`starwave.scalar`: `2D/3D` scalar acoustics; velocity model `v`; returns a one-element tuple of recordings.
 
 - {py:func}`starwave.vrz`: `2D` variable-density acoustics; `v` plus exactly one `impedance` / `density` parameterization.
 
@@ -37,29 +37,29 @@ Notation: `B` is the number of shots, `S` the sources per shot, `R` the receiver
 
 ```{py:function} starwave.scalar(v: torch.Tensor, grid_spacing: float | int | list[float] | tuple[float, ...], dt: float | int, *, source_amplitudes: torch.Tensor, source_locations: torch.Tensor, receiver_locations: torch.Tensor, accuracy: int=8, pml_freq: float | int=25.0, pml_width: int | list[int] | tuple[int, ...]=20, boundary_buffer: int=5, memory: str='boundary', max_vel: float | int | None=None, freq_taper_frac: float | int=0.0, time_pad_frac: float | int=0.0, time_taper: bool=False, illumination: ScalarIllumination | None=None) -> tuple[torch.Tensor]
 
-Propagates scalar acoustic waves on a two-dimensional, equally spaced grid, supporting a batch of independent shots. The output supports one first-order gradient with respect to the velocity model; source waveforms, coordinates, and numerical settings are not trainable inputs. Every call starts with a fresh propagation state and does not return the final wavefield.
+Propagates scalar acoustic waves on a 2D or 3D grid selected by `v.ndim`, with a batch of independent shots. Both dimensions support one first-order velocity gradient; 3D also supports source-waveform gradients. Coordinates and numerical settings are not differentiable. Each call starts with fresh propagation state and does not return final wavefields.
 
-:param v: **Required; positional or keyword.** Two-dimensional model `[N0,N1]`, with at least 2 cells in each dimension; CUDA float32. Typical unit: m/s. Coordinates `[i,j]` directly index `v[i,j]`; physical axis order is not inferred automatically. All values must be finite. Negative and zero values are accepted, but this does not guarantee physical validity. Model-axis transformations preserve the autograd chain; `requires_grad=True` requests a velocity gradient.
+:param v: **Required; positional or keyword.** Two-dimensional `[N0,N1]` or three-dimensional `[N0,N1,N2]` model, with at least 2 cells per dimension; CUDA float32, typically in m/s. `v.ndim` selects the dimension. Coordinates `[i,j]` / `[i,j,k]` directly index `v[i,j]` / `v[i,j,k]`; the 3D examples use `[nx,ny,nz]`, with no automatic physical-axis permutation. All values must be finite. Signed and zero values are accepted without guaranteeing physical validity. Model-axis transformations preserve autograd; `requires_grad=True` requests a velocity gradient.
 :type v: `torch.Tensor`
-:param grid_spacing: **Required; positional or keyword.** Positive, finite grid spacing, typically in m. Accepts one value or two equal values; scalar/VRZ do not support unequal spacing along the two axes. Booleans, zero/negative values, and mismatched sequence lengths are rejected.
+:param grid_spacing: **Required; positional or keyword.** Positive, finite spacing, typically in m. In 2D, accepts one value or two equal values. In 3D, accepts one value or three values in model-axis order (for example `[dx,dy,dz]`); unequal spacings are supported. Booleans, zero/negative values, and mismatched sequence lengths are rejected.
 :type grid_spacing: `float | int | list[float] | tuple[float, ...]`
 :param dt: **Required; positional or keyword.** Positive, finite sampling interval of the user input/output, typically in s. Internally, the CFL condition may require a smaller time step; the returned sampling interval remains this value. Tensor and Boolean inputs are not accepted, and this parameter is not differentiated.
 :type dt: `float | int`
-:param source_amplitudes: **Required; keyword-only.** Fixed real-valued tensor `[B,S,T]`, with all three dimensions nonempty and `requires_grad=True` forbidden. Values must be finite and representable as float32; the tensor is converted to the model device and float32. This is the normalized forcing `f`, not a pressure increment per step; if the wavefield is in Pa and length is in m, its unit is Pa/m². A tensor of shape `[T]` or `[B,T]` alone is not accepted: explicitly expand the shot/source dimensions for a shared waveform.
+:param source_amplitudes: **Required; keyword-only.** Real tensor `[B,S,T]` with nonempty dimensions. Values must be finite and representable as float32; conversion to the model device and float32 preserves the supported gradient chain. In 2D the source must be fixed (`requires_grad=True` is rejected); 3D supports first-order source gradients, alone or together with velocity gradients. This is normalized forcing `f`, not a per-step pressure increment; its unit is Pa/m² if the wavefield is in Pa and length in m. `[T]` and `[B,T]` are not accepted: explicitly expand shot/source dimensions for a shared waveform.
 :type source_amplitudes: `torch.Tensor`
-:param source_locations: **Required; keyword-only.** Fixed integer tensor `[B,S,2]`; `[B,2]` is also accepted for a single source per shot. `torch.long` is recommended. Uses physical-grid indices in the input model axis order, without PML offsets or out-of-bounds values. Each source has a corresponding waveform; increments from coincident sources within a shot are added.
+:param source_locations: **Required; keyword-only.** Fixed integer tensor `[B,S,D]`, where `D=v.ndim`; `[B,D]` is also accepted for a single source per shot. `torch.long` is recommended. Coordinates directly index the physical grid in input-model axis order; 3D `[i,j,k]` means `v[i,j,k]`. No PML offsets or out-of-bounds values are allowed. Each source has a waveform, and coincident sources within one shot add their increments.
 :type source_locations: `torch.Tensor`
-:param receiver_locations: **Required; keyword-only.** Fixed integer tensor `[B,R,2]`, with `R>0`; `torch.long` is recommended. The shot count must match the sources. Uses physical-grid indices in the input model axis order. Duplicate positions are allowed. Receivers are required; an empty tensor cannot request propagation without recordings.
+:param receiver_locations: **Required; keyword-only.** Fixed integer tensor `[B,R,D]`, where `D=v.ndim` and `R>0`; `torch.long` is recommended. The shot count matches the sources. Coordinates index the physical grid in input-model axis order. Duplicate positions are allowed. Receivers cannot be omitted, and an empty tensor cannot request propagation without recordings.
 :type receiver_locations: `torch.Tensor`
 :param accuracy: **Default `8`; keyword-only.** Spatial finite-difference order, one of `2,4,6,8`, not an error tolerance. Affects stencil extent, computational cost, and the minimum boundary buffer. Booleans and other orders are rejected.
 :type accuracy: `int`
 :param pml_freq: **Default `25.0`; keyword-only.** Positive, finite frequency used to configure the PML, typically in Hz; also used for spatial-sampling diagnostics. It does not generate a waveform or automatically measure the source frequency. Choose it for the actual experiment.
 :type pml_freq: `float | int`
-:param pml_width: **Default `20`; keyword-only.** Positive integer thickness in grid cells. A single value applies to every face; a sequence of four equal integers is also accepted, ordered as the beginning/end of the first axis, then the beginning/end of the second axis. Zero width, asymmetric face widths, and requesting a free surface with a zero-width face are unsupported.
+:param pml_width: **Default `20`; keyword-only.** Positive integer thickness in grid cells, applied to every face. Also accepts four equal integers in 2D or six equal integers in 3D, paired as the beginning/end of each model axis. Zero widths, asymmetric faces, and requesting a free surface with zero width are unsupported.
 :type pml_width: `int | list[int] | tuple[int, ...]`
 :param boundary_buffer: **Default `5`; keyword-only.** Nonnegative buffer in spatial grid cells, not a number of time steps or a checkpoint interval. Boundary mode requires at least `accuracy // 2 + 1`, which is 5 at eighth order; full mode allows 0. Total padding on each side is `pml_width + boundary_buffer + accuracy // 2`.
 :type boundary_buffer: `int`
-:param memory: **Default `'boundary'`; keyword-only.** History strategy for model backpropagation. `"boundary"` stores boundary strips and reconstructs the wavefield; `"full"` stores the complete history. Full mode can exhaust GPU memory; there is no automatic fallback or `"checkpoint"` option. Forward propagation without a requested model gradient does not retain model-backpropagation history.
+:param memory: **Default `'boundary'`; keyword-only.** Backpropagation-history strategy. `"boundary"` stores pressure strips and two terminal pressure fields for reconstruction; the six 3D faces each have width `M=accuracy//2` (Radius-M). In 3D, `"full"` stores unscaled `Lap(u)` history over the whole padded volume at every internal step and is intended for small comparisons. Source-only 3D gradients also retain the selected history; a forward with neither velocity nor source gradients retains none. Full mode can exhaust GPU memory. There is no automatic fallback, CPU/disk offload, or `"checkpoint"` option.
 :type memory: `str`
 :param max_vel: **Default `None`; keyword-only.** CFL/PML velocity envelope, typically in m/s. With `None`, each call replans from the current model’s `max(abs(v))`. An explicit value must be positive, finite, and cover that maximum; it is not a clipping limit. An all-zero model requires an explicit positive value. Extrema, time substeps, and PML configuration are not differentiated.
 :type max_vel: `float | int | None`
@@ -69,7 +69,7 @@ Propagates scalar acoustic waves on a two-dimensional, equally spaced grid, supp
 :type time_pad_frac: `float | int`
 :param time_taper: **Default `False`; keyword-only.** Whether to apply a nonperiodic Hann window during temporal resampling: after upsampling and before downsampling. Changes both the signal and its backpropagation transpose. Accepts only Booleans, not the integers 0/1. It does not change the signal when the internal resampling ratio is 1.
 :type time_taper: `bool`
-:param illumination: **Default `None`; keyword-only.** Optional fresh `ScalarIllumination` collector. Requires gradient tracking to be enabled and a trainable model to be present. Collects detached source, receiver, and geometric-product statistics; it is sealed after forward and reduced after one backward. `None` allocates no illumination buffers. This parameter does not automatically precondition gradients, and the statistics are not an exact Hessian.
+:param illumination: **Default `None`; keyword-only.** Optional fresh `ScalarIllumination` collector in 2D, requiring enabled gradient tracking and a trainable model. Collects detached source, receiver, and geometric-product statistics; it is sealed after forward and reduced after one backward. In 3D only `None` is accepted; any other value raises `NotImplementedError`. `None` allocates no illumination buffers. These statistics are not an exact Hessian and do not automatically precondition gradients.
 :type illumination: `ScalarIllumination | None`
 :returns: **`(receiver_amplitudes,)`**, a tuple with exactly one element. The recordings are a contiguous CUDA float32 tensor `[B,R,T]` on the same device as the model, at nominal times `0, dt, ..., (T-1)*dt`. They are pressure-like recordings whose scale depends on the source and unit system. Extract them with `[0]` or `[-1]`. No final wavefield or PML state is included.
 :rtype: `tuple[torch.Tensor]`
@@ -78,7 +78,7 @@ Propagates scalar acoustic waves on a two-dimensional, equally spaced grid, supp
 (scalar-details)=
 ### Sources and autograd
 
-The public equation convention is `u_tt = v² (Lap(u) - f)`. The user provides fixed `f`; the internal source increment is `-v_source² * internal_dt² * U(f)`, where `U` is internal upsampling. Do not multiply by `-v² dt²` again externally. The velocity-scaling chain at source locations is retained in the model gradient.
+The public equation convention is `u_tt = v² (Lap(u) - f)`. The user supplies fixed `f` in 2D and may train `f` in 3D; the internal source increment is `-v_source² * internal_dt² * U(f)`, where `U` is internal upsampling. Do not multiply by `-v² dt²` again externally. The velocity-scaling chain at source locations is retained in the model gradient.
 
 Post-step recordings are aligned to the user clock before downsampling by prepending zero and dropping the final step. The transposes of temporal resampling and shifting remain in autograd; noncausal FFT filtering can cause ringing in the initial user samples.
 
@@ -102,10 +102,63 @@ receiver_amplitudes, = starwave.scalar(
 
 For complete input construction without external data files and one FWI update, see [Quickstart](quickstart.md) and [FWI](inversion/fwi.md). The default `pml_freq=25.0` does not automatically track the source frequency.
 
+
+(scalar-time-sampling)=
+### CFL and internal temporal resampling
+
+Scalar uses the conservative coefficient 0.6, every model-axis spacing, and `max(abs(v))` (or the checked `max_vel`) to compute a time-step bound. The internal ratio `r` is a positive integer satisfying that bound, with `internal_dt=dt/r` and `internal_nt=T*r`. Unequal 3D spacings participate axis by axis. `accuracy` does not enable a different public CFL parameter. Time planning, the velocity envelope, and PML coefficients are fixed setup values outside autograd.
+
+Sources are FFT-upsampled before source-location velocity scaling. Records are time-aligned before downsampling to `[B,R,T]`. Backward uses the actual transposes of these operations, not simple repetition or decimation. At ratio 1, valid taper/padding settings do not alter the signal. Time substeps cannot repair spatial dispersion.
+
+(scalar-memory)=
+### 3D memory: full and Radius-M boundary
+
+`M=accuracy//2` is the pressure-Laplacian stencil radius, distinct from `boundary_buffer` and `pml_width`. Boundary mode stores six pressure faces of exactly M cells plus two terminal pressure fields, without a full time-volume history or automatic fallback to full. Full mode stores unscaled `Lap(u)` volume history at every internal step. Both modes retain propagation/adjoint workspaces; 3D CPML memory uses directional slabs. Source-only gradients also retain the selected history. Memory grows with internal time steps and shot count, so boundary mode does not guarantee production-scale 3D fits a GPU. See the exact payload formulas in {ref}`Scalar3D reconstruction <reconstruction-scalar3d>`.
+
+(scalar-3d-example)=
+### Runnable 3D call: first-order velocity and source gradients
+
+With 5.0.0 installed and visible logical CUDA device 0 available, the following is a standalone small example. The model uses `[x,y,z]`, spacing is `[dx,dy,dz]`, and coordinates are grid indices. The loss only checks gradient wiring. Syntax and interface have been checked; this documentation update did not execute the GPU example, so these assertions are not numerical acceptance results.
+
+```python
+import torch
+import starwave
+
+starwave.prepare_native([0])
+device = torch.device("cuda:0")
+v = torch.full((24, 20, 16), 1800.0, device=device,
+               dtype=torch.float32, requires_grad=True)
+t = torch.arange(96, device=device, dtype=torch.float32) * 0.001
+a = (torch.pi * 15.0 * (t - 0.04)).square()
+source_amplitudes = ((1 - 2 * a) * torch.exp(-a)).reshape(1, 1, -1)
+source_amplitudes = source_amplitudes.detach().requires_grad_()
+source_locations = torch.tensor([[[12, 10, 3]]], device=device,
+                                dtype=torch.long)
+receiver_locations = torch.tensor(
+    [[[i, 10, 3] for i in range(4, 20)]], device=device, dtype=torch.long)
+receiver_amplitudes, = starwave.scalar(
+    v, grid_spacing=(10.0, 12.0, 8.0), dt=0.001,
+    source_amplitudes=source_amplitudes,
+    source_locations=source_locations,
+    receiver_locations=receiver_locations,
+    accuracy=4, pml_freq=15.0, pml_width=8, boundary_buffer=5,
+    memory="boundary", max_vel=2000.0,
+    freq_taper_frac=0.0, time_pad_frac=0.0, time_taper=False,
+    illumination=None,
+)
+assert receiver_amplitudes.shape == (1, 16, 96)
+loss = receiver_amplitudes.square().mean()
+loss.backward()
+assert v.grad is not None and source_amplitudes.grad is not None
+assert torch.isfinite(receiver_amplitudes).all()
+assert torch.isfinite(v.grad).all()
+assert torch.isfinite(source_amplitudes.grad).all()
+```
+
 (scalar-notes)=
 ### Notes
 
-- Supports CUDA FP32 on the default stream only; each forward permits one first-order backward pass. Source gradients, higher-order derivatives, AMP, CUDA graphs, custom streams, and public initial/final states are unsupported.
+- Supports CUDA FP32 on the default stream only; each forward permits one first-order backward pass. Source gradients remain unsupported in 2D and are supported at first order in 3D. Higher-order derivatives, AMP, CUDA graphs, custom streams, CPU propagation, and public initial/final states are unsupported.
 - CFL time substeps cannot compensate for inadequate spatial sampling. Spatial-resolution warnings are diagnostics, not certificates of accuracy or stability.
 - For DataParallel, place the complete model in a Module and split acquisition inputs only along the shot dimension; see [Multi-GPU introduction](inversion/dataparallel.md).
 - This page’s interface contract has been checked. Target-GPU numerical, performance, and FWI acceptance tests have not been completed.
@@ -612,6 +665,6 @@ Load the separate elastic native library on the main thread. Prepare explicit lo
 
 `ScalarIllumination`, `IlluminationFields`, and `precondition_gradient` are verified exported names related to scalar illumination. This edition does not yet provide a complete lifecycle tutorial for them; the propagator pages explain the usage boundaries of the `illumination` parameter.
 
-StarWave 4.0.0 has no public `starwave.Scalar` wrapper class. The tutorials define their own Module wrapper. Do not assume another library’s classes exist in StarWave, or add elastic state, `nt`, or storage options to scalar/VRZ/VTI calls.
+StarWave 5.0.0 has no public `starwave.Scalar` wrapper class. The tutorials define their own Module wrapper. Do not assume another library’s classes exist in StarWave, or add elastic state, `nt`, or storage options to scalar/VRZ/VTI calls.
 
 {ref}`genindex`

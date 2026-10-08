@@ -15,14 +15,14 @@
 - [其它导出名称与范围](#other-exports)
 ```
 
-本参考以 StarWave **4.0.0** 公开 wheel 为准，新增 V11 的 Deepwave 后端 elastic 接口；原有 scalar、VRZ、VTI 契约保留。每个传播函数提供真实签名、逐项参数、返回值、梯度范围、注意事项与调用示例。参数类型描述运行时接受的值；签名保留实际关键字边界和默认值。
+本参考以 StarWave **5.0.0** 公开 wheel（V12）为准，`starwave.scalar` 按模型维数支持二维与三维；二维 scalar 及 VRZ、VTI、elastic 的既有契约保留。每个传播函数提供真实签名、逐项参数、返回值、梯度范围、注意事项与调用示例。参数类型描述运行时接受的值；签名保留实际关键字边界和默认值。
 
 页面组织参考 [Deepwave 官方 Usage](https://ausargeo.com/deepwave/usage) 的 Sphinx Python API 风格，正文按 StarWave 的实际契约重新编写。两者的参数集合、源单位、返回结构和可微范围不能互换。
 
 (propagators)=
 ## 传播函数速查
 
-- {py:func}`starwave.scalar`：二维标量声学；速度模型 `v`；返回单元素记录元组。
+- {py:func}`starwave.scalar`：二维/三维标量声学；速度模型 `v`；返回单元素记录元组。
 
 - {py:func}`starwave.vrz`：二维变密度声学；`v` 加恰好一种 `impedance` / `density` 参数化。
 
@@ -37,29 +37,29 @@
 
 ```{py:function} starwave.scalar(v: torch.Tensor, grid_spacing: float | int | list[float] | tuple[float, ...], dt: float | int, *, source_amplitudes: torch.Tensor, source_locations: torch.Tensor, receiver_locations: torch.Tensor, accuracy: int=8, pml_freq: float | int=25.0, pml_width: int | list[int] | tuple[int, ...]=20, boundary_buffer: int=5, memory: str='boundary', max_vel: float | int | None=None, freq_taper_frac: float | int=0.0, time_pad_frac: float | int=0.0, time_taper: bool=False, illumination: ScalarIllumination | None=None) -> tuple[torch.Tensor]
 
-在二维等间距网格上传播标量声学波，支持一批独立炮。输出可对速度模型求一次一阶梯度；源波形、坐标和数值设置不作为可训练输入。每次调用使用新的传播状态，不返回最终波场。
+根据 `v.ndim` 在二维或三维网格上传播标量声学波，支持一批独立炮。两种维数都支持一次一阶速度梯度，三维还支持源波形梯度；坐标和数值设置不参与求导。每次调用使用新的传播状态，不返回最终波场。
 
-:param v: **必填；位置或关键字参数。** 二维模型 `[N0,N1]`，每个维度至少为 2；CUDA float32。典型单位 m/s。坐标 `[i,j]` 直接索引 `v[i,j]`；不自动推断物理轴序。 所有值须有限；允许负值或零值，但这不保证物理合理性。模型轴变换保留 autograd 链；`requires_grad=True` 时请求速度梯度。
+:param v: **必填；位置或关键字参数。** 二维 `[N0,N1]` 或三维 `[N0,N1,N2]` 模型，每维至少为 2；CUDA float32，典型单位 m/s。由 `v.ndim` 选择传播维数。坐标 `[i,j]` / `[i,j,k]` 直接索引 `v[i,j]` / `v[i,j,k]`；三维示例采用 `[nx,ny,nz]`，不自动交换物理轴。所有值须有限；允许负值或零值，但不保证物理合理性。模型轴变换保留 autograd 链；`requires_grad=True` 时请求速度梯度。
 :type v: `torch.Tensor`
-:param grid_spacing: **必填；位置或关键字参数。** 正且有限的网格间距，典型单位 m。接受单值或两个相等的值；scalar/VRZ 不支持两轴不等间距。拒绝布尔值、零/负值和长度不匹配。
+:param grid_spacing: **必填；位置或关键字参数。** 正且有限的网格间距，典型单位 m。二维接受单值或两个相等的值；三维接受单值或按模型轴序排列的三个值（例如 `[dx,dy,dz]`），允许不等间距。拒绝布尔值、零/负值和长度不匹配。
 :type grid_spacing: `float | int | list[float] | tuple[float, ...]`
 :param dt: **必填；位置或关键字参数。** 正且有限的用户输入/输出采样间隔，典型单位 s。内部可能按 CFL 采用更小的时间步，返回间隔仍为此值。不能传入 Tensor 或布尔值，不对其求导。
 :type dt: `float | int`
-:param source_amplitudes: **必填；仅关键字参数。** 固定实数张量 `[B,S,T]`，三个维度均非空，不能设置 `requires_grad=True`。数据须有限、可表示为 float32；会转换到模型设备和 float32。它是归一化 forcing `f`，不是每步压力增量；若波场用 Pa、长度用 m，单位为 Pa/m²。不能只传 `[T]` 或 `[B,T]`，共享波形应显式扩展炮/源维。
+:param source_amplitudes: **必填；仅关键字参数。** 实数张量 `[B,S,T]`，三个维度均非空；数据须有限、可表示为 float32，会转换到模型设备和 float32。二维须固定（不能设置 `requires_grad=True`）；三维支持一阶源梯度，可单独或同时训练源与速度。它是归一化 forcing `f`，不是每步压力增量；若波场用 Pa、长度用 m，单位为 Pa/m²。不能只传 `[T]` 或 `[B,T]`，共享波形应显式扩展炮/源维。
 :type source_amplitudes: `torch.Tensor`
-:param source_locations: **必填；仅关键字参数。** 固定整数张量 `[B,S,2]`；单源时也接受 `[B,2]`。建议 `torch.long`。使用输入模型轴序的物理网格下标，不能包含 PML 偏移或越界值。每个源有对应波形；同一炮内重合源的增量相加。
+:param source_locations: **必填；仅关键字参数。** 固定整数张量 `[B,S,D]`，`D=v.ndim`；单源时也接受 `[B,D]`。建议 `torch.long`。坐标按输入模型轴序直接索引物理网格；三维 `[i,j,k]` 对应 `v[i,j,k]`。不能包含 PML 偏移或越界值。每个源有对应波形，同一炮内重合源的增量相加。
 :type source_locations: `torch.Tensor`
-:param receiver_locations: **必填；仅关键字参数。** 固定整数张量 `[B,R,2]`，`R>0`，建议 `torch.long`。炮数与源一致，使用输入模型轴序的物理网格下标。允许重复位置；接收点不可省略，不能用空张量请求无记录传播。
+:param receiver_locations: **必填；仅关键字参数。** 固定整数张量 `[B,R,D]`，`D=v.ndim`、`R>0`，建议 `torch.long`。炮数与源一致，使用输入模型轴序的物理网格下标。允许重复位置；接收点不可省略，不能用空张量请求无记录传播。
 :type receiver_locations: `torch.Tensor`
 :param accuracy: **默认 `8`；仅关键字参数。** 空间有限差分阶数，可选 `2,4,6,8`，不是误差容差。影响模板范围、计算量和 boundary buffer 最小值；拒绝布尔值及其它阶数。
 :type accuracy: `int`
 :param pml_freq: **默认 `25.0`；仅关键字参数。** 正且有限的 PML 设置频率，典型单位 Hz，也用于空间采样诊断。不是波形生成器，不会自动测量源信号频率；应按实际实验选择。
 :type pml_freq: `float | int`
-:param pml_width: **默认 `20`；仅关键字参数。** 正整数网格厚度，单值应用到所有面；也接受四个相等整数，按第一轴前/后、第二轴前/后排列。零宽、非对称面宽和以零面宽请求自由表面均不支持。
+:param pml_width: **默认 `20`；仅关键字参数。** 正整数网格厚度，单值应用到所有面；也接受二维四个、三维六个相等整数，按各模型轴前/后成对排列。零宽、非对称面宽和以零面宽请求自由表面均不支持。
 :type pml_width: `int | list[int] | tuple[int, ...]`
 :param boundary_buffer: **默认 `5`；仅关键字参数。** 非负空间网格 buffer，不是时间步数或 checkpoint 间隔。boundary 模式要求至少 `accuracy // 2 + 1`，8 阶时为 5；full 模式允许 0。每侧总填充为 `pml_width + boundary_buffer + accuracy // 2`。
 :type boundary_buffer: `int`
-:param memory: **默认 `'boundary'`；仅关键字参数。** 模型反传历史策略。`"boundary"` 保存边界条带并重构，`"full"` 保存完整历史。full 可能耗尽显存；没有自动降级或 `"checkpoint"` 选项。没有模型梯度需求的正演不保留模型反传历史。
+:param memory: **默认 `'boundary'`；仅关键字参数。** 反传历史策略。`"boundary"` 保存压力边界条带与两个终态压力场并重构；三维六个面的保存宽度为 `M=accuracy//2`（Radius-M）。三维 `"full"` 保存逐内部时间步、完整填充体积的未缩放 `Lap(u)` 历史，适合小规模对照。三维只训练源也会保存所选历史；只有不需要速度或源梯度的正演才不保存。full 可能耗尽显存；没有自动降级、CPU/磁盘卸载或 `"checkpoint"` 选项。
 :type memory: `str`
 :param max_vel: **默认 `None`；仅关键字参数。** CFL/PML 速度包络，典型单位 m/s。`None` 时每次调用从当前模型 `max(abs(v))` 重新规划。显式值必须正且有限并覆盖该最大值；不是裁剪上限。全零模型需要显式正值。极值、时间子步与 PML 设置不参与求导。
 :type max_vel: `float | int | None`
@@ -69,7 +69,7 @@
 :type time_pad_frac: `float | int`
 :param time_taper: **默认 `False`；仅关键字参数。** 是否在时间重采样中应用非周期 Hann 窗：上采样后、下采样前应用。改变信号及其反传转置；仅接受布尔值，不接受整数 0/1。内部重采样比为 1 时不改变信号。
 :type time_taper: `bool`
-:param illumination: **默认 `None`；仅关键字参数。** 可选的新 `ScalarIllumination` 收集器；需启用梯度且存在可训练模型。收集 detached 的源、接收与几何乘积统计；forward 后 seal，一次 backward 后 reduce。`None` 不分配照明 buffer；本参数不自动预条件梯度，统计量也不是精确 Hessian。
+:param illumination: **默认 `None`；仅关键字参数。** 二维可选的新 `ScalarIllumination` 收集器；需启用梯度且存在可训练模型。收集 detached 的源、接收与几何乘积统计；forward 后 seal，一次 backward 后 reduce。三维只接受 `None`，其它值会抛出 `NotImplementedError`。`None` 不分配照明 buffer；统计量不是精确 Hessian，也不自动预条件梯度。
 :type illumination: `ScalarIllumination | None`
 :returns: **`(receiver_amplitudes,)`**，恰好一个元素的元组。记录为连续 CUDA float32 张量 `[B,R,T]`，与模型在同一设备，名义时间 `0, dt, ..., (T-1)*dt`。为 pressure-like 记录，尺度取决于源和单位体系。用 `[0]` 或 `[-1]` 取出；不包含最终波场或 PML 状态。
 :rtype: `tuple[torch.Tensor]`
@@ -78,7 +78,7 @@
 (scalar-details)=
 ### 震源与自动微分
 
-公开方程约定为 `u_tt = v² (Lap(u) - f)`。用户提供固定 `f`；内部源增量为 `-v_source² * internal_dt² * U(f)`，其中 `U` 是内部上采样。不要在外部再次乘 `-v² dt²`。源位置的速度缩放链保留在模型梯度中。
+公开方程约定为 `u_tt = v² (Lap(u) - f)`。二维用户提供固定 `f`，三维还可训练 `f`；内部源增量为 `-v_source² * internal_dt² * U(f)`，其中 `U` 是内部上采样。不要在外部再次乘 `-v² dt²`。源位置的速度缩放链保留在模型梯度中。
 
 步后记录在下采样前通过前置零、丢弃最后一步对齐用户时钟。时间重采样和移位的转置保留在 autograd 中；FFT 的非因果滤波可能使初始用户样本出现振铃。
 
@@ -102,10 +102,63 @@ receiver_amplitudes, = starwave.scalar(
 
 完整、无数据文件依赖的输入构造与一次 FWI 更新见[快速入门](quickstart.md)和[FWI](inversion/fwi.md)。默认 `pml_freq=25.0` 不会随源频率自动调整。
 
+
+(scalar-time-sampling)=
+### CFL 与内部时间重采样
+
+scalar 使用保守系数 0.6，按全部模型轴间距与 `max(abs(v))`（或经校验的 `max_vel`）计算时间上界。内部子步比 `r` 为满足该上界的正整数，`internal_dt=dt/r`、`internal_nt=T*r`。3D 不等间距会逐轴参与规划；`accuracy` 不会开启另一套公开 CFL 参数。时间规划、速度包络和 PML 系数是固定设置，不参与 autograd。
+
+源波形先经 FFT 上采样，再施加源位置速度缩放；记录先做时间对齐，再降采样回 `[B,R,T]`。反传使用这些实际操作的转置，不能用简单重复或抽样代替。子步比为 1 时，合法 taper/padding 设置不改变信号；子步不能修复空间色散。
+
+(scalar-memory)=
+### 三维内存：full 与 Radius-M boundary
+
+`M=accuracy//2` 是压力 Laplacian 的差分半径，和 `boundary_buffer`、`pml_width` 各司其职。boundary 保存六个宽度恰为 M 的压力面以及两个终态压力场；不保存完整时间体积，也不会失败后自动改为 full。full 保存逐内部步的未缩放 `Lap(u)` 体积历史。两种模式都保留传播/伴随工作场，三维 CPML 记忆使用方向条带；只训练源也会保存所选历史。显存还随内部时间步数和炮数增加，boundary 不保证大规模三维一定放得下。精确存储公式见{ref}`Scalar3D 重建说明 <reconstruction-scalar3d>`。
+
+(scalar-3d-example)=
+### 三维可运行调用：速度与源的一阶梯度
+
+安装 5.0.0 并确保可见逻辑 CUDA 设备 0 可用后，可运行下面的独立小例子。模型采用 `[x,y,z]`，间距为 `[dx,dy,dz]`，坐标是网格下标。loss 仅检查求导接线。此代码已检查语法与接口；本次文档维护未运行 GPU，不把断言视为已通过的数值验收。
+
+```python
+import torch
+import starwave
+
+starwave.prepare_native([0])
+device = torch.device("cuda:0")
+v = torch.full((24, 20, 16), 1800.0, device=device,
+               dtype=torch.float32, requires_grad=True)
+t = torch.arange(96, device=device, dtype=torch.float32) * 0.001
+a = (torch.pi * 15.0 * (t - 0.04)).square()
+source_amplitudes = ((1 - 2 * a) * torch.exp(-a)).reshape(1, 1, -1)
+source_amplitudes = source_amplitudes.detach().requires_grad_()
+source_locations = torch.tensor([[[12, 10, 3]]], device=device,
+                                dtype=torch.long)
+receiver_locations = torch.tensor(
+    [[[i, 10, 3] for i in range(4, 20)]], device=device, dtype=torch.long)
+receiver_amplitudes, = starwave.scalar(
+    v, grid_spacing=(10.0, 12.0, 8.0), dt=0.001,
+    source_amplitudes=source_amplitudes,
+    source_locations=source_locations,
+    receiver_locations=receiver_locations,
+    accuracy=4, pml_freq=15.0, pml_width=8, boundary_buffer=5,
+    memory="boundary", max_vel=2000.0,
+    freq_taper_frac=0.0, time_pad_frac=0.0, time_taper=False,
+    illumination=None,
+)
+assert receiver_amplitudes.shape == (1, 16, 96)
+loss = receiver_amplitudes.square().mean()
+loss.backward()
+assert v.grad is not None and source_amplitudes.grad is not None
+assert torch.isfinite(receiver_amplitudes).all()
+assert torch.isfinite(v.grad).all()
+assert torch.isfinite(source_amplitudes.grad).all()
+```
+
 (scalar-notes)=
 ### 注意事项
 
-- 仅 CUDA FP32 默认 stream；每次 forward 只支持一次一阶 backward。源梯度、高阶导数、AMP、CUDA graphs、自定义 stream、公开初始/最终状态不在支持范围。
+- 仅 CUDA FP32 默认 stream；每次 forward 只支持一次一阶 backward。二维不支持源梯度；三维支持一次一阶源梯度。高阶导数、AMP、CUDA graphs、自定义 stream、CPU 传播、公开初始/最终状态不在支持范围。
 - 时间 CFL 子步不能弥补空间采样不足；空间分辨率警告是诊断，不是精度或稳定性证书。
 - DataParallel 应把完整模型放入 Module，只拆分炮维采集；参见[多卡入门](inversion/dataparallel.md)。
 - 本页已核对接口契约，未完成目标 GPU 数值、性能或 FWI 验收。
@@ -610,8 +663,8 @@ prepared = starwave.prepare_native([0])
 (other-exports)=
 ## 其它导出名称与范围
 
-`ScalarIllumination`、`IlluminationFields`、`precondition_gradient` 是已核验导出的 scalar 照明相关名称。本版暂不提供它们的完整生命周期教程；传播函数页会解释 `illumination` 参数的使用边界。
+`ScalarIllumination`、`IlluminationFields`、`precondition_gradient` 是已核验导出的二维 scalar 照明相关名称。本版暂不提供它们的完整生命周期教程；传播函数页会解释 `illumination` 参数的使用边界。
 
-StarWave 4.0.0 没有公开 `starwave.Scalar` 包装类。教程中的 Module wrapper 由教程定义；不能将其它库的类名直接用于 StarWave，也不能把 elastic 的状态、`nt` 或存储选项添加到 scalar/VRZ/VTI 调用中。
+StarWave 5.0.0 没有公开 `starwave.Scalar` 包装类。教程中的 Module wrapper 由教程定义；不能将其它库的类名直接用于 StarWave，也不能把 elastic 的状态、`nt` 或存储选项添加到 scalar/VRZ/VTI 调用中。
 
 {ref}`genindex`

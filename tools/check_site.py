@@ -14,7 +14,7 @@ from build_docs import USAGE_SECTIONS, USAGE_NUMBERS
 from check_presentation_asset import ASSET_PATH, check as check_presentation
 
 
-RECONSTRUCTION_SECTIONS = ('reconstruction', 'reconstruction-state',
+RECONSTRUCTION_SECTIONS = ('reconstruction', 'reconstruction-scalar3d', 'reconstruction-state',
                            'reconstruction-tape', 'reconstruction-reverse',
                            'reconstruction-gradient', 'reconstruction-memory',
                            'reconstruction-scope', 'reconstruction-references')
@@ -359,7 +359,7 @@ def check(root):
         if 'Usage / API' in content or 'toctree-l2' in content:
             errors.append(f'Navigation is not flat: {locale}')
         anchors = re.findall(r'data-sw-anchor="([^"]+)"', content)
-        if tuple(anchors) != USAGE_SECTIONS or len(set(anchors)) != 28 or any(anchor not in pages[usage].ids for anchor in anchors):
+        if tuple(anchors) != USAGE_SECTIONS or len(set(anchors)) != len(USAGE_SECTIONS) or any(anchor not in pages[usage].ids for anchor in anchors):
             errors.append(f'Missing or invalid stable Usage section metadata: {locale}')
         for anchor, number in zip(USAGE_SECTIONS, USAGE_NUMBERS):
             if pages[usage].id_sections.get(anchor) != f'sw-section-{number}':

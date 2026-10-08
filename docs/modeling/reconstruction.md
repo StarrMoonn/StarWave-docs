@@ -1,6 +1,8 @@
 (reconstruction)=
 # 波场反传重建
 
+本章先介绍 5.0.0 的 Scalar3D Radius-M 六面压力重建，再保留既有弹性重建推导。
+
 StarWave 弹性传播的 `memory="boundary"` 模式，在损失梯度反向传播时逐步重建正演物理场，用**边界带与终态物理场**替代按时间保存的全体积材料导数历史。本章解释 4.0.0 源码契约中的原生二维／三维方法。参数与调用示例见 {ref}`Elastic Function <elastic>` 及其{ref}`内存选项 <elastic-memory>`。
 
 **正演场重建与伴随传播承担不同任务。** 重建恢复较早时刻的正演值；伴随场携带损失对这些值的敏感度。二者在对应时间层相遇，累加模型梯度。它们都不能简单理解为把接收记录倒放。
@@ -13,6 +15,34 @@ StarWave 弹性传播的 `memory="boundary"` 模式，在损失梯度反向传�
   <figcaption>图 1．原生边界方法的数据流。保存的正演信息用于重建，记录或终态输出的损失余切驱动伴随场。两条轨迹都沿时间索引递减的方向推进，但场变量与作用各不相同。</figcaption>
 </figure>
 ```
+
+
+(reconstruction-scalar3d)=
+## Scalar3D：Radius-M 六面压力重建
+
+公开 5.0.0 的三维 `starwave.scalar` 使用独立的压力重建路径。它与下文 elastic 的速度/牵引带不同；下面的压力存储公式只适用于 scalar3D。模型轴序、源单位、时间重采样及调用见 {ref}`Scalar Function <scalar>`。
+
+设 `M=accuracy//2` 为差分半径，`a=pml_width`，`b=boundary_buffer`，模型轴尺寸为 {math}`n_x,n_y,n_z`。每侧填充 {math}`p=a+b+M`，完整运行尺寸为 {math}`L_i=n_i+2p`。六个独立压力面每面宽度恰为 M；其切向尺寸为 {math}`Q_i=L_i-2(a+M)=n_i+2b`。源/接收的公开坐标仍直接索引物理模型，不需要手动加入 p。
+
+每个内部时间步保存低/高 z、低/高 y、低/高 x 面，另保存两份最终的完整填充压力场。终态启动二阶时间递推的反向重建，六面数据补足内部差分模板；不会尝试直接逆转耗散 PML 的全部状态。重建的正演压力与独立伴随场在对应时间层参与速度梯度累加。它不是把接收记录倒放，也不是以下 elastic 交错速度/应力更新的复用。
+
+设 B 为炮数、N 为 CFL 重采样后的内部步数（`N=T*r`），FP32 每元素 e=4 字节。以下是本实现已分配的主要保存载荷，不是 GPU 峰值显存：
+
+```{math}
+\begin{aligned}
+M_{\mathrm{faces}} &= eBN\,2M\,(Q_yQ_z+Q_xQ_z+Q_xQ_y),\\
+M_{\mathrm{terminal}} &= 2eB L_xL_yL_z,\\
+M_{\mathrm{full}} &= eBN L_xL_yL_z.
+\end{aligned}
+```
+
+六面分别分配，交叠条带也分别计入第一式。boundary 保存前两项；full 保存第三项，即未缩放的 `Lap(u)` 历史，不是所有压力/PML 状态。两种模式都只在需要反传时保存；当前三维源单独求导也会分配所选历史。因此固定 PML、buffer 和阶数时，boundary 的时间历史按表面积增长，full 按体积增长，但 boundary 仍随时间和炮数线性增长。
+
+运行时还需要模型、源/接收数组、传播压力场、伴随场、重建工作区、梯度和自动微分图。CPML 辅助状态按方向条带分配，不能把这一优化解释成没有体积工作场。实际尺寸还受原生有符号 32 位索引及 CUDA 启动网格限制；超限会被拒绝。没有 CPU/磁盘卸载、压缩或自动 full 回退，也没有公开 checkpoint/restart 状态。
+
+两种模式均为 CUDA FP32、默认 stream、2/4/6/8 阶，每个 forward 只允许一次一阶 backward。三维可请求速度与源梯度，源位置的 `-v²*internal_dt²` 因子及时间重采样转置保留在求导链中；CFL/PML 设置固定。模型边缘仍采用 replicate-forward/crop-backward，full 不补齐扩边的完整转置。三维不支持 illumination。
+
+这些是源码和公开 wheel 中的存储与接口契约，本次文档维护没有重跑 GPU。对实际使用配置，应分别比较 full/boundary 记录、速度梯度、源梯度和实测峰值显存，并单独检查长时间稳定性。六面重建与编译目标覆盖都不是任意规模能装入显存或 GPU 数值验收通过的证明。
 
 (reconstruction-state)=
 ## 交错网格上的弹性状态

@@ -22,12 +22,12 @@ USAGE_TARGETS = tuple(
     for name in ('scalar', 'vrz', 'vti')
     for target in (name, f'{name}-function', f'{name}-details',
                    f'{name}-examples', f'{name}-notes')
-) + ELASTIC_SECTIONS + ('elastic-function', 'usage', 'propagators', 'native-runtime',
+) + ('scalar-time-sampling', 'scalar-memory', 'scalar-3d-example') + ELASTIC_SECTIONS + ('elastic-function', 'usage', 'propagators', 'native-runtime',
                        'native-status', 'prepare-native', 'native-notes',
                        'native-examples', 'prepare-elastic', 'other-exports')
 TOC_TARGETS = ('scalar', 'vrz', 'vti', 'elastic', 'elastic-conversions',
                'native-status', 'prepare-native', 'prepare-elastic', 'other-exports')
-RECONSTRUCTION_SECTIONS = ('reconstruction', 'reconstruction-state',
+RECONSTRUCTION_SECTIONS = ('reconstruction', 'reconstruction-scalar3d', 'reconstruction-state',
                            'reconstruction-tape', 'reconstruction-reverse',
                            'reconstruction-gradient', 'reconstruction-memory',
                            'reconstruction-scope', 'reconstruction-references')
@@ -155,7 +155,7 @@ def check_usage(page, locale, output):
     assert all(row['size'] == '17px' and all(code['size'] == row['size'] and code['line'] == row['line'] and code['vertical'] == 'baseline' for code in row['codes']) for row in overview_rows), (locale, overview_rows)
     if locale == 'en':
         dimensions = overview.locator('code.literal').filter(has_text=re.compile(r'^2D(?:/3D)?$'))
-        assert dimensions.all_text_contents() == ['2D', '2D', '2D/3D', '2D/3D']
+        assert dimensions.all_text_contents() == ['2D/3D', '2D', '2D/3D', '2D/3D']
         # Inspect the rendered font metrics: dimension numerals must have lining
         # figures rather than a descending old-style 3 beside the uppercase D.
         metrics = dimensions.first.evaluate("""e => {
