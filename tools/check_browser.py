@@ -7,6 +7,7 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 import re
 import threading
+import time
 from urllib.parse import parse_qsl, quote, unquote, urlsplit
 from playwright.sync_api import sync_playwright
 
@@ -39,6 +40,18 @@ CHAPTERS = {
     'inversion/dataparallel', 'inversion/inr', 'usage', 'faq',
     'release-notes', 'status',
 }
+
+
+def wait_for_native_condition(locator, expression, description, timeout=30):
+    """Poll from Python: page animation callbacks can stop with JavaScript off."""
+    deadline = time.monotonic() + timeout
+    while True:
+        satisfied = locator.evaluate(expression)
+        remaining = deadline - time.monotonic()
+        if satisfied or remaining <= 0:
+            break
+        time.sleep(min(0.05, remaining))
+    assert satisfied, f'Timed out after {timeout}s: {description}'
 
 
 def open_mobile_menu(page):
@@ -518,8 +531,9 @@ def check_reconstruction(page, base, locale, output, suffix=''):
         # networkidle. Trigger visibility, then wait for this exact image; the
         # same path also runs in the JavaScript-disabled browser context.
         figure.evaluate("e => e.scrollIntoView({block:'start'})")
-        page.wait_for_function('img => img.complete && img.naturalWidth > 0 && img.naturalHeight > 0',
-                               arg=img.element_handle())
+        wait_for_native_condition(img,
+            'img => img.complete && img.naturalWidth > 0 && img.naturalHeight > 0',
+            f'Reconstruction image load: {locale}/{name}/{width}{suffix}')
         expected = f'/{locale}/_static/reconstruction/{name}-{locale}.svg'
         source = img.evaluate('e => e.currentSrc || e.src')
         assert urlsplit(source).path == expected and urlsplit(source).netloc == urlsplit(base).netloc
@@ -592,7 +606,9 @@ def check_reconstruction(page, base, locale, output, suffix=''):
             scroll.evaluate('e => e.scrollLeft = 0')
             scroll.focus()
             scroll.press('ArrowRight')
-            page.wait_for_function("() => document.activeElement?.classList.contains('sw-reconstruction-scroll') && document.activeElement.scrollLeft > 0")
+            wait_for_native_condition(scroll,
+                "e => e === document.activeElement && e.classList.contains('sw-reconstruction-scroll') && e.scrollLeft > 0",
+                f'Reconstruction keyboard scroll: {locale}/{name}/{width}{suffix}')
             scroll.evaluate('e => e.scrollLeft = 0')
         figure.evaluate("e => e.scrollIntoView({block:'start'})")
         page.screenshot(path=str(output / f'{locale}-reconstruction-{name}-{width}{suffix}.png'))
