@@ -1,0 +1,60 @@
+{
+  "status": "PASSED",
+  "checks": [
+    {
+      "check": "full_vs_boundary",
+      "accuracy": 2,
+      "record_relative_l2": 0.0,
+      "gradient_relative_l2": 7.14217851149455e-07,
+      "record_tolerance": 1e-06,
+      "gradient_tolerance": 0.001
+    },
+    {
+      "check": "full_vs_boundary",
+      "accuracy": 4,
+      "record_relative_l2": 0.0,
+      "gradient_relative_l2": 4.513145522561239e-07,
+      "record_tolerance": 1e-06,
+      "gradient_tolerance": 0.001
+    },
+    {
+      "check": "full_vs_boundary",
+      "accuracy": 6,
+      "record_relative_l2": 0.0,
+      "gradient_relative_l2": 6.005102093770098e-07,
+      "record_tolerance": 1e-06,
+      "gradient_tolerance": 0.001
+    },
+    {
+      "check": "full_vs_boundary",
+      "accuracy": 8,
+      "record_relative_l2": 0.0,
+      "gradient_relative_l2": 5.191972923667195e-07,
+      "record_tolerance": 1e-06,
+      "gradient_tolerance": 0.001
+    },
+    {
+      "check": "model_directional_derivative",
+      "accuracy": 4,
+      "epsilon_m_s": 1.0,
+      "finite_difference": -0.00016422756016254425,
+      "adjoint": -0.00016422513914611265,
+      "relative_error": 1.4741840098004163e-05,
+      "tolerance": 0.005
+    },
+    {
+      "check": "single_vs_multi_gpu",
+      "shots": 4,
+      "gpu_ids": [
+        2,
+        0,
+        1,
+        3
+      ],
+      "record_relative_l2": 0.0,
+      "gradient_relative_l2": 1.2403855902639432e-07,
+      "record_tolerance": 1e-06,
+      "gradient_tolerance": 0.0001
+    }
+  ]
+}

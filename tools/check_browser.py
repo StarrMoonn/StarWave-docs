@@ -38,7 +38,8 @@ CHAPTERS = {
     'modeling/scalar', 'modeling/gradient', 'modeling/acquisition', 'modeling/wave-propagation',
     'modeling/reconstruction', 'inversion/fwi',
     'inversion/dataparallel', 'inversion/inr', 'usage', 'faq',
-    'release-notes', 'status',
+    'release-notes', 'status', 'examples/index', 'examples/enclosed',
+    'examples/surface', 'examples/layered', 'examples/reproduce',
 }
 
 
@@ -743,6 +744,75 @@ def check_search(page, base):
         page.wait_for_function("expected => document.querySelector('.search-summary')?.textContent.includes(expected)", arg=expected_status)
 
 
+
+def check_scalar3d_examples(page, base, output):
+    """Verify native typography, all figures, mobile scrolling and the complete ZIP."""
+    asset_root = PROJECT / 'docs' / '_static' / 'scalar3d'
+    package = json.loads((asset_root / 'downloads/package/package.json').read_text())
+    for width in (1440, 390, 320):
+        page.set_viewport_size({'width': width, 'height': 900})
+        for locale in ('zh', 'en'):
+            for case in ('index', 'enclosed', 'surface', 'layered', 'reproduce'):
+                page.goto(base + locale + '/examples/' + case + '.html', wait_until='networkidle')
+                captions = page.locator('.wy-menu-vertical .caption-text').all_text_contents()
+                assert captions.count('Example') == 1 and captions[captions.index('Example') + 1] == 'Usage'
+                title = page.locator('.sw-example-page > h1')
+                style = title.evaluate("e => ({size:parseFloat(getComputedStyle(e).fontSize),font:getComputedStyle(e).fontFamily,weight:getComputedStyle(e).fontWeight})")
+                assert abs(style['size'] - 40.8) < .01 and 'Georgia' in style['font'] and style['weight'] == '400'
+                assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), (locale,case,width)
+                if case in ('enclosed','surface','layered'):
+                    figures = page.locator('figure.sw-example-figure')
+                    assert figures.count() == 7
+                    for index, figure in enumerate(figures.all()):
+                        figure.scroll_into_view_if_needed()
+                        image = figure.locator('img')
+                        wait_for_native_condition(image, 'e => e.complete && e.naturalWidth > 0', 'Scalar3D image load')
+                        assert image.get_attribute('alt') and len(figure.locator('figcaption').inner_text()) > 35
+                        viewport = figure.locator('.sw-example-viewport')
+                        assert viewport.get_attribute('tabindex') == '0'
+                        assert viewport.evaluate('e => e.getBoundingClientRect().right <= innerWidth + 1')
+                        if width <= 390:
+                            assert viewport.evaluate('e => e.scrollWidth > e.clientWidth')
+                            viewport.focus();page.keyboard.press('End')
+                            viewport.evaluate('e => e.scrollLeft = e.scrollWidth')
+                            assert viewport.evaluate('e => e.scrollLeft > 0')
+                        if index in (0,4):
+                            figure.screenshot(path=str(output / f'{locale}-example-{case}-{index}-{width}.png'))
+                if case == 'reproduce':
+                    assert page.locator('[data-sw-package-download]').is_visible()
+                    assert not page.locator('#package-cancel').is_visible()
+                    page.screenshot(path=str(output / f'{locale}-example-downloads-{width}.png'), full_page=True)
+    # Desktop interruption: fail part02 three times, then resume the same button.
+    page.set_viewport_size({'width':1440,'height':1000})
+    page.goto(base+'en/examples/reproduce.html')
+    failed_url='**/'+package['parts'][1]['file']
+    page.route(failed_url, lambda route: route.abort())
+    page.locator('[data-sw-package-download]').click()
+    page.wait_for_function("document.getElementById('package-status').textContent.includes('Download incomplete')", timeout=60000)
+    assert page.locator('[data-sw-package-download]').is_enabled()
+    page.unroute(failed_url)
+    with page.expect_download(timeout=180000) as event:
+        page.locator('[data-sw-package-download]').click()
+    download=event.value
+    assert download.suggested_filename==package['filename'] and download.failure() is None
+    assert hashlib.sha256(Path(download.path()).read_bytes()).hexdigest()==package['sha256']
+    page.wait_for_function("document.getElementById('package-status').textContent.includes('Complete ZIP verified')")
+    # A fresh narrow-phone run also assembles one standard ZIP with the exact bytes.
+    page.set_viewport_size({'width':390,'height':844})
+    page.goto(base+'zh/examples/reproduce.html')
+    with page.expect_download(timeout=180000) as event:
+        page.locator('[data-sw-package-download]').click()
+    download=event.value
+    assert download.failure() is None and hashlib.sha256(Path(download.path()).read_bytes()).hexdigest()==package['sha256']
+    assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
+    # No-JavaScript fallback retains ordinary PDF/notebook links and a stdlib script.
+    context=page.context.browser.new_context(java_script_enabled=False,viewport={'width':390,'height':844})
+    plain=context.new_page();plain.goto(base+'en/examples/reproduce.html')
+    assert plain.locator('a[href$="join_package.py"]').is_visible()
+    assert plain.locator('a[href$="Scalar3D_enclosed_Results.ipynb"]').is_visible()
+    assert plain.locator('a[download="Scalar3D-CUDA-Report.pdf"]').is_visible()
+    context.close()
+
 def check(root, browser_path=None):
     handler = partial(SimpleHTTPRequestHandler, directory=str(root))
     server = ThreadingHTTPServer(('127.0.0.1', 0), handler)
@@ -763,7 +833,7 @@ def check(root, browser_path=None):
                 page.set_viewport_size(size)
                 for locale in ('zh', 'en'):
                     for path in sorted((root / locale).rglob('*.html')):
-                        if path.relative_to(root / locale).parts[0] == 'api' or path.relative_to(root / locale).as_posix() in {'modeling/vrz.html', 'modeling/vti.html'}:
+                        if path.relative_to(root / locale).parts[0] in {'api', '_static'} or path.relative_to(root / locale).as_posix() in {'modeling/vrz.html', 'modeling/vti.html'}:
                             continue  # Compatibility pages are tested separately.
                         relative = path.relative_to(root).as_posix()
                         page.goto(base + relative, wait_until='networkidle')
@@ -887,6 +957,7 @@ def check(root, browser_path=None):
                 assert dict(parse_qsl(urlsplit(plain.url).query))['q'] == 'gradient'
                 # Form navigation works without JS; Sphinx result rendering still requires JS.
             context.close()
+            check_scalar3d_examples(page, base, output)
             browser.close()
         assert not errors, errors
         print('PASS: flat desktop/mobile navigation, Usage TOC and API fields, reconstruction figures and readable scrolling, search, direct legacy routes, language anchors, history, keyboard, PDF preview/download, and no-JS fallback.')

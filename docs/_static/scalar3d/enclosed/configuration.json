@@ -1,0 +1,68 @@
+{
+  "shape_xyz": [
+    50,
+    50,
+    30
+  ],
+  "shape_zyx": [
+    30,
+    50,
+    50
+  ],
+  "dx_m": 10.0,
+  "dt_s": 0.001,
+  "nt": 512,
+  "frequency_hz": 25.0,
+  "full_ricker": true,
+  "accuracy": 4,
+  "pml_width": 12,
+  "boundary_buffer": 5,
+  "memory": "boundary",
+  "gpu_ids": [
+    2,
+    0,
+    1,
+    3
+  ],
+  "epochs": 100,
+  "learning_rate": 10.0,
+  "shots": 8,
+  "receivers_per_shot": 378,
+  "batch_shots": 4,
+  "num_batches": 2,
+  "fixed_background_margin": 3,
+  "initialization": "uniform 2000 m/s",
+  "anomaly": "300 m/s ball; centre xyz=(25,25,15); core radius6, tapered radius8 cells",
+  "acquisition": "8 corner sources; receivers on six surrounding faces; exclude sources",
+  "time_and_memory_plan": {
+    "model_shape": [
+      50,
+      50,
+      30
+    ],
+    "padded_shape": [
+      88,
+      88,
+      68
+    ],
+    "shots": 1,
+    "internal_nt": 512,
+    "step_ratio": 1,
+    "internal_dt": 0.001,
+    "memory": "boundary",
+    "history_bytes": 68812800,
+    "terminal_fields_bytes": 4212736,
+    "working_bytes": 44165808,
+    "estimate_bytes": 117191344
+  },
+  "source_root": "/path/to/compiled/StarWave",
+  "library_sha256": "90a83df0b94cd282c7c8849b6bd42a0896c18ff746e98ab1e91f6fbc9be6cbf8",
+  "torch": "2.5.1",
+  "cuda": "11.8",
+  "device_names": {
+    "2": "NVIDIA A30",
+    "0": "NVIDIA A30",
+    "1": "NVIDIA A30",
+    "3": "NVIDIA A30"
+  }
+}

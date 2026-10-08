@@ -1,8 +1,8 @@
 # StarWave-docs · 中文 / English
 
-StarWave 5.0.0 双语使用手册，基于 Sphinx、Read the Docs 主题和 MyST Markdown。完整中文和英文版本各含 20 个内容页面，覆盖安装、正演、反演、API 与演示文稿；每种语言独立构建、导航和搜索。API 采用 Deepwave 风格的类型签名、参数、返回、注意事项及示例组织，所有说明针对 StarWave 原创编写。
+StarWave 5.0.0 双语使用手册，基于 Sphinx、Read the Docs 主题和 MyST Markdown。完整中文和英文版本各含 25 个内容页面，覆盖安装、正演、反演、API 与演示文稿；每种语言独立构建、导航和搜索。API 采用 Deepwave 风格的类型签名、参数、返回、注意事项及示例组织，所有说明针对 StarWave 原创编写。
 
-Bilingual user documentation for StarWave 5.0.0, built with Sphinx, the Read the Docs theme, and MyST Markdown. Each language contains the complete 20-page manual and a separate search index. The API presentation takes organizational cues from Deepwave while preserving StarWave’s own public contracts.
+Bilingual user documentation for StarWave 5.0.0, built with Sphinx, the Read the Docs theme, and MyST Markdown. Each language contains the complete 25-page manual and a separate search index. The API presentation takes organizational cues from Deepwave while preserving StarWave’s own public contracts.
 
 ## 构建 / Build
 
@@ -59,7 +59,7 @@ The browser checks cover desktop/mobile layout, section and API switching, legac
 
 ## 内容边界 / Scope
 
-This repository contains documentation, original synthetic usage examples and build tooling. It contains no propagation implementation, binary libraries, private datasets or internal records. It neither imports StarWave through autodoc nor publishes source pages. Public 5.0.0 API signatures are verified; The three original tutorials now include measured A30 / StarWave 0.1.0.dev9 results and clean notebook downloads. Public-wheel GPU validation, full adjoint correctness, performance, multi-GPU operation, and FWI convergence remain unvalidated. See the manual’s documentation-status page.
+This repository contains documentation, original synthetic usage examples and build tooling. It contains no propagation implementation, binary libraries, private datasets or internal records. It neither imports StarWave through autodoc nor publishes source pages. Public 5.0.0 API signatures are verified; The three original tutorials now include measured A30 / StarWave 0.1.0.dev9 results and clean notebook downloads. Those historical tutorials do not establish public-wheel GPU validation, full adjoint correctness or general performance and convergence. The new Scalar3D Example chapter separately reports bounded source-build numerical checks and measured four-GPU experiments, including incomplete surface-only recovery. See the manual’s documentation-status page.
 
 No new software or documentation license is declared on behalf of the owners.
 
@@ -76,3 +76,9 @@ The bilingual Forward Modeling navigation now includes Reconstruction / 波场�
 ## Scalar3D API update · 2026-10-08
 
 The 5.0.0 manual adds source-verified 2D/3D scalar dispatch, model-axis coordinates, one-element receiver tuple returns, first-order velocity gradients in 2D/3D and source-waveform gradients in 3D, temporal-resampling adjoint semantics, and radius-M six-face boundary storage with internal terminal pressure fields. Scalar exposes no public initial/final states, and 2D sources remain fixed. The nine public signatures match the SHA-256-pinned 5.0.0 wheel. Existing VRZ, VTI and Elastic contract bodies, historical tutorial evidence and legacy anchors are preserved. New source-build example results are a separate documentation deliverable and are not claimed as wheel GPU validation.
+
+## Scalar3D Example chapter
+
+The flat sidebar now places **Example** directly above **Usage** in both languages. It contains an overview, enclosed-anomaly, surface-only-anomaly and undulating-layer experiments, and report/reproduction downloads. The 21 original plots retain their exact pixels, detailed localized captions, keyboard-scrollable mobile regions and full-resolution links. The report PDF is a repagination of the original Chinese HTML report. Numerical consistency, interior-only directional checks, fixed-model objective, training-pass averages, gradient normalization, and incomplete surface-only recovery remain explicitly distinguished.
+
+Run `python tools/check_scalar3d_examples.py _build/html` to verify the asset allowlist, hashes, plots, navigation order, bilingual sections and downloads. The historical 2D tutorials are preserved; the new Example content is 3D-only.

@@ -1,0 +1,376 @@
+[
+  {
+    "epoch": 0,
+    "fixed_model_normalized_mse": 0.0002042890955635812,
+    "rmse_m_s": 25.30483071714928,
+    "interior_rmse_m_s": 29.16220560083071,
+    "elapsed_seconds": 1.4833256429992616,
+    "contrast_relative_l2": 1.0,
+    "contrast_correlation": 0.0,
+    "anomaly_rmse_m_s": 227.50219568161637,
+    "central_recovered_contrast_m_s": 0.0,
+    "maximum_recovered_contrast_m_s": 0.0,
+    "recovered_centroid_xyz_m": null,
+    "centroid_distance_m": null
+  },
+  {
+    "epoch": 10,
+    "fixed_model_normalized_mse": 4.497836562222801e-05,
+    "rmse_m_s": 24.958340326888152,
+    "interior_rmse_m_s": 28.762897495890133,
+    "elapsed_seconds": 1.4404449470021063,
+    "contrast_relative_l2": 0.9863073420986648,
+    "contrast_correlation": 0.16890437246576373,
+    "anomaly_rmse_m_s": 223.6930225931881,
+    "central_recovered_contrast_m_s": -9.5997314453125,
+    "maximum_recovered_contrast_m_s": 106.688720703125,
+    "recovered_centroid_xyz_m": [
+      399.9453991152984,
+      399.9944454448312,
+      116.15577055199864
+    ],
+    "centroid_distance_m": 63.84425303751886
+  },
+  {
+    "epoch": 20,
+    "fixed_model_normalized_mse": 3.0301612696348457e-05,
+    "rmse_m_s": 24.77282225613693,
+    "interior_rmse_m_s": 28.549099735992453,
+    "elapsed_seconds": 1.4529969309951412,
+    "contrast_relative_l2": 0.9789760118548512,
+    "contrast_correlation": 0.20765095446642326,
+    "anomaly_rmse_m_s": 221.9732151080301,
+    "central_recovered_contrast_m_s": -20.2012939453125,
+    "maximum_recovered_contrast_m_s": 146.50048828125,
+    "recovered_centroid_xyz_m": [
+      399.9513343257329,
+      399.983093853968,
+      116.21063155843821
+    ],
+    "centroid_distance_m": 63.78938924569623
+  },
+  {
+    "epoch": 30,
+    "fixed_model_normalized_mse": 2.4028077405091608e-05,
+    "rmse_m_s": 24.626777903171927,
+    "interior_rmse_m_s": 28.38079292155012,
+    "elapsed_seconds": 1.461679512009141,
+    "contrast_relative_l2": 0.9732046097618101,
+    "contrast_correlation": 0.23342089782493705,
+    "anomaly_rmse_m_s": 220.6209199067608,
+    "central_recovered_contrast_m_s": -29.39990234375,
+    "maximum_recovered_contrast_m_s": 169.11279296875,
+    "recovered_centroid_xyz_m": [
+      399.95347882631927,
+      399.9771336855782,
+      116.65986240286342
+    ],
+    "centroid_distance_m": 63.34015880870627
+  },
+  {
+    "epoch": 40,
+    "fixed_model_normalized_mse": 2.0290865450078854e-05,
+    "rmse_m_s": 24.500874175000025,
+    "interior_rmse_m_s": 28.235696894317197,
+    "elapsed_seconds": 1.4770838330005063,
+    "contrast_relative_l2": 0.9682291278240244,
+    "contrast_correlation": 0.2534882520885058,
+    "anomaly_rmse_m_s": 219.45148671641343,
+    "central_recovered_contrast_m_s": -37.13427734375,
+    "maximum_recovered_contrast_m_s": 184.382568359375,
+    "recovered_centroid_xyz_m": [
+      399.957626522194,
+      399.978861966394,
+      117.21440330278845
+    ],
+    "centroid_distance_m": 62.785614554235174
+  },
+  {
+    "epoch": 50,
+    "fixed_model_normalized_mse": 1.776195790625934e-05,
+    "rmse_m_s": 24.388199585439363,
+    "interior_rmse_m_s": 28.105846606698773,
+    "elapsed_seconds": 1.4818111860076897,
+    "contrast_relative_l2": 0.9637764369200579,
+    "contrast_correlation": 0.27019226534399304,
+    "anomaly_rmse_m_s": 218.4048008877676,
+    "central_recovered_contrast_m_s": -43.2794189453125,
+    "maximum_recovered_contrast_m_s": 195.44189453125,
+    "recovered_centroid_xyz_m": [
+      399.9130705682998,
+      399.97891349213995,
+      117.8146271161191
+    ],
+    "centroid_distance_m": 62.18543721864645
+  },
+  {
+    "epoch": 60,
+    "fixed_model_normalized_mse": 1.5915970607238705e-05,
+    "rmse_m_s": 24.28518985062818,
+    "interior_rmse_m_s": 27.98713444857258,
+    "elapsed_seconds": 1.4503008699975908,
+    "contrast_relative_l2": 0.9597056831591416,
+    "contrast_correlation": 0.2845915938847222,
+    "anomaly_rmse_m_s": 217.44456179356038,
+    "central_recovered_contrast_m_s": -47.979248046875,
+    "maximum_recovered_contrast_m_s": 203.894287109375,
+    "recovered_centroid_xyz_m": [
+      399.9631249738635,
+      399.98092540922994,
+      118.23952287246064
+    ],
+    "centroid_distance_m": 61.760491081506785
+  },
+  {
+    "epoch": 70,
+    "fixed_model_normalized_mse": 1.4490175317405374e-05,
+    "rmse_m_s": 24.189042115428386,
+    "interior_rmse_m_s": 27.876330307920878,
+    "elapsed_seconds": 1.4610099109995645,
+    "contrast_relative_l2": 0.9559061029021344,
+    "contrast_correlation": 0.2973962266904214,
+    "anomaly_rmse_m_s": 216.54645421983423,
+    "central_recovered_contrast_m_s": -51.4923095703125,
+    "maximum_recovered_contrast_m_s": 210.62109375,
+    "recovered_centroid_xyz_m": [
+      399.83009366884244,
+      399.8468652301721,
+      118.42127392691322
+    ],
+    "centroid_distance_m": 61.57915088082456
+  },
+  {
+    "epoch": 80,
+    "fixed_model_normalized_mse": 1.3349501614356996e-05,
+    "rmse_m_s": 24.09901612938414,
+    "interior_rmse_m_s": 27.77258109324383,
+    "elapsed_seconds": 1.4612074680044316,
+    "contrast_relative_l2": 0.9523484428232927,
+    "contrast_correlation": 0.308897000230575,
+    "anomaly_rmse_m_s": 215.7049152928246,
+    "central_recovered_contrast_m_s": -54.0367431640625,
+    "maximum_recovered_contrast_m_s": 216.0751953125,
+    "recovered_centroid_xyz_m": [
+      400.0296759893234,
+      399.9551785746901,
+      119.17992977200228
+    ],
+    "centroid_distance_m": 60.820093983510766
+  },
+  {
+    "epoch": 90,
+    "fixed_model_normalized_mse": 1.2408842167133116e-05,
+    "rmse_m_s": 24.013772763212337,
+    "interior_rmse_m_s": 27.67434354333901,
+    "elapsed_seconds": 1.4459820729971398,
+    "contrast_relative_l2": 0.9489797830158184,
+    "contrast_correlation": 0.31939184744912896,
+    "anomaly_rmse_m_s": 214.90650978814548,
+    "central_recovered_contrast_m_s": -55.794189453125,
+    "maximum_recovered_contrast_m_s": 220.5751953125,
+    "recovered_centroid_xyz_m": [
+      400.09575341832283,
+      400.10667218756396,
+      119.40244216971719
+    ],
+    "centroid_distance_m": 60.59772737213162
+  },
+  {
+    "epoch": 100,
+    "fixed_model_normalized_mse": 1.1613895367190707e-05,
+    "rmse_m_s": 23.9325126078121,
+    "interior_rmse_m_s": 27.580696390136318,
+    "elapsed_seconds": 1.4680293669953244,
+    "contrast_relative_l2": 0.9457685323139845,
+    "contrast_correlation": 0.32905812837771725,
+    "anomaly_rmse_m_s": 214.14340906322474,
+    "central_recovered_contrast_m_s": -56.9158935546875,
+    "maximum_recovered_contrast_m_s": 224.44189453125,
+    "recovered_centroid_xyz_m": [
+      399.96671723376437,
+      399.8939201615221,
+      120.12587229227228
+    ],
+    "centroid_distance_m": 59.874230929807766
+  },
+  {
+    "epoch": 110,
+    "fixed_model_normalized_mse": 1.0934091278613778e-05,
+    "rmse_m_s": 23.855125839897703,
+    "interior_rmse_m_s": 27.49151306929418,
+    "elapsed_seconds": 1.4430219490022864,
+    "contrast_relative_l2": 0.9427103507051284,
+    "contrast_correlation": 0.3379989477548176,
+    "anomaly_rmse_m_s": 213.41747003308572,
+    "central_recovered_contrast_m_s": -57.54296875,
+    "maximum_recovered_contrast_m_s": 227.715576171875,
+    "recovered_centroid_xyz_m": [
+      399.7628971051975,
+      399.7730786065538,
+      120.40974389754203
+    ],
+    "centroid_distance_m": 59.591159859983065
+  },
+  {
+    "epoch": 120,
+    "fixed_model_normalized_mse": 1.0341319466533605e-05,
+    "rmse_m_s": 23.780931670584177,
+    "interior_rmse_m_s": 27.406009014985784,
+    "elapsed_seconds": 1.4139821760036284,
+    "contrast_relative_l2": 0.9397783346745592,
+    "contrast_correlation": 0.34632861189299036,
+    "anomaly_rmse_m_s": 212.7197678490423,
+    "central_recovered_contrast_m_s": -57.7567138671875,
+    "maximum_recovered_contrast_m_s": 230.557373046875,
+    "recovered_centroid_xyz_m": [
+      399.4817613905458,
+      399.4495142752738,
+      121.37621110929295
+    ],
+    "centroid_distance_m": 58.62866389140762
+  },
+  {
+    "epoch": 130,
+    "fixed_model_normalized_mse": 9.815901194087928e-06,
+    "rmse_m_s": 23.709669495396515,
+    "interior_rmse_m_s": 27.323883897152978,
+    "elapsed_seconds": 1.4722653619974153,
+    "contrast_relative_l2": 0.9369621856165309,
+    "contrast_correlation": 0.3541230362744636,
+    "anomaly_rmse_m_s": 212.04908056476606,
+    "central_recovered_contrast_m_s": -57.638916015625,
+    "maximum_recovered_contrast_m_s": 233.077880859375,
+    "recovered_centroid_xyz_m": [
+      399.79594106983143,
+      399.7261200887794,
+      121.98810716073964
+    ],
+    "centroid_distance_m": 58.01289823001932
+  },
+  {
+    "epoch": 140,
+    "fixed_model_normalized_mse": 9.351018206871231e-06,
+    "rmse_m_s": 23.641248470992256,
+    "interior_rmse_m_s": 27.245033024629887,
+    "elapsed_seconds": 1.4206693000014639,
+    "contrast_relative_l2": 0.9342583135705549,
+    "contrast_correlation": 0.36143487169542854,
+    "anomaly_rmse_m_s": 211.40540980585075,
+    "central_recovered_contrast_m_s": -57.2607421875,
+    "maximum_recovered_contrast_m_s": 235.270263671875,
+    "recovered_centroid_xyz_m": [
+      399.96424033243017,
+      399.96810127799563,
+      122.23259073713514
+    ],
+    "centroid_distance_m": 57.76742913810182
+  },
+  {
+    "epoch": 150,
+    "fixed_model_normalized_mse": 8.932610512601968e-06,
+    "rmse_m_s": 23.57515091951066,
+    "interior_rmse_m_s": 27.16885980665568,
+    "elapsed_seconds": 1.4044374020013493,
+    "contrast_relative_l2": 0.9316462608672423,
+    "contrast_correlation": 0.36833326570428593,
+    "anomaly_rmse_m_s": 210.78234891538185,
+    "central_recovered_contrast_m_s": -56.6591796875,
+    "maximum_recovered_contrast_m_s": 237.261962890625,
+    "recovered_centroid_xyz_m": [
+      399.9662015422885,
+      399.97003802440923,
+      122.55469396520213
+    ],
+    "centroid_distance_m": 57.4453237913001
+  },
+  {
+    "epoch": 160,
+    "fixed_model_normalized_mse": 8.55484552175767e-06,
+    "rmse_m_s": 23.51140328284342,
+    "interior_rmse_m_s": 27.095394715826313,
+    "elapsed_seconds": 1.4730769720044918,
+    "contrast_relative_l2": 0.9291270724411352,
+    "contrast_correlation": 0.3748512381601814,
+    "anomaly_rmse_m_s": 210.18177940819353,
+    "central_recovered_contrast_m_s": -55.88916015625,
+    "maximum_recovered_contrast_m_s": 239.04443359375,
+    "recovered_centroid_xyz_m": [
+      399.91360633320903,
+      399.91835078389875,
+      122.68117805772816
+    ],
+    "centroid_distance_m": 57.318945204094746
+  },
+  {
+    "epoch": 170,
+    "fixed_model_normalized_mse": 8.211566978388873e-06,
+    "rmse_m_s": 23.449793454658966,
+    "interior_rmse_m_s": 27.02439331310485,
+    "elapsed_seconds": 1.4455395120021421,
+    "contrast_relative_l2": 0.9266923662432115,
+    "contrast_correlation": 0.3810211227173615,
+    "anomaly_rmse_m_s": 209.60056931457365,
+    "central_recovered_contrast_m_s": -54.9739990234375,
+    "maximum_recovered_contrast_m_s": 240.659912109375,
+    "recovered_centroid_xyz_m": [
+      399.8976289864531,
+      399.90317114490836,
+      123.15972179449234
+    ],
+    "centroid_distance_m": 56.84045286704796
+  },
+  {
+    "epoch": 180,
+    "fixed_model_normalized_mse": 7.897509590293339e-06,
+    "rmse_m_s": 23.39013020422834,
+    "interior_rmse_m_s": 26.955635217256663,
+    "elapsed_seconds": 1.4323922769981436,
+    "contrast_relative_l2": 0.924334585189565,
+    "contrast_correlation": 0.38688764594203223,
+    "anomaly_rmse_m_s": 209.03771623790024,
+    "central_recovered_contrast_m_s": -53.9501953125,
+    "maximum_recovered_contrast_m_s": 242.110107421875,
+    "recovered_centroid_xyz_m": [
+      399.9013395996835,
+      399.90480088023133,
+      123.36534195059656
+    ],
+    "centroid_distance_m": 56.63482399654697
+  },
+  {
+    "epoch": 190,
+    "fixed_model_normalized_mse": 7.609643262185273e-06,
+    "rmse_m_s": 23.332333957637523,
+    "interior_rmse_m_s": 26.88902872441435,
+    "elapsed_seconds": 1.4868874450039584,
+    "contrast_relative_l2": 0.9220505846666274,
+    "contrast_correlation": 0.3924707196507903,
+    "anomaly_rmse_m_s": 208.49263593107437,
+    "central_recovered_contrast_m_s": -52.8319091796875,
+    "maximum_recovered_contrast_m_s": 243.44775390625,
+    "recovered_centroid_xyz_m": [
+      399.81224936890646,
+      400.009934517409,
+      124.45166185213114
+    ],
+    "centroid_distance_m": 55.548656329240714
+  },
+  {
+    "epoch": 200,
+    "fixed_model_normalized_mse": 7.344257483055117e-06,
+    "rmse_m_s": 23.276197554101184,
+    "interior_rmse_m_s": 26.824335094968003,
+    "elapsed_seconds": 1.4666404930030694,
+    "contrast_relative_l2": 0.9198321780641958,
+    "contrast_correlation": 0.39780162419056375,
+    "anomaly_rmse_m_s": 207.96305713679064,
+    "central_recovered_contrast_m_s": -51.632568359375,
+    "maximum_recovered_contrast_m_s": 244.680908203125,
+    "recovered_centroid_xyz_m": [
+      399.9086448471308,
+      399.91616329729715,
+      124.53616525671887
+    ],
+    "centroid_distance_m": 55.46397334113988
+  }
+]

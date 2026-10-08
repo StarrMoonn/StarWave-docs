@@ -25,6 +25,7 @@ jobs:
       - run: python tools/check_site.py _build/html
       - run: python tools/check_api_docs.py
       - run: python tools/check_tutorial_assets.py
+      - run: python tools/check_scalar3d_examples.py _build/html
       - run: python -m pip install -r docs/requirements-browser.txt
       - run: python -m playwright install --with-deps chromium
       - run: python tools/check_browser.py

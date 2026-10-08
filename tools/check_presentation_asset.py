@@ -1,7 +1,8 @@
 """Validate the one reviewed, watermarked public presentation PDF.
 
 The exact approved bytes are allowlisted; editable slides, source material,
-attachments, active PDF actions and additional PDFs are never published.
+attachments and active PDF actions are never published. Scalar3D report PDFs
+are independently allowlisted and validated by check_scalar3d_examples.py.
 These checks complement independent content and visual review.
 """
 import hashlib
@@ -109,18 +110,22 @@ def check(root=None):
     except Exception as exc:
         errors.append(f'Unable to validate the presentation PDF: {exc}')
 
-    # No other deck/PDF may enter the source tree or either built locale.
+    # Preserve the presentation allowlist; separately validate the requested report.
+    from check_scalar3d_examples import approved_assets
+    report_pdfs = {p for p in approved_assets() if p.suffix == '.pdf'}
     for path in PROJECT.rglob('*'):
         relative = path.relative_to(PROJECT)
         if any(part in {'.git', '.venv', '_build', '_readthedocs', '__pycache__'} for part in relative.parts):
             continue
-        if path.is_file() and path.suffix.lower() in {'.pdf', '.ppt', '.pptx', '.odp', '.key'} and path != ASSET_PATH:
+        if path.is_file() and path.suffix.lower() in {'.pdf', '.ppt', '.pptx', '.odp', '.key'} and path != ASSET_PATH and path not in report_pdfs:
             errors.append(f'Unapproved presentation file: {relative}')
     if root is not None:
         root = Path(root).resolve()
         expected = {root / locale / '_static' / 'presentations' / ASSET_NAME for locale in ('zh', 'en')}
         actual = {p for p in root.rglob('*') if p.is_file() and p.suffix.lower() in {'.pdf', '.ppt', '.pptx', '.odp', '.key'}}
-        if actual != expected:
+        expected_reports = {root / locale / p.relative_to(PROJECT / 'docs')
+                            for p in report_pdfs for locale in ('zh', 'en')}
+        if actual != expected | expected_reports:
             errors.append('Published presentation file set differs from the allowlist')
         for path in expected:
             if not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != manifest['sha256']:

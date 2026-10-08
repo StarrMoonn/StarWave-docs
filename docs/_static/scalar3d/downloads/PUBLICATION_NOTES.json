@@ -1,0 +1,60 @@
+{
+  "publication": "Public reproduction package of the measured 2026-10-08 Scalar3D experiments",
+  "input_archives": [
+    {
+      "file": "StarWave_Scalar3D_CUDA_Examples_20261008.zip",
+      "sha256": "c33caf65a7db0d69e0e6205f44bb3d503996ab7bdd0701a0b511255a8d464a74"
+    },
+    {
+      "file": "Scalar3D_Examples_20261008.zip",
+      "sha256": "c25525af2ed0932a82f9799b3a43c10e51232730165ddcbe5f1fb97bd37cfbae"
+    }
+  ],
+  "scientific_arrays_changed": false,
+  "private_paths_replaced_only": [
+    "source_identity.json",
+    "Scalar3D_Surface_80x80x50_200epochs.py",
+    "Scalar3D_Layered_50x50x10_100epochs.py",
+    "validation_summary.json",
+    "Scalar3D_Anomaly_50x50x30_100epochs.py",
+    "evidence/surface_gradients.log",
+    "evidence/enclosed_training.log",
+    "evidence/surface_training.log",
+    "evidence/layered_gradients.log",
+    "evidence/delivery_status.json",
+    "evidence/enclosed_gradients.log",
+    "evidence/layered_training.log",
+    "results/enclosed/summary.json",
+    "results/enclosed/configuration.json",
+    "results/enclosed/status.json",
+    "results/layered/summary.json",
+    "results/layered/configuration.json",
+    "results/layered/status.json",
+    "results/surface/summary.json",
+    "results/surface/configuration.json",
+    "results/surface/status.json"
+  ],
+  "excluded_second_archive_only_files": [
+    "Scalar3D_Surface_80x80x50_100epochs.py",
+    "build_server_results.py",
+    "preview/enclosed.png",
+    "preview/surface.png"
+  ],
+  "exclusion_reason": "Earlier 100-epoch script, server authoring script and duplicate previews are not the final 200-epoch surface result. Scientific data from the complete first archive are retained.",
+  "new_gpu_run_performed": false,
+  "corrections_and_reproduction_notes": [
+    "Layered truth is also used to construct the Gaussian initial model; the historical REPORT closing statement about truth use is too broad.",
+    "The original unified runner selects quartile checkpoint indices; use explicit recorded gradient epochs to match the report.",
+    "Fixed top two layers means depth grid planes z=0 and z=1, not two geological layers."
+  ],
+  "required_external_dependency": {
+    "file": "example_support/scalar_examples.py",
+    "sha256": "93d807b0ffd082daaf627167a69729f44727bf414430b1c07262608d3cec1d6a",
+    "included": false,
+    "reason": "Required by CUDA training and gradient-recording scripts; absent from both supplied result ZIPs. Use the matching authorized StarWave source checkout. CPU result rendering does not require it."
+  },
+  "license_notice": "No new overall code or data license is granted by this publication.",
+  "excluded_unrelated_metadata": {
+    "evidence/compiled_source_manifest.json": "Omitted private source-tree inventory of unrelated historical/maintainer files. Relevant source and native-library fingerprints remain in source_identity.json; all experiment arrays, metrics, figures and execution logs are retained."
+  }
+}

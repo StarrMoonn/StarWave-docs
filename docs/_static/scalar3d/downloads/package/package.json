@@ -1,0 +1,97 @@
+{
+  "filename": "StarWave-Scalar3D-Examples.zip",
+  "bytes": 74477747,
+  "sha256": "c77038804932182cc7db3933fb4d330bdfe5ceeae393c5e870fc0ae105597f32",
+  "parts": [
+    {
+      "file": "StarWave-Scalar3D-Examples.zip.part01",
+      "bytes": 4194304,
+      "sha256": "7d7cb6bca11a6918680858c319b238725c097ca4212c70884ca549c4b9075d47"
+    },
+    {
+      "file": "StarWave-Scalar3D-Examples.zip.part02",
+      "bytes": 4194304,
+      "sha256": "6258e1ef50eed03455031831736106d219cdeb3373f11da9406fdc2c570ee5a3"
+    },
+    {
+      "file": "StarWave-Scalar3D-Examples.zip.part03",
+      "bytes": 4194304,
+      "sha256": "418729037de76b825bf165e28374a6e59851b4f0073c54961edd7ce5b3566597"
+    },
+    {
+      "file": "StarWave-Scalar3D-Examples.zip.part04",
+      "bytes": 4194304,
+      "sha256": "e41692b04736ea7332f817bd1e54d2198aa6b2747896f377f2eb1ad1dd4d5cc3"
+    },
+    {
+      "file": "StarWave-Scalar3D-Examples.zip.part05",
+      "bytes": 4194304,
+      "sha256": "398f19c6ac29c6ed6c0910ac65157ee651878ddb9b3225aded8d8dd7995b6f04"
+    },
+    {
+      "file": "StarWave-Scalar3D-Examples.zip.part06",
+      "bytes": 4194304,
+      "sha256": "46df2d68f720fd1754d09c29d63cbb3da65e54764fc70f04be5d4c5c81a30607"
+    },
+    {
+      "file": "StarWave-Scalar3D-Examples.zip.part07",
+      "bytes": 4194304,
+      "sha256": "514fd043d299735c3088b7701d380aa70b6f60119f0fef43fc0200260ef47fa8"
+    },
+    {
+      "file": "StarWave-Scalar3D-Examples.zip.part08",
+      "bytes": 4194304,
+      "sha256": "bb58d5d982e989a2ca154d28a730b9a9852acdd9b1310a69ce32815d4d596b58"
+    },
+    {
+      "file": "StarWave-Scalar3D-Examples.zip.part09",
+      "bytes": 4194304,
+      "sha256": "67b120c60d8d4ef7ddb26cca5ea205de10f8e1e91d28b99d2a5c72460700486f"
+    },
+    {
+      "file": "StarWave-Scalar3D-Examples.zip.part10",
+      "bytes": 4194304,
+      "sha256": "eeec522549304eaad1c11561fa9a628222268c219d79bd882a852f8250b1f3a6"
+    },
+    {
+      "file": "StarWave-Scalar3D-Examples.zip.part11",
+      "bytes": 4194304,
+      "sha256": "e39de04e4d87d4b650fd72d51242e5b2905e6e9f580ca3990d82fb4dd50f02d2"
+    },
+    {
+      "file": "StarWave-Scalar3D-Examples.zip.part12",
+      "bytes": 4194304,
+      "sha256": "89d179782847f4f3585b30b71746b56c1e4b4184583b5a7ec96107cd0b336057"
+    },
+    {
+      "file": "StarWave-Scalar3D-Examples.zip.part13",
+      "bytes": 4194304,
+      "sha256": "d4b10ab60ee31b32ded496213dd28957da5356d60b85c0986bab8c41067eeefa"
+    },
+    {
+      "file": "StarWave-Scalar3D-Examples.zip.part14",
+      "bytes": 4194304,
+      "sha256": "40561bc7fe49b8fb7139093a1c687e0cc0285c0538a94ab2eef9ba4bf6ef1a0a"
+    },
+    {
+      "file": "StarWave-Scalar3D-Examples.zip.part15",
+      "bytes": 4194304,
+      "sha256": "0e3a681e43bcf4b645d990d69e40bb6e3f6a160e606ad9168ed8b60e9e6b9a1c"
+    },
+    {
+      "file": "StarWave-Scalar3D-Examples.zip.part16",
+      "bytes": 4194304,
+      "sha256": "cf085256e550fcaebf751013c0e9a4db37dc1231fa16082f7503cc1c8c42421c"
+    },
+    {
+      "file": "StarWave-Scalar3D-Examples.zip.part17",
+      "bytes": 4194304,
+      "sha256": "4ba86e5d7948a15370f3ebd551de5156650b484a93b90dacafa144a087f8bd68"
+    },
+    {
+      "file": "StarWave-Scalar3D-Examples.zip.part18",
+      "bytes": 3174579,
+      "sha256": "903de807b035c689e8a3f0591a4e0d0e847885d4aa2f03bc71069bc4aa659555"
+    }
+  ]
+}

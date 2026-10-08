@@ -219,6 +219,8 @@ def build(destination):
             number = FWI_NUMBERS[matches[0]] if relative == 'inversion/fwi.html' else matches[0]
             mapping[entry['id']] = f'sw-section-{number}'
         texts[0] = texts[0].replace('aria-label="Main"', 'aria-label="主导航"')
+        if relative.startswith('examples/'):
+            texts = [text.replace('<section ', '<section class="sw-example-page" ', 1) for text in texts]
         if relative not in {'usage.html', 'index.html'}:
             texts = [add_page_toc(text, locale) for text, locale in zip(texts, ('zh', 'en'))]
         stable = None

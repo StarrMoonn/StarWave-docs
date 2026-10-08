@@ -126,6 +126,18 @@ INR <inversion/inr>
 ```{toctree}
 :maxdepth: 1
 :hidden:
+:caption: Example
+
+Scalar3D <examples/index>
+六面包围异常体 <examples/enclosed>
+地表采集异常体 <examples/surface>
+起伏薄层模型 <examples/layered>
+下载与复现 <examples/reproduce>
+```
+
+```{toctree}
+:maxdepth: 1
+:hidden:
 :caption: Usage
 
 Usage <usage>

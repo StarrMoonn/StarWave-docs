@@ -221,3 +221,27 @@ html[lang="zh-CN"] .rst-content #usage :is(h2, h3) { font-family: inherit; }
 /* Inline formulas must also stay inside narrow article/list content boxes. */
 .rst-content #reconstruction span.math { display: inline-block; max-width: 100%; vertical-align: middle; overflow-x: auto; overflow-y: hidden; }
 .rst-content #reconstruction code.literal { white-space: normal; overflow-wrap: anywhere; }
+
+/* Actual Scalar3D figures: preserve labels and physical aspect ratios. */
+.sw-example-figure { margin: 1.6rem 0 2.2rem; }
+.sw-example-viewport { overflow-x: auto; border: 1px solid #d8e0e6; border-radius: 4px; background: #fff; }
+.sw-example-viewport:focus { outline: 3px solid #487eae; outline-offset: 3px; }
+.sw-example-viewport img { display: block; width: 100%; min-width: 760px; height: auto; margin: 0; }
+.sw-example-figure figcaption { margin-top: .65rem; color: #404b56; font-size: .94em; line-height: 1.6; }
+.sw-example-figure figcaption a { white-space: nowrap; }
+.sw-example-downloads { display: flex; gap: .7rem; flex-wrap: wrap; margin: 1.2rem 0; }
+@media (max-width: 768px) {
+  .sw-example-figure { margin: 1.2rem 0 1.8rem; }
+  .sw-example-viewport img { min-width: 720px; }
+}
+
+/* Match the established Usage title and text scale in the new Example chapter. */
+.rst-content .sw-example-page { font-size: 17px; line-height: 1.4; color: #333; overflow-wrap: anywhere; }
+.rst-content .sw-example-page > h1 { font-family: Georgia, serif; font-size: 40.8px; font-weight: 400; line-height: 1.2; margin: 0 0 24px; }
+.rst-content .sw-example-page h2 { font-size: 30.6px; font-weight: 400; line-height: 1.25; margin: 30px 0 14px; }
+html[lang="zh-CN"] .rst-content .sw-example-page { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif; line-height: 1.65; }
+html[lang="zh-CN"] .rst-content .sw-example-page h2 { font-family: inherit; }
+.sw-example-package-status { min-height: 1.65em; margin: .6rem 0 1rem; }
+.sw-example-downloads button { font: inherit; cursor: pointer; }
+.sw-example-downloads button[disabled] { opacity: .6; cursor: wait; }
+.sw-example-downloads [hidden] { display: none !important; }

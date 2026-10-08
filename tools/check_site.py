@@ -12,6 +12,7 @@ import xml.etree.ElementTree as ET
 from urllib.parse import unquote, urlsplit
 from build_docs import USAGE_SECTIONS, USAGE_NUMBERS
 from check_presentation_asset import ASSET_PATH, check as check_presentation
+from check_scalar3d_examples import approved_assets, check as check_scalar3d
 
 
 RECONSTRUCTION_SECTIONS = ('reconstruction', 'reconstruction-scalar3d', 'reconstruction-state',
@@ -286,6 +287,7 @@ def check(root):
     errors = []
     errors.extend(check_presentation(root))
     errors.extend(check_reconstruction(project, root))
+    errors.extend(check_scalar3d(root))
     pages = {p: Page(p.read_text(encoding="utf-8")) for p in root.rglob("*.html")}
     if not pages or not (root / "index.html").is_file():
         errors.append("Missing HTML output or index.html")
@@ -295,7 +297,8 @@ def check(root):
     localized = {}
     for locale in ('zh', 'en'):
         folder = root / locale
-        localized[locale] = {p.relative_to(folder) for p in folder.rglob('*.html')}
+        localized[locale] = {p.relative_to(folder) for p in folder.rglob('*.html')
+                             if '_static' not in p.relative_to(folder).parts}
         for required in ('index.html', 'search.html', 'genindex.html', 'searchindex.js'):
             if not (folder / required).is_file():
                 errors.append(f'Missing {locale} output: {required}')
@@ -532,6 +535,7 @@ def check(root):
         re.compile(r"(?:RELEASE_VERIFICATION|MAINTAINER_HANDOFF|HESS_JOINT_VP_WATER_FIX)"),
     ]
     allowed = {".md", ".py", ".txt", ".css", ".yml", ".yaml", ".html", ".js", ".json"}
+    scalar3d_assets = approved_assets()
     sources = []
     for p in project.rglob("*"):
         relative = p.relative_to(project)
@@ -547,14 +551,15 @@ def check(root):
         is_reconstruction_file = relative.parts[:3] == ('docs', '_static', 'reconstruction') and p.name in RECONSTRUCTION_ASSETS
         is_tutorial_notebook = p.suffix == ".ipynb" and relative.parts[:2] == ("examples", "tutorials")
         is_presentation = p == ASSET_PATH
-        if p.name not in {".gitignore", ".gitattributes"} and p.suffix not in allowed and not is_tutorial_png and not is_tutorial_notebook and not is_brand_file and not is_font_file and not is_diagram_file and not is_reconstruction_file and not is_presentation:
+        is_scalar3d_asset = p in scalar3d_assets
+        if p.name not in {".gitignore", ".gitattributes"} and p.suffix not in allowed and not is_tutorial_png and not is_tutorial_notebook and not is_brand_file and not is_font_file and not is_diagram_file and not is_reconstruction_file and not is_presentation and not is_scalar3d_asset:
             errors.append(f"Unexpected source file: {relative}")
         if p.suffix == ".py":
             try:
                 ast.parse(p.read_text(encoding="utf-8"))
             except SyntaxError as exc:
                 errors.append(f"Python syntax: {relative}: {exc.msg}")
-        if p not in {Path(__file__).resolve(), project / 'tools' / 'check_presentation_asset.py'} and not is_tutorial_png and not (is_brand_file and p.suffix == ".png") and not is_font_file and not is_presentation:
+        if p not in {Path(__file__).resolve(), project / 'tools' / 'check_presentation_asset.py'} and not is_tutorial_png and not (is_brand_file and p.suffix == ".png") and not is_font_file and not is_presentation and not is_scalar3d_asset:
             text = p.read_text(encoding="utf-8")
             if any(pattern.search(text) for pattern in forbidden):
                 errors.append(f"Review restricted content: {relative}")

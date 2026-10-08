@@ -1,0 +1,79 @@
+[
+  {
+    "epoch": 0,
+    "fixed_model_normalized_mse": 0.04723405838012695,
+    "rmse_m_s": 84.7042435842085,
+    "subsurface_rmse_m_s": 94.7022233184953,
+    "elapsed_seconds": 0.41600409398961347
+  },
+  {
+    "epoch": 10,
+    "fixed_model_normalized_mse": 0.001696851511951536,
+    "rmse_m_s": 78.99997153348868,
+    "subsurface_rmse_m_s": 88.32465328471449,
+    "elapsed_seconds": 0.4090785440057516
+  },
+  {
+    "epoch": 20,
+    "fixed_model_normalized_mse": 0.0007276551623363048,
+    "rmse_m_s": 75.46819832004843,
+    "subsurface_rmse_m_s": 84.37601079153185,
+    "elapsed_seconds": 0.37395773899334017
+  },
+  {
+    "epoch": 30,
+    "fixed_model_normalized_mse": 0.0002948196924990043,
+    "rmse_m_s": 73.55742062713004,
+    "subsurface_rmse_m_s": 82.239696385904,
+    "elapsed_seconds": 0.40319271699991077
+  },
+  {
+    "epoch": 40,
+    "fixed_model_normalized_mse": 0.0001970424345927313,
+    "rmse_m_s": 72.2011472945618,
+    "subsurface_rmse_m_s": 80.72333670205762,
+    "elapsed_seconds": 0.4124685800052248
+  },
+  {
+    "epoch": 50,
+    "fixed_model_normalized_mse": 0.00015520185843342915,
+    "rmse_m_s": 71.19492042490205,
+    "subsurface_rmse_m_s": 79.5983408613846,
+    "elapsed_seconds": 0.40410046000033617
+  },
+  {
+    "epoch": 60,
+    "fixed_model_normalized_mse": 0.00012954515477758832,
+    "rmse_m_s": 70.33602411831875,
+    "subsurface_rmse_m_s": 78.63806559781271,
+    "elapsed_seconds": 0.41556044199387543
+  },
+  {
+    "epoch": 70,
+    "fixed_model_normalized_mse": 0.00011146745600854047,
+    "rmse_m_s": 69.58303477427572,
+    "subsurface_rmse_m_s": 77.79619791800611,
+    "elapsed_seconds": 0.4013199290056946
+  },
+  {
+    "epoch": 80,
+    "fixed_model_normalized_mse": 9.783822315512225e-05,
+    "rmse_m_s": 68.90542319082158,
+    "subsurface_rmse_m_s": 77.03860513653376,
+    "elapsed_seconds": 0.38452506900648586
+  },
+  {
+    "epoch": 90,
+    "fixed_model_normalized_mse": 8.711098416824825e-05,
+    "rmse_m_s": 68.28670519563299,
+    "subsurface_rmse_m_s": 76.34685738846171,
+    "elapsed_seconds": 0.3893721719941823
+  },
+  {
+    "epoch": 100,
+    "fixed_model_normalized_mse": 7.838547389837913e-05,
+    "rmse_m_s": 67.71385053427731,
+    "subsurface_rmse_m_s": 75.70638640645225,
+    "elapsed_seconds": 0.35909691199776717
+  }
+]

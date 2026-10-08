@@ -1,0 +1,513 @@
+{
+  "description": "Actual Scalar3D scientific arrays and result figures, with documented path-only public packaging. No new GPU run.",
+  "run_date": "2026-10-08",
+  "source_report": "REPORT.html",
+  "source_report_sha256": "ba7363165883713e3f5ccb07db3b3094a716150ec4d6279de56e16559d18a1bc",
+  "derived_pdf": {
+    "description": "Repaginated from the original HTML text, tables and 21 images, with publication/correction note. Neither original ZIP supplied a PDF.",
+    "pages": 25
+  },
+  "complete_package": {
+    "filename": "StarWave-Scalar3D-Examples.zip",
+    "bytes": 74477747,
+    "sha256": "c77038804932182cc7db3933fb4d330bdfe5ceeae393c5e870fc0ae105597f32",
+    "parts": [
+      {
+        "file": "StarWave-Scalar3D-Examples.zip.part01",
+        "bytes": 4194304,
+        "sha256": "7d7cb6bca11a6918680858c319b238725c097ca4212c70884ca549c4b9075d47"
+      },
+      {
+        "file": "StarWave-Scalar3D-Examples.zip.part02",
+        "bytes": 4194304,
+        "sha256": "6258e1ef50eed03455031831736106d219cdeb3373f11da9406fdc2c570ee5a3"
+      },
+      {
+        "file": "StarWave-Scalar3D-Examples.zip.part03",
+        "bytes": 4194304,
+        "sha256": "418729037de76b825bf165e28374a6e59851b4f0073c54961edd7ce5b3566597"
+      },
+      {
+        "file": "StarWave-Scalar3D-Examples.zip.part04",
+        "bytes": 4194304,
+        "sha256": "e41692b04736ea7332f817bd1e54d2198aa6b2747896f377f2eb1ad1dd4d5cc3"
+      },
+      {
+        "file": "StarWave-Scalar3D-Examples.zip.part05",
+        "bytes": 4194304,
+        "sha256": "398f19c6ac29c6ed6c0910ac65157ee651878ddb9b3225aded8d8dd7995b6f04"
+      },
+      {
+        "file": "StarWave-Scalar3D-Examples.zip.part06",
+        "bytes": 4194304,
+        "sha256": "46df2d68f720fd1754d09c29d63cbb3da65e54764fc70f04be5d4c5c81a30607"
+      },
+      {
+        "file": "StarWave-Scalar3D-Examples.zip.part07",
+        "bytes": 4194304,
+        "sha256": "514fd043d299735c3088b7701d380aa70b6f60119f0fef43fc0200260ef47fa8"
+      },
+      {
+        "file": "StarWave-Scalar3D-Examples.zip.part08",
+        "bytes": 4194304,
+        "sha256": "bb58d5d982e989a2ca154d28a730b9a9852acdd9b1310a69ce32815d4d596b58"
+      },
+      {
+        "file": "StarWave-Scalar3D-Examples.zip.part09",
+        "bytes": 4194304,
+        "sha256": "67b120c60d8d4ef7ddb26cca5ea205de10f8e1e91d28b99d2a5c72460700486f"
+      },
+      {
+        "file": "StarWave-Scalar3D-Examples.zip.part10",
+        "bytes": 4194304,
+        "sha256": "eeec522549304eaad1c11561fa9a628222268c219d79bd882a852f8250b1f3a6"
+      },
+      {
+        "file": "StarWave-Scalar3D-Examples.zip.part11",
+        "bytes": 4194304,
+        "sha256": "e39de04e4d87d4b650fd72d51242e5b2905e6e9f580ca3990d82fb4dd50f02d2"
+      },
+      {
+        "file": "StarWave-Scalar3D-Examples.zip.part12",
+        "bytes": 4194304,
+        "sha256": "89d179782847f4f3585b30b71746b56c1e4b4184583b5a7ec96107cd0b336057"
+      },
+      {
+        "file": "StarWave-Scalar3D-Examples.zip.part13",
+        "bytes": 4194304,
+        "sha256": "d4b10ab60ee31b32ded496213dd28957da5356d60b85c0986bab8c41067eeefa"
+      },
+      {
+        "file": "StarWave-Scalar3D-Examples.zip.part14",
+        "bytes": 4194304,
+        "sha256": "40561bc7fe49b8fb7139093a1c687e0cc0285c0538a94ab2eef9ba4bf6ef1a0a"
+      },
+      {
+        "file": "StarWave-Scalar3D-Examples.zip.part15",
+        "bytes": 4194304,
+        "sha256": "0e3a681e43bcf4b645d990d69e40bb6e3f6a160e606ad9168ed8b60e9e6b9a1c"
+      },
+      {
+        "file": "StarWave-Scalar3D-Examples.zip.part16",
+        "bytes": 4194304,
+        "sha256": "cf085256e550fcaebf751013c0e9a4db37dc1231fa16082f7503cc1c8c42421c"
+      },
+      {
+        "file": "StarWave-Scalar3D-Examples.zip.part17",
+        "bytes": 4194304,
+        "sha256": "4ba86e5d7948a15370f3ebd551de5156650b484a93b90dacafa144a087f8bd68"
+      },
+      {
+        "file": "StarWave-Scalar3D-Examples.zip.part18",
+        "bytes": 3174579,
+        "sha256": "903de807b035c689e8a3f0591a4e0d0e847885d4aa2f03bc71069bc4aa659555"
+      }
+    ]
+  },
+  "assets": [
+    {
+      "path": "downloads/PUBLICATION_NOTES.json",
+      "bytes": 2954,
+      "sha256": "73993df05b5cc334d78373aeb9283a6295132d5cf2b736f148299962e4c31426"
+    },
+    {
+      "path": "downloads/REPORT.html",
+      "bytes": 5755777,
+      "sha256": "ba7363165883713e3f5ccb07db3b3094a716150ec4d6279de56e16559d18a1bc"
+    },
+    {
+      "path": "downloads/Scalar3D-CUDA-Report.pdf",
+      "bytes": 4731144,
+      "sha256": "6c85084568eefdc1e5628092eaff347219cb6c1c9ad5a4509fdc253c0c2c6db1"
+    },
+    {
+      "path": "downloads/Scalar3D_enclosed_Results.ipynb",
+      "bytes": 1893269,
+      "sha256": "db3c34e376b025f0259f7ba96c810da30a7154a3a4bf0338fa67427dee5e26b7"
+    },
+    {
+      "path": "downloads/Scalar3D_layered_Results.ipynb",
+      "bytes": 1808940,
+      "sha256": "aae4dd6aa0632ee0e40229be88b17421e3067af0bed7fe205d1445326241ba02"
+    },
+    {
+      "path": "downloads/Scalar3D_surface_Results.ipynb",
+      "bytes": 2080287,
+      "sha256": "ddff7baf4b3d6a34e2ce0d0dad774a063de1e79cdf9208fca227d0c5d0e3afd6"
+    },
+    {
+      "path": "downloads/package/StarWave-Scalar3D-Examples.zip.part01",
+      "bytes": 4194304,
+      "sha256": "7d7cb6bca11a6918680858c319b238725c097ca4212c70884ca549c4b9075d47"
+    },
+    {
+      "path": "downloads/package/StarWave-Scalar3D-Examples.zip.part02",
+      "bytes": 4194304,
+      "sha256": "6258e1ef50eed03455031831736106d219cdeb3373f11da9406fdc2c570ee5a3"
+    },
+    {
+      "path": "downloads/package/StarWave-Scalar3D-Examples.zip.part03",
+      "bytes": 4194304,
+      "sha256": "418729037de76b825bf165e28374a6e59851b4f0073c54961edd7ce5b3566597"
+    },
+    {
+      "path": "downloads/package/StarWave-Scalar3D-Examples.zip.part04",
+      "bytes": 4194304,
+      "sha256": "e41692b04736ea7332f817bd1e54d2198aa6b2747896f377f2eb1ad1dd4d5cc3"
+    },
+    {
+      "path": "downloads/package/StarWave-Scalar3D-Examples.zip.part05",
+      "bytes": 4194304,
+      "sha256": "398f19c6ac29c6ed6c0910ac65157ee651878ddb9b3225aded8d8dd7995b6f04"
+    },
+    {
+      "path": "downloads/package/StarWave-Scalar3D-Examples.zip.part06",
+      "bytes": 4194304,
+      "sha256": "46df2d68f720fd1754d09c29d63cbb3da65e54764fc70f04be5d4c5c81a30607"
+    },
+    {
+      "path": "downloads/package/StarWave-Scalar3D-Examples.zip.part07",
+      "bytes": 4194304,
+      "sha256": "514fd043d299735c3088b7701d380aa70b6f60119f0fef43fc0200260ef47fa8"
+    },
+    {
+      "path": "downloads/package/StarWave-Scalar3D-Examples.zip.part08",
+      "bytes": 4194304,
+      "sha256": "bb58d5d982e989a2ca154d28a730b9a9852acdd9b1310a69ce32815d4d596b58"
+    },
+    {
+      "path": "downloads/package/StarWave-Scalar3D-Examples.zip.part09",
+      "bytes": 4194304,
+      "sha256": "67b120c60d8d4ef7ddb26cca5ea205de10f8e1e91d28b99d2a5c72460700486f"
+    },
+    {
+      "path": "downloads/package/StarWave-Scalar3D-Examples.zip.part10",
+      "bytes": 4194304,
+      "sha256": "eeec522549304eaad1c11561fa9a628222268c219d79bd882a852f8250b1f3a6"
+    },
+    {
+      "path": "downloads/package/StarWave-Scalar3D-Examples.zip.part11",
+      "bytes": 4194304,
+      "sha256": "e39de04e4d87d4b650fd72d51242e5b2905e6e9f580ca3990d82fb4dd50f02d2"
+    },
+    {
+      "path": "downloads/package/StarWave-Scalar3D-Examples.zip.part12",
+      "bytes": 4194304,
+      "sha256": "89d179782847f4f3585b30b71746b56c1e4b4184583b5a7ec96107cd0b336057"
+    },
+    {
+      "path": "downloads/package/StarWave-Scalar3D-Examples.zip.part13",
+      "bytes": 4194304,
+      "sha256": "d4b10ab60ee31b32ded496213dd28957da5356d60b85c0986bab8c41067eeefa"
+    },
+    {
+      "path": "downloads/package/StarWave-Scalar3D-Examples.zip.part14",
+      "bytes": 4194304,
+      "sha256": "40561bc7fe49b8fb7139093a1c687e0cc0285c0538a94ab2eef9ba4bf6ef1a0a"
+    },
+    {
+      "path": "downloads/package/StarWave-Scalar3D-Examples.zip.part15",
+      "bytes": 4194304,
+      "sha256": "0e3a681e43bcf4b645d990d69e40bb6e3f6a160e606ad9168ed8b60e9e6b9a1c"
+    },
+    {
+      "path": "downloads/package/StarWave-Scalar3D-Examples.zip.part16",
+      "bytes": 4194304,
+      "sha256": "cf085256e550fcaebf751013c0e9a4db37dc1231fa16082f7503cc1c8c42421c"
+    },
+    {
+      "path": "downloads/package/StarWave-Scalar3D-Examples.zip.part17",
+      "bytes": 4194304,
+      "sha256": "4ba86e5d7948a15370f3ebd551de5156650b484a93b90dacafa144a087f8bd68"
+    },
+    {
+      "path": "downloads/package/StarWave-Scalar3D-Examples.zip.part18",
+      "bytes": 3174579,
+      "sha256": "903de807b035c689e8a3f0591a4e0d0e847885d4aa2f03bc71069bc4aa659555"
+    },
+    {
+      "path": "downloads/package/join_package.py",
+      "bytes": 1907,
+      "sha256": "59de2583f7c7e1694cf2c825b2449fac43018aa87e0d817023dbbd5fd6628f1e"
+    },
+    {
+      "path": "downloads/package/package.json",
+      "bytes": 3319,
+      "sha256": "313e00ce3da1cfd434f47c5bbebf5cadb9c5333a7c173c7368eb9259c8fb1e0f"
+    },
+    {
+      "path": "downloads/run_scalar3d_example.py",
+      "bytes": 1905,
+      "sha256": "f8f75b02257f836b879a1d20ec7556028cfb8a2e4d5e53e058ff0e732617222b"
+    },
+    {
+      "path": "enclosed/acquisition.png",
+      "bytes": 268056,
+      "sha256": "edc0fc89918f147dc37c24d167ea70f4e38e753c9fb4329607d0cd1a0e648511",
+      "pixels": [
+        2210,
+        850
+      ]
+    },
+    {
+      "path": "enclosed/configuration.json",
+      "bytes": 1375,
+      "sha256": "43afd91e69ba16c569d0d87d88d75ffa3f7fb5c3e4ad0740e3c35960d6e4703a"
+    },
+    {
+      "path": "enclosed/convergence.png",
+      "bytes": 114361,
+      "sha256": "e46dc014cc60dcc7084ae25792c939552cabd693a6c73cdbb018f88a53b777f2",
+      "pixels": [
+        2550,
+        680
+      ]
+    },
+    {
+      "path": "enclosed/evaluations.json",
+      "bytes": 6680,
+      "sha256": "72d3fea12929b558fcedf162b3c686664cd0d794c81e18bd7988e3b3182ef8b1"
+    },
+    {
+      "path": "enclosed/gradient_manifest.json",
+      "bytes": 2886,
+      "sha256": "5de128c9d6d0d2a8f59fdd18e3c881acfc83649e713e9c40e9a18c7fc4a9aee2"
+    },
+    {
+      "path": "enclosed/gradients_normalized.png",
+      "bytes": 144278,
+      "sha256": "cf27276306d3a9022cc0588a502da80962151564b29167042e685112d74766d7",
+      "pixels": [
+        2640,
+        960
+      ]
+    },
+    {
+      "path": "enclosed/gradients_shared_scale.png",
+      "bytes": 117058,
+      "sha256": "6c7c1ca262ff53662975c06da79d5c2dcb60a4d5636d5b6769f1a190c253466f",
+      "pixels": [
+        2640,
+        960
+      ]
+    },
+    {
+      "path": "enclosed/model_3d.png",
+      "bytes": 245802,
+      "sha256": "9dfc1691e9e3bbfab2c178b386e3612757a7ea120cad1925b11e8163d0ac54fb",
+      "pixels": [
+        2380,
+        850
+      ]
+    },
+    {
+      "path": "enclosed/model_comparison.png",
+      "bytes": 127692,
+      "sha256": "9d682d6ba1a97a0481a58e46392368c38f8aa715a3755fe81707de60d2775d34",
+      "pixels": [
+        2210,
+        1700
+      ]
+    },
+    {
+      "path": "enclosed/numerical_checks.json",
+      "bytes": 1499,
+      "sha256": "f34f1980778f79b06793e013d852d47743584cbb6d3a36c33d062aa5751d4736"
+    },
+    {
+      "path": "enclosed/shot_gather.png",
+      "bytes": 392438,
+      "sha256": "17d9dd9f45c98144006a8f314cdb1a11bb9449501515af6517d57d14024dfeee",
+      "pixels": [
+        2240,
+        800
+      ]
+    },
+    {
+      "path": "enclosed/summary.json",
+      "bytes": 3444,
+      "sha256": "f8f51db66e45dbc59f45734ea79992e2ce729fa3d0d72d9c5551dc2e1555ea40"
+    },
+    {
+      "path": "layered/acquisition.png",
+      "bytes": 248807,
+      "sha256": "266b1082c751603fc16254cec83e9d4bb6e95a1ba3c4e72c3d30df4a9de57d39",
+      "pixels": [
+        2210,
+        850
+      ]
+    },
+    {
+      "path": "layered/configuration.json",
+      "bytes": 1212,
+      "sha256": "3e1985e8f35acd6b1047121d5f5c5651c1f4af748b9270aad36336e871b9aa33"
+    },
+    {
+      "path": "layered/convergence.png",
+      "bytes": 158044,
+      "sha256": "edbfa135791e7ea9f5257a538cfc88ae648f364486878e4cbdabad53f830a868",
+      "pixels": [
+        2550,
+        680
+      ]
+    },
+    {
+      "path": "layered/evaluations.json",
+      "bytes": 2270,
+      "sha256": "12d03230d98354a93b8d4f1b8de309c5421e4b2788b6e6b886b73cddad01427b"
+    },
+    {
+      "path": "layered/gradient_manifest.json",
+      "bytes": 2880,
+      "sha256": "7589c4ea625b4126d2456d60dbc38716bb03a1a26507fb2ef003b14e0bc07727"
+    },
+    {
+      "path": "layered/gradients_normalized.png",
+      "bytes": 118528,
+      "sha256": "cd2d443567a392c2384400f6698cfb2a114968e4931ece825381dce5420ad3d5",
+      "pixels": [
+        2640,
+        960
+      ]
+    },
+    {
+      "path": "layered/gradients_shared_scale.png",
+      "bytes": 91668,
+      "sha256": "5fcc79c442200f5afcc58515cc26a8ed22fb0ba1d6e2e1a39970e7276fda353c",
+      "pixels": [
+        2640,
+        960
+      ]
+    },
+    {
+      "path": "layered/model_3d.png",
+      "bytes": 243413,
+      "sha256": "1b6bd5f3945b7cb17e15e3a41c4e113590406ef98fe091e1e98a8561ef7e5378",
+      "pixels": [
+        2380,
+        850
+      ]
+    },
+    {
+      "path": "layered/model_comparison.png",
+      "bytes": 116056,
+      "sha256": "5104b745be8bf928542488aff9082830d8f0149d4e55fbf71b5997561a40c3a3",
+      "pixels": [
+        2210,
+        1700
+      ]
+    },
+    {
+      "path": "layered/numerical_checks.json",
+      "bytes": 1494,
+      "sha256": "8f7ef392352b903dd695644059153636dca7a7c79a97ae6f704bdd6a5b1512cc"
+    },
+    {
+      "path": "layered/shot_gather.png",
+      "bytes": 370496,
+      "sha256": "d6bd4b603b5ef50bf22a6d87952885bd16013bfcbf597653ce40c41bf05bc70f",
+      "pixels": [
+        2240,
+        800
+      ]
+    },
+    {
+      "path": "layered/summary.json",
+      "bytes": 2572,
+      "sha256": "10f99a0f7209b461b7ac9f8e965c160a15aece043480d98f3732647fc0fd39e0"
+    },
+    {
+      "path": "package-download.js",
+      "bytes": 6331,
+      "sha256": "3ba5eef8ba1350f8d4f152e3ff582956283bb87e5161d07c3a918150e9513980"
+    },
+    {
+      "path": "surface/acquisition.png",
+      "bytes": 321126,
+      "sha256": "f5781c3493beefc8fbc954cb2213e7ae175b40c77c5ef0696c3323e9e4061159",
+      "pixels": [
+        2210,
+        850
+      ]
+    },
+    {
+      "path": "surface/configuration.json",
+      "bytes": 1476,
+      "sha256": "31586ff56235cc6b8040ae33fbcae7e5826e54f67bb61b61080facc94dbfcbf8"
+    },
+    {
+      "path": "surface/convergence.png",
+      "bytes": 128666,
+      "sha256": "bc408947839b52423c9ee5ef58af32ae0e144b8e6def25d2fa785cc883b9edb6",
+      "pixels": [
+        2550,
+        680
+      ]
+    },
+    {
+      "path": "surface/evaluations.json",
+      "bytes": 12878,
+      "sha256": "0c34fe8191167b28ff6cc6809711f29b90f337eb4ff224733c98eeed06eb5d01"
+    },
+    {
+      "path": "surface/gradient_manifest.json",
+      "bytes": 2891,
+      "sha256": "92507ff0a608d430d8bee9bac71333d369840bd36a6b66250ce757e25c920026"
+    },
+    {
+      "path": "surface/gradients_normalized.png",
+      "bytes": 153106,
+      "sha256": "7d0afde49196e4f7c5710d4fa0e9d7b969ec74f748595928f785abf0c1850f4b",
+      "pixels": [
+        2640,
+        960
+      ]
+    },
+    {
+      "path": "surface/gradients_shared_scale.png",
+      "bytes": 113661,
+      "sha256": "b3a1905388e4f365e47cd028c6c546f84a885038534f42ca92e29e0072a2734c",
+      "pixels": [
+        2640,
+        960
+      ]
+    },
+    {
+      "path": "surface/model_3d.png",
+      "bytes": 232141,
+      "sha256": "af9e2498721c4871a56880ee453f4b3aaede4f42e128fa09ba9d29bbc4c2f7d2",
+      "pixels": [
+        2380,
+        850
+      ]
+    },
+    {
+      "path": "surface/model_comparison.png",
+      "bytes": 135564,
+      "sha256": "a5e3f93c20b7aa5f1c15971decb73ed5b4daf871ca29023039252ddfd8d2b2ca",
+      "pixels": [
+        2210,
+        1700
+      ]
+    },
+    {
+      "path": "surface/numerical_checks.json",
+      "bytes": 1498,
+      "sha256": "6a4a057a10b375db6b0fc1e8a7f0feaec64b0b2197de15ebaef7cd443ece7e08"
+    },
+    {
+      "path": "surface/shot_gather.png",
+      "bytes": 465669,
+      "sha256": "3240caed6689a84aec31de7fbbfc44c593eb8190a55cc4bafb6fdbb9d37754a2",
+      "pixels": [
+        2240,
+        800
+      ]
+    },
+    {
+      "path": "surface/summary.json",
+      "bytes": 3560,
+      "sha256": "6d065bdb0570d4f16b9091d763aa306e7ceb730a387eb3ad70f324b8640a4d7a"
+    }
+  ]
+}

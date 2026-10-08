@@ -1,0 +1,78 @@
+{
+  "status": "PASSED",
+  "wall_seconds": 20.12229710399697,
+  "objective": "mean((predicted-observed)^2) / mean(observed^2); full survey at a fixed model",
+  "gradient": "d(objective)/d(Vp), before any Adam update; raw and fixed-region-masked arrays",
+  "not_training_batch_gradient": true,
+  "epochs": [
+    0,
+    20,
+    60,
+    100,
+    200
+  ],
+  "checks": [
+    {
+      "epoch": 0,
+      "fixed_model_normalized_mse": 0.0002042890955635812,
+      "recorded_evaluation": 0.0002042890955635812,
+      "objective_relative_difference": 0.0,
+      "raw_gradient_l2": 2.527637417423971e-07,
+      "masked_gradient_l2": 2.2333956787352534e-07,
+      "raw_gradient_min": -1.1701693836130289e-08,
+      "raw_gradient_max": 8.783446858728894e-09,
+      "model_sha256": "e3eb1825c6b0a8e539cd3a8fd3384913da4a4240b5798cc60878223dce0e5c7a"
+    },
+    {
+      "epoch": 20,
+      "fixed_model_normalized_mse": 3.0301612696348457e-05,
+      "recorded_evaluation": 3.0301612696348457e-05,
+      "objective_relative_difference": 0.0,
+      "raw_gradient_l2": 1.774759645474521e-08,
+      "masked_gradient_l2": 1.5181763573408606e-08,
+      "raw_gradient_min": -2.918330244128242e-09,
+      "raw_gradient_max": 1.1029510638138618e-09,
+      "model_sha256": "17bd0dd850c0ecf204a60c80d5802ca5ed3b730a126b20eb3a02597d4d3adc7f"
+    },
+    {
+      "epoch": 60,
+      "fixed_model_normalized_mse": 1.5915970607238705e-05,
+      "recorded_evaluation": 1.5915970607238705e-05,
+      "objective_relative_difference": 0.0,
+      "raw_gradient_l2": 7.925959820326332e-09,
+      "masked_gradient_l2": 6.475475150712553e-09,
+      "raw_gradient_min": -1.5859142887819644e-09,
+      "raw_gradient_max": 4.6455758684338377e-10,
+      "model_sha256": "4b3e22577d3a0c391ae63eaa019633250e0ae6dbbe67c3673e0346c96359b607"
+    },
+    {
+      "epoch": 100,
+      "fixed_model_normalized_mse": 1.1613895367190707e-05,
+      "recorded_evaluation": 1.1613895367190707e-05,
+      "objective_relative_difference": 0.0,
+      "raw_gradient_l2": 5.400481702749978e-09,
+      "masked_gradient_l2": 4.400373286853526e-09,
+      "raw_gradient_min": -7.529824541663288e-10,
+      "raw_gradient_max": 3.252914604345847e-10,
+      "model_sha256": "e3aa5d5448bedc006f6303cc9ebae0b8e33593009be2fc1508623f4315744b80"
+    },
+    {
+      "epoch": 200,
+      "fixed_model_normalized_mse": 7.344257483055117e-06,
+      "recorded_evaluation": 7.344257483055117e-06,
+      "objective_relative_difference": 0.0,
+      "raw_gradient_l2": 3.3593878476721513e-09,
+      "masked_gradient_l2": 2.7084056221176846e-09,
+      "raw_gradient_min": -3.6631142563692265e-10,
+      "raw_gradient_max": 8.863284411964045e-11,
+      "model_sha256": "b75294926c5cce06ff14815403246286012f367eed39e716d6d00ebe5bc27758"
+    }
+  ],
+  "library_sha256": "90a83df0b94cd282c7c8849b6bd42a0896c18ff746e98ab1e91f6fbc9be6cbf8",
+  "gpu_ids": [
+    2,
+    0,
+    1,
+    3
+  ]
+}

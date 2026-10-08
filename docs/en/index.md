@@ -126,6 +126,18 @@ INR <inversion/inr>
 ```{toctree}
 :maxdepth: 1
 :hidden:
+:caption: Example
+
+Scalar3D <examples/index>
+Enclosed anomaly <examples/enclosed>
+Surface-only anomaly <examples/surface>
+Undulating layers <examples/layered>
+Reproduce <examples/reproduce>
+```
+
+```{toctree}
+:maxdepth: 1
+:hidden:
 :caption: Usage
 
 Usage <usage>
