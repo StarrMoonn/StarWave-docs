@@ -238,6 +238,8 @@ def build(destination):
             stable = RECONSTRUCTION_SECTIONS
             numbers = RECONSTRUCTION_NUMBERS
         rendered = [add_anchors(text, stable, numbers) for text in texts]
+        if relative == 'visco-sls.html':
+            rendered = [text.replace('<section id=', '<section class="sw-api-page" id=', 1) for text in rendered]
         if relative.startswith('examples/'):
             rendered = [text.replace('<section id=', '<section class="sw-example-page" id=', 1) for text in rendered]
         path.write_text(rendered[0], encoding='utf-8')

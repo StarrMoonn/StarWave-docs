@@ -1,5 +1,19 @@
 # Documentation Status and References
 
+## V14 / 7.0.0 SLS
+
+[StarWave 7.0.0](https://pypi.org/project/starwave/7.0.0/) was published on 2026-10-09, corresponding to authorized V14 / `0.1.0.dev14`. Its sole distribution is `starwave-7.0.0-py3-none-manylinux_2_35_x86_64.whl` (17,515,547 bytes), with no sdist. The official PyPI file is byte-identical to the reviewed CI build. Python 3.10–3.12 installation/host checks and a clean reinstall from the public artifact passed.
+
+The new [bilingual SLS API](visco-sls.md) retains the nine existing function contracts and adds three entry points. All twelve signatures, defaults, keyword boundaries and return contracts match the actual wheel. Four ELF libraries (core, elastic, SLS CPU and SLS CUDA) and their receipt hashes were verified. The documentation checker reads the archive without loading or executing native libraries.
+
+Public 7.0.0 wheel SHA-256:
+
+```text
+0fb2d66555ad19d4178738db93ea5d71c3b7dbfb456cf4fd82898f5d44725964
+```
+
+Scope is 2D single-SLS, fixed variable density, full histories and first-order Vp/Q/source gradients. Saved source-version GPU results are documented in the [SLS Marmousi2 Example](examples/visco-sls.md): fixed-Q and joint Vp/Q runs of 100 epochs each on two A30 GPUs, plus a separate RTX 4060 ring model. These original runs are distinct from reinstalling the public wheel. This documentation update did not independently rerun a GPU. Existing tutorials, figures, Scalar3D split downloads and PDFs retain their original versions and evidence scopes.
+
 ## V13 / 6.0.0 maintenance scope · 2026-10-09
 
 This maintenance targets 6.0.0 / source `0.1.0.dev13`: installation versions, old-library compatibility warnings, Scalar2D internal storage and PML-transpose corrections, and removal of elastic L2 shot-group trajectory scheduling. The nine public function signatures retain the existing 5.0.0 contract; no API parameters or example calls are added or changed.

@@ -1,5 +1,16 @@
 # 发布说明
 
+## 7.0.0 / V14 · 2026-10-09
+
+[StarWave 7.0.0](https://pypi.org/project/starwave/7.0.0/) 对应授权源码 `0.1.0.dev14`，首次公开提供新增并整合的 [SLS 黏声学接口](visco-sls.md)。Linux 二进制 wheel 包含核心、elastic、SLS CPU 和 SLS CUDA 四份原生库；不需要用户编译，也不提供 sdist。
+
+- 新增 `starwave.visco_sls`、`starwave.prepare_visco_sls` 与 `starwave.visco_sls_native_status`；原有九个公开函数的签名和默认值不变。
+- 二维 single-SLS、固定可变密度、full 体积历史；Vp/Q/source 可独立求一阶梯度。CPU 原生、CUDA 与 Torch 参考后端均显式选择，不自动回退。
+- Vp 是 `f_ref` 处相速度，Q 是同频复模量品质因子。源单位为 Pa/m²，首步半权重，记录为更新前的 `p[n]`，不重采样。
+- 训练 Vp/Q 且 PML 非零时须固定显式非松弛速度上界 `max_vel`；不支持 rho 梯度、3D 或 boundary。
+
+既有 scalar、VRZ、VTI、elastic 科学调用与 Scalar3D Example 保留。升级后须重启 Python/Notebook kernel；SLS 原生库使用独立准备入口。安装与最终发行身份见[安装](installation.md)和[文档状态](status.md)。
+
 ## 6.0.0 / V13 · 2026-10-09
 
 公开 [StarWave 6.0.0 wheel](https://pypi.org/project/starwave/6.0.0/) 对应授权源码 `0.1.0.dev13`，以内部存储和 CUDA 执行路径维护为主；发行文件身份与验收范围见[文档状态](status.md)：

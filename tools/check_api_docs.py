@@ -9,10 +9,10 @@ from pathlib import Path
 import re
 import zipfile
 
-# Public 6.0.0 binary artifact, independently downloaded and matched to its receipt.
-# The API/semantic snapshot retains its original 5.0.0 review provenance.
-WHEEL_VERSION = '6.0.0'
-WHEEL_SHA256 = '297a4e359d86003513452294e6384f78a6ab7029fdabefa936e0733228882cf7'
+# Public 7.0.0 wheel: official PyPI identity matches the reviewed CI artifact.
+# Existing API/semantic entries retain their original review provenance.
+WHEEL_VERSION = '7.0.0'
+WHEEL_SHA256 = '0fb2d66555ad19d4178738db93ea5d71c3b7dbfb456cf4fd82898f5d44725964'
 MODULES = {
     'scalar': 'starwave/scalar.py', 'vrz': 'starwave/vrz.py',
     'vti': 'starwave/vti.py', 'native_status': 'starwave/_native.py',
@@ -21,6 +21,9 @@ MODULES = {
     'common.vpvsrho_to_lambmubuoyancy': 'starwave/common.py',
     'common.lambmubuoyancy_to_vpvsrho': 'starwave/common.py',
     'prepare_elastic': 'starwave/elastic_runtime.py',
+    'visco_sls': 'starwave/visco_sls.py',
+    'prepare_visco_sls': 'starwave/visco_sls.py',
+    'visco_sls_native_status': 'starwave/visco_sls.py',
 }
 WHEEL_TYPED_APIS = {
     'elastic', 'common.vpvsrho_to_lambmubuoyancy',
@@ -120,7 +123,7 @@ def check_scalar3d_examples(project, contract):
     assert examples[0] == examples[1], 'Bilingual 3D runnable snippets differ'
 
 
-def check(wheel_path=None):
+def check(wheel_path=None, source_root=None):
     project = Path(__file__).resolve().parents[1]
     contracts = json.loads((project / 'tools' / 'api_contract.json').read_text())
     assert set(contracts) == set(MODULES), 'Public contract inventory changed'
@@ -170,8 +173,20 @@ def check(wheel_path=None):
         languages[locale] = functions
     for name in MODULES:
         assert ast.dump(languages['zh'][name]) == ast.dump(languages['en'][name]), f'{name}: language signature mismatch'
+    if source_root:
+        class SourceArchive:
+            def read(self, path):
+                return (Path(source_root) / path).read_bytes()
+            def namelist(self):
+                return [p.relative_to(source_root).as_posix() for p in Path(source_root).rglob('*.py')]
+        source = SourceArchive()
+        for name, module in MODULES.items():
+            actual = wheel_function(source, module, name.rsplit('.', 1)[-1])
+            assert arguments_without_annotations(languages['zh'][name]) == arguments_without_annotations(actual.args), f'{name}: differs from source'
+        print(f'PASS: {len(MODULES)} documented signatures match the supplied source tree (not a wheel verification).')
     if wheel_path:
         wheel_path = Path(wheel_path)
+        assert WHEEL_SHA256, 'Public 7.0.0 wheel identity has not yet been pinned'
         assert hashlib.sha256(wheel_path.read_bytes()).hexdigest() == WHEEL_SHA256, f'Not the verified {WHEEL_VERSION} binary wheel'
         with zipfile.ZipFile(wheel_path) as wheel:
             metadata = BytesParser().parsebytes(wheel.read(f'starwave-{WHEEL_VERSION}.dist-info/METADATA'))
@@ -182,8 +197,9 @@ def check(wheel_path=None):
             receipt = json.loads(wheel.read('starwave/_binary/release.json'))
             assert receipt['artifact_kind'] == 'precompiled-binary-only'
             assert receipt['contract']['package_version'] == WHEEL_VERSION
-            assert receipt['contract']['source_version'] == '0.1.0.dev13'
-            for kind, filename in [('core', 'libstarwave_cuda.so'), ('elastic', 'libstarwave_deepwave_elastic.so')]:
+            assert receipt['contract']['source_version'] == '0.1.0.dev14'
+            for kind, filename in [('core', 'libstarwave_cuda.so'), ('elastic', 'libstarwave_deepwave_elastic.so'),
+                                   ('sls_cpu', 'libstarwave_sls_cpu.so'), ('sls_cuda', 'libstarwave_sls_cuda.so')]:
                 library = wheel.read('starwave/_binary/' + filename)
                 assert library.startswith(b'\x7fELF'), f'Expected native ELF library: {filename}'
                 assert hashlib.sha256(library).hexdigest() == receipt['libraries'][kind]['sha256'], f'Binary receipt mismatch: {filename}'
@@ -196,10 +212,12 @@ def check(wheel_path=None):
                     assert contracts[name]['return'] == ast.unparse(actual.returns), f'{name}: return type differs from public wheel'
     counts = {name: len(parameter_defaults(languages['zh'][name])) for name in MODULES}
     print(f'PASS: both languages: typed signatures, descriptions/defaults {counts}, {len(MODULES)} return contracts; {blocks} Python blocks parsed as Python 3.10.')
-    print(f'PASS: {len(MODULES)} signatures match verified {WHEEL_VERSION} binary wheel; metadata and native-library receipt hashes match.' if wheel_path else f'PASS: {WHEEL_VERSION} documentation retains the reviewed 5.0.0 API contract; optional --wheel verifies the pinned binary archive.')
+    print(f'PASS: {len(MODULES)} signatures match verified {WHEEL_VERSION} binary wheel; metadata and native-library receipt hashes match.' if wheel_path else f'PASS: bilingual signatures match the API contract; public {WHEEL_VERSION} binary identity is checked only with --wheel.')
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--wheel', help=f'StarWave {WHEEL_VERSION} binary wheel (read only, never imported)')
-    check(parser.parse_args().wheel)
+    parser.add_argument('--source-root', type=Path, help='Optional source tree for AST-only signature comparison; never imported')
+    args = parser.parse_args()
+    check(args.wheel, args.source_root)

@@ -208,5 +208,76 @@
       "device_ids": "list[int] | tuple[int, ...] | None"
     },
     "return": "dict"
+  },
+  "visco_sls": {
+    "signature": "(vp, q, rho, grid_spacing, dt, *, source_amplitudes, source_locations, receiver_locations, f_ref, accuracy=4, pml_width=20, memory='full', max_vel=None, backend='cuda')",
+    "types": {
+      "vp": "torch.Tensor",
+      "q": "torch.Tensor",
+      "rho": "torch.Tensor",
+      "grid_spacing": "float | int | list[float] | tuple[float, float]",
+      "dt": "float | int",
+      "source_amplitudes": "torch.Tensor",
+      "source_locations": "torch.Tensor",
+      "receiver_locations": "torch.Tensor",
+      "f_ref": "float | int",
+      "accuracy": "int",
+      "pml_width": "int | list[int] | tuple[int, int]",
+      "memory": "str",
+      "max_vel": "float | int | None",
+      "backend": "str"
+    },
+    "return": "tuple[torch.Tensor]",
+    "page": "visco-sls",
+    "semantics": {
+      "model_dimensions": [
+        2
+      ],
+      "memory": [
+        "full"
+      ],
+      "density_gradient": false,
+      "density_spatial_variation": true,
+      "gradients": [
+        "vp",
+        "q",
+        "source_amplitudes"
+      ],
+      "source_unit": "Pa/m^2",
+      "source_sign": -1,
+      "startup_weight": 0.5,
+      "record_time": "pre-update p[n], n=0..T-1",
+      "last_source_vjp": 0,
+      "vp_definition": "phase velocity at f_ref",
+      "q_definition": "complex modulus Q at f_ref",
+      "max_vel_definition": "covering unrelaxed-speed envelope",
+      "trainable_model_nonzero_pml_requires_fixed_max_vel": true,
+      "backends": [
+        "cuda",
+        "native_cpu",
+        "torch"
+      ],
+      "dtype": [
+        "float32",
+        "float64"
+      ]
+    }
+  },
+  "prepare_visco_sls": {
+    "signature": "(device='cuda:0', *, backend='cuda')",
+    "types": {
+      "device": "str | torch.device",
+      "backend": "str"
+    },
+    "return": "dict",
+    "page": "visco-sls"
+  },
+  "visco_sls_native_status": {
+    "signature": "(*, backend='cuda')",
+    "types": {
+      "backend": "str"
+    },
+    "return": "dict",
+    "page": "visco-sls"
   }
 }

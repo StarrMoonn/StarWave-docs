@@ -38,7 +38,7 @@
 .rst-content .sw-page-toc > :last-child, .rst-content .sw-page-toc ul { margin-bottom: 0; }
 .rst-content .sw-page-toc li { margin-bottom: 4px; }
 .rst-content .sw-page-toc a { text-decoration: underline; text-underline-offset: 2px; }
-.rst-content #usage h2 { margin-top: 36px; padding-top: 4px; }
+.rst-content :is(#usage, .sw-api-page) h2 { margin-top: 36px; padding-top: 4px; }
 .rst-content section { scroll-margin-top: 20px; }
 @media (max-width: 768px) {
   .rst-content .sw-page-toc { padding: 16px 18px; }
@@ -154,39 +154,39 @@ html[lang="en"] .rst-content .sw-home-next a { font-size: 17px; }
 html[lang="en"] .rst-content pre { font-family: Consolas, Menlo, "DejaVu Sans Mono", "Bitstream Vera Sans Mono", monospace; font-size: 15.3px; line-height: 1.5; }
 
 /* Usage: an unboxed, naturally wrapping reference in the Deepwave rhythm. */
-.rst-content #usage > h1 { font-family: Georgia, serif; font-size: 40.8px; font-weight: 400; line-height: 1.2; margin: 0 0 24px; }
-.rst-content #usage { font-size: 17px; line-height: 1.4; color: #333; overflow-wrap: anywhere; }
-html[lang="zh-CN"] .rst-content #usage { font-family: "StarWave Home Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif; line-height: 1.65; }
-.rst-content #usage dl.py > dt.sig { display: block; margin: 0 0 12px; padding: 0; border: 0; border-radius: 0; background: transparent; color: #333; font-family: Consolas, Menlo, "DejaVu Sans Mono", "Bitstream Vera Sans Mono", monospace; font-size: 17px; font-weight: 400; line-height: 1.4; white-space: normal; overflow-wrap: anywhere; }
-.rst-content #usage .sig .sig-name { font-size: 18.7px; font-weight: 700; }
-.rst-content #usage .sig .sig-prename { font-size: 17px; font-weight: 400; }
-.rst-content #usage .sig .sig-param { font-size: 17px; font-weight: 400; font-style: italic; white-space: normal; }
-.rst-content #usage .sig .sig-paren { font-size: 20.4px; }
-.rst-content #usage .sig .pre { white-space: normal; overflow-wrap: anywhere; }
-.rst-content #usage dl.py > dd { margin-left: 30px; }
-.rst-content #usage p { font-size: 17px; line-height: inherit; margin-bottom: 20px; }
-.rst-content #usage code.literal { padding: 0; border: 0; background: transparent; color: inherit; font-family: Consolas, Menlo, "DejaVu Sans Mono", "Bitstream Vera Sans Mono", monospace; font-size: 15.3px; }
+.rst-content :is(#usage, .sw-api-page) > h1 { font-family: Georgia, serif; font-size: 40.8px; font-weight: 400; line-height: 1.2; margin: 0 0 24px; }
+.rst-content :is(#usage, .sw-api-page) { font-size: 17px; line-height: 1.4; color: #333; overflow-wrap: anywhere; }
+html[lang="zh-CN"] .rst-content :is(#usage, .sw-api-page) { font-family: "StarWave Home Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif; line-height: 1.65; }
+.rst-content :is(#usage, .sw-api-page) dl.py > dt.sig { display: block; margin: 0 0 12px; padding: 0; border: 0; border-radius: 0; background: transparent; color: #333; font-family: Consolas, Menlo, "DejaVu Sans Mono", "Bitstream Vera Sans Mono", monospace; font-size: 17px; font-weight: 400; line-height: 1.4; white-space: normal; overflow-wrap: anywhere; }
+.rst-content :is(#usage, .sw-api-page) .sig .sig-name { font-size: 18.7px; font-weight: 700; }
+.rst-content :is(#usage, .sw-api-page) .sig .sig-prename { font-size: 17px; font-weight: 400; }
+.rst-content :is(#usage, .sw-api-page) .sig .sig-param { font-size: 17px; font-weight: 400; font-style: italic; white-space: normal; }
+.rst-content :is(#usage, .sw-api-page) .sig .sig-paren { font-size: 20.4px; }
+.rst-content :is(#usage, .sw-api-page) .sig .pre { white-space: normal; overflow-wrap: anywhere; }
+.rst-content :is(#usage, .sw-api-page) dl.py > dd { margin-left: 30px; }
+.rst-content :is(#usage, .sw-api-page) p { font-size: 17px; line-height: inherit; margin-bottom: 20px; }
+.rst-content :is(#usage, .sw-api-page) code.literal { padding: 0; border: 0; background: transparent; color: inherit; font-family: Consolas, Menlo, "DejaVu Sans Mono", "Bitstream Vera Sans Mono", monospace; font-size: 15.3px; }
 /* The overview reads as one consistent line, including API links and notation. */
-.rst-content #usage #propagators :is(ul, li, p) { line-height: inherit; }
-.rst-content #usage #propagators code.literal { font-size: inherit; line-height: inherit; vertical-align: baseline; font-variant-numeric: lining-nums; }
-.rst-content #usage pre { font-family: Consolas, Menlo, "DejaVu Sans Mono", "Bitstream Vera Sans Mono", monospace; font-size: 15.3px; line-height: 1.3; }
-html.writer-html5 .rst-content #usage dl.field-list { display: grid; grid-template-columns: max-content minmax(0, 1fr); column-gap: 14px; row-gap: 12px; margin: 20px 0 28px; }
-html.writer-html5 .rst-content #usage dl.field-list > dt { padding: 0; margin: 0; border: 0; background: transparent; color: #333; font-family: inherit; font-size: 17px; line-height: inherit; font-weight: 700; }
-html.writer-html5 .rst-content #usage dl.field-list > dd { min-width: 0; margin: 0; padding: 0; font-size: 17px; line-height: inherit; }
-.rst-content #usage dl.field-list > dd ul { margin-left: 20px; margin-bottom: 0; }
-.rst-content #usage dl.field-list > dd li { margin-bottom: 12px; }
+.rst-content :is(#usage, .sw-api-page) #propagators :is(ul, li, p) { line-height: inherit; }
+.rst-content :is(#usage, .sw-api-page) #propagators code.literal { font-size: inherit; line-height: inherit; vertical-align: baseline; font-variant-numeric: lining-nums; }
+.rst-content :is(#usage, .sw-api-page) pre { font-family: Consolas, Menlo, "DejaVu Sans Mono", "Bitstream Vera Sans Mono", monospace; font-size: 15.3px; line-height: 1.3; }
+html.writer-html5 .rst-content :is(#usage, .sw-api-page) dl.field-list { display: grid; grid-template-columns: max-content minmax(0, 1fr); column-gap: 14px; row-gap: 12px; margin: 20px 0 28px; }
+html.writer-html5 .rst-content :is(#usage, .sw-api-page) dl.field-list > dt { padding: 0; margin: 0; border: 0; background: transparent; color: #333; font-family: inherit; font-size: 17px; line-height: inherit; font-weight: 700; }
+html.writer-html5 .rst-content :is(#usage, .sw-api-page) dl.field-list > dd { min-width: 0; margin: 0; padding: 0; font-size: 17px; line-height: inherit; }
+.rst-content :is(#usage, .sw-api-page) dl.field-list > dd ul { margin-left: 20px; margin-bottom: 0; }
+.rst-content :is(#usage, .sw-api-page) dl.field-list > dd li { margin-bottom: 12px; }
 /* Parameter names, types, defaults, and prose share the same reading size. */
-.rst-content #usage dl.field-list > dd code.literal { font-size: inherit; }
-.rst-content #usage dl.field-list > dd strong:first-child { font-family: inherit; font-size: inherit; overflow-wrap: anywhere; }
-.rst-content #usage h2 { font-size: 30.6px; font-weight: 400; line-height: 1.25; margin: 30px 0 14px; }
-html[lang="en"] .rst-content #usage h3 { font-size: 25.5px; font-weight: 400; line-height: 1.3; margin: 30px 0 12px; }
-html[lang="zh-CN"] .rst-content #usage :is(h2, h3) { font-family: inherit; }
-.rst-content #usage :is(#scalar, #vrz, #vti, #elastic) > h2 { font-family: Georgia, serif; }
+.rst-content :is(#usage, .sw-api-page) dl.field-list > dd code.literal { font-size: inherit; }
+.rst-content :is(#usage, .sw-api-page) dl.field-list > dd strong:first-child { font-family: inherit; font-size: inherit; overflow-wrap: anywhere; }
+.rst-content :is(#usage, .sw-api-page) h2 { font-size: 30.6px; font-weight: 400; line-height: 1.25; margin: 30px 0 14px; }
+html[lang="en"] .rst-content :is(#usage, .sw-api-page) h3 { font-size: 25.5px; font-weight: 400; line-height: 1.3; margin: 30px 0 12px; }
+html[lang="zh-CN"] .rst-content :is(#usage, .sw-api-page) :is(h2, h3) { font-family: inherit; }
+.rst-content :is(#usage, .sw-api-page) :is(#scalar, #vrz, #vti, #elastic) > h2 { font-family: Georgia, serif; }
 @media (max-width: 768px) {
-  .rst-content #usage dl.py > dd { margin-left: 0; }
-  html.writer-html5 .rst-content #usage dl.field-list { display: block; }
-  html.writer-html5 .rst-content #usage dl.field-list > dt { margin-bottom: 10px; }
-  html.writer-html5 .rst-content #usage dl.field-list > dd { margin-bottom: 22px; }
+  .rst-content :is(#usage, .sw-api-page) dl.py > dd { margin-left: 0; }
+  html.writer-html5 .rst-content :is(#usage, .sw-api-page) dl.field-list { display: block; }
+  html.writer-html5 .rst-content :is(#usage, .sw-api-page) dl.field-list > dt { margin-bottom: 10px; }
+  html.writer-html5 .rst-content :is(#usage, .sw-api-page) dl.field-list > dd { margin-bottom: 22px; }
 }
 
 /* The presentation uses a same-origin, browser-native PDF reader. */

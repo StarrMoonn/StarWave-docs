@@ -1,0 +1,37 @@
+{
+  "filename": "StarWave-SLS-Marmousi2-Example.zip",
+  "bytes": 24228615,
+  "sha256": "8083324ee61ac513d1560a27b87ca052c067e6c98313e480bf54faa9098d87e9",
+  "parts": [
+    {
+      "file": "StarWave-SLS-Marmousi2-Example.zip.part01",
+      "bytes": 4194304,
+      "sha256": "dce924b05eca98540d6ddeb5460df919a14ebcaa16dbe23aa412baee1a729cf3"
+    },
+    {
+      "file": "StarWave-SLS-Marmousi2-Example.zip.part02",
+      "bytes": 4194304,
+      "sha256": "2426a2211b9013f970d4aa4f24f8fa3bd7fa303f8736de07f7ce1cda5f7a13dd"
+    },
+    {
+      "file": "StarWave-SLS-Marmousi2-Example.zip.part03",
+      "bytes": 4194304,
+      "sha256": "6b1b688b5598224047dcb2822e26c0ce33cdeb58c241ee2f6f88c948621408c5"
+    },
+    {
+      "file": "StarWave-SLS-Marmousi2-Example.zip.part04",
+      "bytes": 4194304,
+      "sha256": "090a7f4659765471b0a4f9f40fa5af4fcb924a7f87093ef20766262faf862189"
+    },
+    {
+      "file": "StarWave-SLS-Marmousi2-Example.zip.part05",
+      "bytes": 4194304,
+      "sha256": "ad89a2fb671f930d6c6a29eea155b822ea5efa411f9c768126e9a3102d36ab59"
+    },
+    {
+      "file": "StarWave-SLS-Marmousi2-Example.zip.part06",
+      "bytes": 3257095,
+      "sha256": "9f96aa12459dff5d1a61e23b51b1458023cb9105fcb7770b1ae6305953217aaa"
+    }
+  ]
+}

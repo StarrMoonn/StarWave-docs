@@ -129,6 +129,7 @@ INR <inversion/inr>
 :caption: Example
 
 Scalar3D <examples/index>
+SLS Marmousi2 <examples/visco-sls>
 六面包围异常体 <examples/enclosed>
 地表采集异常体 <examples/surface>
 起伏薄层模型 <examples/layered>
@@ -141,6 +142,7 @@ Scalar3D <examples/index>
 :caption: Usage
 
 Usage <usage>
+SLS Function <visco-sls>
 ```
 
 ```{toctree}

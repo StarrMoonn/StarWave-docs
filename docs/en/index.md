@@ -129,6 +129,7 @@ INR <inversion/inr>
 :caption: Example
 
 Scalar3D <examples/index>
+SLS Marmousi2 <examples/visco-sls>
 Enclosed anomaly <examples/enclosed>
 Surface-only anomaly <examples/surface>
 Undulating layers <examples/layered>
@@ -141,6 +142,7 @@ Reproduce <examples/reproduce>
 :caption: Usage
 
 Usage <usage>
+SLS Function <visco-sls>
 ```
 
 ```{toctree}

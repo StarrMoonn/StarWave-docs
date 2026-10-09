@@ -1,5 +1,16 @@
 # Release Notes
 
+## 7.0.0 / V14 · 2026-10-09
+
+[StarWave 7.0.0](https://pypi.org/project/starwave/7.0.0/) corresponds to authorized source `0.1.0.dev14` and first publicly supplies the newly integrated [SLS viscoacoustic interface](visco-sls.md). The Linux binary wheel contains four native libraries: core, elastic, SLS CPU and SLS CUDA. Local compilation is unnecessary and no sdist is provided.
+
+- Adds `starwave.visco_sls`, `starwave.prepare_visco_sls` and `starwave.visco_sls_native_status`; signatures and defaults of the nine existing public functions are unchanged.
+- 2D single-SLS, fixed variable density and full volume histories, with independent first-order Vp/Q/source gradients. Native CPU, CUDA and Torch-reference backends are selected explicitly, without automatic fallback.
+- Vp is phase velocity at `f_ref`; Q is the complex-modulus quality factor there. Sources use Pa/m² with half-weight startup; recordings are pre-update `p[n]`, without resampling.
+- Trainable Vp/Q with nonzero PML require a fixed explicit unrelaxed-speed envelope `max_vel`. Density gradients, 3D and boundary mode are unsupported.
+
+Existing scalar, VRZ, VTI and elastic scientific calls and Scalar3D Examples are preserved. Restart Python/the notebook kernel after upgrading; SLS uses separate native preparation. See [Installation](installation.md) and [Status](status.md) for installation and final artifact identity.
+
 ## 6.0.0 / V13 · 2026-10-09
 
 The public [StarWave 6.0.0 wheel](https://pypi.org/project/starwave/6.0.0/) corresponds to authorized source `0.1.0.dev13` and focuses on internal storage and CUDA execution maintenance. See [Status](status.md) for artifact identity and verification scope:

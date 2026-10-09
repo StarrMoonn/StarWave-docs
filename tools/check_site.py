@@ -13,6 +13,7 @@ from urllib.parse import unquote, urlsplit
 from build_docs import USAGE_SECTIONS, USAGE_NUMBERS
 from check_presentation_asset import ASSET_PATH, check as check_presentation
 from check_scalar3d_examples import approved_assets, check as check_scalar3d
+from check_sls_examples import approved_assets as approved_sls_assets, check as check_sls
 
 
 RECONSTRUCTION_SECTIONS = ('reconstruction', 'reconstruction-scalar3d', 'reconstruction-state',
@@ -288,6 +289,7 @@ def check(root):
     errors.extend(check_presentation(root))
     errors.extend(check_reconstruction(project, root))
     errors.extend(check_scalar3d(root))
+    errors.extend(check_sls(root))
     pages = {p: Page(p.read_text(encoding="utf-8")) for p in root.rglob("*.html")}
     if not pages or not (root / "index.html").is_file():
         errors.append("Missing HTML output or index.html")
@@ -354,8 +356,9 @@ def check(root):
     for locale in ('zh', 'en'):
         usage = root / locale / 'usage.html'
         content = usage.read_text(encoding='utf-8')
-        for name in contracts:
-            if f'starwave.{name}' not in pages[usage].ids:
+        for name, contract in contracts.items():
+            api_page = root / locale / (contract.get('page', 'usage') + '.html')
+            if api_page not in pages or f'starwave.{name}' not in pages[api_page].ids:
                 errors.append(f'Missing public API anchor: {locale}/{name}')
         if not re.search(r'<h1>Usage<a', content):
             errors.append(f'Wrong Usage title: {locale}')
@@ -382,7 +385,7 @@ def check(root):
             errors.append(f'Usage section cannot switch language: {locale}')
         index = (root / locale / 'searchindex.js').read_text(encoding='utf-8')
         docnames = json.loads(index.removeprefix('Search.setIndex(').removesuffix(')'))['docnames']
-        if 'usage' not in docnames or any(name.startswith('api/') for name in docnames):
+        if not {'usage', 'visco-sls'} <= set(docnames) or any(name.startswith('api/') for name in docnames):
             errors.append(f'API search entries are duplicated or missing: {locale}')
         if not {'modeling/wave-propagation', 'modeling/acquisition', 'modeling/reconstruction', 'docker', 'presentation'} <= set(docnames) or {'modeling/vrz', 'modeling/vti'} & set(docnames):
             errors.append(f'Modeling search entries are duplicated or missing: {locale}')
@@ -536,6 +539,7 @@ def check(root):
     ]
     allowed = {".md", ".py", ".txt", ".css", ".yml", ".yaml", ".html", ".js", ".json"}
     scalar3d_assets = approved_assets()
+    sls_assets = approved_sls_assets()
     sources = []
     for p in project.rglob("*"):
         relative = p.relative_to(project)
@@ -552,14 +556,15 @@ def check(root):
         is_tutorial_notebook = p.suffix == ".ipynb" and relative.parts[:2] == ("examples", "tutorials")
         is_presentation = p == ASSET_PATH
         is_scalar3d_asset = p in scalar3d_assets
-        if p.name not in {".gitignore", ".gitattributes"} and p.suffix not in allowed and not is_tutorial_png and not is_tutorial_notebook and not is_brand_file and not is_font_file and not is_diagram_file and not is_reconstruction_file and not is_presentation and not is_scalar3d_asset:
+        is_sls_asset = p in sls_assets
+        if p.name not in {".gitignore", ".gitattributes"} and p.suffix not in allowed and not is_tutorial_png and not is_tutorial_notebook and not is_brand_file and not is_font_file and not is_diagram_file and not is_reconstruction_file and not is_presentation and not is_scalar3d_asset and not is_sls_asset:
             errors.append(f"Unexpected source file: {relative}")
         if p.suffix == ".py":
             try:
                 ast.parse(p.read_text(encoding="utf-8"))
             except SyntaxError as exc:
                 errors.append(f"Python syntax: {relative}: {exc.msg}")
-        if p not in {Path(__file__).resolve(), project / 'tools' / 'check_presentation_asset.py'} and not is_tutorial_png and not (is_brand_file and p.suffix == ".png") and not is_font_file and not is_presentation and not is_scalar3d_asset:
+        if p not in {Path(__file__).resolve(), project / 'tools' / 'check_presentation_asset.py', project / 'tools' / 'check_sls_examples.py'} and not is_tutorial_png and not (is_brand_file and p.suffix == ".png") and not is_font_file and not is_presentation and not is_scalar3d_asset and not is_sls_asset:
             text = p.read_text(encoding="utf-8")
             if any(pattern.search(text) for pattern in forbidden):
                 errors.append(f"Review restricted content: {relative}")

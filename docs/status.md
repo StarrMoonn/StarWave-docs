@@ -1,5 +1,19 @@
 # 文档状态与参考来源
 
+## V14 / 7.0.0 SLS
+
+[StarWave 7.0.0](https://pypi.org/project/starwave/7.0.0/) 已于 2026-10-09 发布，对应授权 V14 / `0.1.0.dev14`。唯一发行文件为 `starwave-7.0.0-py3-none-manylinux_2_35_x86_64.whl`（17,515,547 字节），无 sdist。官方 PyPI 文件与已审 CI 构建逐字节一致；Python 3.10–3.12 安装/主机检查与公开文件干净环境回装通过。
+
+新增[双语 SLS API](visco-sls.md)，保留原有九函数契约并增加三个入口。十二份签名、默认值、关键字边界和返回契约已与真实 wheel 对齐；核心、elastic、SLS CPU、SLS CUDA 四份 ELF 及 receipt 哈希均已核验。文档检查器读取归档，不加载或执行原生库。
+
+7.0.0 公开 wheel SHA-256：
+
+```text
+0fb2d66555ad19d4178738db93ea5d71c3b7dbfb456cf4fd82898f5d44725964
+```
+
+适用范围为二维 single-SLS、固定可变密度、full 历史以及 Vp/Q/source 一阶梯度。已有源码 GPU 结果见 [SLS Marmousi2 Example](examples/visco-sls.md)：两张 A30 的固定 Q / 联合 Vp/Q 各 100 轮，以及独立 RTX 4060 环形小模型。这些原运行记录与公开 wheel 回装核验属于不同阶段。本次文档维护没有独立重跑 GPU。既有教程、图件、Scalar3D 分卷下载与 PDF 保留原版本和证据范围。
+
 ## V13 / 6.0.0 维护范围 · 2026-10-09
 
 本次维护面向 6.0.0 / 源码 `0.1.0.dev13`，同步安装版本、旧库兼容警告、Scalar2D 内部存储和 PML 转置修复，以及 elastic 取消 L2 炮组轨迹调度的说明。九个公开函数的参数签名与既有 5.0.0 契约保持一致；不增加 API 参数或改写示例调用。

@@ -1,8 +1,8 @@
 # StarWave-docs · 中文 / English
 
-StarWave 6.0.0 双语使用手册，基于 Sphinx、Read the Docs 主题和 MyST Markdown。完整中文和英文版本各含 25 个内容页面，覆盖安装、正演、反演、API 与演示文稿；每种语言独立构建、导航和搜索。API 采用 Deepwave 风格的类型签名、参数、返回、注意事项及示例组织，所有说明针对 StarWave 原创编写。
+StarWave 7.0.0 双语使用手册，基于 Sphinx、Read the Docs 主题和 MyST Markdown。完整中文和英文版本各含 27 个内容页面，覆盖安装、正演、反演、API 与演示文稿；每种语言独立构建、导航和搜索。API 采用 Deepwave 风格的类型签名、参数、返回、注意事项及示例组织，所有说明针对 StarWave 原创编写。
 
-Bilingual user documentation for StarWave 6.0.0, built with Sphinx, the Read the Docs theme, and MyST Markdown. Each language contains the complete 25-page manual and a separate search index. The API presentation takes organizational cues from Deepwave while preserving StarWave’s own public contracts.
+Bilingual user documentation for StarWave 7.0.0, built with Sphinx, the Read the Docs theme, and MyST Markdown. Each language contains the complete 27-page manual and a separate search index. The API presentation takes organizational cues from Deepwave while preserving StarWave’s own public contracts.
 
 ## 构建 / Build
 
@@ -35,7 +35,7 @@ Each page has an accessible language switch. Section and Python-object anchors s
 - `check_presentation_asset.py` (also run by `check_site.py`): the reviewed PDF's SHA-256, exactly 30 slides, an image hash for each reviewed watermark-bearing page, absence of active PDF actions or embedded files, and a strict publication allowlist. These checks preserve the independently reviewed pixels; they do not claim to recognize a watermark automatically.
 - `check_api_docs.py`: all nine typed function signatures, types/defaults/descriptions, scalar 16 / VRZ 18 / VTI 20 / elastic 62 parameter coverage, two four-parameter material conversions and prepare_elastic, return contracts and Python snippets. The checked-in public contract snapshot prevents cross-language agreement from hiding interface drift.
 - `check_tutorial_assets.py`: clean notebook/script parity, numerical-source provenance, safe metadata, configuration and measured-result invariants.
-- Optional `--wheel PATH`: verifies the pinned 6.0.0 binary wheel SHA-256, package/platform metadata, native-library receipt hashes, and signatures through AST parsing, without importing or running StarWave. Wheels are never part of the source or published site.
+- Optional `--wheel PATH`: verifies the pinned 7.0.0 binary wheel SHA-256, package/platform metadata, native-library receipt hashes, and signatures through AST parsing, without importing or running StarWave. Wheels are never part of the source or published site.
 
 Usage uses a 40.8px regular Georgia page title and single 30.6px Scalar Function, VRZ Function, VTI Function, and Elastic Function headings in both languages. Parameter names, types, defaults, and prose all use 17px text. Signatures retain 17px naturally wrapping monospace text and bold 18.7px function names; the propagator overview uses matching 17px API links, dimension tokens, and notation with consistent baselines. Code blocks and other inline code outside API fields retain their separate 15.3px size. Original section bookmarks, positional aliases, language switching, and legacy API routes are preserved.
 
@@ -59,7 +59,7 @@ The browser checks cover desktop/mobile layout, section and API switching, legac
 
 ## 内容边界 / Scope
 
-This repository contains documentation, original synthetic usage examples and build tooling. It contains no propagation implementation, binary libraries, private datasets or internal records. It neither imports StarWave through autodoc nor publishes source pages. Public API signatures are verified against the pinned 6.0.0 binary wheel and retain the 5.0.0 contract; the three original tutorials now include measured A30 / StarWave 0.1.0.dev9 results and clean notebook downloads. Those historical tutorials do not establish public-wheel GPU validation, full adjoint correctness or general performance and convergence. The new Scalar3D Example chapter separately reports bounded source-build numerical checks and measured four-GPU experiments, including incomplete surface-only recovery. See the manual’s documentation-status page.
+This repository contains documentation, original synthetic usage examples and build tooling. It contains no propagation implementation, binary libraries, private datasets or internal records. It neither imports StarWave through autodoc nor publishes source pages. Public API signatures are verified against the pinned 7.0.0 binary wheel with the existing nine contracts preserved and three SLS entry points added; the three original tutorials now include measured A30 / StarWave 0.1.0.dev9 results and clean notebook downloads. Those historical tutorials do not establish public-wheel GPU validation, full adjoint correctness or general performance and convergence. The new Scalar3D Example chapter separately reports bounded source-build numerical checks and measured four-GPU experiments, including incomplete surface-only recovery. See the manual’s documentation-status page.
 
 No new software or documentation license is declared on behalf of the owners.
 
@@ -67,7 +67,7 @@ The Presentation chapter publishes only the approved original 30-slide watermark
 
 ## Elastic documentation maintenance · 2026-10-08
 
-The existing single-page Usage now documents the published V11 / 4.0.0 elastic contract, explicit material conversions, and the separate elastic preparation helper. Source/wheel signature parity and exact return order were reviewed without executing GPU propagation. Existing scalar/VRZ/VTI API content, historical tutorial assets, styling, attribution and compatibility anchors are preserved. Review scope and the published wheel hash are recorded in each language's Status and Release Notes pages. For the current binary archive, use `python tools/check_api_docs.py --wheel PATH_TO_6.0.0_WHEEL` for optional local verification; do not commit the wheel.
+The existing single-page Usage now documents the published V11 / 4.0.0 elastic contract, explicit material conversions, and the separate elastic preparation helper. Source/wheel signature parity and exact return order were reviewed without executing GPU propagation. Existing scalar/VRZ/VTI API content, historical tutorial assets, styling, attribution and compatibility anchors are preserved. Review scope and the published wheel hash are recorded in each language's Status and Release Notes pages. For the current binary archive, use `python tools/check_api_docs.py --wheel PATH_TO_7.0.0_WHEEL` for optional local verification; do not commit the wheel.
 
 ## Wavefield Reconstruction chapter
 
@@ -86,3 +86,12 @@ Run `python tools/check_scalar3d_examples.py _build/html` to verify the asset al
 ## V13 / 6.0.0 maintenance · 2026-10-09
 
 Installation and compatibility guidance now cover the V13 / 6.0.0 internal-storage update. Scalar2D compact PML, Radius-M boundary storage, compact full history (retaining boundary_buffer, with the full layout preserved for illumination), and PML-transpose corrections are summarized without changing API calls. Elastic full/boundary no longer use L2 shot-group trajectory scheduling; the existing kernel mapping, including 3D forward shot loops, is retained. Source users must rebuild matching native libraries and restart. Existing tutorials and Scalar3D Example assets keep their original versions, hashes, and evidence scopes. No private implementation, helper module, new test report, or general speedup claim is published. The optional checker is pinned to the published 6.0.0 binary wheel and verifies its metadata, two native-library receipt hashes, and all nine signatures. The official PyPI version record and an independent public download match the 16,674,439-byte artifact and its SHA-256. Python 3.10–3.12 host/CPU installation checks and a clean public-PyPI installation passed; none establishes GPU numerical or performance acceptance.
+
+
+## V14 / 7.0.0 SLS and Marmousi2 Example · 2026-10-09
+
+The first public SLS binary release adds `visco_sls`, `prepare_visco_sls` and `visco_sls_native_status` alongside the nine unchanged API contracts. Both languages now include a dedicated SLS reference and an Example page with ten original figures, precise physical/source/sampling conventions, fixed-Q versus joint Vp/Q results, and the distinction between training-batch losses and full-survey evaluation. The observed late-stage Q degradation is retained, not presented as uniform recovery.
+
+The public example ZIP contains saved numerical results and the standalone experiment workflow, a new CPU-only results-review notebook, a four-page bilingual PDF and integrity manifests. Six bounded download parts assemble one SHA-256-verified ZIP. Operator implementations, private helper modules, raw server workspaces and unrelated notebooks are excluded. Existing Scalar3D examples, figures, ZIP parts and PDFs are unchanged.
+
+`python tools/check_api_docs.py --wheel PATH_TO_7.0.0_WHEEL` checks twelve signatures and four native-library receipt hashes. `python tools/check_sls_examples.py _build/html` verifies the strict publication allowlist, ZIP contents, privacy boundaries and bilingual evidence labels; the browser suite covers the SLS API, figures, mobile scrolling, interrupted download/resume and no-JavaScript alternatives.

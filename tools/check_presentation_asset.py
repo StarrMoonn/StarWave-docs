@@ -1,8 +1,8 @@
 """Validate the one reviewed, watermarked public presentation PDF.
 
 The exact approved bytes are allowlisted; editable slides, source material,
-attachments and active PDF actions are never published. Scalar3D report PDFs
-are independently allowlisted and validated by check_scalar3d_examples.py.
+attachments and active PDF actions are never published. Scalar3D and SLS report
+PDFs are independently allowlisted and validated by their example checkers.
 These checks complement independent content and visual review.
 """
 import hashlib
@@ -112,7 +112,8 @@ def check(root=None):
 
     # Preserve the presentation allowlist; separately validate the requested report.
     from check_scalar3d_examples import approved_assets
-    report_pdfs = {p for p in approved_assets() if p.suffix == '.pdf'}
+    from check_sls_examples import approved_assets as approved_sls_assets
+    report_pdfs = {p for p in approved_assets() | approved_sls_assets() if p.suffix == '.pdf'}
     for path in PROJECT.rglob('*'):
         relative = path.relative_to(PROJECT)
         if any(part in {'.git', '.venv', '_build', '_readthedocs', '__pycache__'} for part in relative.parts):

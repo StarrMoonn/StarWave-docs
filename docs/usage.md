@@ -1,5 +1,7 @@
 # Usage
 
+SLS: [visco_sls](visco-sls.md).
+
 ```{container} sw-page-toc
 
 **本页内容**
@@ -15,7 +17,7 @@
 - [其它导出名称与范围](#other-exports)
 ```
 
-本参考以 StarWave **6.0.0** 公开 wheel（V13）为准，`starwave.scalar` 按模型维数支持二维与三维；二维 scalar 及 VRZ、VTI、elastic 的既有契约保留。每个传播函数提供真实签名、逐项参数、返回值、梯度范围、注意事项与调用示例。参数类型描述运行时接受的值；签名保留实际关键字边界和默认值。
+本参考以 StarWave **7.0.0** 公开 wheel（V14）为准，`starwave.scalar` 按模型维数支持二维与三维；二维 scalar 及 VRZ、VTI、elastic 的既有契约保留。每个传播函数提供真实签名、逐项参数、返回值、梯度范围、注意事项与调用示例。参数类型描述运行时接受的值；签名保留实际关键字边界和默认值。
 
 6.0.0 的内部存储和 PML 转置维护见[发布说明](release-notes.md)，二维存储变化见[scalar 说明](modeling/scalar.md)。它们不引入新的公共参数；源码升级需重新构建配套原生库。
 
@@ -120,7 +122,7 @@ scalar 使用保守系数 0.6，按全部模型轴间距与 `max(abs(v))`（或�
 (scalar-3d-example)=
 ### 三维可运行调用：速度与源的一阶梯度
 
-安装 6.0.0 并确保可见逻辑 CUDA 设备 0 可用后，可运行下面的独立小例子。模型采用 `[x,y,z]`，间距为 `[dx,dy,dz]`，坐标是网格下标。loss 仅检查求导接线。此代码已检查语法与接口；本次文档维护未运行 GPU，不把断言视为已通过的数值验收。
+安装 7.0.0 并确保可见逻辑 CUDA 设备 0 可用后，可运行下面的独立小例子。模型采用 `[x,y,z]`，间距为 `[dx,dy,dz]`，坐标是网格下标。loss 仅检查求导接线。此代码已检查语法与接口；本次文档维护未运行 GPU，不把断言视为已通过的数值验收。
 
 ```python
 import torch
@@ -667,6 +669,6 @@ prepared = starwave.prepare_native([0])
 
 `ScalarIllumination`、`IlluminationFields`、`precondition_gradient` 是已核验导出的二维 scalar 照明相关名称。本版暂不提供它们的完整生命周期教程；传播函数页会解释 `illumination` 参数的使用边界。
 
-StarWave 6.0.0 没有公开 `starwave.Scalar` 包装类。教程中的 Module wrapper 由教程定义；不能将其它库的类名直接用于 StarWave，也不能把 elastic 的状态、`nt` 或存储选项添加到 scalar/VRZ/VTI 调用中。
+StarWave 7.0.0 没有公开 `starwave.Scalar` 包装类。教程中的 Module wrapper 由教程定义；不能将其它库的类名直接用于 StarWave，也不能把 elastic 的状态、`nt` 或存储选项添加到 scalar/VRZ/VTI 调用中。
 
 {ref}`genindex`
