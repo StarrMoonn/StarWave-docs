@@ -1,6 +1,6 @@
 # 标量声学 scalar
 
-`starwave.scalar` 在公开 **5.0.0** 中接受二维或三维速度模型 `v`，由 `v.ndim` 自动选择，返回单元素元组 `(receiver_amplitudes,)`。使用 `[0]` 取得形状 `[B,R,T]` 的 pressure-like 记录。
+`starwave.scalar` 在公开 **6.0.0** 中接受二维或三维速度模型 `v`，由 `v.ndim` 自动选择，返回单元素元组 `(receiver_amplitudes,)`。使用 `[0]` 取得形状 `[B,R,T]` 的 pressure-like 记录。
 
 ## 模型、坐标与采样
 
@@ -28,6 +28,8 @@ records = starwave.scalar(
 ## 梯度与照明
 
 设 `v.requires_grad=True`，从记录构造标量 loss 后调用一次 `backward()`。源位置速度因子也属于模型梯度链。二维源仍不可训练；三维支持单独或同时请求速度与源梯度。可选 `ScalarIllumination` 仅支持二维 scalar，三维必须传 `None`。照明统计量不能称为精确 Hessian。
+
+二维在 6.0.0 中使用方向紧凑 PML 状态，boundary 保存宽度 `M=accuracy//2` 的压力条带与两个终态压力场；普通目标反传（`illumination=None`）的 full 历史移除 PML/差分 halo、保留 `boundary_buffer`，每轴长度为原模型长度加 `2*boundary_buffer`；启用可选照明收集器时保留完整布局。省去填充区历史不等于省去传播、伴随或重建工作场。实际峰值显存仍取决于模型、PML、炮数、内部时间步和计算图；full/boundary 的公开选择与默认值不变。PML 转置修复不改变下述模型扩边梯度限制。
 
 默认 `memory="boundary"`。三维保存六个宽度为 `M=accuracy//2` 的压力面和两个终态压力场，用于反向重建；`"full"` 保存逐内部步的完整填充体积 `Lap(u)` 历史。源单独求导也会保存历史。CPML 使用方向条带，但传播、伴随和其它工作区仍占显存，没有自动降级或 CPU/磁盘卸载。内存估计见{ref}`Scalar3D 重建 <reconstruction-scalar3d>`。
 

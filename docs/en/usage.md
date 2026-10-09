@@ -15,7 +15,9 @@
 - [Other exported names and scope](#other-exports)
 ```
 
-This reference targets the public StarWave **5.0.0** wheel (V12). `starwave.scalar` now selects 2D or 3D from the model dimension; the existing scalar2D, VRZ, VTI, and elastic contracts are preserved. Each propagator includes its actual signature, every parameter, return values, gradient scope, notes, and a call example. Parameter types describe accepted runtime values; signatures retain the actual keyword-only boundaries and defaults.
+This reference targets the public StarWave **6.0.0** wheel (V13). `starwave.scalar` now selects 2D or 3D from the model dimension; the existing scalar2D, VRZ, VTI, and elastic contracts are preserved. Each propagator includes its actual signature, every parameter, return values, gradient scope, notes, and a call example. Parameter types describe accepted runtime values; signatures retain the actual keyword-only boundaries and defaults.
+
+See [Release Notes](release-notes.md) for 6.0.0 internal storage and PML-transpose maintenance, and [Scalar](modeling/scalar.md) for 2D storage changes. These introduce no new public parameters; source upgrades require rebuilt matching native libraries.
 
 The page organization follows the Sphinx Python API style of the [official Deepwave Usage documentation](https://ausargeo.com/deepwave/usage). All descriptions are newly written from StarWave’s actual contracts. The libraries’ parameter sets, source units, return structures, and differentiability scopes are not interchangeable.
 
@@ -118,7 +120,7 @@ Sources are FFT-upsampled before source-location velocity scaling. Records are t
 (scalar-3d-example)=
 ### Runnable 3D call: first-order velocity and source gradients
 
-With 5.0.0 installed and visible logical CUDA device 0 available, the following is a standalone small example. The model uses `[x,y,z]`, spacing is `[dx,dy,dz]`, and coordinates are grid indices. The loss only checks gradient wiring. Syntax and interface have been checked; this documentation update did not execute the GPU example, so these assertions are not numerical acceptance results.
+With 6.0.0 installed and visible logical CUDA device 0 available, the following is a standalone small example. The model uses `[x,y,z]`, spacing is `[dx,dy,dz]`, and coordinates are grid indices. The loss only checks gradient wiring. Syntax and interface have been checked; this documentation update did not execute the GPU example, so these assertions are not numerical acceptance results.
 
 ```python
 import torch
@@ -665,6 +667,6 @@ Load the separate elastic native library on the main thread. Prepare explicit lo
 
 `ScalarIllumination`, `IlluminationFields`, and `precondition_gradient` are verified exported names related to scalar illumination. This edition does not yet provide a complete lifecycle tutorial for them; the propagator pages explain the usage boundaries of the `illumination` parameter.
 
-StarWave 5.0.0 has no public `starwave.Scalar` wrapper class. The tutorials define their own Module wrapper. Do not assume another library’s classes exist in StarWave, or add elastic state, `nt`, or storage options to scalar/VRZ/VTI calls.
+StarWave 6.0.0 has no public `starwave.Scalar` wrapper class. The tutorials define their own Module wrapper. Do not assume another library’s classes exist in StarWave, or add elastic state, `nt`, or storage options to scalar/VRZ/VTI calls.
 
 {ref}`genindex`

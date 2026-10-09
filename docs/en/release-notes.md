@@ -1,5 +1,17 @@
 # Release Notes
 
+## 6.0.0 / V13 · 2026-10-09
+
+The public [StarWave 6.0.0 wheel](https://pypi.org/project/starwave/6.0.0/) corresponds to authorized source `0.1.0.dev13` and focuses on internal storage and CUDA execution maintenance. See [Status](status.md) for artifact identity and verification scope:
+
+- Scalar2D uses directional compact PML states, pressure boundary strips of width `M=accuracy//2`, and full history excluding PML/finite-difference halos but retaining `boundary_buffer` for ordinary objective backpropagation (`illumination=None`). CUDA updates use 32 × 8 thread blocks and direct loads.
+- Scalar2D transpose updates correct extra support in the plain region and neighboring union-PML contributions. This does not supply the complete transpose of model replicate-padding.
+- Elastic2D/3D full/boundary remove L2-cache-based shot-group trajectory scheduling while retaining the existing kernel mapping. 3D forward still loops over shots inside the kernel; this is not full shot parallelism in the CUDA grid.
+
+Public API signatures, defaults, source scaling, CFL, and existing calls are unchanged. Scalar3D, VRZ, and VTI scientific implementations are outside this optimization scope. Source users must rebuild matching native libraries; all users should restart Python / the notebook kernel after upgrading. See [Installation and upgrading](installation.md).
+
+This documentation update did not independently rerun a GPU and makes no general speedup, peak-memory, or faster-than-SWEEP claim. Existing tutorials and Scalar3D Examples retain their original versions and evidence scopes; they are not new 6.0.0 acceptance results.
+
 ## 5.0.0 / V12 · 2026-10-08
 
 The public [StarWave 5.0.0 wheel](https://pypi.org/project/starwave/5.0.0/) extends `starwave.scalar` without changing its signature: `v.ndim` selects 2D/3D, and 3D supports unequal spacing, orders 2/4/6/8, Radius-M six-face pressure reconstruction, and one first-order velocity/source backward. `full` retains `Lap(u)` volume history at each internal step. Coordinates directly index the model in its own axis order. The result remains the one-element `(receiver_amplitudes,)` tuple with `[B,R,T]` recordings.

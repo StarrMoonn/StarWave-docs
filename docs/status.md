@@ -1,8 +1,24 @@
 # 文档状态与参考来源
 
+## V13 / 6.0.0 维护范围 · 2026-10-09
+
+本次维护面向 6.0.0 / 源码 `0.1.0.dev13`，同步安装版本、旧库兼容警告、Scalar2D 内部存储和 PML 转置修复，以及 elastic 取消 L2 炮组轨迹调度的说明。九个公开函数的参数签名与既有 5.0.0 契约保持一致；不增加 API 参数或改写示例调用。
+
+[StarWave 6.0.0](https://pypi.org/project/starwave/6.0.0/) 已于 2026-10-09 发布。官方 PyPI 版本记录仅含 `starwave-6.0.0-py3-none-manylinux_2_35_x86_64.whl`（16,674,439 字节），无 sdist；从官方文件地址独立下载后的字节数与 SHA-256 均匹配构建产物。已核对版本与平台元数据、两份原生库的 receipt 哈希，以及九个公开签名、默认值和已记录的类型/返回契约。文档检查器只读取归档，不导入或执行 StarWave。
+
+发布流程通过 Python 3.10–3.12 的安装及主机/CPU 检查，并通过公开 PyPI 的干净环境回装检查。这些结果不代表 CUDA 数值验收；scalar3D 仍没有 CPU 传播路径。
+
+6.0.0 公开 wheel SHA-256：
+
+```text
+297a4e359d86003513452294e6384f78a6ab7029fdabefa936e0733228882cf7
+```
+
+本次没有独立执行 GPU 数值、性能、多卡或长程 FWI 测试。存储布局说明不是峰值显存实测，也不构成通用速度保证。现有教程和 Scalar3D Example 的图件、下载与实测记录保持不变，其原始版本和适用范围继续有效。
+
 ## V12 / 5.0.0 Scalar3D API 核对 · 2026-10-08
 
-当前安装版本为公开 [StarWave 5.0.0](https://pypi.org/project/starwave/5.0.0/)。同一个 `starwave.scalar` 签名按 `v.ndim` 选择二维/三维。三维支持逐轴不等间距、2/4/6/8 阶、Radius-M 六面 boundary 或 full、一次一阶速度与源梯度；二维源仍固定，三维 illumination 不支持。原有 VRZ、VTI 和 Deepwave elastic 契约保留。
+本节历史安装版本为公开 [StarWave 5.0.0](https://pypi.org/project/starwave/5.0.0/)。同一个 `starwave.scalar` 签名按 `v.ndim` 选择二维/三维。三维支持逐轴不等间距、2/4/6/8 阶、Radius-M 六面 boundary 或 full、一次一阶速度与源梯度；二维源仍固定，三维 illumination 不支持。原有 VRZ、VTI 和 Deepwave elastic 契约保留。
 
 本次独立读取公开 wheel，并核对 SHA-256、九个公开签名、参数默认值、类型和返回契约；还将 scalar、三维包装/保存布局、输入验证和时间采样模块逐字节与本次授权源码核对。双语文档与调用片段按 Python 3.10 语法检查，不在文档构建时加载或运行 StarWave。
 

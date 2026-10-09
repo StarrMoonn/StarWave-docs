@@ -2,14 +2,17 @@
 import argparse
 import ast
 import copy
+from email.parser import BytesParser
 import hashlib
 import json
 from pathlib import Path
 import re
 import zipfile
 
-# Public 5.0.0 artifact, independently matched to the publication receipt.
-WHEEL_SHA256 = 'bf159a6544cdc1ab12c99e22578ec40ed56e0d3011ae71be9fc8ecb04f9c2bff'
+# Public 6.0.0 binary artifact, independently downloaded and matched to its receipt.
+# The API/semantic snapshot retains its original 5.0.0 review provenance.
+WHEEL_VERSION = '6.0.0'
+WHEEL_SHA256 = '297a4e359d86003513452294e6384f78a6ab7029fdabefa936e0733228882cf7'
 MODULES = {
     'scalar': 'starwave/scalar.py', 'vrz': 'starwave/vrz.py',
     'vti': 'starwave/vti.py', 'native_status': 'starwave/_native.py',
@@ -169,8 +172,21 @@ def check(wheel_path=None):
         assert ast.dump(languages['zh'][name]) == ast.dump(languages['en'][name]), f'{name}: language signature mismatch'
     if wheel_path:
         wheel_path = Path(wheel_path)
-        assert hashlib.sha256(wheel_path.read_bytes()).hexdigest() == WHEEL_SHA256, 'Not the verified 5.0.0 wheel'
+        assert hashlib.sha256(wheel_path.read_bytes()).hexdigest() == WHEEL_SHA256, f'Not the verified {WHEEL_VERSION} binary wheel'
         with zipfile.ZipFile(wheel_path) as wheel:
+            metadata = BytesParser().parsebytes(wheel.read(f'starwave-{WHEEL_VERSION}.dist-info/METADATA'))
+            assert metadata['Name'] == 'starwave' and metadata['Version'] == WHEEL_VERSION
+            wheel_metadata = BytesParser().parsebytes(wheel.read(f'starwave-{WHEEL_VERSION}.dist-info/WHEEL'))
+            assert wheel_metadata['Root-Is-Purelib'] == 'false', 'A binary wheel is required'
+            assert wheel_metadata['Tag'] == 'py3-none-manylinux_2_35_x86_64'
+            receipt = json.loads(wheel.read('starwave/_binary/release.json'))
+            assert receipt['artifact_kind'] == 'precompiled-binary-only'
+            assert receipt['contract']['package_version'] == WHEEL_VERSION
+            assert receipt['contract']['source_version'] == '0.1.0.dev13'
+            for kind, filename in [('core', 'libstarwave_cuda.so'), ('elastic', 'libstarwave_deepwave_elastic.so')]:
+                library = wheel.read('starwave/_binary/' + filename)
+                assert library.startswith(b'\x7fELF'), f'Expected native ELF library: {filename}'
+                assert hashlib.sha256(library).hexdigest() == receipt['libraries'][kind]['sha256'], f'Binary receipt mismatch: {filename}'
             for name, module in MODULES.items():
                 actual = wheel_function(wheel, module, name.rsplit('.', 1)[-1])
                 assert arguments_without_annotations(languages['zh'][name]) == arguments_without_annotations(actual.args), f'{name}: differs from public wheel'
@@ -180,10 +196,10 @@ def check(wheel_path=None):
                     assert contracts[name]['return'] == ast.unparse(actual.returns), f'{name}: return type differs from public wheel'
     counts = {name: len(parameter_defaults(languages['zh'][name])) for name in MODULES}
     print(f'PASS: both languages: typed signatures, descriptions/defaults {counts}, {len(MODULES)} return contracts; {blocks} Python blocks parsed as Python 3.10.')
-    print(f'PASS: {len(MODULES)} signatures match verified public 5.0.0 wheel.' if wheel_path else 'PASS: public 5.0.0 contract snapshot; optional --wheel verifies the published archive.')
+    print(f'PASS: {len(MODULES)} signatures match verified {WHEEL_VERSION} binary wheel; metadata and native-library receipt hashes match.' if wheel_path else f'PASS: {WHEEL_VERSION} documentation retains the reviewed 5.0.0 API contract; optional --wheel verifies the pinned binary archive.')
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--wheel', help='Public StarWave 5.0.0 wheel (read only, never imported)')
+    parser.add_argument('--wheel', help=f'StarWave {WHEEL_VERSION} binary wheel (read only, never imported)')
     check(parser.parse_args().wheel)

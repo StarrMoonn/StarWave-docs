@@ -1,5 +1,17 @@
 # 发布说明
 
+## 6.0.0 / V13 · 2026-10-09
+
+公开 [StarWave 6.0.0 wheel](https://pypi.org/project/starwave/6.0.0/) 对应授权源码 `0.1.0.dev13`，以内部存储和 CUDA 执行路径维护为主；发行文件身份与验收范围见[文档状态](status.md)：
+
+- Scalar2D 使用方向紧凑 PML 状态、宽度 `M=accuracy//2` 的压力边界带，以及普通目标反传（`illumination=None`）时移除 PML/差分 halo、仍含 `boundary_buffer` 区域的 full 历史；CUDA 更新采用 32 × 8 线程块和直接加载。
+- 修正 Scalar2D 转置更新中的 plain 区额外支撑及邻点 union-PML 贡献。此修复不补齐模型 replicate-padding 的完整反传转置。
+- Elastic2D/3D 的 full/boundary 取消按 L2 缓存容量分组的炮轨迹调度，保留原有内核映射；三维 forward 仍在内核内遍历炮，不能据此理解为全炮 CUDA grid 并行。
+
+公开 API 签名、默认值、源尺度、CFL 和既有调用方式不变。Scalar3D、VRZ 与 VTI 的科学实现不属于本次优化范围。源码用户需重建配套原生库；所有用户升级后均应重启 Python / Notebook kernel，见[安装与升级](installation.md)。
+
+本次文档维护未独立重跑 GPU，未给出通用加速比、峰值显存或优于 SWEEP 的性能结论。原有教程与 Scalar3D Example 保留各自版本和证据范围，不能当作 6.0.0 的新验收。
+
 ## 5.0.0 / V12 · 2026-10-08
 
 公开 [StarWave 5.0.0 wheel](https://pypi.org/project/starwave/5.0.0/) 在原签名上扩展 `starwave.scalar`：二维/三维由 `v.ndim` 选择，三维支持不等间距、2/4/6/8 阶、Radius-M 六面压力重建，以及一次一阶速度与源梯度。`full` 保留逐内部步 `Lap(u)` 体积历史。三维模型按自身轴序给出，坐标直接索引；输出仍为单元素 `(receiver_amplitudes,)`，记录 `[B,R,T]`。

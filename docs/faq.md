@@ -6,7 +6,7 @@
 
 ## 需要编译 CUDA 吗？
 
-使用公开 5.0.0 wheel 不需要编译或安装 nvcc。scalar/VRZ/VTI 和 elastic boundary 需要兼容 GPU/驱动；elastic full 也可在 CPU 上运行。如果完整性或兼容检查失败，在相同环境重装对应 wheel 并重启 Python；不要指望文档项目包含私有构建工具。
+使用公开 6.0.0 wheel 不需要编译或安装 nvcc。scalar/VRZ/VTI 和 elastic boundary 需要兼容 GPU/驱动；elastic full 也可在 CPU 上运行。如果完整性或兼容检查失败，在相同环境重装对应 wheel 并重启 Python；不要指望文档项目包含私有构建工具。
 
 ## import 成功，为什么 prepare_native 失败？
 

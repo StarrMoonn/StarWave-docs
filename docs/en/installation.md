@@ -2,13 +2,13 @@
 
 **Installation channels**
 
-- **PyPI**: the public wheel is available. Follow the instructions below to install StarWave 5.0.0.
+- **PyPI**: the public wheel is available. Follow the instructions below to install StarWave 6.0.0.
 - **Source**: available only to users with authorized source access. Follow the instructions provided with that source.
 - **[Docker](docker.md)**: preparing; no StarWave container image has been published yet.
 
 ## Runtime requirements
 
-| Component | StarWave 5.0.0 wheel requirement |
+| Component | StarWave 6.0.0 wheel requirement |
 |---|---|
 | Operating system | Linux x86_64, glibc ≥ 2.35 |
 | C++ runtime | libstdc++ providing GLIBCXX_3.4.30 / CXXABI_1.3.13 symbols or newer |
@@ -17,9 +17,9 @@
 | GPU | NVIDIA CUDA for scalar 2D/3D, VRZ/VTI, and elastic boundary; elastic full also supports CPU |
 | Compilation targets | SASS 70/75/80/86/89/90 and compute80 PTX |
 
-Installing the prebuilt wheel does not require nvcc or a local CUDA Toolkit. A conservative target for the Linux driver is 520.61.05 or newer, and the driver must also support the actual GPU. WSL uses the Windows host driver; see the [WSL guidance](wsl.md). The A30 and RTX 4060 Laptop are covered by the compilation targets; device-level numerical and performance tests of the public 5.0.0 wheel are still pending. A separate development-version A30 run is documented below.
+Installing the prebuilt wheel does not require nvcc or a local CUDA Toolkit. A conservative target for the Linux driver is 520.61.05 or newer, and the driver must also support the actual GPU. WSL uses the Windows host driver; see the [WSL guidance](wsl.md). The A30 and RTX 4060 Laptop are covered by the compilation targets; device-level numerical and performance tests of the public 6.0.0 wheel are still pending. A separate development-version A30 run is documented below.
 
-The version information above comes from the [PyPI 5.0.0 release description](https://pypi.org/project/starwave/5.0.0/). The public release contains only Linux wheels, with no sdist. This wheel cannot be used directly on native Windows, macOS, or ARM hosts.
+The version information above comes from the [PyPI 6.0.0 release description](https://pypi.org/project/starwave/6.0.0/); see [Documentation Status](status.md) for artifact identity and verification scope. The public release contains only a Linux wheel, with no sdist. This wheel cannot be used directly on native Windows, macOS, or ARM hosts.
 
 ## Create a runtime environment
 
@@ -30,11 +30,19 @@ python3.12 -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
 python -m pip install torch==2.5.1 --index-url https://download.pytorch.org/whl/cu118
-python -m pip install --only-binary=starwave starwave==5.0.0
+python -m pip install --only-binary=starwave starwave==6.0.0
 python -m pip check
 ```
 
 The PyTorch installation command follows the [PyTorch previous-versions page](https://pytorch.org/get-started/previous-versions/). `cu118` is the starting configuration for validating this version; it does not mean that other PyTorch versions have been validated. Restart Python or the notebook kernel after upgrading StarWave.
+
+## Upgrading from an earlier version
+
+The public installation target is `starwave==6.0.0`; `0.1.0.dev13` identifies the authorized source version, not a PyPI installation target. Public function signatures, parameter defaults, coordinate/return conventions, source scaling, and CFL rules are unchanged from 5.0.0, so existing calls remain applicable.
+
+Source users must pair this version's Python package with rebuilt native libraries, following the instructions supplied with the source. Scalar2D PML, boundary, and full-history layouts have changed; matching core ABI layouts do not make old libraries reusable, and compatibility guards must not be bypassed. The public wheel needs no local compilation. After upgrading or replacing loaded libraries, restart Python / the notebook kernel, then repeat native preparation and small forward/gradient checks.
+
+Internal operation ordering and the PML-transpose correction can change low-order bits or previously incorrect gradients; bitwise equality with older versions is not expected. Memory optimizations do not remove model-extension gradient limits or guarantee speed or memory benefits for every configuration.
 
 ## Check imports and the native library
 
@@ -57,7 +65,7 @@ In a fresh Python process, before the first native preparation, the wheel should
 The documentation site's build environment is separate from the computational runtime environment. Reading or building the documentation does not require a GPU.
 
 
-Elastic uses a separate preparation entry point: call `starwave.prepare_elastic([0])` on the GPU main thread, or `starwave.prepare_elastic()` with `memory="full"` for CPU. See {ref}`Elastic Function <elastic>` for parameters and vp/vs/rho conversion. Published 5.0.0 wheel installation and host checks passed; scalar3D has no CPU propagation path. GPU, DataParallel and long-FWI acceptance scopes are listed in [Status](status.md).
+Elastic uses a separate preparation entry point: call `starwave.prepare_elastic([0])` on the GPU main thread, or `starwave.prepare_elastic()` with `memory="full"` for CPU. See {ref}`Elastic Function <elastic>` for parameters and vp/vs/rho conversion. Scalar3D has no CPU propagation path. GPU, DataParallel and long-FWI acceptance scopes are listed in [Status](status.md).
 
 (installation-smoke)=
 ## Notebook 01: Executed smoke test
@@ -73,7 +81,7 @@ Select the corresponding CUDA kernel and run every cell from the beginning. Each
 
 ```{admonition} Measured environment · 2026-10-05
 :class: sw-run-note
-NVIDIA A30 · Python 3.10.18 · PyTorch 2.5.1 / CUDA 11.8 · installed StarWave **0.1.0.dev9**. The server results below check a small workflow in this development-version environment. They do not establish device validation of the public **2.0.0, 4.0.0, or 5.0.0 wheel**.
+NVIDIA A30 · Python 3.10.18 · PyTorch 2.5.1 / CUDA 11.8 · installed StarWave **0.1.0.dev9**. The server results below check a small workflow in this development-version environment. They do not establish device validation of the public **2.0.0, 4.0.0, 5.0.0, or 6.0.0 wheel**.
 ```
 
 ## Small experiment design

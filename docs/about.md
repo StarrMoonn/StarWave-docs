@@ -25,4 +25,4 @@ StarWave 的调用风格参考了 [Deepwave](https://github.com/ar4/deepwave)；
 3. [梯度教程](modeling/gradient.md)与 [FWI 教程](inversion/fwi.md)：把观测差异连接到模型更新。
 4. [INR](inversion/inr.md)：了解如何接入自己的神经网络模型。
 
-教程中的实测结果来自 A30 / StarWave 0.1.0.dev9 的特定标量声学实验；新公开 5.0.0 wheel 的接口已单独核对；这一接口核对不等同于 wheel 的完整 GPU 验证。INR 页面提供概念与接线示例。各项证据与适用范围见[文档状态](status.md)。
+教程中的实测结果来自 A30 / StarWave 0.1.0.dev9 的特定标量声学实验；6.0.0 公开 wheel 的接口已单独核对，保留 5.0.0 公开签名；接口核对不等同于 wheel 的完整 GPU 验证。INR 页面提供概念与接线示例。各项证据与适用范围见[文档状态](status.md)。

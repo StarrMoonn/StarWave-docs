@@ -25,4 +25,4 @@ StarWave's call style takes cues from [Deepwave](https://github.com/ar4/deepwave
 3. [Gradient](modeling/gradient.md) and [FWI](inversion/fwi.md) tutorials: connect the data residual to a model update.
 4. [INR](inversion/inr.md): learn how to connect your own neural model.
 
-Measured tutorial results cover specific scalar-acoustic experiments on an A30 with StarWave 0.1.0.dev9. The new public 5.0.0 wheel has a separate verified interface contract; that check does not constitute full GPU validation of the wheel. The INR guide covers concepts and integration snippets. See [Status](status.md) for the evidence and its scope.
+Measured tutorial results cover specific scalar-acoustic experiments on an A30 with StarWave 0.1.0.dev9. The public 6.0.0 wheel has a separately verified interface contract retaining the public 5.0.0 signatures; interface checks do not constitute full GPU validation of a wheel. The INR guide covers concepts and integration snippets. See [Status](status.md) for the evidence and its scope.

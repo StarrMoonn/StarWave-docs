@@ -1,6 +1,6 @@
 # Scalar Acoustics
 
-In public **5.0.0**, `starwave.scalar` accepts a 2D or 3D velocity model `v`, selected by `v.ndim`, and returns a single-element tuple `(receiver_amplitudes,)`. Use `[0]` to obtain pressure-like records of shape `[B,R,T]`.
+In public **6.0.0**, `starwave.scalar` accepts a 2D or 3D velocity model `v`, selected by `v.ndim`, and returns a single-element tuple `(receiver_amplitudes,)`. Use `[0]` to obtain pressure-like records of shape `[B,R,T]`.
 
 ## Models, coordinates, and sampling
 
@@ -28,6 +28,8 @@ This fragment requires prepared inputs. See [Quickstart](../quickstart.md) for a
 ## Gradients and illumination
 
 Set `v.requires_grad=True`, build a scalar loss from the records, and call `backward()` once. The source-location velocity factor remains part of the model-gradient chain. 2D sources remain fixed; 3D supports velocity or source gradients separately or together. `ScalarIllumination` is supported only for 2D scalar; 3D requires `None`. Illumination statistics are not an exact Hessian.
+
+In 6.0.0, 2D uses directional compact PML states. Boundary mode stores pressure strips of width `M=accuracy//2` and two terminal pressure fields. For ordinary objective backpropagation (`illumination=None`), full history excludes PML/finite-difference halos but retains `boundary_buffer`: each axis is the original model size plus `2*boundary_buffer`. Enabling the optional illumination collector retains the full layout. Removing padded-region history does not remove propagation, adjoint, or reconstruction workspaces. Actual peak memory still depends on the model, PML, shot count, internal timesteps, and computational graph. Public full/boundary choices and defaults are unchanged. The PML-transpose correction does not change the model-extension gradient limits below.
 
 The default is `memory="boundary"`. 3D stores six pressure faces of width `M=accuracy//2` and two terminal pressure fields for reverse reconstruction. `"full"` stores `Lap(u)` history over the padded volume at each internal step. Source-only gradients also retain history. Directional CPML slabs do not eliminate propagation, adjoint, or other workspaces. There is no automatic fallback or CPU/disk offload. See {ref}`Scalar3D reconstruction <reconstruction-scalar3d>` for memory estimates.
 

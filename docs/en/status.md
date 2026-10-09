@@ -1,8 +1,24 @@
 # Documentation Status and References
 
+## V13 / 6.0.0 maintenance scope · 2026-10-09
+
+This maintenance targets 6.0.0 / source `0.1.0.dev13`: installation versions, old-library compatibility warnings, Scalar2D internal storage and PML-transpose corrections, and removal of elastic L2 shot-group trajectory scheduling. The nine public function signatures retain the existing 5.0.0 contract; no API parameters or example calls are added or changed.
+
+[StarWave 6.0.0](https://pypi.org/project/starwave/6.0.0/) was published on 2026-10-09. The official PyPI version record contains only `starwave-6.0.0-py3-none-manylinux_2_35_x86_64.whl` (16,674,439 bytes), with no sdist; an independent download from the official file URL matches the built artifact in byte count and SHA-256. Version/platform metadata, both native-library receipt hashes, and nine public signatures, defaults, and recorded type/return contracts were checked. The documentation checker only reads the archive and never imports or executes StarWave.
+
+The release workflow passed Python 3.10–3.12 installation and host/CPU checks, followed by a clean-environment installation from public PyPI. These results are not CUDA numerical acceptance; scalar3D still has no CPU propagation path.
+
+Public 6.0.0 wheel SHA-256:
+
+```text
+297a4e359d86003513452294e6384f78a6ab7029fdabefa936e0733228882cf7
+```
+
+This update independently ran no GPU numerical, performance, multi-GPU, or long-FWI tests. Storage-layout descriptions are not peak-memory measurements or general speed guarantees. Existing tutorials and Scalar3D Example figures, downloads, and measurements are unchanged and retain their original versions and scopes.
+
 ## V12 / 5.0.0 Scalar3D API review · 2026-10-08
 
-The current installation target is public [StarWave 5.0.0](https://pypi.org/project/starwave/5.0.0/). The unchanged `starwave.scalar` signature selects 2D/3D from `v.ndim`. 3D supports unequal per-axis spacing, orders 2/4/6/8, Radius-M six-face boundary or full memory, and one first-order velocity/source backward. 2D sources remain fixed; 3D illumination is unsupported. Existing VRZ, VTI, and Deepwave elastic contracts are preserved.
+The historical installation target in this section is public [StarWave 5.0.0](https://pypi.org/project/starwave/5.0.0/). The unchanged `starwave.scalar` signature selects 2D/3D from `v.ndim`. 3D supports unequal per-axis spacing, orders 2/4/6/8, Radius-M six-face boundary or full memory, and one first-order velocity/source backward. 2D sources remain fixed; 3D illumination is unsupported. Existing VRZ, VTI, and Deepwave elastic contracts are preserved.
 
 This update independently read the public wheel and checked its SHA-256, nine public signatures, parameter defaults/types, and return contracts. Scalar, the 3D wrapper/storage layout, validation, and temporal-sampling modules were also byte-matched to the authorized source. Bilingual documentation and call fragments are checked with Python 3.10 syntax; the documentation build does not load or execute StarWave.
 
