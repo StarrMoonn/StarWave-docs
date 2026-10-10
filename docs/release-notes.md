@@ -1,8 +1,19 @@
 # 发布说明
 
-## 7.0.0 / V14 · 2026-10-09
+## V15 / GSLS 源码 Release · 2026-10-10
 
-[StarWave 7.0.0](https://pypi.org/project/starwave/7.0.0/) 对应授权源码 `0.1.0.dev14`，首次公开提供新增并整合的 [SLS 黏声学接口](visco-sls.md)。Linux 二进制 wheel 包含核心、elastic、SLS CPU 和 SLS CUDA 四份原生库；不需要用户编译，也不提供 sdist。
+[V15 源码 Release](https://github.com/StarrMoonn/StarWave/releases/tag/V15) 已发布，源码版本为 `0.1.0.dev15`，提交 `2508543ccc1dc3015b07806e6e240dd88c8e871e`。本次没有更新 PyPI：公开 7.0.0 仍是历史 V14 二进制，不能用于当前 GSLS 调用。
+
+- [GSLS](visco-gsls.md) 成为唯一黏声接口；独立 `visco_sls` 及其准备/状态入口移除。单机制使用 `mode="sls_compat", n_mechanisms=1`。
+- 二维固定可变密度，原生 CPU/CUDA full/checkpoint、显式 Torch full；Vp/Q/source/provider 参数一阶梯度。默认 Hao1、显式 band_fit 与 sls_compat 各有不同 Q 语义，不能直接互换。
+- 原有 scalar/VRZ/VTI/elastic 的科学实现、签名与默认值保持不变。GSLS ABI 2 / semantics 1 / capabilities 255 要求配套重建和重启；`compile_all.py` 覆盖 core、elastic、GSLS 三库，CPU GSLS 单独显式构建。
+- 导航和当前 API 直接介绍 GSLS。旧独立 SLS API、实验页面和下载均从当前手册移除；原始材料保留在 Git 历史中，不改标为 GSLS。
+
+本次文档更新不宣称最终集成版 GPU、多卡、长程 FWI 或性能验收。安装渠道、历史验证范围与来源见[安装](installation.md)和[文档状态](status.md)。
+
+## 7.0.0 / V14（历史） · 2026-10-09
+
+[StarWave 7.0.0](https://pypi.org/project/starwave/7.0.0/) 对应授权源码 `0.1.0.dev14`，首次公开提供新增并整合的 SLS 黏声学接口。Linux 二进制 wheel 包含核心、elastic、SLS CPU 和 SLS CUDA 四份原生库；不需要用户编译，也不提供 sdist。
 
 - 新增 `starwave.visco_sls`、`starwave.prepare_visco_sls` 与 `starwave.visco_sls_native_status`；原有九个公开函数的签名和默认值不变。
 - 二维 single-SLS、固定可变密度、full 体积历史；Vp/Q/source 可独立求一阶梯度。CPU 原生、CUDA 与 Torch 参考后端均显式选择，不自动回退。

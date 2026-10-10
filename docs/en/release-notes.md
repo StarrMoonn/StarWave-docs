@@ -1,8 +1,19 @@
 # Release Notes
 
-## 7.0.0 / V14 · 2026-10-09
+## V15 / GSLS source Release · 2026-10-10
 
-[StarWave 7.0.0](https://pypi.org/project/starwave/7.0.0/) corresponds to authorized source `0.1.0.dev14` and first publicly supplies the newly integrated [SLS viscoacoustic interface](visco-sls.md). The Linux binary wheel contains four native libraries: core, elastic, SLS CPU and SLS CUDA. Local compilation is unnecessary and no sdist is provided.
+The [V15 source Release](https://github.com/StarrMoonn/StarWave/releases/tag/V15) is published with source version `0.1.0.dev15`, commit `2508543ccc1dc3015b07806e6e240dd88c8e871e`. PyPI is not updated: public 7.0.0 remains the historical V14 binary and cannot run the current GSLS API.
+
+- [GSLS](visco-gsls.md) becomes the only viscoacoustic interface. Independent `visco_sls` and its preparation/status helpers are removed. Single-mechanism calculations use `mode="sls_compat", n_mechanisms=1`.
+- 2D fixed variable density, native CPU/CUDA full/checkpoint, explicit Torch full, and first-order Vp/Q/source/provider gradients. Default Hao1, explicit band_fit and sls_compat have distinct Q meanings and are not interchangeable.
+- Existing scalar/VRZ/VTI/elastic scientific implementations, signatures and defaults remain unchanged. GSLS ABI 2 / semantics 1 / capabilities 255 requires matching rebuilds and a restart. `compile_all.py` covers core, elastic and GSLS; GSLS CPU is built explicitly and separately.
+- Navigation and current API documentation introduce GSLS directly. The independent SLS API, experiment pages and downloads are removed from the current manual. Original materials remain in Git history and are not relabelled as GSLS.
+
+This documentation update does not claim final integrated GPU, multi-GPU, long-FWI or performance acceptance. See [Installation](installation.md) and [Status](status.md) for channels, historical verification scope and sources.
+
+## 7.0.0 / V14 (historical) · 2026-10-09
+
+[StarWave 7.0.0](https://pypi.org/project/starwave/7.0.0/) corresponds to authorized source `0.1.0.dev14` and first publicly supplies the newly integrated SLS viscoacoustic interface. The Linux binary wheel contains four native libraries: core, elastic, SLS CPU and SLS CUDA. Local compilation is unnecessary and no sdist is provided.
 
 - Adds `starwave.visco_sls`, `starwave.prepare_visco_sls` and `starwave.visco_sls_native_status`; signatures and defaults of the nine existing public functions are unchanged.
 - 2D single-SLS, fixed variable density and full volume histories, with independent first-order Vp/Q/source gradients. Native CPU, CUDA and Torch-reference backends are selected explicitly, without automatic fallback.

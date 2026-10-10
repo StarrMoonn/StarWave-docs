@@ -112,8 +112,7 @@ def check(root=None):
 
     # Preserve the presentation allowlist; separately validate the requested report.
     from check_scalar3d_examples import approved_assets
-    from check_sls_examples import approved_assets as approved_sls_assets
-    report_pdfs = {p for p in approved_assets() | approved_sls_assets() if p.suffix == '.pdf'}
+    report_pdfs = {p for p in approved_assets() if p.suffix == '.pdf'}
     for path in PROJECT.rglob('*'):
         relative = path.relative_to(PROJECT)
         if any(part in {'.git', '.venv', '_build', '_readthedocs', '__pycache__'} for part in relative.parts):

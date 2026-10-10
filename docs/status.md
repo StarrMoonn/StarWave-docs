@@ -1,10 +1,22 @@
 # 文档状态与参考来源
 
-## V14 / 7.0.0 SLS
+## V15 / GSLS · 2026-10-10
+
+当前手册依据已发布的 [V15 源码 Release](https://github.com/StarrMoonn/StarWave/releases/tag/V15)，源码版本 `0.1.0.dev15`，对应提交 `2508543ccc1dc3015b07806e6e240dd88c8e871e`。Release 发布与 PyPI 二进制发行分开：原公开 **7.0.0** 未更新，不包含 GSLS，也不包含独立 SLS 的源码清理。
+
+当前黏声入口为 [GSLS](visco-gsls.md)：二维、固定空间变密度、原生 CPU/CUDA full/checkpoint、显式 Torch full、一阶 Vp/Q/source/provider 梯度。独立 SLS API/生产源码/构建入口已移除，单机制显式选择 `mode="sls_compat", n_mechanisms=1`。本手册不发布传播实现、CUDA 源码或完整源码归档。
+
+参数和物理说明以该 V15 源码契约为准。默认 Hao1 的 Q 为名义 Q0；Vp 是参考相速度；训练材料且 PML 非零时须固定覆盖非松弛速度的 `max_vel`。不支持三维、rho 梯度、boundary 或传播高阶导数。完整限制见 GSLS 页，显式构建和重启步骤见[安装](installation.md)。
+
+提供的 A30/RTX 4060 记录属于集成前的源码指纹；host guard 与集成后的身份不同，不能作为最终集成版 GPU 重跑的证明。本次手册更新没有运行 GPU、DataParallel、长程 FWI 或目标设备性能测试。旧独立 SLS API、实验页面及下载已从当前手册移除；原始材料保留在 Git 历史中，不改标为 GSLS 结果。
+
+以下各节保留历史发行核验事实，不能转移为 V15 的新验收结论。
+
+## V14 / 7.0.0 SLS（历史）
 
 [StarWave 7.0.0](https://pypi.org/project/starwave/7.0.0/) 已于 2026-10-09 发布，对应授权 V14 / `0.1.0.dev14`。唯一发行文件为 `starwave-7.0.0-py3-none-manylinux_2_35_x86_64.whl`（17,515,547 字节），无 sdist。官方 PyPI 文件与已审 CI 构建逐字节一致；Python 3.10–3.12 安装/主机检查与公开文件干净环境回装通过。
 
-新增[双语 SLS API](visco-sls.md)，保留原有九函数契约并增加三个入口。十二份签名、默认值、关键字边界和返回契约已与真实 wheel 对齐；核心、elastic、SLS CPU、SLS CUDA 四份 ELF 及 receipt 哈希均已核验。文档检查器读取归档，不加载或执行原生库。
+当时新增双语 SLS API，保留原有九函数契约并增加三个入口。十二份签名、默认值、关键字边界和返回契约已与真实 wheel 对齐；核心、elastic、SLS CPU、SLS CUDA 四份 ELF 及 receipt 哈希均已核验。文档检查器读取归档，不加载或执行原生库。
 
 7.0.0 公开 wheel SHA-256：
 
@@ -12,7 +24,7 @@
 0fb2d66555ad19d4178738db93ea5d71c3b7dbfb456cf4fd82898f5d44725964
 ```
 
-适用范围为二维 single-SLS、固定可变密度、full 历史以及 Vp/Q/source 一阶梯度。已有源码 GPU 结果见 [SLS Marmousi2 Example](examples/visco-sls.md)：两张 A30 的固定 Q / 联合 Vp/Q 各 100 轮，以及独立 RTX 4060 环形小模型。这些原运行记录与公开 wheel 回装核验属于不同阶段。本次文档维护没有独立重跑 GPU。既有教程、图件、Scalar3D 分卷下载与 PDF 保留原版本和证据范围。
+适用范围为二维 single-SLS、固定可变密度、full 历史以及 Vp/Q/source 一阶梯度。当时记录的源码 GPU 结果包括：两张 A30 的固定 Q / 联合 Vp/Q 各 100 轮，以及独立 RTX 4060 环形小模型。这些原运行记录与公开 wheel 回装核验属于不同阶段。本次文档维护没有独立重跑 GPU。既有教程、图件、Scalar3D 分卷下载与 PDF 保留原版本和证据范围。
 
 ## V13 / 6.0.0 维护范围 · 2026-10-09
 

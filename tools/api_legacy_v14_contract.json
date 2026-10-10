@@ -1,0 +1,18 @@
+{
+  "provenance": {
+    "public_version": "7.0.0",
+    "source_version": "0.1.0.dev14",
+    "scope": "Historical binary-wheel signature verification only; not current V15 documentation."
+  },
+  "apis": {
+    "visco_sls": {
+      "signature": "(vp, q, rho, grid_spacing, dt, *, source_amplitudes, source_locations, receiver_locations, f_ref, accuracy=4, pml_width=20, memory='full', max_vel=None, backend='cuda')"
+    },
+    "prepare_visco_sls": {
+      "signature": "(device='cuda:0', *, backend='cuda')"
+    },
+    "visco_sls_native_status": {
+      "signature": "(*, backend='cuda')"
+    }
+  }
+}

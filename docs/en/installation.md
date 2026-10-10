@@ -1,14 +1,44 @@
 # Installation
 
-The newly integrated V14 [SLS API](visco-sls.md) is first publicly available in **7.0.0**. Its wheel includes SLS CPU/CUDA libraries without local compilation; see [Status](status.md) for artifact identity.
+The published [V15 source Release](https://github.com/StarrMoonn/StarWave/releases/tag/V15) (`0.1.0.dev15`) provides the [GSLS API](visco-gsls.md). Public PyPI **7.0.0** remains the older V14 binary without GSLS; `pip install starwave==7.0.0` does not install V15.
+
+The source repository is private; downloading the Release/source requires authorized GitHub access, or use the complete V15 source provided by the project owner.
 
 **Installation channels**
 
-- **PyPI**: the public wheel is available. Follow the instructions below to install StarWave 7.0.0.
-- **Source**: available only to users with authorized source access. Follow the instructions provided with that source.
+- **V15 source**: use the complete matching Release source and build explicitly from its root.
+- **PyPI 7.0.0 (historical binary)**: its requirements and commands remain below, separately from current GSLS examples.
 - **[Docker](docker.md)**: preparing; no StarWave container image has been published yet.
 
-## Runtime requirements
+## Build V15 from source
+
+Use an installed CUDA Toolkit/C++ toolchain matching PyTorch. From the complete source root:
+
+```bash
+python compile_all.py --arch 80
+```
+
+This builds/verifies three CUDA libraries: core (scalar/VRZ/VTI), elastic and GSLS. Use `80` for A30, `89` for RTX 4060, or your actual GPU architecture. `combined_build.py` covers core/elastic only. To build GSLS alone, select CUDA or CPU explicitly:
+
+```bash
+# GSLS CUDA
+python compile_visco_gsls.py --arch 80
+# GSLS native CPU
+python compile_visco_gsls.py --backend cpu
+```
+
+GSLS source builds output to `native/build/gsls/`, or the `gsls/` subdirectory of the common `STARWAVE_BUILD_DIR` override. Build and runtime must use matching source/library inputs; do not mix old standalone libraries. GSLS ABI 2 / semantics 1 / capabilities 255 and core ABI 2 are checked separately. Restart Python/the notebook kernel after updates. Compilation or loading does not establish GPU numerical acceptance.
+
+A complete source checkout runs without pip registration. Optional registration is separate from compilation and does not implicitly build:
+
+```bash
+python -m pip install --no-deps -e .
+```
+
+The following wheel requirements and commands describe only the historical 7.0.0 channel.
+
+(runtime-requirements)=
+## Historical 7.0.0 wheel requirements
 
 | Component | StarWave 7.0.0 wheel requirement |
 |---|---|
@@ -23,7 +53,7 @@ Installing the prebuilt wheel does not require nvcc or a local CUDA Toolkit. A c
 
 The version information above comes from the [PyPI 7.0.0 release description](https://pypi.org/project/starwave/7.0.0/); see [Documentation Status](status.md) for artifact identity and verification scope. The public release contains only a Linux wheel, with no sdist. This wheel cannot be used directly on native Windows, macOS, or ARM hosts.
 
-## Create a runtime environment
+## Install the historical 7.0.0 wheel
 
 Run the following commands in a Linux or WSL 2 Linux terminal that meets the requirements. Choose Python 3.10–3.12; this example uses 3.12.
 
@@ -38,15 +68,15 @@ python -m pip check
 
 The PyTorch installation command follows the [PyTorch previous-versions page](https://pytorch.org/get-started/previous-versions/). `cu118` is the starting configuration for validating this version; it does not mean that other PyTorch versions have been validated. Restart Python or the notebook kernel after upgrading StarWave.
 
-## Upgrading from an earlier version
+## Upgrade to V15 source
 
-The public installation target is `starwave==7.0.0`; `0.1.0.dev14` identifies the authorized source version, not a PyPI installation target. Compared with 6.0.0, three SLS entry points are added while the existing nine public signatures, defaults and scientific calling conventions are unchanged. SLS has its own source, sampling and memory contract; other equations' arguments cannot simply be substituted.
+V15 has one viscoacoustic entry point, `starwave.visco_gsls`; independent `visco_sls` and its preparation/status helpers are removed. Single-mechanism calculations explicitly use `mode="sls_compat", n_mechanisms=1`; changing only the function name would select default Hao1 instead. Source version `0.1.0.dev15` and public wheel `7.0.0` identify different distributions.
 
 Source users must pair this version's Python package with rebuilt native libraries, following the instructions supplied with the source. When upgrading from a version earlier than 6.0.0, Scalar2D PML, boundary, and full-history layouts have changed; matching core ABI layouts do not make old libraries reusable, and compatibility guards must not be bypassed. The public wheel needs no local compilation. After upgrading or replacing loaded libraries, restart Python / the notebook kernel, then repeat native preparation and small forward/gradient checks.
 
 Internal operation ordering and the PML-transpose correction can change low-order bits or previously incorrect gradients; bitwise equality with older versions is not expected. Memory optimizations do not remove model-extension gradient limits or guarantee speed or memory benefits for every configuration.
 
-## Check imports and the native library
+## Check the core library (installed wheel or registered source)
 
 ```python
 import torch
@@ -69,7 +99,9 @@ The documentation site's build environment is separate from the computational ru
 
 Elastic uses a separate preparation entry point: call `starwave.prepare_elastic([0])` on the GPU main thread, or `starwave.prepare_elastic()` with `memory="full"` for CPU. See {ref}`Elastic Function <elastic>` for parameters and vp/vs/rho conversion. Scalar3D has no CPU propagation path. GPU, DataParallel and long-FWI acceptance scopes are listed in [Status](status.md).
 
-SLS uses separate preparation: call `starwave.prepare_visco_sls("cuda:0", backend="cuda")` on the CUDA main thread, or `starwave.prepare_visco_sls(backend="native_cpu")` for CPU. `starwave.visco_sls_native_status(backend="cuda")` only reports presence/load state. Explicit `backend="torch"` selects the small-model reference without native preparation. See the [SLS API](visco-sls.md) for complete parameters and a standalone CPU example.
+## V15 GSLS preparation and backend selection
+
+V15 GSLS uses separate preparation: call `starwave.prepare_visco_gsls(backend="cuda", device="cuda:0")` on the CUDA main thread, or `starwave.prepare_visco_gsls(backend="native_cpu")` for CPU. `starwave.visco_gsls_native_status(backend="cuda")` only reports status. Preparation defaults to CPU while propagation defaults to CUDA; select explicitly, without automatic fallback. `backend="torch", memory="full"` is the small-model reference requiring no native build. See the [GSLS API](visco-gsls.md) for the complete contract and CPU example.
 
 (installation-smoke)=
 ## Notebook 01: Executed smoke test

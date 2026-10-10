@@ -209,8 +209,8 @@
     },
     "return": "dict"
   },
-  "visco_sls": {
-    "signature": "(vp, q, rho, grid_spacing, dt, *, source_amplitudes, source_locations, receiver_locations, f_ref, accuracy=4, pml_width=20, memory='full', max_vel=None, backend='cuda')",
+  "visco_gsls": {
+    "signature": "(vp, q, rho, grid_spacing, dt, *, source_amplitudes, source_locations, receiver_locations, f_ref, accuracy=4, pml_width=20, memory='full', max_vel=None, backend='cuda', mode='hao1', frequency_band=None, n_mechanisms=None, fit_tolerance=0.05, strict=False, material_model=None, checkpoint_interval=None)",
     "types": {
       "vp": "torch.Tensor",
       "q": "torch.Tensor",
@@ -225,16 +225,24 @@
       "pml_width": "int | list[int] | tuple[int, int]",
       "memory": "str",
       "max_vel": "float | int | None",
-      "backend": "str"
+      "backend": "str",
+      "mode": "str",
+      "frequency_band": "tuple[float, float] | list[float] | None",
+      "n_mechanisms": "int | None",
+      "fit_tolerance": "float | int | None",
+      "strict": "bool",
+      "material_model": "Callable | None",
+      "checkpoint_interval": "int | None"
     },
     "return": "tuple[torch.Tensor]",
-    "page": "visco-sls",
+    "page": "visco-gsls",
     "semantics": {
       "model_dimensions": [
         2
       ],
       "memory": [
-        "full"
+        "full",
+        "checkpoint"
       ],
       "density_gradient": false,
       "density_spatial_variation": true,
@@ -249,7 +257,11 @@
       "record_time": "pre-update p[n], n=0..T-1",
       "last_source_vjp": 0,
       "vp_definition": "phase velocity at f_ref",
-      "q_definition": "complex modulus Q at f_ref",
+      "q_definition": {
+        "hao1": "nominal Q0, not exact Q at f_ref",
+        "band_fit": "approximate constant-Q target over explicit frequency_band",
+        "sls_compat": "exact modulus Q at f_ref"
+      },
       "max_vel_definition": "covering unrelaxed-speed envelope",
       "trainable_model_nonzero_pml_requires_fixed_max_vel": true,
       "backends": [
@@ -260,24 +272,50 @@
       "dtype": [
         "float32",
         "float64"
-      ]
+      ],
+      "reviewed_source_version": "0.1.0.dev15",
+      "reviewed_source_commit": "2508543ccc1dc3015b07806e6e240dd88c8e871e",
+      "public_wheel_contains_api": false,
+      "memory_by_backend": {
+        "cuda": [
+          "full",
+          "checkpoint"
+        ],
+        "native_cpu": [
+          "full",
+          "checkpoint"
+        ],
+        "torch": [
+          "full"
+        ]
+      },
+      "modes": [
+        "hao1",
+        "band_fit",
+        "sls_compat"
+      ],
+      "default_mode": "hao1",
+      "hao1_mechanisms": 5,
+      "hao1_band": "explicit (scale, 200 * scale) design band",
+      "checkpoint_interval": "None or positive integer, allowed only with checkpoint",
+      "material_model": "once per call on padded vp/q; returns c_rel2,strength,A,B; builtin mode/fit settings bypassed"
     }
   },
-  "prepare_visco_sls": {
-    "signature": "(device='cuda:0', *, backend='cuda')",
+  "prepare_visco_gsls": {
+    "signature": "(backend='native_cpu', device=None)",
     "types": {
-      "device": "str | torch.device",
-      "backend": "str"
+      "backend": "str",
+      "device": "str | torch.device | None"
     },
     "return": "dict",
-    "page": "visco-sls"
+    "page": "visco-gsls"
   },
-  "visco_sls_native_status": {
-    "signature": "(*, backend='cuda')",
+  "visco_gsls_native_status": {
+    "signature": "(backend='native_cpu')",
     "types": {
       "backend": "str"
     },
     "return": "dict",
-    "page": "visco-sls"
+    "page": "visco-gsls"
   }
 }

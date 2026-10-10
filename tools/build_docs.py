@@ -166,6 +166,20 @@ location.replace(target.href);
 def build(destination):
     destination = destination.resolve()
     destination.mkdir(parents=True, exist_ok=True)
+    # Incremental/local builds must never retain retired SLS publication files.
+    for locale in ('', 'zh', 'en'):
+        # MyST copies linked Python/notebook files into hashed download paths.
+        # Recreate generated copy directories so removed pages cannot leave data.
+        for generated in ('_downloads', '_images'):
+            copies = destination / locale / generated
+            if copies.exists():
+                shutil.rmtree(copies)
+        retired_page = destination / locale / 'examples/visco-sls.html'
+        if retired_page.exists():
+            retired_page.unlink()
+        retired_assets = destination / locale / '_static/sls'
+        if retired_assets.exists():
+            shutil.rmtree(retired_assets)
     stage = PROJECT / '_build' / 'source'
     if stage.exists():
         shutil.rmtree(stage)
@@ -237,8 +251,11 @@ def build(destination):
         if relative == 'modeling/reconstruction.html':
             stable = RECONSTRUCTION_SECTIONS
             numbers = RECONSTRUCTION_NUMBERS
+        if relative == 'visco-gsls.html':
+            stable = re.findall(r'^\((visco-gsls[^)]*)\)=\n#+ ', (PROJECT / 'docs' / 'visco-gsls.md').read_text(), re.M)
+            assert len(stable) == len(pairs[0]), 'GSLS anchors must cover every section'
         rendered = [add_anchors(text, stable, numbers) for text in texts]
-        if relative == 'visco-sls.html':
+        if relative == 'visco-gsls.html':
             rendered = [text.replace('<section id=', '<section class="sw-api-page" id=', 1) for text in rendered]
         if relative.startswith('examples/'):
             rendered = [text.replace('<section id=', '<section class="sw-example-page" id=', 1) for text in rendered]
@@ -253,7 +270,7 @@ def build(destination):
             relative = relative if source == 'root' else source + '/' + relative
             old = destination / relative
             old.parent.mkdir(parents=True, exist_ok=True)
-            old.write_text(redirect_page(relative, route['fragments'], target_relative='usage.html',
+            old.write_text(redirect_page(relative, route['fragments'], target_relative=route.get('target_page', 'usage.html'),
                                          locale='zh' if source == 'root' else source,
                                          default_fragment=route['default']), encoding='utf-8')
     modeling_redirects = json.loads((PROJECT / 'tools' / 'modeling_redirects.json').read_text())

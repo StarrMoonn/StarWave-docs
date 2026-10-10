@@ -20,15 +20,15 @@
     },
     {
       "id": "id2",
-      "title": "运行条件"
+      "title": "历史 7.0.0 wheel 运行条件"
     },
     {
       "id": "id3",
-      "title": "新建运行环境"
+      "title": "安装历史 7.0.0 wheel"
     },
     {
       "id": "id4",
-      "title": "检查导入与原生库"
+      "title": "核心库检查（已安装 wheel 或已注册源码）"
     }
   ],
   "status.html": [

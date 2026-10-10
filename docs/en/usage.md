@@ -1,6 +1,6 @@
 # Usage
 
-SLS: [visco_sls](visco-sls.md).
+GSLS: [visco_gsls](visco-gsls.md).
 
 ```{container} sw-page-toc
 
@@ -17,7 +17,7 @@ SLS: [visco_sls](visco-sls.md).
 - [Other exported names and scope](#other-exports)
 ```
 
-This reference targets the public StarWave **7.0.0** wheel (V14). `starwave.scalar` now selects 2D or 3D from the model dimension; the existing scalar2D, VRZ, VTI, and elastic contracts are preserved. Each propagator includes its actual signature, every parameter, return values, gradient scope, notes, and a call example. Parameter types describe accepted runtime values; signatures retain the actual keyword-only boundaries and defaults.
+This reference targets the published [V15 source Release](https://github.com/StarrMoonn/StarWave/releases/tag/V15) (`0.1.0.dev15`). The scalar/VRZ/VTI/elastic contracts below retain those of the 7.0.0 wheel. [GSLS](visco-gsls.md) is the current viscoacoustic entry point; the public PyPI 7.0.0 wheel does not contain GSLS. `starwave.scalar` now selects 2D or 3D from the model dimension; the existing scalar2D, VRZ, VTI, and elastic contracts are preserved. Each propagator includes its actual signature, every parameter, return values, gradient scope, notes, and a call example. Parameter types describe accepted runtime values; signatures retain the actual keyword-only boundaries and defaults.
 
 See [Release Notes](release-notes.md) for 6.0.0 internal storage and PML-transpose maintenance, and [Scalar](modeling/scalar.md) for 2D storage changes. These introduce no new public parameters; source upgrades require rebuilt matching native libraries.
 
@@ -33,6 +33,8 @@ The page organization follows the Sphinx Python API style of the [official Deepw
 - {py:func}`starwave.vti`: `2D/3D` acoustic VTI; `vp, epsilon, delta, rho`; returns recordings in the selected component order.
 
 - {py:func}`starwave.elastic`: `2D/3D` isotropic elasticity; `lamb, mu, buoyancy`; complete final states plus p/velocity records.
+
+- {py:func}`starwave.visco_gsls`: 2D generalized-standard-linear-solid viscoacoustics, fixed variable density and native full/checkpoint; see the dedicated [GSLS API](visco-gsls.md).
 
 Notation: `B` is the number of shots, `S` the sources per shot, `R` the receivers per shot, `T` the number of user time samples, and `D` the number of spatial dimensions. Sources and receivers use integer grid indices in the physical model, not coordinates in meters, and do not include PML offsets.
 

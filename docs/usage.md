@@ -1,6 +1,6 @@
 # Usage
 
-SLS: [visco_sls](visco-sls.md).
+GSLS: [visco_gsls](visco-gsls.md).
 
 ```{container} sw-page-toc
 
@@ -17,7 +17,7 @@ SLS: [visco_sls](visco-sls.md).
 - [其它导出名称与范围](#other-exports)
 ```
 
-本参考以 StarWave **7.0.0** 公开 wheel（V14）为准，`starwave.scalar` 按模型维数支持二维与三维；二维 scalar 及 VRZ、VTI、elastic 的既有契约保留。每个传播函数提供真实签名、逐项参数、返回值、梯度范围、注意事项与调用示例。参数类型描述运行时接受的值；签名保留实际关键字边界和默认值。
+本参考以已发布的 [V15 源码 Release](https://github.com/StarrMoonn/StarWave/releases/tag/V15)（`0.1.0.dev15`）为准；以下 scalar/VRZ/VTI/elastic 契约与原 7.0.0 wheel 保持一致。当前 GSLS 入口为 [GSLS](visco-gsls.md)，公开 PyPI 7.0.0 不包含 GSLS。`starwave.scalar` 按模型维数支持二维与三维；二维 scalar 及 VRZ、VTI、elastic 的既有契约保留。每个传播函数提供真实签名、逐项参数、返回值、梯度范围、注意事项与调用示例。参数类型描述运行时接受的值；签名保留实际关键字边界和默认值。
 
 6.0.0 的内部存储和 PML 转置维护见[发布说明](release-notes.md)，二维存储变化见[scalar 说明](modeling/scalar.md)。它们不引入新的公共参数；源码升级需重新构建配套原生库。
 
@@ -33,6 +33,8 @@ SLS: [visco_sls](visco-sls.md).
 - {py:func}`starwave.vti`：二维/三维声学 VTI；`vp, epsilon, delta, rho`；按所选分量顺序返回记录。
 
 - {py:func}`starwave.elastic`：二维/三维各向同性弹性；`lamb, mu, buoyancy`；返回完整最终状态及 p/速度记录。
+
+- {py:func}`starwave.visco_gsls`：二维广义标准线性固体声学；固定可变密度，原生 full/checkpoint；详见独立 [GSLS API](visco-gsls.md)。
 
 符号约定：`B` 炮数、`S` 每炮源数、`R` 每炮接收点数、`T` 用户时间采样数、`D` 空间维数。源和接收点使用物理模型的整数网格下标，不是米坐标，不包含 PML 偏移。
 

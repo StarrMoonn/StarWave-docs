@@ -1,10 +1,22 @@
 # Documentation Status and References
 
-## V14 / 7.0.0 SLS
+## V15 / GSLS · 2026-10-10
+
+The current manual targets the published [V15 source Release](https://github.com/StarrMoonn/StarWave/releases/tag/V15), source version `0.1.0.dev15`, at commit `2508543ccc1dc3015b07806e6e240dd88c8e871e`. A source Release and a PyPI binary distribution are separate: public **7.0.0** is unchanged and contains neither GSLS nor the standalone-SLS source cleanup.
+
+[GSLS](visco-gsls.md) is the current viscoacoustic entry point: 2D, fixed spatially varying density, native CPU/CUDA full/checkpoint, explicit Torch full, and first-order Vp/Q/source/provider gradients. Independent SLS API/production sources/build entry points are removed; a single mechanism explicitly uses `mode="sls_compat", n_mechanisms=1`. This manual does not publish propagation implementations, CUDA source or complete source archives.
+
+Parameters and physical descriptions follow that V15 source contract. Default Hao1 Q is nominal Q0; Vp is reference phase velocity. Trainable material with nonzero PML requires a fixed `max_vel` covering unrelaxed speed. 3D, density gradients, boundary mode and higher-order propagation derivatives are unsupported. See GSLS for the complete limits and [Installation](installation.md) for explicit build/restart steps.
+
+Supplied A30/RTX 4060 records identify pre-integration source, not the final host-guard/integration fingerprint. They do not establish a final integrated GPU rerun. This manual update ran no GPU, DataParallel, long FWI or target-device performance test. The old independent SLS API, experiment pages and downloads are removed from the current manual. Original materials remain in Git history and are not relabelled as GSLS results.
+
+The sections below preserve historical release-verification facts; they are not new V15 acceptance results.
+
+## V14 / 7.0.0 SLS (historical)
 
 [StarWave 7.0.0](https://pypi.org/project/starwave/7.0.0/) was published on 2026-10-09, corresponding to authorized V14 / `0.1.0.dev14`. Its sole distribution is `starwave-7.0.0-py3-none-manylinux_2_35_x86_64.whl` (17,515,547 bytes), with no sdist. The official PyPI file is byte-identical to the reviewed CI build. Python 3.10–3.12 installation/host checks and a clean reinstall from the public artifact passed.
 
-The new [bilingual SLS API](visco-sls.md) retains the nine existing function contracts and adds three entry points. All twelve signatures, defaults, keyword boundaries and return contracts match the actual wheel. Four ELF libraries (core, elastic, SLS CPU and SLS CUDA) and their receipt hashes were verified. The documentation checker reads the archive without loading or executing native libraries.
+The historical bilingual SLS API retained the nine existing function contracts and added three entry points. All twelve signatures, defaults, keyword boundaries and return contracts match the actual wheel. Four ELF libraries (core, elastic, SLS CPU and SLS CUDA) and their receipt hashes were verified. The documentation checker reads the archive without loading or executing native libraries.
 
 Public 7.0.0 wheel SHA-256:
 
@@ -12,7 +24,7 @@ Public 7.0.0 wheel SHA-256:
 0fb2d66555ad19d4178738db93ea5d71c3b7dbfb456cf4fd82898f5d44725964
 ```
 
-Scope is 2D single-SLS, fixed variable density, full histories and first-order Vp/Q/source gradients. Saved source-version GPU results are documented in the [SLS Marmousi2 Example](examples/visco-sls.md): fixed-Q and joint Vp/Q runs of 100 epochs each on two A30 GPUs, plus a separate RTX 4060 ring model. These original runs are distinct from reinstalling the public wheel. This documentation update did not independently rerun a GPU. Existing tutorials, figures, Scalar3D split downloads and PDFs retain their original versions and evidence scopes.
+Scope is 2D single-SLS, fixed variable density, full histories and first-order Vp/Q/source gradients. The source-version GPU results recorded at the time included: fixed-Q and joint Vp/Q runs of 100 epochs each on two A30 GPUs, plus a separate RTX 4060 ring model. These original runs are distinct from reinstalling the public wheel. This documentation update did not independently rerun a GPU. Existing tutorials, figures, Scalar3D split downloads and PDFs retain their original versions and evidence scopes.
 
 ## V13 / 6.0.0 maintenance scope · 2026-10-09
 

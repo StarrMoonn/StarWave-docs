@@ -88,6 +88,33 @@
         "id5": "other-exports",
         "sw-section-7": "other-exports"
       }
+    },
+    "visco-sls.html": {
+      "target_page": "visco-gsls.html",
+      "default": "visco-gsls",
+      "fragments": {
+        "visco-sls": "visco-gsls-function",
+        "visco-sls-function": "visco-gsls-function",
+        "visco-sls-physics": "visco-gsls-physics",
+        "visco-sls-gradients": "visco-gsls-gradients",
+        "visco-sls-stability": "visco-gsls-stability",
+        "visco-sls-example": "visco-gsls-example",
+        "visco-sls-runtime": "visco-gsls-runtime",
+        "visco-sls-references": "visco-gsls-references",
+        "starwave.visco_sls": "starwave.visco_gsls",
+        "starwave.prepare_visco_sls": "starwave.prepare_visco_gsls",
+        "starwave.visco_sls_native_status": "starwave.visco_gsls_native_status",
+        "sw-section-0": "visco-gsls",
+        "sw-section-1": "visco-gsls-function",
+        "sw-section-2": "visco-gsls-physics",
+        "sw-section-3": "visco-gsls-gradients",
+        "sw-section-4": "visco-gsls-stability",
+        "sw-section-5": "visco-gsls-example",
+        "sw-section-6": "visco-gsls-runtime",
+        "sw-section-7": "visco-gsls-references",
+        "sls-api": "visco-gsls",
+        "pml": "visco-gsls-gradients"
+      }
     }
   },
   "en": {
@@ -179,6 +206,38 @@
         "other-exported-names-and-scope": "other-exports",
         "sw-section-7": "other-exports"
       }
+    },
+    "visco-sls.html": {
+      "target_page": "visco-gsls.html",
+      "default": "visco-gsls",
+      "fragments": {
+        "visco-sls": "visco-gsls-function",
+        "visco-sls-function": "visco-gsls-function",
+        "visco-sls-physics": "visco-gsls-physics",
+        "visco-sls-gradients": "visco-gsls-gradients",
+        "visco-sls-stability": "visco-gsls-stability",
+        "visco-sls-example": "visco-gsls-example",
+        "visco-sls-runtime": "visco-gsls-runtime",
+        "visco-sls-references": "visco-gsls-references",
+        "starwave.visco_sls": "starwave.visco_gsls",
+        "starwave.prepare_visco_sls": "starwave.prepare_visco_gsls",
+        "starwave.visco_sls_native_status": "starwave.visco_gsls_native_status",
+        "sw-section-0": "visco-gsls",
+        "sw-section-1": "visco-gsls-function",
+        "sw-section-2": "visco-gsls-physics",
+        "sw-section-3": "visco-gsls-gradients",
+        "sw-section-4": "visco-gsls-stability",
+        "sw-section-5": "visco-gsls-example",
+        "sw-section-6": "visco-gsls-runtime",
+        "sw-section-7": "visco-gsls-references",
+        "sls-viscoacoustic-api": "visco-gsls",
+        "physical-parameters-and-sampling": "visco-gsls-physics",
+        "gradients-pml-and-memory": "visco-gsls-gradients",
+        "time-step-guard": "visco-gsls-stability",
+        "standalone-small-model-call": "visco-gsls-example",
+        "native-runtime-preparation": "visco-gsls-runtime",
+        "equation-references-and-scope": "visco-gsls-references"
+      }
     }
   },
   "root": {
@@ -269,6 +328,33 @@
         "sw-section-6": "native-examples",
         "id5": "other-exports",
         "sw-section-7": "other-exports"
+      }
+    },
+    "visco-sls.html": {
+      "target_page": "visco-gsls.html",
+      "default": "visco-gsls",
+      "fragments": {
+        "visco-sls": "visco-gsls-function",
+        "visco-sls-function": "visco-gsls-function",
+        "visco-sls-physics": "visco-gsls-physics",
+        "visco-sls-gradients": "visco-gsls-gradients",
+        "visco-sls-stability": "visco-gsls-stability",
+        "visco-sls-example": "visco-gsls-example",
+        "visco-sls-runtime": "visco-gsls-runtime",
+        "visco-sls-references": "visco-gsls-references",
+        "starwave.visco_sls": "starwave.visco_gsls",
+        "starwave.prepare_visco_sls": "starwave.prepare_visco_gsls",
+        "starwave.visco_sls_native_status": "starwave.visco_gsls_native_status",
+        "sw-section-0": "visco-gsls",
+        "sw-section-1": "visco-gsls-function",
+        "sw-section-2": "visco-gsls-physics",
+        "sw-section-3": "visco-gsls-gradients",
+        "sw-section-4": "visco-gsls-stability",
+        "sw-section-5": "visco-gsls-example",
+        "sw-section-6": "visco-gsls-runtime",
+        "sw-section-7": "visco-gsls-references",
+        "sls-api": "visco-gsls",
+        "pml": "visco-gsls-gradients"
       }
     }
   }

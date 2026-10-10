@@ -21,9 +21,9 @@ MODULES = {
     'common.vpvsrho_to_lambmubuoyancy': 'starwave/common.py',
     'common.lambmubuoyancy_to_vpvsrho': 'starwave/common.py',
     'prepare_elastic': 'starwave/elastic_runtime.py',
-    'visco_sls': 'starwave/visco_sls.py',
-    'prepare_visco_sls': 'starwave/visco_sls.py',
-    'visco_sls_native_status': 'starwave/visco_sls.py',
+    'visco_gsls': 'starwave/visco_gsls.py',
+    'prepare_visco_gsls': 'starwave/visco_gsls.py',
+    'visco_gsls_native_status': 'starwave/visco_gsls.py',
 }
 WHEEL_TYPED_APIS = {
     'elastic', 'common.vpvsrho_to_lambmubuoyancy',
@@ -123,11 +123,53 @@ def check_scalar3d_examples(project, contract):
     assert examples[0] == examples[1], 'Bilingual 3D runnable snippets differ'
 
 
+def check_gsls_contract(project, contracts):
+    """Pin V15 semantics separately from historical 7.0.0 binary evidence."""
+    gsls = contracts['visco_gsls']['semantics']
+    assert gsls['reviewed_source_version'] == '0.1.0.dev15'
+    assert gsls['reviewed_source_commit'] == '2508543ccc1dc3015b07806e6e240dd88c8e871e'
+    assert gsls['public_wheel_contains_api'] is False
+    assert gsls['default_mode'] == 'hao1' and gsls['hao1_mechanisms'] == 5
+    assert gsls['modes'] == ['hao1', 'band_fit', 'sls_compat']
+    assert gsls['memory_by_backend'] == {'cuda': ['full', 'checkpoint'], 'native_cpu': ['full', 'checkpoint'], 'torch': ['full']}
+    assert gsls['density_gradient'] is False
+    assert gsls['gradients'] == ['vp', 'q', 'source_amplitudes']
+    assert gsls['source_sign'] == -1 and gsls['startup_weight'] == 0.5
+    assert gsls['last_source_vjp'] == 0
+    snippets = []
+    for locale in ('zh', 'en'):
+        docs = project / 'docs' / ('en' if locale == 'en' else '')
+        assert not (docs / 'visco-sls.md').exists(), 'Removed standalone SLS API page persists'
+        text = (docs / 'visco-gsls.md').read_text(encoding='utf-8')
+        for anchor in ('function', 'physics', 'gradients', 'stability', 'example', 'runtime', 'references', 'modes', 'provider', 'memory', 'coefficients'):
+            assert f'(visco-gsls-{anchor})=' in text, f'{locale}: missing GSLS section {anchor}'
+        section = text.split('(visco-gsls-example)=', 1)[1].split('(visco-gsls-runtime)=', 1)[0]
+        snippets.append(re.findall(r'^```python\n(.*?)^```', section, re.M | re.S))
+        assert snippets[-1], f'{locale}: missing GSLS example'
+        standalone = [code for code in snippets[-1] if 'import torch\nimport starwave' in code]
+        assert len(standalone) == 1, f'{locale}: standalone GSLS example missing'
+        example_tree = parse_python(standalone[0])
+        calls = [node for node in ast.walk(example_tree) if isinstance(node, ast.Call) and ast.unparse(node.func) == 'starwave.visco_gsls']
+        assert len(calls) == 1, f'{locale}: standalone GSLS example call missing'
+        values = {item.arg: item.value for item in calls[0].keywords}
+        expected = {param.arg for param in parse_signature(contracts['visco_gsls']['signature']).args.kwonlyargs}
+        assert set(values) == expected, f'{locale}: GSLS example optional arguments incomplete'
+        for key, expected_value in {'mode': 'hao1', 'backend': 'torch', 'memory': 'full', 'n_mechanisms': 5, 'frequency_band': (1.0, 200.0), 'checkpoint_interval': None}.items():
+            assert ast.literal_eval(values[key]) == expected_value, f'{locale}: GSLS example {key}'
+    assert snippets[0] == snippets[1], 'Bilingual GSLS examples differ'
+
+
 def check(wheel_path=None, source_root=None):
     project = Path(__file__).resolve().parents[1]
     contracts = json.loads((project / 'tools' / 'api_contract.json').read_text())
     assert set(contracts) == set(MODULES), 'Public contract inventory changed'
     check_scalar3d_examples(project, contracts['scalar'])
+    check_gsls_contract(project, contracts)
+    legacy = json.loads((project / 'tools' / 'api_legacy_v14_contract.json').read_text())['apis']
+    assert set(legacy) == {'visco_sls', 'prepare_visco_sls', 'visco_sls_native_status'}
+    for entry in legacy.values():
+        assert set(entry) == {'signature'}, 'Legacy snapshot must remain signature-only'
+        parse_signature(entry['signature'])
     languages = {}
     blocks = 0
     for locale, docs in [('zh', project / 'docs'), ('en', project / 'docs' / 'en')]:
@@ -183,12 +225,17 @@ def check(wheel_path=None, source_root=None):
         for name, module in MODULES.items():
             actual = wheel_function(source, module, name.rsplit('.', 1)[-1])
             assert arguments_without_annotations(languages['zh'][name]) == arguments_without_annotations(actual.args), f'{name}: differs from source'
+        exports = parse_python(source.read('starwave/__init__.py').decode('utf-8'))
+        public = next(ast.literal_eval(n.value) for n in exports.body if isinstance(n, ast.Assign) and any(isinstance(t, ast.Name) and t.id == '__all__' for t in n.targets))
+        assert {'visco_gsls', 'prepare_visco_gsls', 'visco_gsls_native_status'} <= set(public)
+        assert not {'visco_sls', 'prepare_visco_sls', 'visco_sls_native_status'} & set(public), 'Removed standalone SLS APIs are exported'
         print(f'PASS: {len(MODULES)} documented signatures match the supplied source tree (not a wheel verification).')
     if wheel_path:
         wheel_path = Path(wheel_path)
         assert WHEEL_SHA256, 'Public 7.0.0 wheel identity has not yet been pinned'
         assert hashlib.sha256(wheel_path.read_bytes()).hexdigest() == WHEEL_SHA256, f'Not the verified {WHEEL_VERSION} binary wheel'
         with zipfile.ZipFile(wheel_path) as wheel:
+            assert 'starwave/visco_gsls.py' not in wheel.namelist(), 'Historical wheel unexpectedly contains current GSLS API'
             metadata = BytesParser().parsebytes(wheel.read(f'starwave-{WHEEL_VERSION}.dist-info/METADATA'))
             assert metadata['Name'] == 'starwave' and metadata['Version'] == WHEEL_VERSION
             wheel_metadata = BytesParser().parsebytes(wheel.read(f'starwave-{WHEEL_VERSION}.dist-info/WHEEL'))
@@ -203,16 +250,18 @@ def check(wheel_path=None, source_root=None):
                 library = wheel.read('starwave/_binary/' + filename)
                 assert library.startswith(b'\x7fELF'), f'Expected native ELF library: {filename}'
                 assert hashlib.sha256(library).hexdigest() == receipt['libraries'][kind]['sha256'], f'Binary receipt mismatch: {filename}'
-            for name, module in MODULES.items():
+            wheel_contracts = {name: entry for name, entry in contracts.items() if 'gsls' not in name} | legacy
+            wheel_modules = {name: module for name, module in MODULES.items() if 'gsls' not in name} | {name: 'starwave/visco_sls.py' for name in legacy}
+            for name, module in wheel_modules.items():
                 actual = wheel_function(wheel, module, name.rsplit('.', 1)[-1])
-                assert arguments_without_annotations(languages['zh'][name]) == arguments_without_annotations(actual.args), f'{name}: differs from public wheel'
+                assert arguments_without_annotations(parse_signature(wheel_contracts[name]['signature']).args) == arguments_without_annotations(actual.args), f'{name}: differs from public wheel'
                 if name in WHEEL_TYPED_APIS:
                     actual_types = {param.arg: ast.unparse(param.annotation) for param, _ in parameter_defaults(actual.args)}
                     assert contracts[name]['types'] == actual_types, f'{name}: types differ from public wheel'
                     assert contracts[name]['return'] == ast.unparse(actual.returns), f'{name}: return type differs from public wheel'
     counts = {name: len(parameter_defaults(languages['zh'][name])) for name in MODULES}
     print(f'PASS: both languages: typed signatures, descriptions/defaults {counts}, {len(MODULES)} return contracts; {blocks} Python blocks parsed as Python 3.10.')
-    print(f'PASS: {len(MODULES)} signatures match verified {WHEEL_VERSION} binary wheel; metadata and native-library receipt hashes match.' if wheel_path else f'PASS: bilingual signatures match the API contract; public {WHEEL_VERSION} binary identity is checked only with --wheel.')
+    print(f'PASS: Historical V14/common signatures match verified {WHEEL_VERSION} binary wheel; metadata and native-library receipt hashes match. V15 GSLS is not verified by this wheel.' if wheel_path else f'PASS: bilingual signatures match the API contract; V15 source signatures are checked only with --source-root; historical {WHEEL_VERSION} binary identity only with --wheel.')
 
 
 if __name__ == '__main__':

@@ -9,8 +9,8 @@ if LOCALE not in {'zh', 'en'}:
 project = 'StarWave'
 author = 'StarWave contributors'
 copyright = '2026, StarWave contributors'
-version = '7.0'
-release = '7.0.0'
+version = 'V15'
+release = '0.1.0.dev15'
 language = 'zh_CN' if LOCALE == 'zh' else 'en'
 extensions = ['myst_parser', 'sphinx.ext.githubpages', 'sphinx.ext.mathjax']
 source_suffix = {'.md': 'markdown'}
@@ -34,7 +34,7 @@ templates_path = [str(CONF_DIR / '_templates')]
 html_css_files = ['custom.css']
 html_favicon = str(CONF_DIR / '_static' / 'brand' / 'starwave-favicon.png')
 html_js_files = ['language.js']
-html_title = 'StarWave 7.0.0 使用手册' if LOCALE == 'zh' else 'StarWave 7.0.0 User Guide'
+html_title = 'StarWave V15 使用手册' if LOCALE == 'zh' else 'StarWave V15 User Guide'
 html_show_sourcelink = False
 html_copy_source = False
 html_show_sphinx = True

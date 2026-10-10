@@ -37,9 +37,9 @@ CHAPTERS = {
     'about', 'presentation', 'installation', 'docker', 'wsl', 'quickstart', 'modeling/conventions',
     'modeling/scalar', 'modeling/gradient', 'modeling/acquisition', 'modeling/wave-propagation',
     'modeling/reconstruction', 'inversion/fwi',
-    'inversion/dataparallel', 'inversion/inr', 'usage', 'visco-sls', 'faq',
+    'inversion/dataparallel', 'inversion/inr', 'usage', 'visco-gsls', 'faq',
     'release-notes', 'status', 'examples/index', 'examples/enclosed',
-    'examples/surface', 'examples/layered', 'examples/reproduce', 'examples/visco-sls',
+    'examples/surface', 'examples/layered', 'examples/reproduce',
 }
 
 
@@ -76,6 +76,7 @@ def check_navigation(page, locale, relative):
     paths = {urlsplit(link['href']).path for link in links}
     expected = {f'/{locale}/{chapter}.html' for chapter in CHAPTERS}
     assert expected <= paths, f'Missing chapters on {relative}: {expected - paths}'
+    assert not any(path.endswith(('/visco-sls.html', '/examples/visco-sls.html')) for path in paths), relative
     assert not any('/api/' in path or path.endswith(('/modeling/vrz.html', '/modeling/vti.html')) for path in paths), relative
     wave_links = [link for link in links if urlsplit(link['href']).path == f'/{locale}/modeling/wave-propagation.html']
     assert len(wave_links) == 1 and wave_links[0]['text'] == ('波传播' if locale == 'zh' else 'Wave propagation'), (relative, wave_links)
@@ -293,13 +294,13 @@ def check_heading_language_switches(page, base):
     open_mobile_menu(page)
     page.locator('[data-sw-language="zh"]').click()
     assert urlsplit(page.url).path == '/zh/installation.html'
-    assert urlsplit(page.url).fragment == 'sw-section-1'
+    assert urlsplit(page.url).fragment == 'sw-section-2'
     assert urlsplit(page.url).query == 'from=chapter'
-    assert page.locator('#sw-section-1').count() == 1
+    assert page.locator('#sw-section-2').count() == 1
     open_mobile_menu(page)
     page.locator('[data-sw-language="en"]').click()
     assert urlsplit(page.url).path == '/en/installation.html'
-    assert urlsplit(page.url).fragment == 'sw-section-1'
+    assert urlsplit(page.url).fragment == 'sw-section-2'
 
 
 def check_redirects(page, base):
@@ -311,6 +312,7 @@ def check_redirects(page, base):
             locale = 'zh' if source_locale == 'root' else source_locale
             prefix = '' if source_locale == 'root' else source_locale + '/'
             for relative, spec in redirects[source_locale].items():
+                target_relative = spec.get('target_page', 'usage.html' if filename == 'api_redirects.json' else 'modeling/wave-propagation.html')
                 source_path = prefix + relative
                 fragments = {'': spec['default']} | spec['fragments']
                 for old, target in fragments.items():
@@ -695,23 +697,27 @@ def check_presentation(page, base, locale, output):
     page.screenshot(path=str(output / f'{locale}-presentation-{width}.png'), full_page=True)
 
 
-def check_sls_api(page, base, locale, output):
-    page.goto(base + locale + '/visco-sls.html', wait_until='networkidle')
+def check_gsls_api(page, base, locale, output):
+    page.goto(base + locale + '/visco-gsls.html', wait_until='networkidle')
     main = page.locator('.sw-api-page')
     assert main.count() == 1
     assert main.locator('dl.py.function').count() == 3
-    for name in ('visco_sls', 'prepare_visco_sls', 'visco_sls_native_status'):
+    for name in ('visco_gsls', 'prepare_visco_gsls', 'visco_gsls_native_status'):
         assert main.locator('[id="starwave.' + name + '"]').count() == 1
     assert 'Pa/m²' in main.inner_text() and 'max_vel' in main.inner_text()
+    for anchor in ('modes', 'memory', 'provider', 'coefficients', 'runtime'):
+        assert main.locator(f'[id="visco-gsls-{anchor}"]').count() == 1
+    for name in ('visco_sls', 'prepare_visco_sls', 'visco_sls_native_status'):
+        assert main.locator('[id="starwave.' + name + '"]').count() == 0
     assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
     assert abs(main.locator(':scope > h1').evaluate('e => parseFloat(getComputedStyle(e).fontSize)') - 40.8) < .01
-    page.screenshot(path=str(output / f'{locale}-sls-api-{page.viewport_size["width"]}.png'), full_page=True)
-    page.goto(base + locale + '/visco-sls.html#visco-sls-gradients')
+    page.screenshot(path=str(output / f'{locale}-gsls-api-{page.viewport_size["width"]}.png'), full_page=True)
+    page.goto(base + locale + '/visco-gsls.html#visco-gsls-gradients')
     other = 'en' if locale == 'zh' else 'zh'
     open_mobile_menu(page)
     page.locator(f'[data-sw-language="{other}"]').click()
-    assert urlsplit(page.url).path == f'/{other}/visco-sls.html'
-    assert urlsplit(page.url).fragment in {'visco-sls-gradients', 'sw-section-3'}
+    assert urlsplit(page.url).path == f'/{other}/visco-gsls.html'
+    assert urlsplit(page.url).fragment == 'visco-gsls-gradients'
 
 
 def check_search(page, base):
@@ -753,8 +759,8 @@ def check_search(page, base):
         }
         assert set(API_NAMES) <= objects.keys(), objects
         assert all(index['docnames'][objects[name]] == 'usage' for name in API_NAMES), objects
-        for name in ('visco_sls', 'prepare_visco_sls', 'visco_sls_native_status'):
-            assert name in objects and index['docnames'][objects[name]] == 'visco-sls', objects
+        for name in ('visco_gsls', 'prepare_visco_gsls', 'visco_gsls_native_status'):
+            assert name in objects and index['docnames'][objects[name]] == 'visco-gsls', objects
         other = 'zh' if locale == 'en' else 'en'
         open_mobile_menu(page)
         page.locator(f'[data-sw-language="{other}"]').click()
@@ -834,51 +840,20 @@ def check_scalar3d_examples(page, base, output):
     assert plain.locator('a[download="Scalar3D-CUDA-Report.pdf"]').is_visible()
     context.close()
 
-def check_sls_example(page, base, output):
-    package = json.loads((PROJECT / 'docs/_static/sls/downloads/package/package.json').read_text())
-    for width in (1440, 390, 320):
-        page.set_viewport_size({'width': width, 'height': 900})
-        for locale in ('zh', 'en'):
-            page.goto(base + locale + '/examples/visco-sls.html', wait_until='networkidle')
-            assert page.locator('.sw-example-page > h1').count() == 1
-            figures = page.locator('figure.sw-example-figure')
-            assert figures.count() == 10
-            assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
-            for index, figure in enumerate(figures.all()):
-                figure.scroll_into_view_if_needed()
-                image = figure.locator('img')
-                wait_for_native_condition(image, 'e => e.complete && e.naturalWidth > 0', 'SLS image load')
-                assert image.get_attribute('alt') and len(figure.locator('figcaption').inner_text()) > 35
-                viewport = figure.locator('.sw-example-viewport')
-                assert viewport.get_attribute('tabindex') == '0'
-                assert viewport.evaluate('e => e.getBoundingClientRect().right <= innerWidth + 1')
-                if width <= 390:
-                    viewport.focus()
-                    viewport.evaluate('e => e.scrollLeft = e.scrollWidth')
-                    assert viewport.evaluate('e => e.scrollLeft > 0')
-                if index in (1, 4):
-                    figure.screenshot(path=str(output / f'{locale}-sls-example-{index}-{width}.png'))
-            assert page.locator('[data-sw-package-download]').is_visible()
-    page.set_viewport_size({'width': 1440, 'height': 1000})
-    page.goto(base + 'en/examples/visco-sls.html')
-    failed_url = '**/' + package['parts'][1]['file']
-    page.route(failed_url, lambda route: route.abort())
-    page.locator('[data-sw-package-download]').click()
-    page.wait_for_function("document.getElementById('sls-package-status').textContent.includes('Download incomplete')", timeout=60000)
-    assert page.locator('[data-sw-package-download]').is_enabled()
-    page.unroute(failed_url)
-    with page.expect_download(timeout=120000) as event:
-        page.locator('[data-sw-package-download]').click()
-    download = event.value
-    assert download.suggested_filename == package['filename'] and download.failure() is None
-    assert hashlib.sha256(Path(download.path()).read_bytes()).hexdigest() == package['sha256']
-    page.wait_for_function("document.getElementById('sls-package-status').textContent.includes('Complete ZIP verified')")
-    context = page.context.browser.new_context(java_script_enabled=False, viewport={'width': 390, 'height': 844})
-    plain = context.new_page()
-    plain.goto(base + 'en/examples/visco-sls.html')
-    for suffix in ('join_package.py', 'SLS_Saved_Results.ipynb', 'SLS_Example_Report.pdf'):
-        assert plain.locator('a[href$="' + suffix + '"]').first.is_visible()
-    context.close()
+def check_sls_retirement(page, base):
+    """Retired examples/downloads must be unavailable, not an archived feature."""
+    for locale in ('', 'zh/', 'en/'):
+        for relative in ('examples/visco-sls.html', '_static/sls/manifest.json',
+                         '_static/sls/downloads/package/package.json',
+                         '_static/sls/downloads/SLS_Example_Report.pdf'):
+            response = page.request.get(base + locale + relative)
+            assert response.status == 404, (locale, relative, response.status)
+    for locale in ('zh', 'en'):
+        page.goto(base + locale + '/index.html', wait_until='networkidle')
+        assert page.locator('a[href*="examples/visco-sls"], a[href*="_static/sls/"]').count() == 0
+        page.goto(base + locale + '/visco-gsls.html', wait_until='networkidle')
+        assert page.locator('[id="starwave.visco_gsls"]').count() == 1
+        assert page.locator('a[href*="examples/visco-sls"], a[href*="_static/sls/"]').count() == 0
 
 
 def check(root, browser_path=None):
@@ -898,12 +873,12 @@ def check(root, browser_path=None):
             page = browser.new_page(viewport={'width': 1440, 'height': 1000})
             page.on('pageerror', lambda error: errors.append(str(error)))
             check_scalar3d_examples(page, base, output)
-            check_sls_example(page, base, output)
+            check_sls_retirement(page, base)
             for size in ({'width': 1440, 'height': 1000}, {'width': 1180, 'height': 760}, {'width': 390, 'height': 844}):
                 page.set_viewport_size(size)
                 for locale in ('zh', 'en'):
                     for path in sorted((root / locale).rglob('*.html')):
-                        if path.relative_to(root / locale).parts[0] in {'api', '_static'} or path.relative_to(root / locale).as_posix() in {'modeling/vrz.html', 'modeling/vti.html'}:
+                        if path.relative_to(root / locale).parts[0] in {'api', '_static'} or path.relative_to(root / locale).as_posix() in {'modeling/vrz.html', 'modeling/vti.html', 'visco-sls.html'}:
                             continue  # Compatibility pages are tested separately.
                         relative = path.relative_to(root).as_posix()
                         page.goto(base + relative, wait_until='networkidle')
@@ -919,7 +894,7 @@ def check(root, browser_path=None):
                     check_forward_modeling(page, base, locale, output)
                     check_reconstruction(page, base, locale, output)
                     check_presentation(page, base, locale, output)
-                    check_sls_api(page, base, locale, output)
+                    check_gsls_api(page, base, locale, output)
                 check_search(page, base)
             # Narrow phones and the smallest desktop sidebar layouts exercise
             # the homepage breakpoints without duplicating the entire API suite.
