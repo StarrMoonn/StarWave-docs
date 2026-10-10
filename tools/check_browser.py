@@ -292,16 +292,23 @@ def check_heading_language_switches(page, base):
 
     # Ordinary chapters retain their positional, cross-language section aliases.
     page.goto(base + 'en/installation.html?from=chapter#runtime-requirements')
+    runtime_section = page.locator('#runtime-requirements').evaluate(
+        'e => e.closest("section[data-sw-section]").dataset.swSection')
+    assert runtime_section == 'sw-section-3'  # V16 Torch/native sections precede legacy wheel requirements.
     open_mobile_menu(page)
     page.locator('[data-sw-language="zh"]').click()
     assert urlsplit(page.url).path == '/zh/installation.html'
-    assert urlsplit(page.url).fragment == 'sw-section-2'
+    assert urlsplit(page.url).fragment == runtime_section
     assert urlsplit(page.url).query == 'from=chapter'
-    assert page.locator('#sw-section-2').count() == 1
+    assert page.locator('#' + runtime_section).count() == 1
+    assert page.locator('#runtime-requirements').evaluate(
+        'e => e.closest("section[data-sw-section]").dataset.swSection') == runtime_section
     open_mobile_menu(page)
     page.locator('[data-sw-language="en"]').click()
     assert urlsplit(page.url).path == '/en/installation.html'
-    assert urlsplit(page.url).fragment == 'sw-section-2'
+    assert urlsplit(page.url).fragment == runtime_section
+    assert page.locator('#runtime-requirements').evaluate(
+        'e => e.closest("section[data-sw-section]").dataset.swSection') == runtime_section
 
 
 def check_redirects(page, base):
