@@ -141,6 +141,7 @@ Reproduce <examples/reproduce>
 :caption: Usage
 
 Usage <usage>
+PyTorch backend <pytorch-backend>
 GSLS Function <visco-gsls>
 ```
 

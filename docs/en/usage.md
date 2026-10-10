@@ -17,7 +17,7 @@ GSLS: [visco_gsls](visco-gsls.md).
 - [Other exported names and scope](#other-exports)
 ```
 
-This reference targets the published [V15 source Release](https://github.com/StarrMoonn/StarWave/releases/tag/V15) (`0.1.0.dev15`). The scalar/VRZ/VTI/elastic contracts below retain those of the 7.0.0 wheel. [GSLS](visco-gsls.md) is the current viscoacoustic entry point; the public PyPI 7.0.0 wheel does not contain GSLS. `starwave.scalar` now selects 2D or 3D from the model dimension; the existing scalar2D, VRZ, VTI, and elastic contracts are preserved. Each propagator includes its actual signature, every parameter, return values, gradient scope, notes, and a call example. Parameter types describe accepted runtime values; signatures retain the actual keyword-only boundaries and defaults.
+This reference targets the additive [PyTorch backend](pytorch-backend.md) in V16 / `0.1.0.dev16`; source Release and target PyPI `7.1.0` wheel publication verification are pending. Published 7.0.0 lacks these new options and GSLS. Existing positional arguments and native defaults are preserved; all five propagators gain explicit full/checkpoint and eager/compile backend selection. Complete signatures, parameters, returns and limits follow.
 
 See [Release Notes](release-notes.md) for 6.0.0 internal storage and PML-transpose maintenance, and [Scalar](modeling/scalar.md) for 2D storage changes. These introduce no new public parameters; source upgrades require rebuilt matching native libraries.
 
@@ -41,11 +41,11 @@ Notation: `B` is the number of shots, `S` the sources per shot, `R` the receiver
 (scalar)=
 ## Scalar Function
 
-```{py:function} starwave.scalar(v: torch.Tensor, grid_spacing: float | int | list[float] | tuple[float, ...], dt: float | int, *, source_amplitudes: torch.Tensor, source_locations: torch.Tensor, receiver_locations: torch.Tensor, accuracy: int=8, pml_freq: float | int=25.0, pml_width: int | list[int] | tuple[int, ...]=20, boundary_buffer: int=5, memory: str='boundary', max_vel: float | int | None=None, freq_taper_frac: float | int=0.0, time_pad_frac: float | int=0.0, time_taper: bool=False, illumination: ScalarIllumination | None=None) -> tuple[torch.Tensor]
+```{py:function} starwave.scalar(v: torch.Tensor, grid_spacing: float | int | list[float] | tuple[float, ...], dt: float | int, *, source_amplitudes: torch.Tensor, source_locations: torch.Tensor, receiver_locations: torch.Tensor, accuracy: int=8, pml_freq: float | int=25.0, pml_width: int | list[int] | tuple[int, ...]=20, boundary_buffer: int=5, memory: str='boundary', max_vel: float | int | None=None, freq_taper_frac: float | int=0.0, time_pad_frac: float | int=0.0, time_taper: bool=False, illumination: ScalarIllumination | None=None, backend: str | None=None, execution: str='eager', checkpoint_interval: int | None=None, compile_steps: int=1) -> tuple[torch.Tensor]
 
 Propagates scalar acoustic waves on a 2D or 3D grid selected by `v.ndim`, with a batch of independent shots. Both dimensions support one first-order velocity gradient; 3D also supports source-waveform gradients. Coordinates and numerical settings are not differentiable. Each call starts with fresh propagation state and does not return final wavefields.
 
-:param v: **Required; positional or keyword.** Two-dimensional `[N0,N1]` or three-dimensional `[N0,N1,N2]` model, with at least 2 cells per dimension; CUDA float32, typically in m/s. `v.ndim` selects the dimension. Coordinates `[i,j]` / `[i,j,k]` directly index `v[i,j]` / `v[i,j,k]`; the 3D examples use `[nx,ny,nz]`, with no automatic physical-axis permutation. All values must be finite. Signed and zero values are accepted without guaranteeing physical validity. Model-axis transformations preserve autograd; `requires_grad=True` requests a velocity gradient.
+:param v: **Required; positional or keyword.** Two-dimensional `[N0,N1]` or three-dimensional `[N0,N1,N2]` model, with at least 2 cells per dimension; float32 (native CUDA; Torch CPU/CUDA), typically in m/s. `v.ndim` selects the dimension. Coordinates `[i,j]` / `[i,j,k]` directly index `v[i,j]` / `v[i,j,k]`; the 3D examples use `[nx,ny,nz]`, with no automatic physical-axis permutation. All values must be finite. Signed and zero values are accepted without guaranteeing physical validity. Model-axis transformations preserve autograd; `requires_grad=True` requests a velocity gradient.
 :type v: `torch.Tensor`
 :param grid_spacing: **Required; positional or keyword.** Positive, finite spacing, typically in m. In 2D, accepts one value or two equal values. In 3D, accepts one value or three values in model-axis order (for example `[dx,dy,dz]`); unequal spacings are supported. Booleans, zero/negative values, and mismatched sequence lengths are rejected.
 :type grid_spacing: `float | int | list[float] | tuple[float, ...]`
@@ -65,7 +65,7 @@ Propagates scalar acoustic waves on a 2D or 3D grid selected by `v.ndim`, with a
 :type pml_width: `int | list[int] | tuple[int, ...]`
 :param boundary_buffer: **Default `5`; keyword-only.** Nonnegative buffer in spatial grid cells, not a number of time steps or a checkpoint interval. Boundary mode requires at least `accuracy // 2 + 1`, which is 5 at eighth order; full mode allows 0. Total padding on each side is `pml_width + boundary_buffer + accuracy // 2`.
 :type boundary_buffer: `int`
-:param memory: **Default `'boundary'`; keyword-only.** Backpropagation-history strategy. `"boundary"` stores pressure strips and two terminal pressure fields for reconstruction; the six 3D faces each have width `M=accuracy//2` (Radius-M). In 3D, `"full"` stores unscaled `Lap(u)` history over the whole padded volume at every internal step and is intended for small comparisons. Source-only 3D gradients also retain the selected history; a forward with neither velocity nor source gradients retains none. Full mode can exhaust GPU memory. There is no automatic fallback, CPU/disk offload, or `"checkpoint"` option.
+:param memory: **Default `'boundary'`; keyword-only.** Backpropagation-history strategy. `"boundary"` stores pressure strips and two terminal pressure fields for reconstruction; the six 3D faces each have width `M=accuracy//2` (Radius-M). In 3D, `"full"` stores unscaled `Lap(u)` history over the whole padded volume at every internal step and is intended for small comparisons. Source-only 3D gradients also retain the selected history; a forward with neither velocity nor source gradients retains none. Full mode can exhaust GPU memory. Native has no automatic fallback, CPU/disk offload or checkpoint. Torch separately supports full/checkpoint (no boundary), with autograd graphs or complete-state checkpoints rather than this native Lap(u) layout.
 :type memory: `str`
 :param max_vel: **Default `None`; keyword-only.** CFL/PML velocity envelope, typically in m/s. With `None`, each call replans from the current model’s `max(abs(v))`. An explicit value must be positive, finite, and cover that maximum; it is not a clipping limit. An all-zero model requires an explicit positive value. Extrema, time substeps, and PML configuration are not differentiated.
 :type max_vel: `float | int | None`
@@ -75,11 +75,21 @@ Propagates scalar acoustic waves on a 2D or 3D grid selected by `v.ndim`, with a
 :type time_pad_frac: `float | int`
 :param time_taper: **Default `False`; keyword-only.** Whether to apply a nonperiodic Hann window during temporal resampling: after upsampling and before downsampling. Changes both the signal and its backpropagation transpose. Accepts only Booleans, not the integers 0/1. It does not change the signal when the internal resampling ratio is 1.
 :type time_taper: `bool`
-:param illumination: **Default `None`; keyword-only.** Optional fresh `ScalarIllumination` collector in 2D, requiring enabled gradient tracking and a trainable model. Collects detached source, receiver, and geometric-product statistics; it is sealed after forward and reduced after one backward. In 3D only `None` is accepted; any other value raises `NotImplementedError`. `None` allocates no illumination buffers. These statistics are not an exact Hessian and do not automatically precondition gradients.
+:param illumination: **Default `None`; keyword-only.** Optional fresh `ScalarIllumination` collector in 2D, requiring enabled gradient tracking and a trainable model. Collects detached source, receiver, and geometric-product statistics; it is sealed after forward and reduced after one backward. In 3D only `None` is accepted; any other value raises `NotImplementedError`. `None` allocates no illumination buffers. These statistics are not an exact Hessian and do not automatically precondition gradients. Must be None for Torch.
 :type illumination: `ScalarIllumination | None`
-:returns: **`(receiver_amplitudes,)`**, a tuple with exactly one element. The recordings are a contiguous CUDA float32 tensor `[B,R,T]` on the same device as the model, at nominal times `0, dt, ..., (T-1)*dt`. They are pressure-like recordings whose scale depends on the source and unit system. Extract them with `[0]` or `[-1]`. No final wavefield or PML state is included.
+:param backend: **Default `None`; keyword-only.** None preserves native behavior and never automatically selects Torch. `'cuda'` explicitly requires CUDA models; `'torch'` selects CPU/CUDA tensor propagation and autograd. Device follows inputs without implicit model transfer. `'cpu'` is not a backend selector. MPS is supported only for Scalar2D accuracy=4 float32; Scalar3D and other scalar MPS combinations are rejected. Explicitly select full/checkpoint for scalar/VRZ/VTI Torch calls.
+:type backend: `str | None`
+:param execution: **Default `'eager'`; keyword-only.** Torch accepts `'eager'` or `'compile'`. Compile uses PyTorch Inductor/AOTAutograd and raises on failure without eager fallback. Native propagation only accepts eager.
+:type execution: `str`
+:param checkpoint_interval: **Default `None`; keyword-only.** Torch checkpoint segment length in internal time steps: a positive integer, excluding bool; None resolves to 32. Keep None for full or native propagation. Longer segments increase the local replay graph and need not reduce peak memory.
+:type checkpoint_interval: `int | None`
+:param compile_steps: **Default `1`; keyword-only.** Positive integer, excluding bool; consecutive internal steps per Torch execution block. Try 4 for compile; the final partial block is retained. Does not change dt, nt, shots or loss. Native propagation accepts only 1.
+:type compile_steps: `int`
+:returns: **`(receiver_amplitudes,)`**, a tuple with exactly one element. The recordings are a contiguous float32 (native CUDA; Torch CPU/CUDA) tensor `[B,R,T]` on the same device as the model, at nominal times `0, dt, ..., (T-1)*dt`. They are pressure-like recordings whose scale depends on the source and unit system. Extract them with `[0]` or `[-1]`. No final wavefield or PML state is included.
 :rtype: `tuple[torch.Tensor]`
 ```
+
+**Torch path:** set `backend="torch"` on the same main entry point and explicitly choose `memory="full"` or `"checkpoint"` for CPU/CUDA without native-library loading. Native history-layout/stream restrictions below describe the native path. See the [PyTorch backend](pytorch-backend.md) for all options and the memory table.
 
 (scalar-details)=
 ### Sources and autograd
@@ -117,14 +127,14 @@ Scalar uses the conservative coefficient 0.6, every model-axis spacing, and `max
 Sources are FFT-upsampled before source-location velocity scaling. Records are time-aligned before downsampling to `[B,R,T]`. Backward uses the actual transposes of these operations, not simple repetition or decimation. At ratio 1, valid taper/padding settings do not alter the signal. Time substeps cannot repair spatial dispersion.
 
 (scalar-memory)=
-### 3D memory: full and Radius-M boundary
+### Native 3D memory: full and Radius-M boundary
 
 `M=accuracy//2` is the pressure-Laplacian stencil radius, distinct from `boundary_buffer` and `pml_width`. Boundary mode stores six pressure faces of exactly M cells plus two terminal pressure fields, without a full time-volume history or automatic fallback to full. Full mode stores unscaled `Lap(u)` volume history at every internal step. Both modes retain propagation/adjoint workspaces; 3D CPML memory uses directional slabs. Source-only gradients also retain the selected history. Memory grows with internal time steps and shot count, so boundary mode does not guarantee production-scale 3D fits a GPU. See the exact payload formulas in {ref}`Scalar3D reconstruction <reconstruction-scalar3d>`.
 
 (scalar-3d-example)=
 ### Runnable 3D call: first-order velocity and source gradients
 
-With 7.0.0 installed and visible logical CUDA device 0 available, the following is a standalone small example. The model uses `[x,y,z]`, spacing is `[dx,dy,dz]`, and coordinates are grid indices. The loss only checks gradient wiring. Syntax and interface have been checked; this documentation update did not execute the GPU example, so these assertions are not numerical acceptance results.
+With V16 source, its matching rebuilt native library, and visible logical CUDA device 0 available, the following is a standalone small example. The model uses `[x,y,z]`, spacing is `[dx,dy,dz]`, and coordinates are grid indices. The loss only checks gradient wiring. Syntax and interface have been checked; this documentation update did not execute the GPU example, so these assertions are not numerical acceptance results.
 
 ```python
 import torch
@@ -150,7 +160,8 @@ receiver_amplitudes, = starwave.scalar(
     accuracy=4, pml_freq=15.0, pml_width=8, boundary_buffer=5,
     memory="boundary", max_vel=2000.0,
     freq_taper_frac=0.0, time_pad_frac=0.0, time_taper=False,
-    illumination=None,
+    illumination=None, backend=None, execution="eager",
+    checkpoint_interval=None, compile_steps=1,
 )
 assert receiver_amplitudes.shape == (1, 16, 96)
 loss = receiver_amplitudes.square().mean()
@@ -164,7 +175,7 @@ assert torch.isfinite(source_amplitudes.grad).all()
 (scalar-notes)=
 ### Notes
 
-- Supports CUDA FP32 on the default stream only; each forward permits one first-order backward pass. Source gradients remain unsupported in 2D and are supported at first order in 3D. Higher-order derivatives, AMP, CUDA graphs, custom streams, CPU propagation, and public initial/final states are unsupported.
+- Native supports CUDA FP32 on the default stream only; each forward permits one first-order backward pass. Source gradients remain unsupported in 2D and are supported at first order in 3D. Higher-order derivatives, AMP, CUDA graphs, custom streams, CPU propagation, and public initial/final states are unsupported.
 - CFL time substeps cannot compensate for inadequate spatial sampling. Spatial-resolution warnings are diagnostics, not certificates of accuracy or stability.
 - For DataParallel, place the complete model in a Module and split acquisition inputs only along the shot dimension; see [Multi-GPU introduction](inversion/dataparallel.md).
 - This page’s interface contract has been checked. Target-GPU numerical, performance, and FWI acceptance tests have not been completed.
@@ -172,19 +183,19 @@ assert torch.isfinite(source_amplitudes.grad).all()
 (vrz)=
 ## VRZ Function
 
-```{py:function} starwave.vrz(v: torch.Tensor, grid_spacing: float | int | list[float] | tuple[float, ...], dt: float | int, *, impedance: torch.Tensor | None=None, density: torch.Tensor | None=None, source_amplitudes: torch.Tensor, source_locations: torch.Tensor, receiver_locations: torch.Tensor, accuracy: int=8, pml_freq: float | int=25.0, pml_width: int | list[int] | tuple[int, ...]=20, boundary_buffer: int=5, memory: str='boundary', max_vel: float | int | None=None, freq_taper_frac: float | int=0.0, time_pad_frac: float | int=0.0, time_taper: bool=False, illumination: None=None) -> tuple[torch.Tensor]
+```{py:function} starwave.vrz(v: torch.Tensor, grid_spacing: float | int | list[float] | tuple[float, ...], dt: float | int, *, impedance: torch.Tensor | None=None, density: torch.Tensor | None=None, source_amplitudes: torch.Tensor, source_locations: torch.Tensor, receiver_locations: torch.Tensor, accuracy: int=8, pml_freq: float | int=25.0, pml_width: int | list[int] | tuple[int, ...]=20, boundary_buffer: int=5, memory: str='boundary', max_vel: float | int | None=None, freq_taper_frac: float | int=0.0, time_pad_frac: float | int=0.0, time_taper: bool=False, illumination: None=None, backend: str | None=None, execution: str='eager', checkpoint_interval: int | None=None, compile_steps: int=1) -> tuple[torch.Tensor]
 
 Performs two-dimensional acoustic propagation using velocity and impedance (or density), with batched shots. Specify exactly one parameterization through `impedance` or `density`. The output supports one first-order gradient with respect to the selected model parameters; source waveforms and acquisition coordinates remain fixed.
 
-:param v: **Required; positional or keyword.** Two-dimensional model `[N0,N1]`, with at least 2 cells in each dimension; CUDA float32. Typical unit: m/s. Coordinates `[i,j]` directly index `v[i,j]`; physical axis order is not inferred automatically. Velocity must be positive and finite; scalar’s signed/zero model domain is not accepted. Set `requires_grad=True` to request a model gradient.
+:param v: **Required; positional or keyword.** Two-dimensional model `[N0,N1]`, with at least 2 cells in each dimension; float32 (native CUDA; Torch CPU/CUDA). Typical unit: m/s. Coordinates `[i,j]` directly index `v[i,j]`; physical axis order is not inferred automatically. Velocity must be positive and finite; scalar’s signed/zero model domain is not accepted. Set `requires_grad=True` to request a model gradient.
 :type v: `torch.Tensor`
 :param grid_spacing: **Required; positional or keyword.** Positive, finite grid spacing, typically in m. Accepts one value or two equal values; scalar/VRZ do not support unequal spacing along the two axes. Booleans, zero/negative values, and mismatched sequence lengths are rejected.
 :type grid_spacing: `float | int | list[float] | tuple[float, ...]`
 :param dt: **Required; positional or keyword.** Positive, finite sampling interval of the user input/output, typically in s. Internally, the CFL condition may require a smaller time step; the returned sampling interval remains this value. Tensor and Boolean inputs are not accepted, and this parameter is not differentiated.
 :type dt: `float | int`
-:param impedance: **Default `None`; keyword-only.** Acoustic impedance `Z`, CUDA float32, with the same shape and device as `v`, positive and finite. Typical SI unit: kg/(m²·s), consistent with `v*rho`. Provide exactly one of this parameter and `density`; providing both or neither is invalid. Training this input uses an independent velocity/impedance parameterization.
+:param impedance: **Default `None`; keyword-only.** Acoustic impedance `Z`, float32 (native CUDA; Torch CPU/CUDA), with the same shape and device as `v`, positive and finite. Typical SI unit: kg/(m²·s), consistent with `v*rho`. Provide exactly one of this parameter and `density`; providing both or neither is invalid. Training this input uses an independent velocity/impedance parameterization.
 :type impedance: `torch.Tensor | None`
-:param density: **Default `None`; keyword-only.** Density `rho`, CUDA float32, with the same shape and device as `v`, positive and finite. Choose a consistent unit system; the SI unit is kg/m³. The interface uses the differentiable conversion `Z=v*rho`, and gradients include this chain rule. No implicit unit conversion is performed. Provide exactly one of this parameter and `impedance`.
+:param density: **Default `None`; keyword-only.** Density `rho`, float32 (native CUDA; Torch CPU/CUDA), with the same shape and device as `v`, positive and finite. Choose a consistent unit system; the SI unit is kg/m³. The interface uses the differentiable conversion `Z=v*rho`, and gradients include this chain rule. No implicit unit conversion is performed. Provide exactly one of this parameter and `impedance`.
 :type density: `torch.Tensor | None`
 :param source_amplitudes: **Required; keyword-only.** Fixed real-valued tensor `[B,S,T]`, with all three dimensions nonempty and `requires_grad=True` forbidden. Values must be finite and representable as float32; the tensor is converted to the model device and float32. This is the normalized forcing `f`, not a pressure increment per step; if the wavefield is in Pa and length is in m, its unit is Pa/m². A tensor of shape `[T]` or `[B,T]` alone is not accepted: explicitly expand the shot/source dimensions for a shared waveform.
 :type source_amplitudes: `torch.Tensor`
@@ -198,9 +209,9 @@ Performs two-dimensional acoustic propagation using velocity and impedance (or d
 :type pml_freq: `float | int`
 :param pml_width: **Default `20`; keyword-only.** Positive integer thickness in grid cells. A single value applies to every face; a sequence of four equal integers is also accepted, ordered as the beginning/end of the first axis, then the beginning/end of the second axis. Zero width, asymmetric face widths, and requesting a free surface with a zero-width face are unsupported.
 :type pml_width: `int | list[int] | tuple[int, ...]`
-:param boundary_buffer: **Default `5`; keyword-only.** Nonnegative buffer in spatial grid cells, not a number of time steps or a checkpoint interval. Boundary mode requires at least `accuracy // 2 + 1`, which is 5 at eighth order; full mode allows 0. Total padding on each side is `pml_width + boundary_buffer + accuracy // 2`.
+:param boundary_buffer: **Default `5`; keyword-only.** Nonnegative buffer in spatial grid cells, not a number of time steps or a checkpoint interval. Boundary mode requires at least `accuracy // 2 + 1`, which is 5 at eighth order; full mode allows 0. Total padding on each side is `pml_width + boundary_buffer + accuracy // 2`. Torch VRZ additionally requires at least accuracy//2 in both full/checkpoint.
 :type boundary_buffer: `int`
-:param memory: **Default `'boundary'`; keyword-only.** History strategy for model backpropagation. `"boundary"` stores boundary strips and reconstructs the wavefield; `"full"` stores the complete history. Full mode can exhaust GPU memory; there is no automatic fallback or `"checkpoint"` option. Forward propagation without a requested model gradient does not retain model-backpropagation history.
+:param memory: **Default `'boundary'`; keyword-only.** History strategy for model backpropagation. `"boundary"` stores boundary strips and reconstructs the wavefield; `"full"` stores the complete history. Full mode can exhaust GPU memory; native has no automatic fallback or checkpoint. Torch separately supports full/checkpoint (no boundary), with a different graph/checkpoint layout. Forward propagation without a requested model gradient does not retain model-backpropagation history.
 :type memory: `str`
 :param max_vel: **Default `None`; keyword-only.** CFL/PML velocity envelope, typically in m/s. With `None`, each call replans from the current `max(v)`. An explicit value must be positive, finite, and cover the current maximum velocity; it is not a clipping limit. Planning and PML configuration are not differentiated. This primary-velocity constraint does not guarantee spatial stability for arbitrary impedance contrasts.
 :type max_vel: `float | int | None`
@@ -210,11 +221,21 @@ Performs two-dimensional acoustic propagation using velocity and impedance (or d
 :type time_pad_frac: `float | int`
 :param time_taper: **Default `False`; keyword-only.** Whether to apply a nonperiodic Hann window during temporal resampling: after upsampling and before downsampling. Changes both the signal and its backpropagation transpose. Accepts only Booleans, not the integers 0/1. It does not change the signal when the internal resampling ratio is 1.
 :type time_taper: `bool`
-:param illumination: **Default `None`; keyword-only.** Compatibility keyword only; must be `None`. VRZ does not support illumination. Explicitly passing a collector or any other value raises `NotImplementedError`; do not reuse scalar’s illumination setup.
+:param illumination: **Default `None`; keyword-only.** Compatibility keyword only; must be `None`. VRZ does not support illumination. Explicitly passing a collector or any other value raises `NotImplementedError`; do not reuse scalar’s illumination setup. Must be None for Torch.
 :type illumination: `None`
-:returns: **`(receiver_amplitudes,)`**, a one-element tuple. Its only recording tensor has shape `[B,R,T]`, is contiguous CUDA float32 on the same device as the model, and has nominal times `0, dt, ..., (T-1)*dt`. These are pressure-like recordings, accessible with `[0]` or `[-1]`; no final wavefield or boundary state is included.
+:param backend: **Default `None`; keyword-only.** None preserves native behavior and never automatically selects Torch. `'cuda'` explicitly requires CUDA models; `'torch'` selects CPU/CUDA tensor propagation and autograd. Device follows inputs without implicit model transfer. `'cpu'` and MPS are rejected. Explicitly select full/checkpoint for scalar/VRZ/VTI Torch calls.
+:type backend: `str | None`
+:param execution: **Default `'eager'`; keyword-only.** Torch accepts `'eager'` or `'compile'`. Compile uses PyTorch Inductor/AOTAutograd and raises on failure without eager fallback. Native propagation only accepts eager.
+:type execution: `str`
+:param checkpoint_interval: **Default `None`; keyword-only.** Torch checkpoint segment length in internal time steps: a positive integer, excluding bool; None resolves to 32. Keep None for full or native propagation. Longer segments increase the local replay graph and need not reduce peak memory.
+:type checkpoint_interval: `int | None`
+:param compile_steps: **Default `1`; keyword-only.** Positive integer, excluding bool; consecutive internal steps per Torch execution block. Try 4 for compile; the final partial block is retained. Does not change dt, nt, shots or loss. Native propagation accepts only 1.
+:type compile_steps: `int`
+:returns: **`(receiver_amplitudes,)`**, a one-element tuple. Its only recording tensor has shape `[B,R,T]`, is contiguous float32 (native CUDA; Torch CPU/CUDA) on the same device as the model, and has nominal times `0, dt, ..., (T-1)*dt`. These are pressure-like recordings, accessible with `[0]` or `[-1]`; no final wavefield or boundary state is included.
 :rtype: `tuple[torch.Tensor]`
 ```
+
+**Torch path:** set `backend="torch"` on the same main entry point and explicitly choose `memory="full"` or `"checkpoint"` for CPU/CUDA without native-library loading. Native history-layout/stream restrictions below describe the native path. See the [PyTorch backend](pytorch-backend.md) for all options and the memory table.
 
 (vrz-details)=
 ### Parameterization, sources, and gradients
@@ -249,7 +270,7 @@ For the impedance parameterization, replace `density=rho` with `impedance=Z`; do
 (vrz-notes)=
 ### Notes
 
-- Supports CUDA FP32 on the default stream only; each forward permits one first-order backward pass. Source gradients, higher-order derivatives, AMP, CUDA graphs, custom streams, and public initial/final states are unsupported.
+- Native supports CUDA FP32 on the default stream only; each forward permits one first-order backward pass. Source gradients, higher-order derivatives, AMP, CUDA graphs, custom streams, and public initial/final states are unsupported.
 - CFL time substeps cannot compensate for inadequate spatial sampling. Spatial-resolution warnings are diagnostics, not certificates of accuracy or stability.
 - For DataParallel, place the complete model in a Module and split acquisition inputs only along the shot dimension; see [Multi-GPU introduction](inversion/dataparallel.md).
 - This page’s interface contract has been checked. Target-GPU numerical, performance, and FWI acceptance tests have not been completed.
@@ -257,17 +278,17 @@ For the impedance parameterization, replace `density=rho` with `impedance=Z`; do
 (vti)=
 ## VTI Function
 
-```{py:function} starwave.vti(vp: torch.Tensor, epsilon: torch.Tensor, delta: torch.Tensor, rho: torch.Tensor, grid_spacing: float | int | list[float] | tuple[float, ...], dt: float | int, *, source_amplitudes: torch.Tensor, source_locations: torch.Tensor, receiver_locations: torch.Tensor, source_fields: str | list[str] | tuple[str, ...]=('sH', 'sV'), receiver_fields: str | list[str] | tuple[str, ...]=('vz',), accuracy: int=4, pml_freq: float | int=25.0, pml_width: int | list[int] | tuple[int, ...]=20, boundary_buffer: int=5, memory: str='boundary', max_vel: float | int | None=None, freq_taper_frac: float | int=0.0, time_pad_frac: float | int=0.0, time_taper: bool=False) -> tuple[torch.Tensor, ...]
+```{py:function} starwave.vti(vp: torch.Tensor, epsilon: torch.Tensor, delta: torch.Tensor, rho: torch.Tensor, grid_spacing: float | int | list[float] | tuple[float, ...], dt: float | int, *, source_amplitudes: torch.Tensor, source_locations: torch.Tensor, receiver_locations: torch.Tensor, source_fields: str | list[str] | tuple[str, ...]=('sH', 'sV'), receiver_fields: str | list[str] | tuple[str, ...]=('vz',), accuracy: int=4, pml_freq: float | int=25.0, pml_width: int | list[int] | tuple[int, ...]=20, boundary_buffer: int=5, memory: str='boundary', max_vel: float | int | None=None, freq_taper_frac: float | int=0.0, time_pad_frac: float | int=0.0, time_taper: bool=False, backend: str | None=None, execution: str='eager', checkpoint_interval: int | None=None, compile_steps: int=1) -> tuple[torch.Tensor, ...]
 
 Propagates a Duveneck-type first-order acoustic VTI system, selecting 2D or 3D from `vp.ndim`. Outputs follow the selected receiver-component order. Each of the four models can independently request a first-order gradient in one backward pass. Fixed models still participate in all physical calculations; this interface is not full elastic VTI.
 
-:param vp: **Required; positional or keyword.** Vertical P-wave velocity in m/s. CUDA float32, positive and finite, with shape `[nx,nz]` or `[nx,ny,nz]` and at least 2 cells per dimension. The last axis is always vertical. All four models must have matching shape, dtype, and device. Physical axis order is neither inferred nor converted automatically.
+:param vp: **Required; positional or keyword.** Vertical P-wave velocity in m/s. float32 (native CUDA; Torch CPU/CUDA), positive and finite, with shape `[nx,nz]` or `[nx,ny,nz]` and at least 2 cells per dimension. The last axis is always vertical. All four models must have matching shape, dtype, and device. Physical axis order is neither inferred nor converted automatically.
 :type vp: `torch.Tensor`
-:param epsilon: **Required; positional or keyword.** Dimensionless Thomsen epsilon, CUDA float32, with the same shape/device as `vp`. Must be finite and strictly greater than -0.5, and the coefficients and derivatives must be numerically representable. `epsilon<delta` is allowed, without implicit clipping; growing modes are a known limitation.
+:param epsilon: **Required; positional or keyword.** Dimensionless Thomsen epsilon, float32 (native CUDA; Torch CPU/CUDA), with the same shape/device as `vp`. Must be finite and strictly greater than -0.5, and the coefficients and derivatives must be numerically representable. `epsilon<delta` is allowed, without implicit clipping; growing modes are a known limitation.
 :type epsilon: `torch.Tensor`
-:param delta: **Required; positional or keyword.** Dimensionless Thomsen delta, CUDA float32, with the same shape/device as `vp`. Must be finite and strictly greater than -0.5, and the coefficients and derivatives must be numerically representable. The input is not constrained to `delta<=epsilon`; the model is not modified implicitly.
+:param delta: **Required; positional or keyword.** Dimensionless Thomsen delta, float32 (native CUDA; Torch CPU/CUDA), with the same shape/device as `vp`. Must be finite and strictly greater than -0.5, and the coefficients and derivatives must be numerically representable. The input is not constrained to `delta<=epsilon`; the model is not modified implicitly.
 :type delta: `torch.Tensor`
-:param rho: **Required; positional or keyword.** Density in kg/m³. CUDA float32, with the same shape/device as `vp`, positive and finite; reciprocals, stiffnesses, and derivatives must be representable. There is no default density or implicit unit conversion. If the original data are confirmed to be in g/cm³, explicitly multiply them by 1000 before calling.
+:param rho: **Required; positional or keyword.** Density in kg/m³. float32 (native CUDA; Torch CPU/CUDA), with the same shape/device as `vp`, positive and finite; reciprocals, stiffnesses, and derivatives must be representable. There is no default density or implicit unit conversion. If the original data are confirmed to be in g/cm³, explicitly multiply them by 1000 before calling.
 :type rho: `torch.Tensor`
 :param grid_spacing: **Required; positional or keyword.** Positive, finite grid spacing in m. Accepts a single value or per-axis spacing `[dx,dz]` / `[dx,dy,dz]`; unequal spacing is allowed. Axis order must match the model. Booleans, zero/negative values, and mismatched sequence lengths are rejected.
 :type grid_spacing: `float | int | list[float] | tuple[float, ...]`
@@ -291,7 +312,7 @@ Propagates a Duveneck-type first-order acoustic VTI system, selecting 2D or 3D f
 :type pml_width: `int | list[int] | tuple[int, ...]`
 :param boundary_buffer: **Default `5`; keyword-only.** Nonnegative buffer in spatial grid cells, not a number of time steps or a checkpoint interval. Boundary mode requires at least `accuracy // 2 + 1`, which is 5 at eighth order; full mode allows 0. Total padding on each side is `pml_width + boundary_buffer + accuracy // 2`.
 :type boundary_buffer: `int`
-:param memory: **Default `'boundary'`; keyword-only.** History strategy for model backpropagation. `"boundary"` stores boundary strips and reconstructs the wavefield; `"full"` stores the complete history. Full mode can exhaust GPU memory; there is no automatic fallback or `"checkpoint"` option. Forward propagation without a requested model gradient does not retain model-backpropagation history.
+:param memory: **Default `'boundary'`; keyword-only.** History strategy for model backpropagation. `"boundary"` stores boundary strips and reconstructs the wavefield; `"full"` stores the complete history. Full mode can exhaust GPU memory; native has no automatic fallback or checkpoint. Torch separately supports full/checkpoint (no boundary), with a different graph/checkpoint layout. Forward propagation without a requested model gradient does not retain model-backpropagation history.
 :type memory: `str`
 :param max_vel: **Default `None`; keyword-only.** Anisotropic CFL/PML velocity envelope in m/s. With `None`, it is computed dynamically. An explicit value must be positive, finite, and cover `max(vp*sqrt(max(1,1+2*epsilon,sqrt(1+2*delta))))`. Covering only `max(vp)` is insufficient. Density contrast is still recomputed. Planning also depends on dimensionality, spacing, and finite-difference coefficients, and is not differentiated.
 :type max_vel: `float | int | None`
@@ -301,9 +322,19 @@ Propagates a Duveneck-type first-order acoustic VTI system, selecting 2D or 3D f
 :type time_pad_frac: `float | int`
 :param time_taper: **Default `False`; keyword-only.** Whether to apply a nonperiodic Hann window during temporal resampling: after upsampling and before downsampling. Changes both the signal and its backpropagation transpose. Accepts only Booleans, not the integers 0/1. It does not change the signal when the internal resampling ratio is 1.
 :type time_taper: `bool`
-:returns: **`(records_0, ..., records_n)`**, with one contiguous CUDA float32 tensor `[B,R,T]` per `receiver_fields` entry, in exactly the requested component order. The default returns only `(vz_records,)`, the vertical particle velocity in m/s, not pressure; `sH/sV` are stresses in Pa. Tensors are on the same device as the model, at nominal user times `0, dt, ..., (T-1)*dt`, without final states.
+:param backend: **Default `None`; keyword-only.** None preserves native behavior and never automatically selects Torch. `'cuda'` explicitly requires CUDA models; `'torch'` selects CPU/CUDA tensor propagation and autograd. Device follows inputs without implicit model transfer. `'cpu'` and MPS are rejected. Explicitly select full/checkpoint for scalar/VRZ/VTI Torch calls.
+:type backend: `str | None`
+:param execution: **Default `'eager'`; keyword-only.** Torch accepts `'eager'` or `'compile'`. Compile uses PyTorch Inductor/AOTAutograd and raises on failure without eager fallback. Native propagation only accepts eager.
+:type execution: `str`
+:param checkpoint_interval: **Default `None`; keyword-only.** Torch checkpoint segment length in internal time steps: a positive integer, excluding bool; None resolves to 32. Keep None for full or native propagation. Longer segments increase the local replay graph and need not reduce peak memory.
+:type checkpoint_interval: `int | None`
+:param compile_steps: **Default `1`; keyword-only.** Positive integer, excluding bool; consecutive internal steps per Torch execution block. Try 4 for compile; the final partial block is retained. Does not change dt, nt, shots or loss. Native propagation accepts only 1.
+:type compile_steps: `int`
+:returns: **`(records_0, ..., records_n)`**, with one contiguous float32 (native CUDA; Torch CPU/CUDA) tensor `[B,R,T]` per `receiver_fields` entry, in exactly the requested component order. The default returns only `(vz_records,)`, the vertical particle velocity in m/s, not pressure; `sH/sV` are stresses in Pa. Tensors are on the same device as the model, at nominal user times `0, dt, ..., (T-1)*dt`, without final states.
 :rtype: `tuple[torch.Tensor, ...]`
 ```
+
+**Torch path:** set `backend="torch"` on the same main entry point and explicitly choose `memory="full"` or `"checkpoint"` for CPU/CUDA without native-library loading. Native history-layout/stream restrictions below describe the native path. See the [PyTorch backend](pytorch-backend.md) for all options and the memory table.
 
 (vti-details)=
 ### Components, timing, and gradients
@@ -341,7 +372,7 @@ This example uses 2D inputs. A 3D call needs all four models shaped `[nx,ny,nz]`
 (vti-notes)=
 ### Notes
 
-- Supports CUDA FP32 on the default stream only; each forward permits one first-order backward pass. Source gradients, higher-order derivatives, AMP, CUDA graphs, custom streams, and public initial/final states are unsupported.
+- Native supports CUDA FP32 on the default stream only; each forward permits one first-order backward pass. Source gradients, higher-order derivatives, AMP, CUDA graphs, custom streams, and public initial/final states are unsupported.
 - CFL time substeps cannot compensate for inadequate spatial sampling. Spatial-resolution warnings are diagnostics, not certificates of accuracy or stability.
 - For DataParallel, place the complete model in a Module and split acquisition inputs only along the shot dimension; see [Multi-GPU introduction](inversion/dataparallel.md).
 - This page’s interface contract has been checked. Target-GPU numerical, performance, and FWI acceptance tests have not been completed.
@@ -349,11 +380,11 @@ This example uses 2D inputs. A 3D call needs all four models shaped `[nx,ny,nz]`
 (elastic)=
 ## Elastic Function
 
-```{py:function} starwave.elastic(lamb: torch.Tensor, mu: torch.Tensor, buoyancy: torch.Tensor, grid_spacing: Union[float, Sequence[float]], dt: float, source_amplitudes_z: Optional[torch.Tensor]=None, source_amplitudes_y: Optional[torch.Tensor]=None, source_amplitudes_x: Optional[torch.Tensor]=None, source_amplitudes_p: Optional[torch.Tensor]=None, source_locations_z: Optional[torch.Tensor]=None, source_locations_y: Optional[torch.Tensor]=None, source_locations_x: Optional[torch.Tensor]=None, source_locations_p: Optional[torch.Tensor]=None, receiver_locations_z: Optional[torch.Tensor]=None, receiver_locations_y: Optional[torch.Tensor]=None, receiver_locations_x: Optional[torch.Tensor]=None, receiver_locations_p: Optional[torch.Tensor]=None, accuracy: int=4, pml_width: Union[int, Sequence[int]]=20, pml_freq: Optional[float]=None, max_vel: Optional[float]=None, survey_pad: Optional[Union[int, Sequence[Optional[int]]]]=None, vz_0: Optional[torch.Tensor]=None, vy_0: Optional[torch.Tensor]=None, vx_0: Optional[torch.Tensor]=None, sigmazz_0: Optional[torch.Tensor]=None, sigmayz_0: Optional[torch.Tensor]=None, sigmaxz_0: Optional[torch.Tensor]=None, sigmayy_0: Optional[torch.Tensor]=None, sigmaxy_0: Optional[torch.Tensor]=None, sigmaxx_0: Optional[torch.Tensor]=None, m_vzz_0: Optional[torch.Tensor]=None, m_vzy_0: Optional[torch.Tensor]=None, m_vzx_0: Optional[torch.Tensor]=None, m_vyz_0: Optional[torch.Tensor]=None, m_vxz_0: Optional[torch.Tensor]=None, m_vyy_0: Optional[torch.Tensor]=None, m_vyx_0: Optional[torch.Tensor]=None, m_vxy_0: Optional[torch.Tensor]=None, m_vxx_0: Optional[torch.Tensor]=None, m_sigmazzz_0: Optional[torch.Tensor]=None, m_sigmayzy_0: Optional[torch.Tensor]=None, m_sigmaxzx_0: Optional[torch.Tensor]=None, m_sigmayzz_0: Optional[torch.Tensor]=None, m_sigmaxzz_0: Optional[torch.Tensor]=None, m_sigmayyy_0: Optional[torch.Tensor]=None, m_sigmaxyy_0: Optional[torch.Tensor]=None, m_sigmaxyx_0: Optional[torch.Tensor]=None, m_sigmaxxx_0: Optional[torch.Tensor]=None, origin: Optional[Sequence[int]]=None, nt: Optional[int]=None, model_gradient_sampling_interval: int=1, freq_taper_frac: float=0.0, time_pad_frac: float=0.0, time_taper: bool=False, forward_callback: Optional[common.Callback]=None, callback_frequency: int=1, python_backend: Union[Literal['eager', 'jit', 'compile'], bool]=False, storage_mode: Literal['device', 'cpu', 'disk', 'none']='device', storage_path: str='.', storage_compression: bool=False, *, memory: Literal['full', 'boundary']='full') -> Tuple[torch.Tensor, ...]
+```{py:function} starwave.elastic(lamb: torch.Tensor, mu: torch.Tensor, buoyancy: torch.Tensor, grid_spacing: Union[float, Sequence[float]], dt: float, source_amplitudes_z: Optional[torch.Tensor]=None, source_amplitudes_y: Optional[torch.Tensor]=None, source_amplitudes_x: Optional[torch.Tensor]=None, source_amplitudes_p: Optional[torch.Tensor]=None, source_locations_z: Optional[torch.Tensor]=None, source_locations_y: Optional[torch.Tensor]=None, source_locations_x: Optional[torch.Tensor]=None, source_locations_p: Optional[torch.Tensor]=None, receiver_locations_z: Optional[torch.Tensor]=None, receiver_locations_y: Optional[torch.Tensor]=None, receiver_locations_x: Optional[torch.Tensor]=None, receiver_locations_p: Optional[torch.Tensor]=None, accuracy: int=4, pml_width: Union[int, Sequence[int]]=20, pml_freq: Optional[float]=None, max_vel: Optional[float]=None, survey_pad: Optional[Union[int, Sequence[Optional[int]]]]=None, vz_0: Optional[torch.Tensor]=None, vy_0: Optional[torch.Tensor]=None, vx_0: Optional[torch.Tensor]=None, sigmazz_0: Optional[torch.Tensor]=None, sigmayz_0: Optional[torch.Tensor]=None, sigmaxz_0: Optional[torch.Tensor]=None, sigmayy_0: Optional[torch.Tensor]=None, sigmaxy_0: Optional[torch.Tensor]=None, sigmaxx_0: Optional[torch.Tensor]=None, m_vzz_0: Optional[torch.Tensor]=None, m_vzy_0: Optional[torch.Tensor]=None, m_vzx_0: Optional[torch.Tensor]=None, m_vyz_0: Optional[torch.Tensor]=None, m_vxz_0: Optional[torch.Tensor]=None, m_vyy_0: Optional[torch.Tensor]=None, m_vyx_0: Optional[torch.Tensor]=None, m_vxy_0: Optional[torch.Tensor]=None, m_vxx_0: Optional[torch.Tensor]=None, m_sigmazzz_0: Optional[torch.Tensor]=None, m_sigmayzy_0: Optional[torch.Tensor]=None, m_sigmaxzx_0: Optional[torch.Tensor]=None, m_sigmayzz_0: Optional[torch.Tensor]=None, m_sigmaxzz_0: Optional[torch.Tensor]=None, m_sigmayyy_0: Optional[torch.Tensor]=None, m_sigmaxyy_0: Optional[torch.Tensor]=None, m_sigmaxyx_0: Optional[torch.Tensor]=None, m_sigmaxxx_0: Optional[torch.Tensor]=None, origin: Optional[Sequence[int]]=None, nt: Optional[int]=None, model_gradient_sampling_interval: int=1, freq_taper_frac: float=0.0, time_pad_frac: float=0.0, time_taper: bool=False, forward_callback: Optional[common.Callback]=None, callback_frequency: int=1, python_backend: Union[Literal['eager', 'jit', 'compile'], bool]=False, storage_mode: Literal['device', 'cpu', 'disk', 'none']='device', storage_path: str='.', storage_compression: bool=False, *, memory: Literal['full', 'boundary', 'checkpoint']='full', backend: str | None=None, execution: str='eager', checkpoint_interval: int | None=None, compile_steps: int=1) -> Tuple[torch.Tensor, ...]
 
-2D/3D isotropic elastic propagation with the Deepwave 0.0.27-derived backend. Inputs are raw Lamé parameters and buoyancy, with multi-shot first-order differentiation of materials, sources and initial states. Every argument except the final memory is positional-or-keyword; only the first five are required.
+2D/3D isotropic elastic propagation with the Deepwave 0.0.27-derived backend. Inputs are raw Lamé parameters and buoyancy, with multi-shot first-order differentiation of materials, sources and initial states. memory and backend/execution/checkpoint_interval/compile_steps are keyword-only; remaining arguments are positional-or-keyword. Only the first five are required.
 
-:param lamb: **Required.** First Lamé parameter, typically Pa. Spatial shape `[Ny,Nx]` (2D) or `[Nz,Ny,Nx]` (3D), optionally with a leading model batch of 1 or B. CPU/CUDA float32 or float64, with finite values. Spatial shape, dtype and device must match mu and buoyancy; this input is never interpreted as vp.
+:param lamb: **Required.** First Lamé parameter, typically Pa. Spatial shape `[Ny,Nx]` (2D) or `[Nz,Ny,Nx]` (3D), optionally with a leading model batch of 1 or B. CPU/float32 (native CUDA; Torch CPU/CUDA) or float64, with finite values. Spatial shape, dtype and device must match mu and buoyancy; this input is never interpreted as vp.
 :type lamb: `torch.Tensor`
 :param mu: **Required.** Second Lamé parameter (shear modulus), typically Pa; the model-batch, axis, dtype and device rules for lamb apply. Trainable inputs retain their autograd chain.
 :type mu: `torch.Tensor`
@@ -455,7 +486,7 @@ This example uses 2D inputs. A 3D call needs all four models shaped `[nx,ny,nz]`
 :type origin: `Optional[Sequence[int]]`
 :param nt: **Default `None`.** Number of user time samples, required when no source amplitudes are supplied. With source amplitudes, duration is normally inferred from their final dimension; an explicit nt must equal that length. Source-free calls still need coordinates or initial fields sufficient to infer dimensions/shots.
 :type nt: `Optional[int]`
-:param model_gradient_sampling_interval: **Default `1`.** Material-gradient time-sampling interval, an integer ≥1. The internal accumulation stride is the CFL ratio q times this value. The default 1 is the simplest choice; larger values use sampled gradients rather than promising every-step equivalence. Current native paths process complete sampling groups; see storage and sampling below.
+:param model_gradient_sampling_interval: **Default `1`.** Material-gradient time-sampling interval, an integer ≥1. The internal accumulation stride is the CFL ratio q times this value. The default 1 is the simplest choice; larger values use sampled gradients rather than promising every-step equivalence. Current native paths process complete sampling groups; see storage and sampling below. Torch accepts only 1 and differentiates all internal steps.
 :type model_gradient_sampling_interval: `int`
 :param freq_taper_frac: **Default `0.0`.** Fraction of the high-frequency end to cosine-taper during CFL-driven FFT resampling of sources and receivers; does not change user output length.
 :type freq_taper_frac: `float`
@@ -463,23 +494,33 @@ This example uses 2D inputs. A 3D call needs all four models shaped `[nx,ny,nz]`
 :type time_pad_frac: `float`
 :param time_taper: **Default `False`.** Whether to apply a temporal Hann window to sources and receivers during resampling.
 :type time_taper: `bool`
-:param forward_callback: **Default `None`.** Observer receiving `starwave.common.CallbackState`. Native callbacks run on backend outer-loop groups; state.dt is internal h and state.step is the outer-loop index. Boundary snapshots are read-only.
+:param forward_callback: **Default `None`.** Observer receiving `starwave.common.CallbackState`. Native callbacks run on backend outer-loop groups; state.dt is internal h and state.step is the outer-loop index. Boundary snapshots are read-only. Torch accepts None only.
 :type forward_callback: `Optional[common.Callback]`
 :param callback_frequency: **Default `1`.** Positive number of backend outer-loop groups between callbacks. A native group spans q × model_gradient_sampling_interval internal steps; it is not a fixed user-record sampling interval.
 :type callback_frequency: `int`
-:param python_backend: **Default `False`.** False selects C/CUDA; `"eager"`, `"jit"` and `"compile"` explicitly select PyTorch paths. True selects compile when a verified build declares OpenMP, otherwise jit; availability depends on PyTorch/toolchain. Python paths require full mode, device storage and no compression.
+:param python_backend: **Default `False`.** With backend=None, False selects C/CUDA; `"eager"`, `"jit"` and `"compile"` explicitly select PyTorch paths. True selects compile when a verified build declares OpenMP, otherwise jit; availability depends on PyTorch/toolchain. The existing python_backend compatibility paths require full mode, device storage and no compression. With new backend="torch", only False or eager is accepted; select compilation with execution="compile".
 :type python_backend: `Union[Literal['eager', 'jit', 'compile'], bool]`
-:param storage_mode: **Default `'device'`.** Intermediate storage: `"device"`, `"cpu"`, `"disk"`, or `"none"`. Offload/disk/none are native full options; none does not provide complete material gradients, as explained below.
+:param storage_mode: **Default `'device'`.** Intermediate storage: `"device"`, `"cpu"`, `"disk"`, or `"none"`. Offload/disk/none are native full options; none does not provide complete material gradients, as explained below. Torch accepts device only.
 :type storage_mode: `Literal['device', 'cpu', 'disk', 'none']`
 :param storage_path: **Default `'.'`.** Directory for disk-mode temporary histories. Keeping the computation graph can keep these files alive; do not delete files still needed for backward.
 :type storage_path: `str`
-:param storage_compression: **Default `False`.** Lossy intermediate compression for native full mode; may change material gradients. Boundary and Python backends reject True.
+:param storage_compression: **Default `False`.** Lossy intermediate compression for native full mode; may change material gradients. Boundary and Python backends reject True. Torch accepts False only.
 :type storage_compression: `bool`
-:param memory: **Default `'full'`.** StarWave keyword-only extension. `"full"` stores volume histories; `"boundary"` uses CUDA boundary storage and reconstruction. Both support 2D/3D and orders 2/4/6/8. Unsupported combinations fail rather than silently falling back to full.
-:type memory: `Literal['full', 'boundary']`
+:param memory: **Default `'full'`.** StarWave keyword-only extension. `"full"` stores volume histories; `"boundary"` uses CUDA boundary storage and reconstruction. Both support 2D/3D and orders 2/4/6/8. Unsupported combinations fail rather than silently falling back to full. Torch additionally supports checkpoint only through backend="torch"; Torch boundary is unsupported.
+:type memory: `Literal['full', 'boundary', 'checkpoint']`
+:param backend: **Default `None`; keyword-only.** None preserves native behavior and never automatically selects Torch. `'cuda'` explicitly requires CUDA models; `'torch'` selects CPU/CUDA tensor propagation and autograd. Device follows inputs without implicit model transfer. `'cpu'` and MPS are rejected. Explicitly select full/checkpoint for scalar/VRZ/VTI Torch calls.
+:type backend: `str | None`
+:param execution: **Default `'eager'`; keyword-only.** Torch accepts `'eager'` or `'compile'`. Compile uses PyTorch Inductor/AOTAutograd and raises on failure without eager fallback. Native propagation only accepts eager.
+:type execution: `str`
+:param checkpoint_interval: **Default `None`; keyword-only.** Torch checkpoint segment length in internal time steps: a positive integer, excluding bool; None resolves to 32. Keep None for full or native propagation. Longer segments increase the local replay graph and need not reduce peak memory.
+:type checkpoint_interval: `int | None`
+:param compile_steps: **Default `1`; keyword-only.** Positive integer, excluding bool; consecutive internal steps per Torch execution block. Try 4 for compile; the final partial block is retained. Does not change dt, nt, shots or loss. Native propagation accepts only 1.
+:type compile_steps: `int`
 :returns: Complete final wavefield/PML states and receiver tuple: 16 tensors in 2D, 31 in 3D. Requested records have shape `[B,R,T]`; absent receiver components remain empty tensors. Exact order is listed below.
 :rtype: `Tuple[torch.Tensor, ...]`
 ```
+
+**Torch path:** set `backend="torch"` on the same main entry point and explicitly choose `memory="full"` or `"checkpoint"` for CPU/CUDA without native-library loading. Native history-layout/stream restrictions below describe the native path. See the [PyTorch backend](pytorch-backend.md) for all options and the memory table.
 
 (elastic-axes)=
 ### Model axes and staggered grid
@@ -520,11 +561,13 @@ Final states have shape `[B,*propagation_domain_including_PML]`, without finite-
 
 For the reconstruction order, material gradients and storage formulas, see {ref}`Wavefield Reconstruction <reconstruction>`.
 
-- `memory="full"` is the default, supporting 2D/3D CPU/CUDA float32/float64. Native `storage_mode="device"` stores histories on the current device; `"cpu"` uses host storage for CUDA and is normalized to device storage for CPU models; `"disk"` uses storage_path. `storage_compression=True` is lossy.
+- `memory="full"` is the default, supporting 2D/3D CPU/float32 (native CUDA; Torch CPU/CUDA)/float64. Native `storage_mode="device"` stores histories on the current device; `"cpu"` uses host storage for CUDA and is normalized to device storage for CPU models; `"disk"` uses storage_path. `storage_compression=True` is lossy.
 - `storage_mode="none"` disables propagation-history contributions to material gradients and cannot provide full material gradients for inversion. Material-dependent force-source scaling can still contribute partial gradients. Trainable materials trigger a warning; source/initial-state gradients are a separate path.
 - `memory="boundary"` is a StarWave extension: CUDA only, with `python_backend=False`, `storage_mode="device"` and `storage_compression=False`. Every cropped physical extent must exceed accuracy; active staggered buoyancy must be nonzero when its gradient is requested. CPU, offload and compression are unsupported, with no automatic full fallback. Memory/speed benefits depend on domain shape, PML and sampling.
 - Keep `model_gradient_sampling_interval=1` for the simplest behavior; when CFL ratio q>1, the material-gradient stride is still q, rather than every internal step. For larger integers, current native full/boundary paths execute complete sampling groups only: an incomplete tail is not propagated, and a positive duration shorter than one group raises an error (possibly during backward when callbacks are used). If sampling is needed, use an interval no larger than user nt that divides nt, and assess the sampled gradient for your application.
 - Ordinary backward releases tensor histories saved by autograd; retaining a graph can extend their lifetime. Disk temporary files live with the corresponding output/loss graph. Log detached values, and do not delete files still needed for backward.
+
+Torch supports full/checkpoint with `model_gradient_sampling_interval=1`, `forward_callback=None`, `storage_mode="device"`, `storage_compression=False`, and python_backend False or eager only. It differentiates every internal step. Native samples material gradients at CFL step_ratio × sampling_interval, so exact native/Torch material-gradient comparisons also require step_ratio=1.
 
 (elastic-examples)=
 ### Minimal example
@@ -671,6 +714,6 @@ Load the separate elastic native library on the main thread. Prepare explicit lo
 
 `ScalarIllumination`, `IlluminationFields`, and `precondition_gradient` are verified exported names related to scalar illumination. This edition does not yet provide a complete lifecycle tutorial for them; the propagator pages explain the usage boundaries of the `illumination` parameter.
 
-StarWave 7.0.0 has no public `starwave.Scalar` wrapper class. The tutorials define their own Module wrapper. Do not assume another library’s classes exist in StarWave, or add elastic state, `nt`, or storage options to scalar/VRZ/VTI calls.
+StarWave V16 has no public `starwave.Scalar` wrapper class. The tutorials define their own Module wrapper. Do not assume another library’s classes exist in StarWave, or add elastic state, `nt`, or storage options to scalar/VRZ/VTI calls.
 
 {ref}`genindex`

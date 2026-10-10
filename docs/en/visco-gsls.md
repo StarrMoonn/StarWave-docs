@@ -1,14 +1,14 @@
 (visco-gsls)=
-# GSLS viscoacoustic API (V15)
+# GSLS viscoacoustic API (V16)
 
-This page describes V15 source `0.1.0.dev15`. The two-dimensional `starwave.visco_gsls` is the current viscoacoustic entry point; a single mechanism uses explicit `mode="sls_compat", n_mechanisms=1`. The standalone `visco_sls`, `prepare_visco_sls` and `visco_sls_native_status` APIs are removed. Existing public PyPI `7.0.0` does not include GSLS; this manual update does not announce a new wheel. See [documentation status](status.md) and [installation](installation.md).
+This page describes V16 source `0.1.0.dev16`. The two-dimensional `starwave.visco_gsls` is the current viscoacoustic entry point; a single mechanism uses explicit `mode="sls_compat", n_mechanisms=1`. The standalone `visco_sls`, `prepare_visco_sls` and `visco_sls_native_status` APIs are removed. Existing public PyPI `7.0.0` does not include GSLS; this manual update does not announce a new wheel. See [documentation status](status.md) and [installation](installation.md).
 
-Supported: fixed spatially varying density, float32/float64, and first-order Vp/Q/source/provider-parameter gradients. Native CPU/CUDA support full/checkpoint; the explicit Torch reference supports full only. The separate scalar, VRZ, VTI and elastic APIs are unchanged.
+Supported: fixed spatially varying density, float32/float64, and first-order Vp/Q/source/provider-parameter gradients. Native CPU/CUDA support full/checkpoint; explicit Torch supports full/checkpoint and eager/compile. All main propagators gain execution options while native defaults remain unchanged; see the [PyTorch backend](pytorch-backend.md).
 
 (visco-gsls-function)=
 ## visco_gsls
 
-```{py:function} starwave.visco_gsls(vp: torch.Tensor, q: torch.Tensor, rho: torch.Tensor, grid_spacing: float | int | list[float] | tuple[float, float], dt: float | int, *, source_amplitudes: torch.Tensor, source_locations: torch.Tensor, receiver_locations: torch.Tensor, f_ref: float | int, accuracy: int=4, pml_width: int | list[int] | tuple[int, int]=20, memory: str='full', max_vel: float | int | None=None, backend: str='cuda', mode: str='hao1', frequency_band: tuple[float, float] | list[float] | None=None, n_mechanisms: int | None=None, fit_tolerance: float | int | None=0.05, strict: bool=False, material_model: Callable | None=None, checkpoint_interval: int | None=None) -> tuple[torch.Tensor]
+```{py:function} starwave.visco_gsls(vp: torch.Tensor, q: torch.Tensor, rho: torch.Tensor, grid_spacing: float | int | list[float] | tuple[float, float], dt: float | int, *, source_amplitudes: torch.Tensor, source_locations: torch.Tensor, receiver_locations: torch.Tensor, f_ref: float | int, accuracy: int=4, pml_width: int | list[int] | tuple[int, int]=20, memory: str='full', max_vel: float | int | None=None, backend: str='cuda', mode: str='hao1', frequency_band: tuple[float, float] | list[float] | None=None, n_mechanisms: int | None=None, fit_tolerance: float | int | None=0.05, strict: bool=False, material_model: Callable | None=None, checkpoint_interval: int | None=None, execution: str='eager', compile_steps: int=1) -> tuple[torch.Tensor]
 
 :param vp: **Required; positional-or-keyword.** Positive finite float32/64 tensor `[z,x]`; phase speed at f_ref, m/s; optionally trainable
 :type vp: `torch.Tensor`
@@ -32,7 +32,7 @@ Supported: fixed spatially varying density, float32/float64, and first-order Vp/
 :type accuracy: `int`
 :param pml_width: **Default `20`; keyword-only.** Nonnegative integer or `(z,x)` symmetric widths. Replicate extension has its full accumulating gradient
 :type pml_width: `int | list[int] | tuple[int, int]`
-:param memory: **Default `'full'`; keyword-only.** full or checkpoint with native CPU/CUDA; Torch oracle is full only; boundary is unsupported
+:param memory: **Default `'full'`; keyword-only.** full or checkpoint with native CPU/CUDA; Torch also supports full/checkpoint; boundary is unsupported
 :type memory: `str`
 :param max_vel: **Default `None`; keyword-only.** Optional fixed unrelaxed-speed envelope, m/s. Required for any trainable material coefficients (including closure parameters) with nonzero PML. Too-small values reject
 :type max_vel: `float | int | None`
@@ -50,8 +50,12 @@ Supported: fixed spatially varying density, float32/float64, and first-order Vp/
 :type strict: `bool`
 :param material_model: **Default `None`; keyword-only.** Optional advanced callable `(vp_padded,q_padded,dt,f_ref)->(c_rel2,strength,A,B)`; overrides built-in material options. See [provider protocol](#visco-gsls-provider)
 :type material_model: `Callable | None`
-:param checkpoint_interval: **Default `None`; keyword-only.** Positive integer segment length, checkpoint only. None balances complete-state and scratch history memory using input shape, never GPU type
+:param checkpoint_interval: **Default `None`; keyword-only.** Positive integer segment length, checkpoint only. Native None balances complete-state and scratch history memory using input shape; Torch None is 32 internal steps. Neither uses GPU type
 :type checkpoint_interval: `int | None`
+:param execution: **Default `'eager'`; keyword-only.** Torch accepts `'eager'` or `'compile'`. Compile uses PyTorch Inductor/AOTAutograd and raises on failure without eager fallback. Native propagation only accepts eager.
+:type execution: `str`
+:param compile_steps: **Default `1`; keyword-only.** Positive integer, excluding bool; consecutive internal steps per Torch execution block. Try 4 for compile; the final partial block is retained. Does not change dt, nt, shots or loss. Native propagation accepts only 1.
+:type compile_steps: `int`
 :returns: One-element tuple `(pressure_records,)`, shape `[B,R,T]`, in Pa, with the model dtype/device.
 :rtype: `tuple[torch.Tensor]`
 ```
@@ -63,7 +67,7 @@ starwave.visco_gsls(vp, q, rho, grid_spacing, dt, *, source_amplitudes,
            pml_width=20, memory="full", max_vel=None, backend="cuda",
            mode="hao1", frequency_band=None, n_mechanisms=None,
            fit_tolerance=0.05, strict=False, material_model=None,
-           checkpoint_interval=None)
+           checkpoint_interval=None, execution="eager", compile_steps=1)
 ```
 <!-- api-doc:visco_gsls:signature:end -->
 
@@ -83,7 +87,7 @@ The first five parameters are positional-or-keyword; all others are keyword-only
 | `f_ref` | `keyword-only` | `required` | real; Hz | Phase reference| Positive Hz; exact phase-reference frequency, also used for fixed PML setup |
 | `accuracy` | `keyword-only` | `4` | integer; dimensionless | Staggered spatial order| Staggered FD order 2,4,6,8 |
 | `pml_width` | `keyword-only` | `20` | integer or pair; cells | Symmetric PML| Nonnegative integer or `(z,x)` symmetric widths. Replicate extension has its full accumulating gradient |
-| `memory` | `keyword-only` | `'full'` | str | Native history strategy| full or checkpoint with native CPU/CUDA; Torch oracle is full only; boundary is unsupported |
+| `memory` | `keyword-only` | `'full'` | str | Native history strategy| full or checkpoint with native CPU/CUDA; Torch also supports full/checkpoint; boundary is unsupported |
 | `max_vel` | `keyword-only` | `None` | None or real; m/s | Unrelaxed envelope| Optional fixed unrelaxed-speed envelope, m/s. Required for any trainable material coefficients (including closure parameters) with nonzero PML. Too-small values reject |
 | `backend` | `keyword-only` | `'cuda'` | str | Explicit implementation| Explicit `cuda`, `native_cpu` or `torch`; no fallback. CUDA/native require built matching library |
 | `mode` | `keyword-only` | `'hao1'` | str | Material mapping| Default `hao1`; explicit `band_fit` or `sls_compat` |
@@ -92,7 +96,9 @@ The first five parameters are positional-or-keyword; all others are keyword-only
 | `fit_tolerance` | `keyword-only` | `0.05` | None or positive real | Relative inverse-Q tolerance| Positive relative inverse-Q tolerance; default dense-grid warning above 0.05; None skips check |
 | `strict` | `keyword-only` | `False` | bool | Fit warning/error policy| If true, exceeding fit_tolerance raises rather than warns |
 | `material_model` | `keyword-only` | `None` | None or callable | Material provider| Optional advanced callable `(vp_padded,q_padded,dt,f_ref)->(c_rel2,strength,A,B)`; overrides built-in material options. See [provider protocol](#visco-gsls-provider) |
-| `checkpoint_interval` | `keyword-only` | `None` | None or positive integer; time steps | Replay segment length| Positive integer segment length, checkpoint only. None balances complete-state and scratch history memory using input shape, never GPU type |
+| `checkpoint_interval` | `keyword-only` | `None` | None or positive integer; time steps | Replay segment length| Positive integer segment length, checkpoint only. Native None balances complete-state and scratch history memory using input shape; Torch None is 32 internal steps. Neither uses GPU type |
+| `execution` | `keyword-only` | `'eager'` | str | Torch execution | Torch eager/compile; native eager only. |
+| `compile_steps` | `keyword-only` | `1` | positive integer | Steps per execution block | Torch positive integer, excluding bool; complete tail; native 1 only. |
 <!-- api-doc:visco_gsls:parameters:end -->
 
 (visco-gsls-modes)=
@@ -148,13 +154,15 @@ Exceeding the bound raises with the allowed maximum dt. Choose a new dt and rege
 (visco-gsls-memory)=
 ## Full and checkpoint memory
 
-Native CPU/CUDA support full and checkpoint; Torch supports full only. boundary is unsupported. With full, checkpoint_interval must be None; an explicit checkpoint interval is a positive number of time steps. None uses input shape and requested histories to estimate memory balance, not GPU-specific speed tuning.
+Native CPU/CUDA support full and checkpoint; Torch supports full/checkpoint. boundary is unsupported. With full, checkpoint_interval must be None; an explicit checkpoint interval is a positive number of time steps. Native None uses input shape and requested histories; Torch None uses 32 internal steps. Neither uses GPU-specific tuning.
 
 Native full histories depend on requested primitive gradients: c_rel2 needs force; strength/B need the spatial drive; A needs all M old material memories, for example with trainable relaxation times. Source-only gradients and no_grad observation require none of these volume histories. Fixed-Q Hao1 Vp gradients store T*V entries, joint Vp/Q stores 2*T*V, and a generic provider requesting every primitive gradient stores (M+2)*T*V. All five physical memories still evolve.
 
-Let N count padded cells, V=B*N, Fx=B*nz_padded*(nx_padded+1), Fz=B*(nz_padded+1)*nx_padded, and M count mechanisms. A complete checkpoint restart includes p, previous p, all material memories, and node/face CPML: S=(4+M)*V+Fx+Fz entries. Segment length K uses approximately `ceil(T/K)*S + K*H*V` tape/replay entries; H counts requested scalar histories, with old material memories contributing M. The default is `K=ceil(sqrt(S*T/(H*V)))` when histories are needed, bounded to [1,T]. These counts, even multiplied by dtype size, are not total peak memory: inputs, outputs, graphs, per-shot gradients, optimizer and workspaces are additional.
+The following formulas apply only to native histories, not Torch autograd peak memory. Let N count padded cells, V=B*N, Fx=B*nz_padded*(nx_padded+1), Fz=B*(nz_padded+1)*nx_padded, and M count mechanisms. A complete checkpoint restart includes p, previous p, all material memories, and node/face CPML: S=(4+M)*V+Fx+Fz entries. Segment length K uses approximately `ceil(T/K)*S + K*H*V` tape/replay entries; H counts requested scalar histories, with old material memories contributing M. The default is `K=ceil(sqrt(S*T/(H*V)))` when histories are needed, bounded to [1,T]. These counts, even multiplied by dtype size, are not total peak memory: inputs, outputs, graphs, per-shot gradients, optimizer and workspaces are additional.
 
-Checkpoint restores complete states, replays each segment forward, and applies its discrete adjoint in reverse order; it does not reverse attenuation. Startup half-weight, global source clock and final partial segments are preserved, with adjoint state carried across segments. When checkpoint replay histories are needed, each time step is recomputed once, exchanging computation for history memory. There is no boundary inverse reconstruction or compression. Examples and memory estimates are not GPU benchmarks.
+Native checkpoint restores complete states, replays each segment forward, and applies its discrete adjoint in reverse order; it does not reverse attenuation. Startup half-weight, global source clock and final partial segments are preserved, with adjoint state carried across segments. When checkpoint replay histories are needed, each time step is recomputed once, exchanging computation for history memory. There is no boundary inverse reconstruction or compression. Examples and memory estimates are not GPU benchmarks.
+
+Torch checkpoint saves complete segment-start states including PML/material memories, replays forward with non-reentrant checkpointing, and differentiates with autograd. It does not invert attenuation or use the native adjoint history above. Short records/small models may not reduce peak memory.
 
 (visco-gsls-example)=
 ## Minimal call and complete CPU example
@@ -175,7 +183,7 @@ The complete CPU Torch full example below needs no native library and explicitly
 import torch
 import starwave
 
-# V15 source; explicit CPU Torch reference, no native build required.
+# V16 source; explicit CPU Torch reference, no native build required.
 dtype = torch.float64
 nz, nx, nt = 12, 16, 80
 vp = torch.full((nz, nx), 1800.0, dtype=dtype, requires_grad=True)
@@ -199,6 +207,7 @@ records, = starwave.visco_gsls(
     frequency_band=(1.0, 200.0), n_mechanisms=5,
     fit_tolerance=0.05, strict=False,
     material_model=None, checkpoint_interval=None,
+    execution="eager", compile_steps=1,
 )
 assert records.shape == (1, 3, nt)
 assert torch.isfinite(records).all()
@@ -218,11 +227,12 @@ records, = starwave.visco_gsls(vp, q, rho, (10.0, 12.0), 0.0005,
     f_ref=18.0, accuracy=4, pml_width=(8, 10), memory="checkpoint",
     max_vel=4000.0, backend="cuda", mode="hao1",
     frequency_band=(1.0, 200.0), n_mechanisms=5, fit_tolerance=0.05,
-    strict=False, material_model=None, checkpoint_interval=32)
+    strict=False, material_model=None, checkpoint_interval=32,
+    execution="eager", compile_steps=1)
 ```
 <!-- api-doc:visco_gsls:full:end -->
 
-The example max_vel is configuration-specific; verify the actual unrelaxed speed and CFL. Switching the Torch example to checkpoint requires a native backend and explicit native build, not just a memory change.
+The example max_vel is configuration-specific; verify the actual unrelaxed speed and CFL. The Torch example can retain backend="torch" and select memory="checkpoint", checkpoint_interval=32. execution="compile" and compile_steps=4 control compilation separately.
 
 (visco-gsls-coefficients)=
 ## Material and spectrum helpers
@@ -348,7 +358,7 @@ starwave.prepare_visco_gsls(backend="native_cpu", device=None)
 starwave.prepare_visco_gsls(backend="cuda", device="cuda:0")
 ```
 
-Build explicitly from a complete authorized V15 source checkout using an installed Torch-compatible toolchain:
+Build explicitly from a complete authorized V16 source checkout using an installed Torch-compatible toolchain:
 
 ```bash
 # All three independent CUDA libraries; replace 80 with the actual target SM.

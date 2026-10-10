@@ -1,12 +1,14 @@
 # 常见问题
 
+V16 新增 [PyTorch 后端](pytorch-backend.md)，可在 CPU/CUDA 上显式使用 full/checkpoint，无需传播原生库；MPS 仅支持 Scalar2D accuracy=4 float32，使用 backend="torch"、full/checkpoint 与 eager/compile；Scalar3D、VRZ、VTI、elastic、GSLS 和其他 MPS 组合明确拒绝。本次不宣称最终 Mac 实机、500 轮 FWI 或性能验收通过。 AMP 仍不支持。源码 Release 与PyPI `7.1.0` wheel 发布核验待完成。下方 wheel 平台和 CUDA 载入问答描述历史 7.0.0 / 原生路径。Torch 显存不足时可评估 checkpoint 间隔，较大间隔不保证更低峰值。
+
 ## 为什么 pip 找不到可用的 StarWave 版本？
 
 检查 Linux x86_64、Python 3.10–3.12 与 glibc ≥2.35，并更新 pip。Windows 原生 Python、macOS、ARM 或较旧 glibc 不匹配这个 wheel。不要用修改 wheel 文件名的方式绕过平台标签。
 
 ## 需要编译 CUDA 吗？
 
-使用公开 6.0.0 wheel 不需要编译或安装 nvcc。scalar/VRZ/VTI 和 elastic boundary 需要兼容 GPU/驱动；elastic full 也可在 CPU 上运行。如果完整性或兼容检查失败，在相同环境重装对应 wheel 并重启 Python；不要指望文档项目包含私有构建工具。
+使用历史公开 7.0.0 wheel 不需要编译或安装 nvcc。scalar/VRZ/VTI 和 elastic boundary 需要兼容 GPU/驱动；elastic full 也可在 CPU 上运行。如果完整性或兼容检查失败，在相同环境重装对应 wheel 并重启 Python；不要指望文档项目包含私有构建工具。
 
 ## import 成功，为什么 prepare_native 失败？
 

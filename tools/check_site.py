@@ -385,7 +385,7 @@ def check(root):
             errors.append(f'Usage section cannot switch language: {locale}')
         index = (root / locale / 'searchindex.js').read_text(encoding='utf-8')
         docnames = json.loads(index.removeprefix('Search.setIndex(').removesuffix(')'))['docnames']
-        if not {'usage', 'visco-gsls'} <= set(docnames) or 'visco-sls' in docnames or any(name.startswith('api/') for name in docnames):
+        if not {'usage', 'visco-gsls', 'pytorch-backend'} <= set(docnames) or 'visco-sls' in docnames or any(name.startswith('api/') for name in docnames):
             errors.append(f'API search entries are duplicated or missing: {locale}')
         if not {'modeling/wave-propagation', 'modeling/acquisition', 'modeling/reconstruction', 'docker', 'presentation'} <= set(docnames) or {'modeling/vrz', 'modeling/vti'} & set(docnames):
             errors.append(f'Modeling search entries are duplicated or missing: {locale}')

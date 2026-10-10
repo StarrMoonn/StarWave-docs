@@ -124,14 +124,14 @@ def check_scalar3d_examples(project, contract):
 
 
 def check_gsls_contract(project, contracts):
-    """Pin V15 semantics separately from historical 7.0.0 binary evidence."""
+    """Pin V16 semantics separately from historical 7.0.0 binary evidence."""
     gsls = contracts['visco_gsls']['semantics']
-    assert gsls['reviewed_source_version'] == '0.1.0.dev15'
-    assert gsls['reviewed_source_commit'] == '2508543ccc1dc3015b07806e6e240dd88c8e871e'
+    assert gsls['reviewed_source_version'] == '0.1.0.dev16'
+    assert gsls['publication_status'] == 'pending'
     assert gsls['public_wheel_contains_api'] is False
     assert gsls['default_mode'] == 'hao1' and gsls['hao1_mechanisms'] == 5
     assert gsls['modes'] == ['hao1', 'band_fit', 'sls_compat']
-    assert gsls['memory_by_backend'] == {'cuda': ['full', 'checkpoint'], 'native_cpu': ['full', 'checkpoint'], 'torch': ['full']}
+    assert gsls['memory_by_backend'] == {'cuda': ['full', 'checkpoint'], 'native_cpu': ['full', 'checkpoint'], 'torch': ['full', 'checkpoint']}
     assert gsls['density_gradient'] is False
     assert gsls['gradients'] == ['vp', 'q', 'source_amplitudes']
     assert gsls['source_sign'] == -1 and gsls['startup_weight'] == 0.5
@@ -159,12 +159,70 @@ def check_gsls_contract(project, contracts):
     assert snippets[0] == snippets[1], 'Bilingual GSLS examples differ'
 
 
+def check_torch_backend_docs(project, contracts):
+    """Guard additive V16 options and full examples without importing solvers."""
+    legacy = json.loads((project / 'tools' / 'api_legacy_v14_common_contract.json').read_text())
+    propagators = ('scalar', 'vrz', 'vti', 'elastic', 'visco_gsls')
+    added = ('backend', 'execution', 'checkpoint_interval', 'compile_steps')
+    for name in propagators:
+        args = parse_signature(contracts[name]['signature']).args
+        options = dict((param.arg, ast.literal_eval(default)) for param, default in parameter_defaults(args) if default is not None)
+        assert options['execution'] == 'eager' and options['compile_steps'] == 1
+        assert options['checkpoint_interval'] is None
+        assert options['backend'] == ('cuda' if name == 'visco_gsls' else None)
+        assert options['memory'] == ('boundary' if name in ('scalar', 'vrz', 'vti') else 'full')
+        cap = contracts[name]['torch_backend']
+        assert cap == {'devices': ['cpu', 'cuda'], 'memory': ['full', 'checkpoint'],
+                       'execution': ['eager', 'compile'], 'checkpoint_interval_default_internal_steps': 32,
+                       'mps': False, 'amp': False, 'gradient_order': 1, 'native_default_preserved': True}
+        if name != 'visco_gsls':
+            original = parse_signature(legacy[name]['signature']).args
+            removed = copy.deepcopy(args)
+            assert tuple(param.arg for param in removed.kwonlyargs[-4:]) == added
+            removed.kwonlyargs = removed.kwonlyargs[:-4]
+            removed.kw_defaults = removed.kw_defaults[:-4]
+            assert arguments_without_annotations(removed) == arguments_without_annotations(original), f'{name}: unreviewed old-parameter change'
+    snippets = {}
+    for locale in ('zh', 'en'):
+        folder = project / 'docs' / ('en' if locale == 'en' else '')
+        content = (folder / 'pytorch-backend.md').read_text(encoding='utf-8')
+        for section in ('selection', 'memory', 'scope', 'example', 'all-options', 'performance'):
+            assert f'(torch-{section})=' in content, f'{locale}: missing Torch section {section}'
+        assert all(word in content for word in ('MPS', 'AMP', 'step_ratio', '32', 'compile_steps', 'boundary_buffer', 'model_gradient_sampling_interval'))
+        smoke_section = content.split('(torch-example)=', 1)[1].split('(torch-all-options)=', 1)[0]
+        smoke = re.search(r'^```python\n(.*?)^```', smoke_section, re.M | re.S)[1]
+        snippets[locale] = [smoke]
+        smoke_calls = [node for node in ast.walk(parse_python(smoke)) if isinstance(node, ast.Call) and ast.unparse(node.func) == 'starwave.scalar']
+        assert len(smoke_calls) == 1
+        smoke_options = {kw.arg: kw.value for kw in smoke_calls[0].keywords}
+        for key, value in {'backend': 'torch', 'memory': 'checkpoint', 'execution': 'eager', 'checkpoint_interval': 32}.items():
+            assert ast.literal_eval(smoke_options[key]) == value
+        for name in ('scalar', 'vrz', 'vti', 'elastic'):
+            section = content.split(f'<!-- torch-api:{name}:full:start -->', 1)[1].split(f'<!-- torch-api:{name}:full:end -->', 1)[0]
+            code = re.search(r'^```python\n(.*?)^```', section, re.M | re.S)[1]
+            snippets[locale].append(code)
+            calls = [node for node in ast.walk(parse_python(code)) if isinstance(node, ast.Call) and ast.unparse(node.func) == 'starwave.' + name]
+            assert len(calls) == 1
+            args = parse_signature(contracts[name]['signature']).args
+            required = [param.arg for param, default in parameter_defaults(args) if default is None and param in args.args]
+            assert len(calls[0].args) == len(required)
+            keywords = {kw.arg: kw.value for kw in calls[0].keywords}
+            expected = {param.arg for param, _ in parameter_defaults(args)} - set(required)
+            assert set(keywords) == expected, f'{locale}/{name}: incomplete all-option call'
+            for key, value in {'backend': 'torch', 'execution': 'eager', 'memory': 'checkpoint', 'checkpoint_interval': 32, 'compile_steps': 1}.items():
+                assert ast.literal_eval(keywords[key]) == value
+    assert snippets['zh'] == snippets['en'], 'Bilingual Torch all-option calls differ'
+
+
 def check(wheel_path=None, source_root=None):
     project = Path(__file__).resolve().parents[1]
     contracts = json.loads((project / 'tools' / 'api_contract.json').read_text())
     assert set(contracts) == set(MODULES), 'Public contract inventory changed'
     check_scalar3d_examples(project, contracts['scalar'])
     check_gsls_contract(project, contracts)
+    check_torch_backend_docs(project, contracts)
+    legacy_common = json.loads((project / 'tools' / 'api_legacy_v14_common_contract.json').read_text())
+    assert set(legacy_common) == set(MODULES) - {'visco_gsls', 'prepare_visco_gsls', 'visco_gsls_native_status'}
     legacy = json.loads((project / 'tools' / 'api_legacy_v14_contract.json').read_text())['apis']
     assert set(legacy) == {'visco_sls', 'prepare_visco_sls', 'visco_sls_native_status'}
     for entry in legacy.values():
@@ -250,18 +308,18 @@ def check(wheel_path=None, source_root=None):
                 library = wheel.read('starwave/_binary/' + filename)
                 assert library.startswith(b'\x7fELF'), f'Expected native ELF library: {filename}'
                 assert hashlib.sha256(library).hexdigest() == receipt['libraries'][kind]['sha256'], f'Binary receipt mismatch: {filename}'
-            wheel_contracts = {name: entry for name, entry in contracts.items() if 'gsls' not in name} | legacy
+            wheel_contracts = legacy_common | legacy
             wheel_modules = {name: module for name, module in MODULES.items() if 'gsls' not in name} | {name: 'starwave/visco_sls.py' for name in legacy}
             for name, module in wheel_modules.items():
                 actual = wheel_function(wheel, module, name.rsplit('.', 1)[-1])
                 assert arguments_without_annotations(parse_signature(wheel_contracts[name]['signature']).args) == arguments_without_annotations(actual.args), f'{name}: differs from public wheel'
                 if name in WHEEL_TYPED_APIS:
                     actual_types = {param.arg: ast.unparse(param.annotation) for param, _ in parameter_defaults(actual.args)}
-                    assert contracts[name]['types'] == actual_types, f'{name}: types differ from public wheel'
-                    assert contracts[name]['return'] == ast.unparse(actual.returns), f'{name}: return type differs from public wheel'
+                    assert legacy_common[name]['types'] == actual_types, f'{name}: types differ from public wheel'
+                    assert legacy_common[name]['return'] == ast.unparse(actual.returns), f'{name}: return type differs from public wheel'
     counts = {name: len(parameter_defaults(languages['zh'][name])) for name in MODULES}
     print(f'PASS: both languages: typed signatures, descriptions/defaults {counts}, {len(MODULES)} return contracts; {blocks} Python blocks parsed as Python 3.10.')
-    print(f'PASS: Historical V14/common signatures match verified {WHEEL_VERSION} binary wheel; metadata and native-library receipt hashes match. V15 GSLS is not verified by this wheel.' if wheel_path else f'PASS: bilingual signatures match the API contract; V15 source signatures are checked only with --source-root; historical {WHEEL_VERSION} binary identity only with --wheel.')
+    print(f'PASS: Historical V14/common signatures match verified {WHEEL_VERSION} binary wheel; metadata and native-library receipt hashes match. V16 additions are not verified by this wheel.' if wheel_path else f'PASS: bilingual signatures match the API contract; V16 source signatures are checked only with --source-root; historical {WHEEL_VERSION} binary identity only with --wheel.')
 
 
 if __name__ == '__main__':

@@ -1,12 +1,23 @@
 # StarWave-docs · 中文 / English
 
-StarWave V15 双语使用手册，基于 Sphinx、Read the Docs 主题和 MyST Markdown。完整中文和英文版本覆盖安装、正演、反演、API 与演示文稿；每种语言独立构建、导航和搜索。API 采用 Deepwave 风格的类型签名、参数、返回、注意事项及示例组织，所有说明针对 StarWave 原创编写。
+StarWave V16 双语使用手册，基于 Sphinx、Read the Docs 主题和 MyST Markdown。完整中文和英文版本覆盖安装、正演、反演、API 与演示文稿；每种语言独立构建、导航和搜索。API 采用 Deepwave 风格的类型签名、参数、返回、注意事项及示例组织，所有说明针对 StarWave 原创编写。
 
-Bilingual user documentation for the StarWave V15 source Release, built with Sphinx, the Read the Docs theme, and MyST Markdown. Each language contains the complete manual and a separate search index. The API presentation takes organizational cues from Deepwave while preserving StarWave’s own public contracts.
+Bilingual user documentation for the StarWave V16 backend candidate, built with Sphinx, the Read the Docs theme, and MyST Markdown. Each language contains the complete manual and a separate search index. The API presentation takes organizational cues from Deepwave while preserving StarWave’s own public contracts.
+
+## V16 / PyTorch backend · publication verification pending
+
+The current manual documents the additive [PyTorch backend](docs/en/pytorch-backend.md) for V16 / `0.1.0.dev16`. Final remote identity verification of the V16 source Release, development commit and target PyPI `7.1.0` wheel is pending; planned publication is not reported as completed. Existing [7.0.0](https://pypi.org/project/starwave/7.0.0/) is a historical V14 binary without GSLS or the unified Torch backend.
+
+- scalar/VRZ/VTI/elastic add backend, execution, checkpoint_interval and compile_steps; GSLS adds execution/compile_steps and Torch checkpoint. Existing positional arguments, native defaults and scientific CUDA/C++ kernels are preserved.
+- Torch offers CPU/CUDA full/checkpoint and eager/compile. MPS is limited to Scalar2D accuracy=4 float32 with backend="torch", full/checkpoint and eager/compile; other MPS combinations are rejected. It has no boundary, AMP, elastic callbacks/offload or sampled material gradients. Final Mac hardware and 500-epoch FWI acceptance remain pending. See [Usage](docs/en/usage.md), [GSLS](docs/en/visco-gsls.md) and the backend page for complete parameters and limits.
+- Torch elastic differentiates every internal step; native material gradients sample at CFL ratio × sampling_interval. Exact cross-backend comparisons require ratio=1; this distinction is not a compilation error.
+- Documentation gates check bilingual complete signatures, defaults, parameter coverage and snippet syntax without importing propagation libraries. CPU/documentation checks do not replace final GPU, DataParallel, long FWI or performance acceptance. Existing examples, figures and PDFs retain their original version/evidence scope.
+
+V15 and older records below describe their historical snapshots only.
 
 ## V15 GSLS · 2026-10-10
 
-The current API follows the published [V15 source Release](https://github.com/StarrMoonn/StarWave/releases/tag/V15), version `0.1.0.dev15`, commit `2508543ccc1dc3015b07806e6e240dd88c8e871e`. PyPI 7.0.0 remains an unchanged historical V14 binary and does not provide GSLS. The dedicated bilingual GSLS reference replaces the independent SLS API; single-mechanism calculations explicitly use `mode="sls_compat", n_mechanisms=1`. Installation distinguishes three-library CUDA source builds from the separate GSLS CPU build and the legacy wheel channel.
+The historical V15 API follows the published [V15 source Release](https://github.com/StarrMoonn/StarWave/releases/tag/V15), version `0.1.0.dev15`, commit `2508543ccc1dc3015b07806e6e240dd88c8e871e`. PyPI 7.0.0 remains an unchanged historical V14 binary and does not provide GSLS. The dedicated bilingual GSLS reference replaces the independent SLS API; single-mechanism calculations explicitly use `mode="sls_compat", n_mechanisms=1`. Installation distinguishes three-library CUDA source builds from the separate GSLS CPU build and the legacy wheel channel.
 
 Example remains above Usage. The independent SLS API, Marmousi2 experiment pages and their assets/downloads are retired from the current manual. Original materials remain recoverable in Git history; they are not republished or relabelled as GSLS FWI results. This documentation update makes no final integrated GPU, multi-GPU, long-FWI or performance claim and publishes no propagation implementation or source archive.
 

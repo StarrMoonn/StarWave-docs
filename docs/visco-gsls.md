@@ -1,14 +1,14 @@
 (visco-gsls)=
-# GSLS 黏声学 API（V15）
+# GSLS 黏声学 API（V16）
 
-本页对应 V15 源码 `0.1.0.dev15`。二维 `starwave.visco_gsls` 是当前唯一黏声入口；单机制 SLS 通过显式 `mode="sls_compat", n_mechanisms=1` 使用。独立 `visco_sls`、`prepare_visco_sls` 和 `visco_sls_native_status` 已移除。既有公开 PyPI `7.0.0` 不包含 GSLS；更新此手册不表示发布了新 wheel。详见[文档状态](status.md)及[安装](installation.md)。
+本页对应 V16 源码 `0.1.0.dev16`。二维 `starwave.visco_gsls` 是当前唯一黏声入口；单机制 SLS 通过显式 `mode="sls_compat", n_mechanisms=1` 使用。独立 `visco_sls`、`prepare_visco_sls` 和 `visco_sls_native_status` 已移除。既有公开 PyPI `7.0.0` 不包含 GSLS；更新此手册不表示发布了新 wheel。详见[文档状态](status.md)及[安装](installation.md)。
 
-支持固定空间变密度、float32/float64、Vp/Q/source/provider 参数一阶梯度。原生 CPU/CUDA 支持 full/checkpoint；显式 Torch 参考仅支持 full。scalar、VRZ、VTI、elastic 的独立 API 不变。
+支持固定空间变密度、float32/float64、Vp/Q/source/provider 参数一阶梯度。原生 CPU/CUDA 支持 full/checkpoint；显式 Torch 支持 full/checkpoint 与 eager/compile。所有主传播入口均新增执行选项，原生默认行为保持；详见 [PyTorch 后端](pytorch-backend.md)。
 
 (visco-gsls-function)=
 ## visco_gsls
 
-```{py:function} starwave.visco_gsls(vp: torch.Tensor, q: torch.Tensor, rho: torch.Tensor, grid_spacing: float | int | list[float] | tuple[float, float], dt: float | int, *, source_amplitudes: torch.Tensor, source_locations: torch.Tensor, receiver_locations: torch.Tensor, f_ref: float | int, accuracy: int=4, pml_width: int | list[int] | tuple[int, int]=20, memory: str='full', max_vel: float | int | None=None, backend: str='cuda', mode: str='hao1', frequency_band: tuple[float, float] | list[float] | None=None, n_mechanisms: int | None=None, fit_tolerance: float | int | None=0.05, strict: bool=False, material_model: Callable | None=None, checkpoint_interval: int | None=None) -> tuple[torch.Tensor]
+```{py:function} starwave.visco_gsls(vp: torch.Tensor, q: torch.Tensor, rho: torch.Tensor, grid_spacing: float | int | list[float] | tuple[float, float], dt: float | int, *, source_amplitudes: torch.Tensor, source_locations: torch.Tensor, receiver_locations: torch.Tensor, f_ref: float | int, accuracy: int=4, pml_width: int | list[int] | tuple[int, int]=20, memory: str='full', max_vel: float | int | None=None, backend: str='cuda', mode: str='hao1', frequency_band: tuple[float, float] | list[float] | None=None, n_mechanisms: int | None=None, fit_tolerance: float | int | None=0.05, strict: bool=False, material_model: Callable | None=None, checkpoint_interval: int | None=None, execution: str='eager', compile_steps: int=1) -> tuple[torch.Tensor]
 
 :param vp: **必填；位置或关键字。** `[nz,nx]` float32/float64 正有限张量，两个维度均至少 2；单位 m/s，严格为 `f_ref` 处相速度，可求导。
 :type vp: `torch.Tensor`
@@ -32,7 +32,7 @@
 :type accuracy: `int`
 :param pml_width: **默认 `20`；仅关键字。** 非负整数或 `(z,x)`，单位网格点，各轴两侧对称；0 禁用对应轴 PML。replicate 扩边梯度完整累加。
 :type pml_width: `int | list[int] | tuple[int, int]`
-:param memory: **默认 `'full'`；仅关键字。** native CPU/CUDA 支持 `full` 或 `checkpoint`；Torch 仅 `full`；不支持 boundary。
+:param memory: **默认 `'full'`；仅关键字。** native CPU/CUDA 支持 `full` 或 `checkpoint`；Torch 也支持 `full` / `checkpoint`；不支持 boundary。
 :type memory: `str`
 :param max_vel: **默认 `None`；仅关键字。** 正有限 m/s 未松弛速度上界。任何可训练物性输出且启用非零 PML 时须显式固定；不能只覆盖 Vp。过小拒绝。
 :type max_vel: `float | int | None`
@@ -50,8 +50,12 @@
 :type strict: `bool`
 :param material_model: **默认 `None`；仅关键字。** 高级 callable `(vp_padded,q_padded,dt,f_ref)->(c_rel2,strength,A,B)`，接管内置物性选项，详见下文。
 :type material_model: `Callable | None`
-:param checkpoint_interval: **默认 `None`；仅关键字。** 仅 checkpoint 下可显式给正整数分段长度；None 用形状/所需历史估计内存平衡，不按 GPU 型号调参。full 下提供此参数会报错。
+:param checkpoint_interval: **默认 `None`；仅关键字。** 仅 checkpoint 下可显式给正整数分段长度；原生 None 用形状/所需历史估计内存平衡；Torch None 固定为 32 个内部步，均不按 GPU 型号调参。full 下提供此参数会报错。
 :type checkpoint_interval: `int | None`
+:param execution: **默认 `'eager'`；仅关键字参数。** Torch 可选 `'eager'` 或 `'compile'`；compile 使用 PyTorch Inductor/AOTAutograd，失败不回退 eager。原生仅接受 eager。
+:type execution: `str`
+:param compile_steps: **默认 `1`；仅关键字参数。** 正整数，拒绝 bool；Torch 每个执行块包含的连续内部时间步数。compile 可尝试 4，完整处理尾块；不改变 dt、nt、炮数或损失。原生只接受 1。
+:type compile_steps: `int`
 :returns: 单元素元组 `(pressure_records,)`，形状 `[B,R,T]`、单位 Pa，与模型 dtype/device 一致。
 :rtype: `tuple[torch.Tensor]`
 ```
@@ -63,7 +67,7 @@ starwave.visco_gsls(vp, q, rho, grid_spacing, dt, *, source_amplitudes,
            pml_width=20, memory="full", max_vel=None, backend="cuda",
            mode="hao1", frequency_band=None, n_mechanisms=None,
            fit_tolerance=0.05, strict=False, material_model=None,
-           checkpoint_interval=None)
+           checkpoint_interval=None, execution="eager", compile_steps=1)
 ```
 <!-- api-doc:visco_gsls:signature:end -->
 
@@ -83,7 +87,7 @@ starwave.visco_gsls(vp, q, rho, grid_spacing, dt, *, source_amplitudes,
 | `f_ref` | `keyword-only` | `required` | real; Hz | Phase reference / 相速度参考频率 | 正有限 Hz；Vp 的精确相速度参考频率，也参与固定 CPML setup。 |
 | `accuracy` | `keyword-only` | `4` | integer; dimensionless | Staggered spatial order / 空间阶数 | 空间 staggered FD 阶数 2/4/6/8，不是时间阶数。 |
 | `pml_width` | `keyword-only` | `20` | integer or pair; cells | Symmetric PML / 对称 PML | 非负整数或 `(z,x)`，单位网格点，各轴两侧对称；0 禁用对应轴 PML。replicate 扩边梯度完整累加。 |
-| `memory` | `keyword-only` | `'full'` | str | Native history strategy / 原生历史策略 | native CPU/CUDA 支持 `full` 或 `checkpoint`；Torch 仅 `full`；不支持 boundary。 |
+| `memory` | `keyword-only` | `'full'` | str | Native history strategy / 原生历史策略 | native CPU/CUDA 支持 `full` 或 `checkpoint`；Torch 也支持 `full` / `checkpoint`；不支持 boundary。 |
 | `max_vel` | `keyword-only` | `None` | None or real; m/s | Unrelaxed envelope / 未松弛速度包络 | 正有限 m/s 未松弛速度上界。任何可训练物性输出且启用非零 PML 时须显式固定；不能只覆盖 Vp。过小拒绝。 |
 | `backend` | `keyword-only` | `'cuda'` | str | Explicit implementation / 显式实现 | 显式 `cuda`、`native_cpu` 或 `torch`；原生后端须匹配设备与已构建库，无回退或运行时编译。 |
 | `mode` | `keyword-only` | `'hao1'` | str | Material mapping / 物性映射 | 默认 Hao 一阶 inverse-Q 模型，或显式 `band_fit`、`sls_compat`。不含论文二阶耦合模型。 |
@@ -92,7 +96,9 @@ starwave.visco_gsls(vp, q, rho, grid_spacing, dt, *, source_amplitudes,
 | `fit_tolerance` | `keyword-only` | `0.05` | None or positive real | Relative inverse-Q tolerance / 相对逆 Q 容差 | 正相对 inverse-Q 容差；超过时默认 warning；None 跳过检查。采样诊断不构成全连续频率误差证明。 |
 | `strict` | `keyword-only` | `False` | bool | Fit warning/error policy / 拟合警告或报错 | 超过拟合容差时是否由 warning 改为报错。 |
 | `material_model` | `keyword-only` | `None` | None or callable | Material provider / 物性提供函数 | 高级 callable `(vp_padded,q_padded,dt,f_ref)->(c_rel2,strength,A,B)`，接管内置物性选项，详见下文。 |
-| `checkpoint_interval` | `keyword-only` | `None` | None or positive integer; time steps | Replay segment length / 重放分段长度 | 仅 checkpoint 下可显式给正整数分段长度；None 用形状/所需历史估计内存平衡，不按 GPU 型号调参。full 下提供此参数会报错。 |
+| `checkpoint_interval` | `keyword-only` | `None` | None or positive integer; time steps | Replay segment length / 重放分段长度 | 仅 checkpoint 下可显式给正整数分段长度；原生 None 用形状/所需历史估计内存平衡；Torch None 固定为 32 个内部步，均不按 GPU 型号调参。full 下提供此参数会报错。 |
+| `execution` | `keyword-only` | `'eager'` | str | Torch execution | Torch eager/compile；原生仅 eager。 |
+| `compile_steps` | `keyword-only` | `1` | positive integer | Steps per execution block | Torch 正整数（非 bool），尾块完整执行；原生仅 1。 |
 <!-- api-doc:visco_gsls:parameters:end -->
 
 (visco-gsls-modes)=
@@ -148,13 +154,15 @@ dt <= 0.8 / (v_bound * sqrt(max(rho)/min(rho))
 (visco-gsls-memory)=
 ## full 与 checkpoint 内存
 
-原生 native_cpu/CUDA 支持 full 和 checkpoint；Torch 仅 full。不支持 boundary。full 下 `checkpoint_interval` 必须为 None；checkpoint 显式间隔为正整数时间步。默认 None 依据形状与所需历史估算，不按 GPU 型号自动调速。
+原生 native_cpu/CUDA 与 Torch 均支持 full 和 checkpoint。不支持 boundary。full 下 `checkpoint_interval` 必须为 None；checkpoint 显式间隔为正整数时间步。原生默认 None 依据形状与所需历史估算；Torch 默认为 32 个内部步。均不按 GPU 型号自动调速。
 
 原生 full 按所请求的 primitive 梯度选择历史：c_rel2 保存 force；strength/B 保存空间驱动；A 保存全部 M 个旧物性记忆（例如可训练松弛时间）。仅源求导或 no_grad 观测不保存这些体积历史。固定 Q 的 Hao1 Vp 梯度存 T*V 项，联合 Vp/Q 存 2*T*V，通用 provider 全 primitive 梯度存 (M+2)*T*V；五个物理记忆仍实际演化。
 
-令 N 为扩边网格点数，V=B*N，Fx=B*nz_padded*(nx_padded+1)，Fz=B*(nz_padded+1)*nx_padded，M 为机制数。完整 checkpoint 重启状态含 p、前一 p、全部物性记忆、节点与面 CPML，共 S=(4+M)*V+Fx+Fz 项。分段长度 K 的 tape/replay 历史约为 `ceil(T/K)*S + K*H*V` 项；H 为请求的 scalar 历史数，旧物性记忆贡献 M。默认 `K=ceil(sqrt(S*T/(H*V)))`（需要历史时），限制于 [1,T]。这些是张量项数，乘 dtype 字节数后也不等于完整峰值显存：还包括输入、输出、图、每炮梯度、优化器及工作区。
+以下公式仅描述原生历史，不能用于 Torch autograd 峰值估算。令 N 为扩边网格点数，V=B*N，Fx=B*nz_padded*(nx_padded+1)，Fz=B*(nz_padded+1)*nx_padded，M 为机制数。完整 checkpoint 重启状态含 p、前一 p、全部物性记忆、节点与面 CPML，共 S=(4+M)*V+Fx+Fz 项。分段长度 K 的 tape/replay 历史约为 `ceil(T/K)*S + K*H*V` 项；H 为请求的 scalar 历史数，旧物性记忆贡献 M。默认 `K=ceil(sqrt(S*T/(H*V)))`（需要历史时），限制于 [1,T]。这些是张量项数，乘 dtype 字节数后也不等于完整峰值显存：还包括输入、输出、图、每炮梯度、优化器及工作区。
 
-checkpoint 恢复完整状态并正向重放每段，再按反序应用离散伴随；不是逆衰减。首次半权重、全局源时钟和尾段均保留，伴随状态跨段连续。需要 checkpoint 重放历史时，每个时间步额外重算一次，用计算换历史内存。没有边界逆重建或压缩。示例和内存公式不构成 GPU 性能测量。
+原生 checkpoint 恢复完整状态并正向重放每段，再按反序应用离散伴随；不是逆衰减。首次半权重、全局源时钟和尾段均保留，伴随状态跨段连续。需要 checkpoint 重放历史时，每个时间步额外重算一次，用计算换历史内存。没有边界逆重建或压缩。示例和内存公式不构成 GPU 性能测量。
+
+Torch checkpoint 保存完整段起始状态（含 PML/物性记忆），由非重入 checkpoint 正向重算并由 autograd 反传，不使用逆衰减或上述原生伴随历史。短记录/小模型不保证降低峰值显存。
 
 (visco-gsls-example)=
 ## 最小调用与完整 CPU 示例
@@ -175,7 +183,7 @@ records, = starwave.visco_gsls(vp, q, rho, 10.0, 0.0005,
 import torch
 import starwave
 
-# V15 source; explicit CPU Torch reference, no native build required.
+# V16 source; explicit CPU Torch reference, no native build required.
 dtype = torch.float64
 nz, nx, nt = 12, 16, 80
 vp = torch.full((nz, nx), 1800.0, dtype=dtype, requires_grad=True)
@@ -199,6 +207,7 @@ records, = starwave.visco_gsls(
     frequency_band=(1.0, 200.0), n_mechanisms=5,
     fit_tolerance=0.05, strict=False,
     material_model=None, checkpoint_interval=None,
+    execution="eager", compile_steps=1,
 )
 assert records.shape == (1, 3, nt)
 assert torch.isfinite(records).all()
@@ -218,11 +227,12 @@ records, = starwave.visco_gsls(vp, q, rho, (10.0, 12.0), 0.0005,
     f_ref=18.0, accuracy=4, pml_width=(8, 10), memory="checkpoint",
     max_vel=4000.0, backend="cuda", mode="hao1",
     frequency_band=(1.0, 200.0), n_mechanisms=5, fit_tolerance=0.05,
-    strict=False, material_model=None, checkpoint_interval=32)
+    strict=False, material_model=None, checkpoint_interval=32,
+    execution="eager", compile_steps=1)
 ```
 <!-- api-doc:visco_gsls:full:end -->
 
-示例 max_vel 仅用于此配置；实际模型必须重新核对未松弛速度与 CFL。Torch 例切换 checkpoint 时要同时更换原生 backend 并显式构建；不能只改 memory。
+示例 max_vel 仅用于此配置；实际模型必须重新核对未松弛速度与 CFL。Torch 例可保持 backend="torch"，改为 memory="checkpoint" 并设置 checkpoint_interval=32；execution="compile" 与 compile_steps=4 另行控制编译。
 
 (visco-gsls-coefficients)=
 ## 物性与频谱辅助函数
@@ -348,7 +358,7 @@ starwave.prepare_visco_gsls(backend="native_cpu", device=None)
 starwave.prepare_visco_gsls(backend="cuda", device="cuda:0")
 ```
 
-在已获准取得的完整 V15 源码根目录显式构建，使用已安装且与 Torch 匹配的工具链：
+在已获准取得的完整 V16 源码根目录显式构建，使用已安装且与 Torch 匹配的工具链：
 
 ```bash
 # All three independent CUDA libraries; replace 80 with the actual target SM.

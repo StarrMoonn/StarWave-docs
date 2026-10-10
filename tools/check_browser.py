@@ -37,7 +37,7 @@ CHAPTERS = {
     'about', 'presentation', 'installation', 'docker', 'wsl', 'quickstart', 'modeling/conventions',
     'modeling/scalar', 'modeling/gradient', 'modeling/acquisition', 'modeling/wave-propagation',
     'modeling/reconstruction', 'inversion/fwi',
-    'inversion/dataparallel', 'inversion/inr', 'usage', 'visco-gsls', 'faq',
+    'inversion/dataparallel', 'inversion/inr', 'usage', 'visco-gsls', 'pytorch-backend', 'faq',
     'release-notes', 'status', 'examples/index', 'examples/enclosed',
     'examples/surface', 'examples/layered', 'examples/reproduce',
 }
@@ -171,7 +171,7 @@ def check_usage(page, locale, output):
         assert 'monospace' in metrics['font'] and metrics['variant'] == 'lining-nums', metrics
         assert max(g['ascent'] for g in metrics['glyphs']) - min(g['ascent'] for g in metrics['glyphs']) <= 2, metrics
         assert all(g['descent'] <= 1 for g in metrics['glyphs']), metrics
-    for name, count in (('scalar', 16), ('vrz', 18), ('vti', 20), ('elastic', 62),
+    for name, count in (('scalar', 20), ('vrz', 22), ('vti', 24), ('elastic', 66),
                         ('common.vpvsrho_to_lambmubuoyancy', 4),
                         ('common.lambmubuoyancy_to_vpvsrho', 4),
                         ('prepare_native', 1), ('prepare_elastic', 1)):

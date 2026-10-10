@@ -1,10 +1,22 @@
 # 文档状态与参考来源
 
+## V16 / PyTorch 后端 · 发布核验待完成
+
+当前手册同步 V16 / `0.1.0.dev16` 的新增 [PyTorch 后端](pytorch-backend.md)。V16 源码 Release、开发分支提交和目标 PyPI `7.1.0` wheel 的远端身份尚待最终核验；本页不把计划描述为已发布。已有 [7.0.0](https://pypi.org/project/starwave/7.0.0/) 为历史 V14 二进制，不含 GSLS 或新增统一 Torch 后端。
+
+- scalar/VRZ/VTI/elastic 新增 backend、execution、checkpoint_interval、compile_steps；GSLS 新增 execution、compile_steps 并扩展 Torch checkpoint。旧位置参数、原生默认行为和科学 CUDA/C++ 核保留。
+- Torch 提供 CPU/CUDA full/checkpoint、eager/compile；没有 Torch boundary、AMP、elastic callbacks/offload 或抽样材料梯度。MPS 仅支持 Scalar2D accuracy=4 float32，使用 backend="torch"、full/checkpoint 与 eager/compile；Scalar3D、VRZ、VTI、elastic、GSLS 和其他 MPS 组合明确拒绝。本次不宣称最终 Mac 实机、500 轮 FWI 或性能验收通过。完整参数和限制见 [Usage](usage.md)、[GSLS](visco-gsls.md) 和后端页。
+- Torch elastic 对所有内部步求导；原生材料梯度按 CFL ratio × sampling_interval 抽样。精确跨后端比较须 ratio=1，不能把这个差别称作编译误差。
+- 文档 gate 核对双语完整签名、默认值、参数覆盖和示例语法，不导入传播库。CPU/文档通过不能替代最终 GPU、DataParallel、长程 FWI 或性能验收；已有示例、图件、PDF 保留原版本与证据范围。
+
+以下 V15 及更早记录仅描述各自历史快照。
+
+
 ## V15 / GSLS · 2026-10-10
 
-当前手册依据已发布的 [V15 源码 Release](https://github.com/StarrMoonn/StarWave/releases/tag/V15)，源码版本 `0.1.0.dev15`，对应提交 `2508543ccc1dc3015b07806e6e240dd88c8e871e`。Release 发布与 PyPI 二进制发行分开：原公开 **7.0.0** 未更新，不包含 GSLS，也不包含独立 SLS 的源码清理。
+V15 手册当时依据已发布的 [V15 源码 Release](https://github.com/StarrMoonn/StarWave/releases/tag/V15)，源码版本 `0.1.0.dev15`，对应提交 `2508543ccc1dc3015b07806e6e240dd88c8e871e`。Release 发布与 PyPI 二进制发行分开：原公开 **7.0.0** 未更新，不包含 GSLS，也不包含独立 SLS 的源码清理。
 
-当前黏声入口为 [GSLS](visco-gsls.md)：二维、固定空间变密度、原生 CPU/CUDA full/checkpoint、显式 Torch full、一阶 Vp/Q/source/provider 梯度。独立 SLS API/生产源码/构建入口已移除，单机制显式选择 `mode="sls_compat", n_mechanisms=1`。本手册不发布传播实现、CUDA 源码或完整源码归档。
+V15 黏声入口为 [GSLS](visco-gsls.md)：二维、固定空间变密度、原生 CPU/CUDA full/checkpoint、显式 Torch full、一阶 Vp/Q/source/provider 梯度。独立 SLS API/生产源码/构建入口已移除，单机制显式选择 `mode="sls_compat", n_mechanisms=1`。本手册不发布传播实现、CUDA 源码或完整源码归档。
 
 参数和物理说明以该 V15 源码契约为准。默认 Hao1 的 Q 为名义 Q0；Vp 是参考相速度；训练材料且 PML 非零时须固定覆盖非松弛速度的 `max_vel`。不支持三维、rho 梯度、boundary 或传播高阶导数。完整限制见 GSLS 页，显式构建和重启步骤见[安装](installation.md)。
 
@@ -73,7 +85,7 @@ bf159a6544cdc1ab12c99e22578ec40ed56e0d3011ae71be9fc8ecb04f9c2bff
 | 内容 | 当前状态 |
 |---|---|
 | 中英双语导航、安装与 WSL 指引 | 已完整翻译；另附 A30 / 0.1.0.dev9 的小规模运行记录，公开 wheel 仍待实测 |
-| scalar / VRZ / VTI API 参考 | 单页 Usage；54 项参数的签名、默认值、类型、shape/单位与约束已核对 |
+| scalar / VRZ / VTI API 参考 | 单页 Usage；66 项参数（V16）的签名、默认值、类型、shape/单位与约束已核对 |
 | Scalar3D / 5.0.0 | API、Radius-M 存储契约与独立小例子已补充；本次未运行 GPU |
 | 原创三份教学 notebook | 服务器返回执行结果无错误；运行产物哈希及数组已核验 |
 | scalar 正演、梯度与 25 次 FWI 更新 | A30 / 0.1.0.dev9 实测；数据拟合改善明显，模型恢复改善仅 0.86% |

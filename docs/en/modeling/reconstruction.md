@@ -1,6 +1,8 @@
 (reconstruction)=
 # Wavefield Reconstruction
 
+This chapter describes native full/boundary adjoints and wavefield reconstruction. Torch checkpoint uses forward replay and autograd rather than this boundary inverse or history formulas; see the [PyTorch backend](../pytorch-backend.md).
+
 This chapter first explains 5.0.0 Scalar3D Radius-M six-face pressure reconstruction, followed by the existing elastic derivation.
 
 StarWave's elastic `memory="boundary"` mode reconstructs the forward physical fields while the loss gradient travels backward. It replaces time histories of volume-wide material derivatives with a **boundary tape and a terminal physical state**. This chapter explains the native 2D/3D method in the 4.0.0 source contract. For arguments and runnable call patterns, see {ref}`Elastic Function <elastic>` and its {ref}`memory options <elastic-memory>`.

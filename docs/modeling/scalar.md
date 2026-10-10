@@ -1,5 +1,7 @@
 # 标量声学 scalar
 
+本页的 CUDA 设备、full/boundary 历史布局与原生构建说明描述原生默认路径。V16 显式 Torch 路径支持 CPU/CUDA full/checkpoint；见 [PyTorch 后端](../pytorch-backend.md)。
+
 `starwave.scalar` 在公开 **6.0.0** 中接受二维或三维速度模型 `v`，由 `v.ndim` 自动选择，返回单元素元组 `(receiver_amplitudes,)`。使用 `[0]` 取得形状 `[B,R,T]` 的 pressure-like 记录。
 
 ## 模型、坐标与采样

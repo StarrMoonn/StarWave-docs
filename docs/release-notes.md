@@ -1,5 +1,17 @@
 # 发布说明
 
+## V16 / PyTorch 后端 · 发布核验待完成
+
+当前手册同步 V16 / `0.1.0.dev16` 的新增 [PyTorch 后端](pytorch-backend.md)。V16 源码 Release、开发分支提交和目标 PyPI `7.1.0` wheel 的远端身份尚待最终核验；本页不把计划描述为已发布。已有 [7.0.0](https://pypi.org/project/starwave/7.0.0/) 为历史 V14 二进制，不含 GSLS 或新增统一 Torch 后端。
+
+- scalar/VRZ/VTI/elastic 新增 backend、execution、checkpoint_interval、compile_steps；GSLS 新增 execution、compile_steps 并扩展 Torch checkpoint。旧位置参数、原生默认行为和科学 CUDA/C++ 核保留。
+- Torch 提供 CPU/CUDA full/checkpoint、eager/compile；没有 Torch boundary、AMP、elastic callbacks/offload 或抽样材料梯度。MPS 仅支持 Scalar2D accuracy=4 float32，使用 backend="torch"、full/checkpoint 与 eager/compile；Scalar3D、VRZ、VTI、elastic、GSLS 和其他 MPS 组合明确拒绝。本次不宣称最终 Mac 实机、500 轮 FWI 或性能验收通过。完整参数和限制见 [Usage](usage.md)、[GSLS](visco-gsls.md) 和后端页。
+- Torch elastic 对所有内部步求导；原生材料梯度按 CFL ratio × sampling_interval 抽样。精确跨后端比较须 ratio=1，不能把这个差别称作编译误差。
+- 文档 gate 核对双语完整签名、默认值、参数覆盖和示例语法，不导入传播库。CPU/文档通过不能替代最终 GPU、DataParallel、长程 FWI 或性能验收；已有示例、图件、PDF 保留原版本与证据范围。
+
+以下 V15 及更早记录仅描述各自历史快照。
+
+
 ## V15 / GSLS 源码 Release · 2026-10-10
 
 [V15 源码 Release](https://github.com/StarrMoonn/StarWave/releases/tag/V15) 已发布，源码版本为 `0.1.0.dev15`，提交 `2508543ccc1dc3015b07806e6e240dd88c8e871e`。本次没有更新 PyPI：公开 7.0.0 仍是历史 V14 二进制，不能用于当前 GSLS 调用。

@@ -1,8 +1,20 @@
 # Documentation Status and References
 
+## V16 / PyTorch backend · publication verification pending
+
+The current manual documents the additive [PyTorch backend](pytorch-backend.md) for V16 / `0.1.0.dev16`. Final remote identity verification of the V16 source Release, development commit and target PyPI `7.1.0` wheel is pending; planned publication is not reported as completed. Existing [7.0.0](https://pypi.org/project/starwave/7.0.0/) is a historical V14 binary without GSLS or the unified Torch backend.
+
+- scalar/VRZ/VTI/elastic add backend, execution, checkpoint_interval and compile_steps; GSLS adds execution/compile_steps and Torch checkpoint. Existing positional arguments, native defaults and scientific CUDA/C++ kernels are preserved.
+- Torch offers CPU/CUDA full/checkpoint and eager/compile. It has no boundary, AMP, elastic callbacks/offload or sampled material gradients. MPS is supported only for Scalar2D accuracy=4 float32 with backend="torch", full/checkpoint and eager/compile. Other MPS combinations, including Scalar3D, VRZ, VTI, elastic and GSLS, are rejected. No final Mac hardware, 500-epoch FWI or performance acceptance is claimed. See [Usage](usage.md), [GSLS](visco-gsls.md) and the backend page for complete parameters and limits.
+- Torch elastic differentiates every internal step; native material gradients sample at CFL ratio × sampling_interval. Exact cross-backend comparisons require ratio=1; this distinction is not a compilation error.
+- Documentation gates check bilingual complete signatures, defaults, parameter coverage and snippet syntax without importing propagation libraries. CPU/documentation checks do not replace final GPU, DataParallel, long FWI or performance acceptance. Existing examples, figures and PDFs retain their original version/evidence scope.
+
+V15 and older records below describe their historical snapshots only.
+
+
 ## V15 / GSLS · 2026-10-10
 
-The current manual targets the published [V15 source Release](https://github.com/StarrMoonn/StarWave/releases/tag/V15), source version `0.1.0.dev15`, at commit `2508543ccc1dc3015b07806e6e240dd88c8e871e`. A source Release and a PyPI binary distribution are separate: public **7.0.0** is unchanged and contains neither GSLS nor the standalone-SLS source cleanup.
+The V15 manual targeted the published [V15 source Release](https://github.com/StarrMoonn/StarWave/releases/tag/V15), source version `0.1.0.dev15`, at commit `2508543ccc1dc3015b07806e6e240dd88c8e871e`. A source Release and a PyPI binary distribution are separate: public **7.0.0** is unchanged and contains neither GSLS nor the standalone-SLS source cleanup.
 
 [GSLS](visco-gsls.md) is the current viscoacoustic entry point: 2D, fixed spatially varying density, native CPU/CUDA full/checkpoint, explicit Torch full, and first-order Vp/Q/source/provider gradients. Independent SLS API/production sources/build entry points are removed; a single mechanism explicitly uses `mode="sls_compat", n_mechanisms=1`. This manual does not publish propagation implementations, CUDA source or complete source archives.
 
@@ -73,7 +85,7 @@ Publication checks passed Python 3.10–3.12 installation and 2D/3D CPU/host che
 | Content | Current status |
 |---|---|
 | Chinese and English navigation, installation, and WSL guidance | Fully translated; a separate A30 / 0.1.0.dev9 smoke run is documented, while public-wheel device tests remain pending |
-| scalar / VRZ / VTI API reference | Single Usage page; signatures, defaults, types, shapes/units, and constraints checked for 54 parameters |
+| scalar / VRZ / VTI API reference | Single Usage page; signatures, defaults, types, shapes/units, and constraints checked for 66 parameters (V16) |
 | Scalar3D / 5.0.0 | API, Radius-M storage contract, and a standalone small example added; no GPU run in this update |
 | Three original teaching notebooks | Returned executed notebooks contain no errors; artifact hashes and arrays checked |
 | Scalar forward, gradients, and 25 FWI updates | Measured A30 / 0.1.0.dev9 run; data fit improves substantially, model recovery only 0.86% |

@@ -1,16 +1,23 @@
 # Installation
 
-The published [V15 source Release](https://github.com/StarrMoonn/StarWave/releases/tag/V15) (`0.1.0.dev15`) provides the [GSLS API](visco-gsls.md). Public PyPI **7.0.0** remains the older V14 binary without GSLS; `pip install starwave==7.0.0` does not install V15.
+The current API targets the additive [PyTorch backend](pytorch-backend.md) in V16 / `0.1.0.dev16`; source Release and target PyPI `7.1.0` wheel publication verification are pending. Historical PyPI **7.0.0** is a V14 binary without GSLS or the unified Torch backend and cannot run the new examples.
 
-The source repository is private; downloading the Release/source requires authorized GitHub access, or use the complete V15 source provided by the project owner.
+The source repository is private; use complete authorized V16 source. No unverified new-version pip command is advertised before publication verification. Historical 7.0.0 requirements and commands remain below as a clearly separate legacy channel.
 
-**Installation channels**
+## V16 pure Torch installation and execution
 
-- **V15 source**: use the complete matching Release source and build explicitly from its root.
-- **PyPI 7.0.0 (historical binary)**: its requirements and commands remain below, separately from current GSLS examples.
-- **[Docker](docker.md)**: preparing; no StarWave container image has been published yet.
+Run directly from the complete V16 source root, or optionally register it:
 
-## Build V15 from source
+```bash
+python -m pip install --no-deps --no-build-isolation -e .
+```
+
+Explicit `backend="torch"` supports CPU/CUDA full/checkpoint without propagation native libraries, nvcc or compile_all.py. Execution mode and model device are separate selections. Compile uses the current PyTorch Inductor toolchain and raises on failure without eager fallback. MPS is supported only for Scalar2D accuracy=4 float32 with backend="torch", full/checkpoint and eager/compile. Other MPS combinations, including Scalar3D, VRZ, VTI, elastic and GSLS, are rejected. No final Mac hardware, 500-epoch FWI or performance acceptance is claimed. AMP remains rejected. Start with the {ref}`standalone CPU example <torch-example>`.
+
+## V16 native build
+
+Native paths require matching complete source/library builds. The new Python entries change elastic/GSLS source-closure identity even though scientific CUDA/C++ kernels are unchanged. Rebuild and restart; do not edit an old build manifest. Only pure Torch calls can omit the native build below.
+
 
 Use an installed CUDA Toolkit/C++ toolchain matching PyTorch. From the complete source root:
 
@@ -68,9 +75,9 @@ python -m pip check
 
 The PyTorch installation command follows the [PyTorch previous-versions page](https://pytorch.org/get-started/previous-versions/). `cu118` is the starting configuration for validating this version; it does not mean that other PyTorch versions have been validated. Restart Python or the notebook kernel after upgrading StarWave.
 
-## Upgrade to V15 source
+## Upgrade to V16 source
 
-V15 has one viscoacoustic entry point, `starwave.visco_gsls`; independent `visco_sls` and its preparation/status helpers are removed. Single-mechanism calculations explicitly use `mode="sls_compat", n_mechanisms=1`; changing only the function name would select default Hao1 instead. Source version `0.1.0.dev15` and public wheel `7.0.0` identify different distributions.
+V16 has one viscoacoustic entry point, `starwave.visco_gsls`; independent `visco_sls` and its preparation/status helpers are removed. Single-mechanism calculations explicitly use `mode="sls_compat", n_mechanisms=1`; changing only the function name would select default Hao1 instead. Source version `0.1.0.dev16` and public wheel `7.0.0` identify different distributions.
 
 Source users must pair this version's Python package with rebuilt native libraries, following the instructions supplied with the source. When upgrading from a version earlier than 6.0.0, Scalar2D PML, boundary, and full-history layouts have changed; matching core ABI layouts do not make old libraries reusable, and compatibility guards must not be bypassed. The public wheel needs no local compilation. After upgrading or replacing loaded libraries, restart Python / the notebook kernel, then repeat native preparation and small forward/gradient checks.
 
@@ -99,9 +106,9 @@ The documentation site's build environment is separate from the computational ru
 
 Elastic uses a separate preparation entry point: call `starwave.prepare_elastic([0])` on the GPU main thread, or `starwave.prepare_elastic()` with `memory="full"` for CPU. See {ref}`Elastic Function <elastic>` for parameters and vp/vs/rho conversion. Scalar3D has no CPU propagation path. GPU, DataParallel and long-FWI acceptance scopes are listed in [Status](status.md).
 
-## V15 GSLS preparation and backend selection
+## V16 GSLS preparation and backend selection
 
-V15 GSLS uses separate preparation: call `starwave.prepare_visco_gsls(backend="cuda", device="cuda:0")` on the CUDA main thread, or `starwave.prepare_visco_gsls(backend="native_cpu")` for CPU. `starwave.visco_gsls_native_status(backend="cuda")` only reports status. Preparation defaults to CPU while propagation defaults to CUDA; select explicitly, without automatic fallback. `backend="torch", memory="full"` is the small-model reference requiring no native build. See the [GSLS API](visco-gsls.md) for the complete contract and CPU example.
+V16 GSLS uses separate preparation: call `starwave.prepare_visco_gsls(backend="cuda", device="cuda:0")` on the CUDA main thread, or `starwave.prepare_visco_gsls(backend="native_cpu")` for CPU. `starwave.visco_gsls_native_status(backend="cuda")` only reports status. Preparation defaults to CPU while propagation defaults to CUDA; select explicitly, without automatic fallback. `backend="torch"` supports full/checkpoint and eager/compile without a native build. See the [GSLS API](visco-gsls.md) for the complete contract and CPU example.
 
 (installation-smoke)=
 ## Notebook 01: Executed smoke test

@@ -1,5 +1,17 @@
 # Release Notes
 
+## V16 / PyTorch backend · publication verification pending
+
+The current manual documents the additive [PyTorch backend](pytorch-backend.md) for V16 / `0.1.0.dev16`. Final remote identity verification of the V16 source Release, development commit and target PyPI `7.1.0` wheel is pending; planned publication is not reported as completed. Existing [7.0.0](https://pypi.org/project/starwave/7.0.0/) is a historical V14 binary without GSLS or the unified Torch backend.
+
+- scalar/VRZ/VTI/elastic add backend, execution, checkpoint_interval and compile_steps; GSLS adds execution/compile_steps and Torch checkpoint. Existing positional arguments, native defaults and scientific CUDA/C++ kernels are preserved.
+- Torch offers CPU/CUDA full/checkpoint and eager/compile. It has no boundary, AMP, elastic callbacks/offload or sampled material gradients. MPS is supported only for Scalar2D accuracy=4 float32 with backend="torch", full/checkpoint and eager/compile. Other MPS combinations, including Scalar3D, VRZ, VTI, elastic and GSLS, are rejected. No final Mac hardware, 500-epoch FWI or performance acceptance is claimed. See [Usage](usage.md), [GSLS](visco-gsls.md) and the backend page for complete parameters and limits.
+- Torch elastic differentiates every internal step; native material gradients sample at CFL ratio × sampling_interval. Exact cross-backend comparisons require ratio=1; this distinction is not a compilation error.
+- Documentation gates check bilingual complete signatures, defaults, parameter coverage and snippet syntax without importing propagation libraries. CPU/documentation checks do not replace final GPU, DataParallel, long FWI or performance acceptance. Existing examples, figures and PDFs retain their original version/evidence scope.
+
+V15 and older records below describe their historical snapshots only.
+
+
 ## V15 / GSLS source Release · 2026-10-10
 
 The [V15 source Release](https://github.com/StarrMoonn/StarWave/releases/tag/V15) is published with source version `0.1.0.dev15`, commit `2508543ccc1dc3015b07806e6e240dd88c8e871e`. PyPI is not updated: public 7.0.0 remains the historical V14 binary and cannot run the current GSLS API.

@@ -1,5 +1,7 @@
 # 模型、采集与时间约定
 
+本页未注明时描述原生默认路径。V16 新增显式 Torch CPU/CUDA full/checkpoint，边界、设备和限制见 [PyTorch 后端](../pytorch-backend.md)。
+
 ## 张量形状
 
 `B` 是炮数，`S` 是每炮震源数，`R` 是每炮接收点数，`T` 是用户时间采样数，`D` 是空间维数。

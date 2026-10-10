@@ -1,6 +1,8 @@
 (reconstruction)=
 # 波场反传重建
 
+本章说明原生 full/boundary 伴随与波场重建。Torch checkpoint 采用正向重算和 autograd，不使用本章的 boundary 逆重建或历史公式；见 [PyTorch 后端](../pytorch-backend.md)。
+
 本章先介绍 5.0.0 的 Scalar3D Radius-M 六面压力重建，再保留既有弹性重建推导。
 
 StarWave 弹性传播的 `memory="boundary"` 模式，在损失梯度反向传播时逐步重建正演物理场，用**边界带与终态物理场**替代按时间保存的全体积材料导数历史。本章解释 4.0.0 源码契约中的原生二维／三维方法。参数与调用示例见 {ref}`Elastic Function <elastic>` 及其{ref}`内存选项 <elastic-memory>`。

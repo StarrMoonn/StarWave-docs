@@ -1,12 +1,14 @@
 # Frequently Asked Questions
 
+V16 adds the [PyTorch backend](pytorch-backend.md): explicit CPU/CUDA full/checkpoint without propagation native libraries; MPS is supported only for Scalar2D accuracy=4 float32 with backend="torch", full/checkpoint and eager/compile. Other MPS combinations, including Scalar3D, VRZ, VTI, elastic and GSLS, are rejected. No final Mac hardware, 500-epoch FWI or performance acceptance is claimed. AMP remains unsupported. Source Release and PyPI `7.1.0` wheel publication verification are pending. Wheel-platform and CUDA-loading answers below describe historical 7.0.0 / native paths. For Torch memory pressure, evaluate checkpoint intervals; larger intervals do not guarantee lower peaks.
+
 ## Why can't pip find a compatible StarWave version?
 
 Check that you are using Linux x86_64, Python 3.10–3.12, and glibc ≥2.35, and update pip. Native Windows Python, macOS, ARM, and older glibc versions do not match this wheel. Do not rename the wheel file to bypass its platform tags.
 
 ## Do I need to compile CUDA code?
 
-The public 6.0.0 wheel does not require compilation or an nvcc installation. Scalar/VRZ/VTI and elastic boundary require a compatible GPU and driver; elastic full also runs on CPU. If integrity or compatibility checks fail, reinstall the corresponding wheel in the same environment and restart Python. Do not expect the documentation project to contain private build tools.
+The historical public 7.0.0 wheel does not require compilation or an nvcc installation. Scalar/VRZ/VTI and elastic boundary require a compatible GPU and driver; elastic full also runs on CPU. If integrity or compatibility checks fail, reinstall the corresponding wheel in the same environment and restart Python. Do not expect the documentation project to contain private build tools.
 
 ## Why does prepare_native fail even though import succeeds?
 

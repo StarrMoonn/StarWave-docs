@@ -1,6 +1,6 @@
 {
   "vti": {
-    "signature": "(vp, epsilon, delta, rho, grid_spacing, dt, *, source_amplitudes, source_locations, receiver_locations, source_fields=('sH', 'sV'), receiver_fields=('vz',), accuracy=4, pml_freq=25.0, pml_width=20, boundary_buffer=5, memory='boundary', max_vel=None, freq_taper_frac=0.0, time_pad_frac=0.0, time_taper=False)",
+    "signature": "(vp, epsilon, delta, rho, grid_spacing, dt, *, source_amplitudes, source_locations, receiver_locations, source_fields=('sH', 'sV'), receiver_fields=('vz',), accuracy=4, pml_freq=25.0, pml_width=20, boundary_buffer=5, memory='boundary', max_vel=None, freq_taper_frac=0.0, time_pad_frac=0.0, time_taper=False, backend=None, execution='eager', checkpoint_interval=None, compile_steps=1)",
     "types": {
       "vp": "torch.Tensor",
       "epsilon": "torch.Tensor",
@@ -21,12 +21,35 @@
       "max_vel": "float | int | None",
       "freq_taper_frac": "float | int",
       "time_pad_frac": "float | int",
-      "time_taper": "bool"
+      "time_taper": "bool",
+      "backend": "str | None",
+      "execution": "str",
+      "checkpoint_interval": "int | None",
+      "compile_steps": "int"
     },
-    "return": "tuple[torch.Tensor, ...]"
+    "return": "tuple[torch.Tensor, ...]",
+    "torch_backend": {
+      "devices": [
+        "cpu",
+        "cuda"
+      ],
+      "memory": [
+        "full",
+        "checkpoint"
+      ],
+      "execution": [
+        "eager",
+        "compile"
+      ],
+      "checkpoint_interval_default_internal_steps": 32,
+      "mps": false,
+      "amp": false,
+      "gradient_order": 1,
+      "native_default_preserved": true
+    }
   },
   "vrz": {
-    "signature": "(v, grid_spacing, dt, *, impedance=None, density=None, source_amplitudes, source_locations, receiver_locations, accuracy=8, pml_freq=25.0, pml_width=20, boundary_buffer=5, memory='boundary', max_vel=None, freq_taper_frac=0.0, time_pad_frac=0.0, time_taper=False, illumination=None)",
+    "signature": "(v, grid_spacing, dt, *, impedance=None, density=None, source_amplitudes, source_locations, receiver_locations, accuracy=8, pml_freq=25.0, pml_width=20, boundary_buffer=5, memory='boundary', max_vel=None, freq_taper_frac=0.0, time_pad_frac=0.0, time_taper=False, illumination=None, backend=None, execution='eager', checkpoint_interval=None, compile_steps=1)",
     "types": {
       "v": "torch.Tensor",
       "grid_spacing": "float | int | list[float] | tuple[float, ...]",
@@ -45,12 +68,35 @@
       "freq_taper_frac": "float | int",
       "time_pad_frac": "float | int",
       "time_taper": "bool",
-      "illumination": "None"
+      "illumination": "None",
+      "backend": "str | None",
+      "execution": "str",
+      "checkpoint_interval": "int | None",
+      "compile_steps": "int"
     },
-    "return": "tuple[torch.Tensor]"
+    "return": "tuple[torch.Tensor]",
+    "torch_backend": {
+      "devices": [
+        "cpu",
+        "cuda"
+      ],
+      "memory": [
+        "full",
+        "checkpoint"
+      ],
+      "execution": [
+        "eager",
+        "compile"
+      ],
+      "checkpoint_interval_default_internal_steps": 32,
+      "mps": false,
+      "amp": false,
+      "gradient_order": 1,
+      "native_default_preserved": true
+    }
   },
   "scalar": {
-    "signature": "(v, grid_spacing, dt, *, source_amplitudes, source_locations, receiver_locations, accuracy=8, pml_freq=25.0, pml_width=20, boundary_buffer=5, memory='boundary', max_vel=None, freq_taper_frac=0.0, time_pad_frac=0.0, time_taper=False, illumination=None)",
+    "signature": "(v, grid_spacing, dt, *, source_amplitudes, source_locations, receiver_locations, accuracy=8, pml_freq=25.0, pml_width=20, boundary_buffer=5, memory='boundary', max_vel=None, freq_taper_frac=0.0, time_pad_frac=0.0, time_taper=False, illumination=None, backend=None, execution='eager', checkpoint_interval=None, compile_steps=1)",
     "types": {
       "v": "torch.Tensor",
       "grid_spacing": "float | int | list[float] | tuple[float, ...]",
@@ -67,7 +113,11 @@
       "freq_taper_frac": "float | int",
       "time_pad_frac": "float | int",
       "time_taper": "bool",
-      "illumination": "ScalarIllumination | None"
+      "illumination": "ScalarIllumination | None",
+      "backend": "str | None",
+      "execution": "str",
+      "checkpoint_interval": "int | None",
+      "compile_steps": "int"
     },
     "return": "tuple[torch.Tensor]",
     "semantics": {
@@ -100,6 +150,25 @@
       "source_only_history_3d": true,
       "public_return_shape": "[B,R,T]",
       "one_backward_per_forward": true
+    },
+    "torch_backend": {
+      "devices": [
+        "cpu",
+        "cuda"
+      ],
+      "memory": [
+        "full",
+        "checkpoint"
+      ],
+      "execution": [
+        "eager",
+        "compile"
+      ],
+      "checkpoint_interval_default_internal_steps": 32,
+      "mps": false,
+      "amp": false,
+      "gradient_order": 1,
+      "native_default_preserved": true
     }
   },
   "native_status": {
@@ -115,7 +184,7 @@
     "return": "dict"
   },
   "elastic": {
-    "signature": "(lamb, mu, buoyancy, grid_spacing, dt, source_amplitudes_z=None, source_amplitudes_y=None, source_amplitudes_x=None, source_amplitudes_p=None, source_locations_z=None, source_locations_y=None, source_locations_x=None, source_locations_p=None, receiver_locations_z=None, receiver_locations_y=None, receiver_locations_x=None, receiver_locations_p=None, accuracy=4, pml_width=20, pml_freq=None, max_vel=None, survey_pad=None, vz_0=None, vy_0=None, vx_0=None, sigmazz_0=None, sigmayz_0=None, sigmaxz_0=None, sigmayy_0=None, sigmaxy_0=None, sigmaxx_0=None, m_vzz_0=None, m_vzy_0=None, m_vzx_0=None, m_vyz_0=None, m_vxz_0=None, m_vyy_0=None, m_vyx_0=None, m_vxy_0=None, m_vxx_0=None, m_sigmazzz_0=None, m_sigmayzy_0=None, m_sigmaxzx_0=None, m_sigmayzz_0=None, m_sigmaxzz_0=None, m_sigmayyy_0=None, m_sigmaxyy_0=None, m_sigmaxyx_0=None, m_sigmaxxx_0=None, origin=None, nt=None, model_gradient_sampling_interval=1, freq_taper_frac=0.0, time_pad_frac=0.0, time_taper=False, forward_callback=None, callback_frequency=1, python_backend=False, storage_mode='device', storage_path='.', storage_compression=False, *, memory='full')",
+    "signature": "(lamb, mu, buoyancy, grid_spacing, dt, source_amplitudes_z=None, source_amplitudes_y=None, source_amplitudes_x=None, source_amplitudes_p=None, source_locations_z=None, source_locations_y=None, source_locations_x=None, source_locations_p=None, receiver_locations_z=None, receiver_locations_y=None, receiver_locations_x=None, receiver_locations_p=None, accuracy=4, pml_width=20, pml_freq=None, max_vel=None, survey_pad=None, vz_0=None, vy_0=None, vx_0=None, sigmazz_0=None, sigmayz_0=None, sigmaxz_0=None, sigmayy_0=None, sigmaxy_0=None, sigmaxx_0=None, m_vzz_0=None, m_vzy_0=None, m_vzx_0=None, m_vyz_0=None, m_vxz_0=None, m_vyy_0=None, m_vyx_0=None, m_vxy_0=None, m_vxx_0=None, m_sigmazzz_0=None, m_sigmayzy_0=None, m_sigmaxzx_0=None, m_sigmayzz_0=None, m_sigmaxzz_0=None, m_sigmayyy_0=None, m_sigmaxyy_0=None, m_sigmaxyx_0=None, m_sigmaxxx_0=None, origin=None, nt=None, model_gradient_sampling_interval=1, freq_taper_frac=0.0, time_pad_frac=0.0, time_taper=False, forward_callback=None, callback_frequency=1, python_backend=False, storage_mode='device', storage_path='.', storage_compression=False, *, memory='full', backend=None, execution='eager', checkpoint_interval=None, compile_steps=1)",
     "types": {
       "lamb": "torch.Tensor",
       "mu": "torch.Tensor",
@@ -178,9 +247,32 @@
       "storage_mode": "Literal['device', 'cpu', 'disk', 'none']",
       "storage_path": "str",
       "storage_compression": "bool",
-      "memory": "Literal['full', 'boundary']"
+      "memory": "Literal['full', 'boundary', 'checkpoint']",
+      "backend": "str | None",
+      "execution": "str",
+      "checkpoint_interval": "int | None",
+      "compile_steps": "int"
     },
-    "return": "Tuple[torch.Tensor, ...]"
+    "return": "Tuple[torch.Tensor, ...]",
+    "torch_backend": {
+      "devices": [
+        "cpu",
+        "cuda"
+      ],
+      "memory": [
+        "full",
+        "checkpoint"
+      ],
+      "execution": [
+        "eager",
+        "compile"
+      ],
+      "checkpoint_interval_default_internal_steps": 32,
+      "mps": false,
+      "amp": false,
+      "gradient_order": 1,
+      "native_default_preserved": true
+    }
   },
   "common.vpvsrho_to_lambmubuoyancy": {
     "signature": "(vp, vs, rho, eps=1e-15)",
@@ -210,7 +302,7 @@
     "return": "dict"
   },
   "visco_gsls": {
-    "signature": "(vp, q, rho, grid_spacing, dt, *, source_amplitudes, source_locations, receiver_locations, f_ref, accuracy=4, pml_width=20, memory='full', max_vel=None, backend='cuda', mode='hao1', frequency_band=None, n_mechanisms=None, fit_tolerance=0.05, strict=False, material_model=None, checkpoint_interval=None)",
+    "signature": "(vp, q, rho, grid_spacing, dt, *, source_amplitudes, source_locations, receiver_locations, f_ref, accuracy=4, pml_width=20, memory='full', max_vel=None, backend='cuda', mode='hao1', frequency_band=None, n_mechanisms=None, fit_tolerance=0.05, strict=False, material_model=None, checkpoint_interval=None, execution='eager', compile_steps=1)",
     "types": {
       "vp": "torch.Tensor",
       "q": "torch.Tensor",
@@ -232,7 +324,9 @@
       "fit_tolerance": "float | int | None",
       "strict": "bool",
       "material_model": "Callable | None",
-      "checkpoint_interval": "int | None"
+      "checkpoint_interval": "int | None",
+      "execution": "str",
+      "compile_steps": "int"
     },
     "return": "tuple[torch.Tensor]",
     "page": "visco-gsls",
@@ -273,8 +367,7 @@
         "float32",
         "float64"
       ],
-      "reviewed_source_version": "0.1.0.dev15",
-      "reviewed_source_commit": "2508543ccc1dc3015b07806e6e240dd88c8e871e",
+      "reviewed_source_version": "0.1.0.dev16",
       "public_wheel_contains_api": false,
       "memory_by_backend": {
         "cuda": [
@@ -286,7 +379,8 @@
           "checkpoint"
         ],
         "torch": [
-          "full"
+          "full",
+          "checkpoint"
         ]
       },
       "modes": [
@@ -297,8 +391,28 @@
       "default_mode": "hao1",
       "hao1_mechanisms": 5,
       "hao1_band": "explicit (scale, 200 * scale) design band",
-      "checkpoint_interval": "None or positive integer, allowed only with checkpoint",
-      "material_model": "once per call on padded vp/q; returns c_rel2,strength,A,B; builtin mode/fit settings bypassed"
+      "checkpoint_interval": "None or positive integer, allowed only with checkpoint; Torch None = 32 internal steps; native None uses shape/history estimate",
+      "material_model": "once per call on padded vp/q; returns c_rel2,strength,A,B; builtin mode/fit settings bypassed",
+      "publication_status": "pending"
+    },
+    "torch_backend": {
+      "devices": [
+        "cpu",
+        "cuda"
+      ],
+      "memory": [
+        "full",
+        "checkpoint"
+      ],
+      "execution": [
+        "eager",
+        "compile"
+      ],
+      "checkpoint_interval_default_internal_steps": 32,
+      "mps": false,
+      "amp": false,
+      "gradient_order": 1,
+      "native_default_preserved": true
     }
   },
   "prepare_visco_gsls": {

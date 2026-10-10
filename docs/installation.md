@@ -1,16 +1,23 @@
 # 安装
 
-当前 [V15 源码 Release](https://github.com/StarrMoonn/StarWave/releases/tag/V15)（`0.1.0.dev15`）提供 [GSLS API](visco-gsls.md)。公开 PyPI **7.0.0** 仍为旧 V14 二进制，不含 GSLS；`pip install starwave==7.0.0` 不能安装 V15。
+当前 API 面向 V16 / `0.1.0.dev16` 的新增 [PyTorch 后端](pytorch-backend.md)；源码 Release 与目标 PyPI `7.1.0` wheel 的发布核验待完成。历史 PyPI **7.0.0** 是 V14 二进制，不含 GSLS 或统一 Torch 后端，不适用于新增示例。
 
-源码仓库为私有仓库；下载 Release / 源码需要已获授权的 GitHub 访问权限，或使用项目所有者提供的完整 V15 源码。
+源码仓库为私有仓库；使用已获授权的完整 V16 源码。未完成发布核验前，不提供未经确认的新版本 pip 命令。下文保留历史 7.0.0 安装条件与命令，明确作为旧渠道。
 
-**安装渠道**
+## V16 纯 Torch 安装与运行
 
-- **V15 源码**：使用 Release 中完整、匹配的源码，在源码根目录显式构建。
-- **PyPI 7.0.0（历史二进制）**：下文单独保留其安装要求与命令，不用于当前 GSLS 示例。
-- **[Docker](docker.md)**：准备中，目前尚未发布 StarWave 容器镜像。
+在完整 V16 源码根目录中，可直接运行，或选择可选注册：
 
-## V15 源码构建
+```bash
+python -m pip install --no-deps --no-build-isolation -e .
+```
+
+显式 `backend="torch"` 支持 CPU/CUDA full/checkpoint，不加载传播原生库，不需要 nvcc 或 compile_all.py；eager/compile 与模型设备分别选择。compile 使用当前 PyTorch Inductor 工具链，失败明确报错，不回退 eager。MPS 仅支持 Scalar2D accuracy=4 float32，使用 backend="torch"、full/checkpoint 与 eager/compile；Scalar3D、VRZ、VTI、elastic、GSLS 和其他 MPS 组合明确拒绝。本次不宣称最终 Mac 实机、500 轮 FWI 或性能验收通过。 AMP 仍拒绝。可从 {ref}`CPU 独立示例 <torch-example>` 开始。
+
+## V16 原生构建
+
+如果仍使用原生路径，必须从完整匹配源码构建。新增 Python 入口改变 elastic/GSLS 源闭包身份；即使 CUDA/C++ 数值核没有变化，也应重建并重启，不能手改旧构建 manifest。只有纯 Torch 调用才可省略下面的原生构建。
+
 
 使用已安装且与 PyTorch 匹配的 CUDA Toolkit/C++ 工具链。在完整源码根目录执行：
 
@@ -68,9 +75,9 @@ python -m pip check
 
 PyTorch 安装命令依据 [PyTorch 历史版本页面](https://pytorch.org/get-started/previous-versions/)。`cu118` 是此版本的起始验证配置，不代表其它 PyTorch 版本已被验证。升级 StarWave 后重启 Python 或 Notebook kernel。
 
-## 升级到 V15 源码
+## 升级到 V16 源码
 
-V15 的唯一黏声入口为 `starwave.visco_gsls`；独立 `visco_sls` 及其准备/状态入口已移除。单机制计算须显式使用 `mode="sls_compat", n_mechanisms=1`，不能只更换函数名而沿用默认 Hao1。源码编号 `0.1.0.dev15` 与公开 wheel `7.0.0` 是不同发行身份。
+V16 的唯一黏声入口为 `starwave.visco_gsls`；独立 `visco_sls` 及其准备/状态入口已移除。单机制计算须显式使用 `mode="sls_compat", n_mechanisms=1`，不能只更换函数名而沿用默认 Hao1。源码编号 `0.1.0.dev16` 与公开 wheel `7.0.0` 是不同发行身份。
 
 源码用户必须使用这一版本配套的 Python 包与重新构建的原生库，按随源码提供的构建说明操作。从早于 6.0.0 的版本升级时，Scalar2D 的 PML、边界与 full 历史布局已改变；即使核心 ABI 布局相同，旧库也不能复用或通过绕过兼容检查加载。安装公开 wheel 不需要自行编译。升级或替换已加载的库后，重启 Python / Notebook kernel，再执行原生准备与小规模正演/梯度检查。
 
@@ -97,11 +104,11 @@ starwave.prepare_native([0])
 文档站本身的构建环境独立于计算环境；仅阅读或构建文档不需要 GPU。
 
 
-弹性传播使用独立准备入口：GPU 主线程调用 `starwave.prepare_elastic([0])`，CPU 调用 `starwave.prepare_elastic()` 并选择 `memory="full"`。完整参数与 vp/vs/rho 转换见 {ref}`Elastic Function <elastic>`。scalar3D 没有 CPU 传播路径。GPU、DataParallel 与长程 FWI 验收范围见[文档状态](status.md)。
+弹性传播使用独立准备入口：GPU 主线程调用 `starwave.prepare_elastic([0])`，CPU 调用 `starwave.prepare_elastic()` 并选择 `memory="full"`。完整参数与 vp/vs/rho 转换见 {ref}`Elastic Function <elastic>`。原生 scalar3D 没有 CPU 路径；V16 Torch scalar3D 可在 CPU/CUDA 上运行。GPU、DataParallel 与长程 FWI 验收范围见[文档状态](status.md)。
 
-## V15 GSLS 准备与后端选择
+## V16 GSLS 准备与后端选择
 
-V15 GSLS 使用独立准备入口：CUDA 主线程调用 `starwave.prepare_visco_gsls(backend="cuda", device="cuda:0")`，CPU 调用 `starwave.prepare_visco_gsls(backend="native_cpu")`。`starwave.visco_gsls_native_status(backend="cuda")` 只查看状态。准备默认 CPU，传播默认 CUDA，建议始终显式指定；不自动回退。`backend="torch", memory="full"` 为无需原生构建的小模型参考。见 [GSLS API](visco-gsls.md) 的完整契约与 CPU 示例。
+V16 GSLS 使用独立准备入口：CUDA 主线程调用 `starwave.prepare_visco_gsls(backend="cuda", device="cuda:0")`，CPU 调用 `starwave.prepare_visco_gsls(backend="native_cpu")`。`starwave.visco_gsls_native_status(backend="cuda")` 只查看状态。准备默认 CPU，传播默认 CUDA，建议始终显式指定；不自动回退。`backend="torch"` 支持 full/checkpoint 与 eager/compile，无需原生构建。见 [GSLS API](visco-gsls.md) 的完整契约与 CPU 示例。
 
 (installation-smoke)=
 ## Notebook 01：实际运行检查

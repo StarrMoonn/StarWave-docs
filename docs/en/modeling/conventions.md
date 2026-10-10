@@ -1,5 +1,7 @@
 # Model, Acquisition, and Time Conventions
 
+Unless stated otherwise, this page describes native defaults. V16 adds explicit Torch CPU/CUDA full/checkpoint; see the [PyTorch backend](../pytorch-backend.md) for device, memory and feature limits.
+
 ## Tensor shapes
 
 `B` is the number of shots, `S` the number of sources per shot, `R` the number of receivers per shot, `T` the number of user time samples, and `D` the number of spatial dimensions.

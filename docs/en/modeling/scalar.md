@@ -1,5 +1,7 @@
 # Scalar Acoustics
 
+The CUDA device, full/boundary history layout and native-build descriptions on this page apply to native defaults. V16 adds explicit Torch CPU/CUDA full/checkpoint; see the [PyTorch backend](../pytorch-backend.md).
+
 In public **6.0.0**, `starwave.scalar` accepts a 2D or 3D velocity model `v`, selected by `v.ndim`, and returns a single-element tuple `(receiver_amplitudes,)`. Use `[0]` to obtain pressure-like records of shape `[B,R,T]`.
 
 ## Models, coordinates, and sampling
