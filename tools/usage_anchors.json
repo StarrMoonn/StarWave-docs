@@ -85,7 +85,16 @@
     "prepare-elastic": "prepare-elastic",
     "sw-section-30": "prepare-elastic",
     "elastic-function": "elastic",
-    "starwave-prepare-elastic": "prepare-elastic"
+    "starwave-prepare-elastic": "prepare-elastic",
+    "vrr": "vrr",
+    "vrr-install": "vrr-install",
+    "vrr-backends": "vrr-backends",
+    "vrr-physics": "vrr-physics",
+    "vrr-top": "vrr-top",
+    "vrr-example": "vrr-example",
+    "vrr-status": "vrr-status",
+    "vrr-function": "vrr",
+    "vrr-api": "vrr"
   },
   "en": {
     "usage": "usage",
@@ -173,6 +182,15 @@
     "prepare-elastic": "prepare-elastic",
     "sw-section-30": "prepare-elastic",
     "elastic-function": "elastic",
-    "starwave-prepare-elastic": "prepare-elastic"
+    "starwave-prepare-elastic": "prepare-elastic",
+    "vrr": "vrr",
+    "vrr-install": "vrr-install",
+    "vrr-backends": "vrr-backends",
+    "vrr-physics": "vrr-physics",
+    "vrr-top": "vrr-top",
+    "vrr-example": "vrr-example",
+    "vrr-status": "vrr-status",
+    "vrr-function": "vrr",
+    "vrr-api": "vrr"
   }
 }

@@ -115,6 +115,30 @@
         "sls-api": "visco-gsls",
         "pml": "visco-gsls-gradients"
       }
+    },
+    "vrr.html": {
+      "default": "vrr",
+      "target_page": "usage.html",
+      "fragments": {
+        "vrr": "vrr",
+        "vrr-function": "vrr",
+        "sw-section-0": "vrr",
+        "vrr-install": "vrr-install",
+        "sw-section-1": "vrr-install",
+        "vrr-api": "vrr",
+        "sw-section-2": "vrr",
+        "vrr-backends": "vrr-backends",
+        "sw-section-3": "vrr-backends",
+        "vrr-physics": "vrr-physics",
+        "sw-section-4": "vrr-physics",
+        "vrr-top": "vrr-top",
+        "sw-section-5": "vrr-top",
+        "vrr-example": "vrr-example",
+        "sw-section-6": "vrr-example",
+        "vrr-status": "vrr-status",
+        "sw-section-7": "vrr-status",
+        "starwave_vrr.vrr": "starwave_vrr.vrr"
+      }
     }
   },
   "en": {
@@ -238,6 +262,37 @@
         "native-runtime-preparation": "visco-gsls-runtime",
         "equation-references-and-scope": "visco-gsls-references"
       }
+    },
+    "vrr.html": {
+      "default": "vrr",
+      "target_page": "usage.html",
+      "fragments": {
+        "vrr": "vrr",
+        "vrr-function": "vrr",
+        "sw-section-0": "vrr",
+        "vrr-install": "vrr-install",
+        "install-and-build": "vrr-install",
+        "sw-section-1": "vrr-install",
+        "vrr-api": "vrr",
+        "signature-and-parameters": "vrr",
+        "sw-section-2": "vrr",
+        "vrr-backends": "vrr-backends",
+        "backends-and-gradients": "vrr-backends",
+        "sw-section-3": "vrr-backends",
+        "vrr-physics": "vrr-physics",
+        "models-source-and-time-conventions": "vrr-physics",
+        "sw-section-4": "vrr-physics",
+        "vrr-top": "vrr-top",
+        "flat-top-boundary": "vrr-top",
+        "sw-section-5": "vrr-top",
+        "vrr-example": "vrr-example",
+        "small-synthetic-example": "vrr-example",
+        "sw-section-6": "vrr-example",
+        "vrr-status": "vrr-status",
+        "source-and-validation-scope": "vrr-status",
+        "sw-section-7": "vrr-status",
+        "starwave_vrr.vrr": "starwave_vrr.vrr"
+      }
     }
   },
   "root": {
@@ -355,6 +410,30 @@
         "sw-section-7": "visco-gsls-references",
         "sls-api": "visco-gsls",
         "pml": "visco-gsls-gradients"
+      }
+    },
+    "vrr.html": {
+      "default": "vrr",
+      "target_page": "usage.html",
+      "fragments": {
+        "vrr": "vrr",
+        "vrr-function": "vrr",
+        "sw-section-0": "vrr",
+        "vrr-install": "vrr-install",
+        "sw-section-1": "vrr-install",
+        "vrr-api": "vrr",
+        "sw-section-2": "vrr",
+        "vrr-backends": "vrr-backends",
+        "sw-section-3": "vrr-backends",
+        "vrr-physics": "vrr-physics",
+        "sw-section-4": "vrr-physics",
+        "vrr-top": "vrr-top",
+        "sw-section-5": "vrr-top",
+        "vrr-example": "vrr-example",
+        "sw-section-6": "vrr-example",
+        "vrr-status": "vrr-status",
+        "sw-section-7": "vrr-status",
+        "starwave_vrr.vrr": "starwave_vrr.vrr"
       }
     }
   }

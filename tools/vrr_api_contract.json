@@ -5,5 +5,29 @@
   "signature": "(v, grid_spacing, dt, *, rx, rz, source_amplitudes, source_locations, receiver_locations, accuracy=8, pml_freq=25.0, pml_width=20, boundary_buffer=5, memory=\"boundary\", max_vel=None, freq_taper_frac=0.0, time_pad_frac=0.0, time_taper=False, backend=\"cuda\", execution=\"eager\", checkpoint_interval=None, compile_steps=1)",
   "source_feature_commit": "e8ccf9b0fe70edd023fc4c6d0319abae6c203c65",
   "source_file": "extensions/vrr/starwave_vrr/api.py",
-  "source_dev_commit": "904c9106bdb883325df8586b7c3412f7814a9737"
+  "source_dev_commit": "904c9106bdb883325df8586b7c3412f7814a9737",
+  "types": {
+    "v": "torch.Tensor",
+    "rx": "torch.Tensor",
+    "rz": "torch.Tensor",
+    "source_amplitudes": "torch.Tensor",
+    "source_locations": "torch.Tensor",
+    "receiver_locations": "torch.Tensor",
+    "grid_spacing": "float | int | list[float] | tuple[float, ...]",
+    "dt": "float | int",
+    "accuracy": "int",
+    "pml_freq": "float | int",
+    "pml_width": "int | list[int] | tuple[int, ...]",
+    "boundary_buffer": "int",
+    "memory": "str",
+    "max_vel": "float | int | None",
+    "freq_taper_frac": "float",
+    "time_pad_frac": "float",
+    "time_taper": "bool",
+    "backend": "str",
+    "execution": "str",
+    "checkpoint_interval": "int | None",
+    "compile_steps": "int"
+  },
+  "documented_signature": "(v: torch.Tensor, grid_spacing: float | int | list[float] | tuple[float, ...], dt: float | int, *, rx: torch.Tensor, rz: torch.Tensor, source_amplitudes: torch.Tensor, source_locations: torch.Tensor, receiver_locations: torch.Tensor, accuracy: int=8, pml_freq: float | int=25.0, pml_width: int | list[int] | tuple[int, ...]=20, boundary_buffer: int=5, memory: str='boundary', max_vel: float | int | None=None, freq_taper_frac: float=0.0, time_pad_frac: float=0.0, time_taper: bool=False, backend: str='cuda', execution: str='eager', checkpoint_interval: int | None=None, compile_steps: int=1) -> tuple[torch.Tensor]"
 }

@@ -2,7 +2,7 @@
 
 The current API is available in [StarWave 7.1.0](https://pypi.org/project/starwave/7.1.0/), published from V16 / `0.1.0.dev16`, including GSLS and the additive [PyTorch backend](pytorch-backend.md). Historical PyPI **7.0.0** is a V14 binary without these features. See [Status](status.md) for the exact public artifact and verification scope.
 
-The separately installed [VRR source extension](vrr.md) uses `starwave_vrr.vrr`, not a sixth main-package entry point. It is absent from 7.1.0. Its explicit Torch mode supports CPU/CUDA float32/64 full/checkpoint and eager/compile; native CUDA float32 full/boundary requires its own build. Follow that page for extension installation and limits.
+The separately installed {ref}`VRR source extension <vrr>` uses `starwave_vrr.vrr`, not a sixth main-package entry point. It is absent from 7.1.0. Its explicit Torch mode supports CPU/CUDA float32/64 full/checkpoint and eager/compile; native CUDA float32 full/boundary requires its own build. Follow that page for extension installation and limits.
 
 Use the prebuilt 7.1.0 wheel on supported Linux x86_64 hosts. The source repository is private; source users need complete authorized V16 source. There is no macOS wheel or PyPI sdist: Mac MPS requires the source installation below and only the documented Scalar2D configuration is eligible.
 

@@ -20,18 +20,32 @@ def check(source_root=None):
         'required' if value is None else ast.unparse(value) for value in expected.kw_defaults]
     examples = []
     for locale, folder in [('zh', ROOT / 'docs'), ('en', ROOT / 'docs/en')]:
-        text = (folder / 'vrr.md').read_text()
+        usage = (folder / 'usage.md').read_text()
+        text = usage.split('(vrr)=\n## VRR Function', 1)[1].split('(vti)=', 1)[0]
         blocks = re.findall(r'^```python\n(.*?)^```', text, re.M | re.S)
         assert len(blocks) == 1, f'{locale}: executable example required'
         for block in blocks:
             ast.parse(block, feature_version=(3, 10))
-        signature = re.search(r'^```text\nstarwave_vrr\.vrr([^\n]+)\n```', text, re.M).group(1)
-        assert ast.dump(signature_args(signature)) == ast.dump(expected), f'{locale}: signature drift'
-        rows = re.findall(r'^\| `(\w+)` \| `([^`]+)` \|', text, re.M)
-        assert [name for name, _ in rows] == names, f'{locale}: missing/reordered parameters'
-        for (_, value), wanted in zip(rows, defaults):
-            assert value == wanted or (value != 'required' and wanted != 'required' and
-                ast.literal_eval(value) == ast.literal_eval(wanted)), f'{locale}: default drift'
+        signature, body = re.search(
+            r'^```\{py:function\} starwave_vrr\.vrr([^\n]+)\n(.*?)^```',
+            text, re.M | re.S).groups()
+        documented = ast.parse('def f' + signature + ': pass', feature_version=(3, 10)).body[0]
+        pinned = ast.parse('def f' + contract['documented_signature'] + ': pass', feature_version=(3, 10)).body[0]
+        assert ast.dump(documented) == ast.dump(pinned), f'{locale}: typed signature drift'
+        for arg in documented.args.args + documented.args.kwonlyargs:
+            arg.annotation = None
+        assert ast.dump(documented.args) == ast.dump(expected), f'{locale}: signature/default drift'
+        fields = re.findall(r'^:param (\w+): (.+)$', body, re.M)
+        assert [name for name, _ in fields] == names, f'{locale}: missing/reordered parameter descriptions'
+        parameter_types = dict(re.findall(r'^:type (\w+): `(.+)`$', body, re.M))
+        assert parameter_types == contract['types'], f'{locale}: parameter type drift'
+        for (name, description), wanted in zip(fields, defaults):
+            if wanted == 'required':
+                assert ('Required' if locale == 'en' else '必填') in description
+            else:
+                value = re.search(r'`([^`]+)`', description).group(1)
+                assert ast.literal_eval(value) == ast.literal_eval(wanted), f'{locale}: {name} default drift'
+        assert ':returns:' in body and ':rtype: tuple[torch.Tensor]' in body
         example = ast.parse(blocks[0], feature_version=(3, 10))
         calls = [node for node in ast.walk(example) if isinstance(node, ast.Call)
                  and isinstance(node.func, ast.Name) and node.func.id == 'vrr']
@@ -46,8 +60,10 @@ def check(source_root=None):
                          'ABI 3', '[w,w,0,w]', 'MPS', 'float32/float64',
                          contract['source_dev_commit'], contract['source_feature_commit']):
             assert required in text, f'{locale}: missing scope marker {required}'
-        assert 'VRR Function <vrr>' in (folder / 'index.md').read_text()
-        assert '[VRR Function](vrr.md)' in (folder / 'usage.md').read_text()
+        assert 'VRR Function <vrr>' not in (folder / 'index.md').read_text()
+        assert '- [VRZ Function](#vrz)\n- [VRR Function](#vrr)\n- [VTI Function](#vti)' in usage
+        assert usage.index('(vrz)=') < usage.index('(vrr)=') < usage.index('(vti)=')
+        assert not (folder / 'vrr.md').exists(), 'Standalone VRR source page must be retired'
     assert examples[0] == examples[1], 'Bilingual example drift'
     if source_root:
         source = Path(source_root) / contract['source_file']

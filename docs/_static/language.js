@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
       catch (_) { return target.href; }
       const element = document.getElementById(id);
       // Python object anchors are identical in both independently built locales.
-      if (element && !id.startsWith('starwave.')) {
+      if (element && !id.startsWith('starwave.') && !id.startsWith('starwave_vrr.')) {
         const section = element.closest('section[data-sw-section]');
         if (section) target.hash = section.dataset.swAnchor || section.dataset.swSection;
       }

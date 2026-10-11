@@ -42,14 +42,15 @@ FWI_NUMBERS = (0, 4, 5, 2, 6, 7, 3, 1)
 USAGE_SECTIONS = ('usage', 'propagators', 'scalar', 'scalar-details',
                   'scalar-examples', 'scalar-time-sampling', 'scalar-memory',
                   'scalar-3d-example', 'scalar-notes', 'vrz', 'vrz-details',
-                  'vrz-examples', 'vrz-notes', 'vti', 'vti-details',
+                  'vrz-examples', 'vrz-notes', 'vrr', 'vrr-install', 'vrr-backends',
+                  'vrr-physics', 'vrr-top', 'vrr-example', 'vrr-status', 'vti', 'vti-details',
                   'vti-examples', 'vti-notes', 'elastic', 'elastic-axes',
                   'elastic-returns', 'elastic-memory', 'elastic-examples',
                   'elastic-notes', 'elastic-conversions', 'native-runtime',
                   'native-status', 'prepare-native', 'native-notes',
                   'native-examples', 'prepare-elastic', 'other-exports')
 # New content receives new numbers even when inserted before older sections.
-USAGE_NUMBERS = (0, 1, 2, 4, 5, 31, 32, 33, 6, 7, 9, 10, 11, 12, 14, 15, 16,
+USAGE_NUMBERS = (0, 1, 2, 4, 5, 31, 32, 33, 6, 7, 9, 10, 11, 34, 35, 36, 37, 38, 39, 40, 12, 14, 15, 16,
                  23, 24, 25, 26, 27, 28, 29, 17, 18, 19, 20, 21, 30, 22)
 MODELING_FRAGMENTS = {'modeling/vrz.md', 'modeling/vti.md'}
 WAVE_SECTIONS = ('wave-propagation', 'wave-vrz', 'wave-vrz-details', 'wave-vrz-limits',

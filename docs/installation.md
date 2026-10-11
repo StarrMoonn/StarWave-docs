@@ -2,7 +2,7 @@
 
 当前 API 已由 [StarWave 7.1.0](https://pypi.org/project/starwave/7.1.0/) 提供，来自 V16 / `0.1.0.dev16`，包含 GSLS 和新增 [PyTorch 后端](pytorch-backend.md)。历史 PyPI **7.0.0** 是不含这些功能的 V14 二进制。公开文件身份及核验范围见[文档状态](status.md)。
 
-另行安装的 [VRR 源码扩展](vrr.md) 使用 `starwave_vrr.vrr`，不是主包第六个入口，也不在 7.1.0 中。其显式 Torch 模式支持 CPU/CUDA float32/64、full/checkpoint 与 eager/compile；原生 CUDA float32 full/boundary 须独立构建。扩展安装和限制见该页。
+另行安装的 {ref}`VRR 源码扩展 <vrr>` 使用 `starwave_vrr.vrr`，不是主包第六个入口，也不在 7.1.0 中。其显式 Torch 模式支持 CPU/CUDA float32/64、full/checkpoint 与 eager/compile；原生 CUDA float32 full/boundary 须独立构建。扩展安装和限制见该页。
 
 受支持的 Linux x86_64 主机可安装预编译 7.1.0 wheel。源码仓库为私有仓库；源码用户需使用已获授权的完整 V16 源码。本次没有 macOS wheel 或 PyPI sdist；Mac MPS 必须按下文从源码安装，且仅支持文档限定的 Scalar2D 配置。
 

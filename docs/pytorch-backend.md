@@ -3,7 +3,7 @@
 
 V16 的统一新增后端通过原有 `starwave.scalar / vrz / vti / elastic / visco_gsls` 入口选择。使用 `backend="torch"`，正演由 PyTorch 张量运算执行，反传由 autograd 生成；`execution="compile"` 编译同一张量计算。旧 CUDA/C++ 科学核和省略新参数时的原生行为保留。已发布的 [7.1.0 Linux wheel](https://pypi.org/project/starwave/7.1.0/) 包含此后端；历史 7.0.0 不含此功能。本次没有 macOS wheel，Mac MPS 需使用已获授权的完整 V16 源码，见[安装](installation.md)和[发行状态](status.md)。
 
-另行安装的 [VRR 源码扩展](vrr.md) 使用 `starwave_vrr.vrr`，不是主包第六个入口，也不在 7.1.0 中。其显式 Torch 模式支持 CPU/CUDA float32/64、full/checkpoint 与 eager/compile；原生 CUDA float32 full/boundary 须独立构建。扩展安装和限制见该页。
+另行安装的 {ref}`VRR 源码扩展 <vrr>` 使用 `starwave_vrr.vrr`，不是主包第六个入口，也不在 7.1.0 中。其显式 Torch 模式支持 CPU/CUDA float32/64、full/checkpoint 与 eager/compile；原生 CUDA float32 full/boundary 须独立构建。扩展安装和限制见该页。
 
 (torch-selection)=
 ## 显式选择后端与设备

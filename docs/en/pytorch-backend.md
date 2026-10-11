@@ -3,7 +3,7 @@
 
 The additive V16 backend is selected through the existing `starwave.scalar / vrz / vti / elastic / visco_gsls` entry points. With `backend="torch"`, PyTorch tensor operations perform the forward and autograd generates its derivatives; `execution="compile"` compiles the same tensor computation. Existing CUDA/C++ scientific kernels and omitted-option native behavior are preserved. The [7.1.0 Linux wheel](https://pypi.org/project/starwave/7.1.0/) includes this backend; historical 7.0.0 does not. There is no macOS wheel: Mac MPS requires authorized complete V16 source. See [installation](installation.md) and [release status](status.md).
 
-The separately installed [VRR source extension](vrr.md) uses `starwave_vrr.vrr`, not a sixth main-package entry point. It is absent from 7.1.0. Its explicit Torch mode supports CPU/CUDA float32/64 full/checkpoint and eager/compile; native CUDA float32 full/boundary requires its own build. Follow that page for extension installation and limits.
+The separately installed {ref}`VRR source extension <vrr>` uses `starwave_vrr.vrr`, not a sixth main-package entry point. It is absent from 7.1.0. Its explicit Torch mode supports CPU/CUDA float32/64 full/checkpoint and eager/compile; native CUDA float32 full/boundary requires its own build. Follow that page for extension installation and limits.
 
 (torch-selection)=
 ## Explicit backend and device selection
