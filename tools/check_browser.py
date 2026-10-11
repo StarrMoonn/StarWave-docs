@@ -126,6 +126,7 @@ def check_navigation(page, locale, relative):
 
 def check_vrr(page, base, output):
     """Keep the independent extension discoverable and usable in both locales."""
+    original_viewport = page.viewport_size.copy()
     for locale in ('zh', 'en'):
         other = 'en' if locale == 'zh' else 'zh'
         for width in (1440, 390, 320):
@@ -148,6 +149,7 @@ def check_vrr(page, base, output):
         page.goto(base + locale + '/usage.html')
         page.locator('[role="main"] a[href="vrr.html"]').click()
         assert urlsplit(page.url).path == f'/{locale}/vrr.html'
+    page.set_viewport_size(original_viewport)
 
 
 def check_usage(page, locale, output):
