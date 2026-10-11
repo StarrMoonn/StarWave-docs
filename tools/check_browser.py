@@ -131,9 +131,9 @@ def check_vrr(page, base, output):
         for width in (1440, 390, 320):
             page.set_viewport_size({'width': width, 'height': 1000})
             page.goto(base + locale + '/vrr.html?from=vrr-check#vrr-api')
-            assert page.locator('#main-content h1').inner_text().startswith('VRR Function')
+            assert page.locator('[role="main"] h1').inner_text().startswith('VRR Function')
             assert page.locator('[id="vrr-api"]').count() == 1
-            assert 'starwave_vrr.vrr' in page.locator('#main-content').inner_text()
+            assert 'starwave_vrr.vrr' in page.locator('[role="main"]').inner_text()
             assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), (locale, width)
             page.screenshot(path=str(output / f'{locale}-vrr-api-{width}.png'))
             open_mobile_menu(page)
@@ -146,7 +146,7 @@ def check_vrr(page, base, output):
             close_mobile_menu(page)
         page.set_viewport_size({'width': 1440, 'height': 1000})
         page.goto(base + locale + '/usage.html')
-        page.locator('#main-content a[href="vrr.html"]').click()
+        page.locator('[role="main"] a[href="vrr.html"]').click()
         assert urlsplit(page.url).path == f'/{locale}/vrr.html'
 
 
