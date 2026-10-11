@@ -1,6 +1,6 @@
 # Usage
 
-GSLS: [visco_gsls](visco-gsls.md).
+GSLS: [visco_gsls](visco-gsls.md). Independent source extension: [VRR Function](vrr.md), outside the 7.1.0 wheel.
 
 ```{container} sw-page-toc
 
@@ -17,7 +17,7 @@ GSLS: [visco_gsls](visco-gsls.md).
 - [Other exported names and scope](#other-exports)
 ```
 
-This reference targets the additive [PyTorch backend](pytorch-backend.md) in V16 / `0.1.0.dev16`; source Release and target PyPI `7.1.0` wheel publication verification are pending. Published 7.0.0 lacks these new options and GSLS. Existing positional arguments and native defaults are preserved; all five propagators gain explicit full/checkpoint and eager/compile backend selection. Complete signatures, parameters, returns and limits follow.
+This reference targets the additive [PyTorch backend](pytorch-backend.md) in V16 / `0.1.0.dev16`; the published PyPI `7.1.0` wheel and its verification scope are recorded in [Status](status.md). Published 7.0.0 lacks these new options and GSLS. Existing positional arguments and native defaults are preserved; all five propagators gain explicit full/checkpoint and eager/compile backend selection. Complete signatures, parameters, returns and limits follow.
 
 See [Release Notes](release-notes.md) for 6.0.0 internal storage and PML-transpose maintenance, and [Scalar](modeling/scalar.md) for 2D storage changes. These introduce no new public parameters; source upgrades require rebuilt matching native libraries.
 

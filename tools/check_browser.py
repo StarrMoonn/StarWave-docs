@@ -37,7 +37,7 @@ CHAPTERS = {
     'about', 'presentation', 'installation', 'docker', 'wsl', 'quickstart', 'modeling/conventions',
     'modeling/scalar', 'modeling/gradient', 'modeling/acquisition', 'modeling/wave-propagation',
     'modeling/reconstruction', 'inversion/fwi',
-    'inversion/dataparallel', 'inversion/inr', 'usage', 'visco-gsls', 'pytorch-backend', 'faq',
+    'inversion/dataparallel', 'inversion/inr', 'usage', 'visco-gsls', 'vrr', 'pytorch-backend', 'faq',
     'release-notes', 'status', 'examples/index', 'examples/enclosed',
     'examples/surface', 'examples/layered', 'examples/reproduce',
 }
@@ -121,6 +121,33 @@ def check_navigation(page, locale, relative):
         assert 0 <= box['y'] < 400 and box['y'] + box['height'] <= page.viewport_size['height'], box
         assert box['width'] >= 150 and box['height'] >= 32, box
         assert sidebar['x'] <= box['x'] < sidebar['x'] + sidebar['width'], box
+
+
+
+def check_vrr(page, base, output):
+    """Keep the independent extension discoverable and usable in both locales."""
+    for locale in ('zh', 'en'):
+        other = 'en' if locale == 'zh' else 'zh'
+        for width in (1440, 390, 320):
+            page.set_viewport_size({'width': width, 'height': 1000})
+            page.goto(base + locale + '/vrr.html?from=vrr-check#vrr-api')
+            assert page.locator('#main-content h1').inner_text().startswith('VRR Function')
+            assert page.locator('[id="vrr-api"]').count() == 1
+            assert 'starwave_vrr.vrr' in page.locator('#main-content').inner_text()
+            assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), (locale, width)
+            page.screenshot(path=str(output / f'{locale}-vrr-api-{width}.png'))
+            open_mobile_menu(page)
+            check_navigation(page, locale, 'vrr.html')
+            page.locator(f'[data-sw-language="{other}"]').click()
+            assert urlsplit(page.url).path == f'/{other}/vrr.html'
+            assert urlsplit(page.url).query == 'from=vrr-check'
+            fragment = unquote(urlsplit(page.url).fragment)
+            assert page.locator(f'[id="{fragment}"]').count() == 1
+            close_mobile_menu(page)
+        page.set_viewport_size({'width': 1440, 'height': 1000})
+        page.goto(base + locale + '/usage.html')
+        page.locator('#main-content a[href="vrr.html"]').click()
+        assert urlsplit(page.url).path == f'/{locale}/vrr.html'
 
 
 def check_usage(page, locale, output):
@@ -962,6 +989,7 @@ def check(root, browser_path=None):
                 assert urlsplit(page.url).path == '/en/usage.html'
                 assert urlsplit(page.url).fragment == f'starwave.{name}'
                 assert page.locator(f'[id="starwave.{name}"]').count() == 1
+            check_vrr(page, base, output)
             check_heading_language_switches(page, base)
             check_reconstruction_language_switches(page, base)
             check_redirects(page, base)

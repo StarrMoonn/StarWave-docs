@@ -143,6 +143,7 @@ Scalar3D <examples/index>
 Usage <usage>
 PyTorch 后端 <pytorch-backend>
 GSLS Function <visco-gsls>
+VRR Function <vrr>
 ```
 
 ```{toctree}

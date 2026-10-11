@@ -1,6 +1,6 @@
 # Usage
 
-GSLS: [visco_gsls](visco-gsls.md).
+GSLS: [visco_gsls](visco-gsls.md). 独立源码扩展：[VRR Function](vrr.md)，不在 7.1.0 wheel 中。
 
 ```{container} sw-page-toc
 
@@ -17,7 +17,7 @@ GSLS: [visco_gsls](visco-gsls.md).
 - [其它导出名称与范围](#other-exports)
 ```
 
-本参考面向 V16 / `0.1.0.dev16` 的新增 [PyTorch 后端](pytorch-backend.md)；源码 Release 与目标 PyPI `7.1.0` wheel 的发布核验仍待完成。已发布 7.0.0 不含这些新选项或 GSLS。原有位置参数与原生默认行为保留，五个传播入口通过显式后端选择新增 full/checkpoint、eager/compile。下方逐项列出完整签名、参数、返回与限制。
+本参考面向 V16 / `0.1.0.dev16` 的新增 [PyTorch 后端](pytorch-backend.md)；已发布 PyPI `7.1.0` wheel，发布核验范围见[文档状态](status.md)。已发布 7.0.0 不含这些新选项或 GSLS。原有位置参数与原生默认行为保留，五个传播入口通过显式后端选择新增 full/checkpoint、eager/compile。下方逐项列出完整签名、参数、返回与限制。
 
 6.0.0 的内部存储和 PML 转置维护见[发布说明](release-notes.md)，二维存储变化见[scalar 说明](modeling/scalar.md)。它们不引入新的公共参数；源码升级需重新构建配套原生库。
 

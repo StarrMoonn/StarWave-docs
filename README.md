@@ -16,7 +16,7 @@ The independently downloaded public wheel matches the verified artifact SHA-256:
 
 Its receipt pins source-manifest SHA-256 `f682ff0a836c0c259cd03a2e760460d68426cc5688e4852f8c62a151804694dc`. The [publication workflow](https://github.com/StarrMoonn/StarWave/actions/runs/38108561775) passed artifact verification, Python 3.10/3.11/3.12 pre-publication host/CPU checks, publishing, and installation from public PyPI on all three Python versions. These checks do not establish new-binary GPU numerical, multi-GPU, long-FWI or performance acceptance.
 
-There is no macOS wheel. Mac MPS use requires authorized complete V16 source and remains limited to the Scalar2D configuration below. The later FreeSurface and VRR candidates are not included in V16 / PyPI 7.1.0.
+There is no macOS wheel. Mac MPS use requires authorized complete V16 source and remains limited to the Scalar2D configuration below. The later dev free-surface work and independently packaged [VRR source extension](docs/en/vrr.md) are not included in V16 / PyPI 7.1.0. The bilingual VRR guide documents reviewed dev runtime `904c9106bdb883325df8586b7c3412f7814a9737`, separate installation/build, the `starwave_vrr.vrr` public API and bounded validation scope; no private implementation or source archive is published.
 
 - scalar/VRZ/VTI/elastic add backend, execution, checkpoint_interval and compile_steps; GSLS adds execution/compile_steps and Torch checkpoint. Existing positional arguments, native defaults and scientific CUDA/C++ kernels are preserved.
 - Torch offers CPU/CUDA full/checkpoint and eager/compile. MPS is limited to Scalar2D accuracy=4 float32 with backend="torch", full/checkpoint and eager/compile; other MPS combinations are rejected. It has no boundary, AMP, elastic callbacks/offload or sampled material gradients. Final Mac hardware and 500-epoch FWI acceptance remain pending. See [Usage](docs/en/usage.md), [GSLS](docs/en/visco-gsls.md) and the backend page for complete parameters and limits.
@@ -44,6 +44,7 @@ python -m pip install -r docs/requirements.txt
 python tools/build_docs.py
 python tools/check_site.py _build/html
 python tools/check_api_docs.py
+python tools/check_vrr_docs.py
 python tools/check_tutorial_assets.py
 python -m http.server 8000 --directory _build/html --bind 127.0.0.1
 ```
@@ -60,6 +61,7 @@ Each page has an accessible language switch. Section and Python-object anchors s
 
 - `check_site.py`: local links, anchors, resources, complete locale coverage, independent search assets, English translation coverage, Python syntax and restricted-content guardrails.
 - `check_presentation_asset.py` (also run by `check_site.py`): the reviewed PDF's SHA-256, exactly 30 slides, an image hash for each reviewed watermark-bearing page, absence of active PDF actions or embedded files, and a strict publication allowlist. These checks preserve the independently reviewed pixels; they do not claim to recognize a watermark automatically.
+- `check_vrr_docs.py`: independent extension signature/defaults, parameter coverage, bilingual examples and source-only scope; optional `--source-root` compares the authorized local source through AST without importing it.
 - `check_api_docs.py`: typed function signatures, types/defaults/descriptions, scalar 20 / VRZ 22 / VTI 24 / elastic 66 parameter coverage, material conversions, native helpers, GSLS contracts, return contracts and Python snippets. The checked-in public contract snapshot prevents cross-language agreement from hiding interface drift.
 - `check_tutorial_assets.py`: clean notebook/script parity, numerical-source provenance, safe metadata, configuration and measured-result invariants.
 - Optional `--wheel PATH`: verifies the pinned 7.1.0 binary wheel SHA-256, package/platform metadata, native-library receipt hashes, and signatures through AST parsing, without importing or running StarWave. Wheels are never part of the source or published site.
@@ -86,7 +88,7 @@ The browser checks cover desktop/mobile layout, section and API switching, legac
 
 ## 内容边界 / Scope
 
-This repository contains documentation, original synthetic usage examples and build tooling. It contains no propagation implementation, binary libraries, private datasets or internal records. It neither imports StarWave through autodoc nor publishes source pages. Current API signatures follow the V16 / 7.1.0 contract, including additive Torch execution options and GSLS; historical release records retain their distinct evidence scope; the three original tutorials now include measured A30 / StarWave 0.1.0.dev9 results and clean notebook downloads. Those historical tutorials do not establish public-wheel GPU validation, full adjoint correctness or general performance and convergence. The new Scalar3D Example chapter separately reports bounded source-build numerical checks and measured four-GPU experiments, including incomplete surface-only recovery. See the manual’s documentation-status page.
+This repository contains documentation, original synthetic usage examples and build tooling. It contains no propagation implementation, binary libraries, private datasets or internal records. It neither imports StarWave through autodoc nor publishes source pages. Main-package API signatures follow the V16 / 7.1.0 contract, including additive Torch execution options and GSLS; historical release records retain their distinct evidence scope; the three original tutorials now include measured A30 / StarWave 0.1.0.dev9 results and clean notebook downloads. Those historical tutorials do not establish public-wheel GPU validation, full adjoint correctness or general performance and convergence. The new Scalar3D Example chapter separately reports bounded source-build numerical checks and measured four-GPU experiments, including incomplete surface-only recovery. See the manual’s documentation-status page.
 
 No new software or documentation license is declared on behalf of the owners.
 

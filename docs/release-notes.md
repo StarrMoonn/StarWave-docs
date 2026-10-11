@@ -12,7 +12,7 @@
 
 receipt 固定的源码清单 SHA-256 为 `f682ff0a836c0c259cd03a2e760460d68426cc5688e4852f8c62a151804694dc`。[发布工作流](https://github.com/StarrMoonn/StarWave/actions/runs/38108561775) 已通过发行文件核验、Python 3.10/3.11/3.12 发布前主机/CPU 检查、发布及三个 Python 版本的公开 PyPI 回装。这些检查不能证明新二进制的 GPU 数值、多卡、长程 FWI 或性能验收通过。
 
-本次没有 macOS wheel。Mac MPS 需使用已获授权的完整 V16 源码，且仅限下述 Scalar2D 配置。后续 FreeSurface 与 VRR 候选功能不在 V16 / PyPI 7.1.0 中。
+本次没有 macOS wheel。Mac MPS 需使用已获授权的完整 V16 源码，且仅限下述 Scalar2D 配置。后续 dev 自由表面工作和独立打包的 [VRR 扩展](vrr.md) 不在 V16 / PyPI 7.1.0 中。VRR 手册现覆盖 `904c9106bdb883325df8586b7c3412f7814a9737` 的经审阅源码整合；这是文档更新，不是新包发布。用户提供的设备报告与文档/CPU 检查、公开 wheel 验证分别记录。
 
 - scalar/VRZ/VTI/elastic 新增 backend、execution、checkpoint_interval、compile_steps；GSLS 新增 execution、compile_steps 并扩展 Torch checkpoint。旧位置参数、原生默认行为和科学 CUDA/C++ 核保留。
 - Torch 提供 CPU/CUDA full/checkpoint、eager/compile；没有 Torch boundary、AMP、elastic callbacks/offload 或抽样材料梯度。MPS 仅支持 Scalar2D accuracy=4 float32，使用 backend="torch"、full/checkpoint 与 eager/compile；Scalar3D、VRZ、VTI、elastic、GSLS 和其他 MPS 组合明确拒绝。本次不宣称最终 Mac 实机、500 轮 FWI 或性能验收通过。完整参数和限制见 [Usage](usage.md)、[GSLS](visco-gsls.md) 和后端页。
