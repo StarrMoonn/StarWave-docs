@@ -1,7 +1,7 @@
 (visco-gsls)=
 # GSLS viscoacoustic API (V16)
 
-This page describes V16 source `0.1.0.dev16`. The two-dimensional `starwave.visco_gsls` is the current viscoacoustic entry point; a single mechanism uses explicit `mode="sls_compat", n_mechanisms=1`. The standalone `visco_sls`, `prepare_visco_sls` and `visco_sls_native_status` APIs are removed. Existing public PyPI `7.0.0` does not include GSLS; this manual update does not announce a new wheel. See [documentation status](status.md) and [installation](installation.md).
+This page describes V16 source `0.1.0.dev16`. The two-dimensional `starwave.visco_gsls` is the current viscoacoustic entry point; a single mechanism uses explicit `mode="sls_compat", n_mechanisms=1`. The standalone `visco_sls`, `prepare_visco_sls` and `visco_sls_native_status` APIs are removed. Published [PyPI 7.1.0](https://pypi.org/project/starwave/7.1.0/) includes this GSLS API; historical `7.0.0` does not. See [documentation status](status.md) and [installation](installation.md).
 
 Supported: fixed spatially varying density, float32/float64, and first-order Vp/Q/source/provider-parameter gradients. Native CPU/CUDA support full/checkpoint; explicit Torch supports full/checkpoint and eager/compile. All main propagators gain execution options while native defaults remain unchanged; see the [PyTorch backend](pytorch-backend.md).
 

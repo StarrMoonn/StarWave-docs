@@ -368,7 +368,7 @@
         "float64"
       ],
       "reviewed_source_version": "0.1.0.dev16",
-      "public_wheel_contains_api": false,
+      "public_wheel_contains_api": true,
       "memory_by_backend": {
         "cuda": [
           "full",
@@ -393,7 +393,8 @@
       "hao1_band": "explicit (scale, 200 * scale) design band",
       "checkpoint_interval": "None or positive integer, allowed only with checkpoint; Torch None = 32 internal steps; native None uses shape/history estimate",
       "material_model": "once per call on padded vp/q; returns c_rel2,strength,A,B; builtin mode/fit settings bypassed",
-      "publication_status": "pending"
+      "publication_status": "published",
+      "reviewed_public_version": "7.1.0"
     },
     "torch_backend": {
       "devices": [

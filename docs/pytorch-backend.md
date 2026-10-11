@@ -1,7 +1,7 @@
 (pytorch-backend)=
 # PyTorch 后端
 
-V16 的统一新增后端通过原有 `starwave.scalar / vrz / vti / elastic / visco_gsls` 入口选择。使用 `backend="torch"`，正演由 PyTorch 张量运算执行，反传由 autograd 生成；`execution="compile"` 编译同一张量计算。旧 CUDA/C++ 科学核和省略新参数时的原生行为保留。源码 Release 与目标 PyPI `7.1.0` wheel 的发布核验仍待完成；历史 7.0.0 不含此功能，见[安装](installation.md)和[发行状态](status.md)。
+V16 的统一新增后端通过原有 `starwave.scalar / vrz / vti / elastic / visco_gsls` 入口选择。使用 `backend="torch"`，正演由 PyTorch 张量运算执行，反传由 autograd 生成；`execution="compile"` 编译同一张量计算。旧 CUDA/C++ 科学核和省略新参数时的原生行为保留。已发布的 [7.1.0 Linux wheel](https://pypi.org/project/starwave/7.1.0/) 包含此后端；历史 7.0.0 不含此功能。本次没有 macOS wheel，Mac MPS 需使用已获授权的完整 V16 源码，见[安装](installation.md)和[发行状态](status.md)。
 
 (torch-selection)=
 ## 显式选择后端与设备
@@ -244,4 +244,4 @@ outputs = starwave.elastic(lamb, mu, buoyancy, grid_spacing, dt,
 
 ## Scalar2D MPS Notebook
 
-源码中的 L2_True_StarWave_Acoustic_MPS.ipynb 和同步 .py 直接 import starwave，仅用 PROJECT_ROOT 显式读取资源，不隐式安装或构建。保留 dt=0.003、nt=2000、30 炮/5 批、500 epochs、Adam lr=10、checkpoint_interval=32 与 compile_steps=4；空间阶数与编译块长度独立。安装本次审阅源码后重启 Python，禁用 PYTORCH_ENABLE_MPS_FALLBACK；不支持的算子或编译失败直接报错，不回退 CPU/eager。既有 7.0.0 二进制不含本更新，发布核验仍待完成。
+源码中的 L2_True_StarWave_Acoustic_MPS.ipynb 和同步 .py 直接 import starwave，仅用 PROJECT_ROOT 显式读取资源，不隐式安装或构建。保留 dt=0.003、nt=2000、30 炮/5 批、500 epochs、Adam lr=10、checkpoint_interval=32 与 compile_steps=4；空间阶数与编译块长度独立。安装本次审阅源码后重启 Python，禁用 PYTORCH_ENABLE_MPS_FALLBACK；不支持的算子或编译失败直接报错，不回退 CPU/eager。已发布的 7.1.0 wheel 仅适用于 Linux，不能用于 Mac MPS 安装；Mac 使用已审完整 V16 源码。历史 7.0.0 二进制不含本更新。

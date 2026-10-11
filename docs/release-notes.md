@@ -1,8 +1,18 @@
 # 发布说明
 
-## V16 / PyTorch 后端 · 发布核验待完成
+## V16 / 7.1.0 · 2026-10-11
 
-当前手册同步 V16 / `0.1.0.dev16` 的新增 [PyTorch 后端](pytorch-backend.md)。V16 源码 Release、开发分支提交和目标 PyPI `7.1.0` wheel 的远端身份尚待最终核验；本页不把计划描述为已发布。已有 [7.0.0](https://pypi.org/project/starwave/7.0.0/) 为历史 V14 二进制，不含 GSLS 或新增统一 Torch 后端。
+[StarWave 7.1.0](https://pypi.org/project/starwave/7.1.0/) 已于 2026-10-11 发布，来自冻结的 V16 源码 `0.1.0.dev16`，提交 `5a224dbb1e86154ff034bbedaf67c0e4cf7a1b6a`，包含 GSLS 和新增 [PyTorch 后端](pytorch-backend.md)。唯一发行文件为 `starwave-7.1.0-py3-none-manylinux_2_35_x86_64.whl`（17,628,561 字节），无 sdist。运行平台为 Linux x86_64 / glibc ≥ 2.35，要求 Python ≥ 3.10 且 < 3.13、PyTorch ≥ 2.5 且 < 2.6。历史 [7.0.0](https://pypi.org/project/starwave/7.0.0/) 仍为不含 GSLS 或统一 Torch 后端的 V14 二进制。
+
+独立下载的公开 wheel 与已核验发行文件的 SHA-256 一致：
+
+```text
+36a0be76af997e2d31de8313cab00ff59d79f7537055c829df2bfdee0ff61e88
+```
+
+receipt 固定的源码清单 SHA-256 为 `f682ff0a836c0c259cd03a2e760460d68426cc5688e4852f8c62a151804694dc`。[发布工作流](https://github.com/StarrMoonn/StarWave/actions/runs/38108561775) 已通过发行文件核验、Python 3.10/3.11/3.12 发布前主机/CPU 检查、发布及三个 Python 版本的公开 PyPI 回装。这些检查不能证明新二进制的 GPU 数值、多卡、长程 FWI 或性能验收通过。
+
+本次没有 macOS wheel。Mac MPS 需使用已获授权的完整 V16 源码，且仅限下述 Scalar2D 配置。后续 FreeSurface 与 VRR 候选功能不在 V16 / PyPI 7.1.0 中。
 
 - scalar/VRZ/VTI/elastic 新增 backend、execution、checkpoint_interval、compile_steps；GSLS 新增 execution、compile_steps 并扩展 Torch checkpoint。旧位置参数、原生默认行为和科学 CUDA/C++ 核保留。
 - Torch 提供 CPU/CUDA full/checkpoint、eager/compile；没有 Torch boundary、AMP、elastic callbacks/offload 或抽样材料梯度。MPS 仅支持 Scalar2D accuracy=4 float32，使用 backend="torch"、full/checkpoint 与 eager/compile；Scalar3D、VRZ、VTI、elastic、GSLS 和其他 MPS 组合明确拒绝。本次不宣称最终 Mac 实机、500 轮 FWI 或性能验收通过。完整参数和限制见 [Usage](usage.md)、[GSLS](visco-gsls.md) 和后端页。

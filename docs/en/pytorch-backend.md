@@ -1,7 +1,7 @@
 (pytorch-backend)=
 # PyTorch backend
 
-The additive V16 backend is selected through the existing `starwave.scalar / vrz / vti / elastic / visco_gsls` entry points. With `backend="torch"`, PyTorch tensor operations perform the forward and autograd generates its derivatives; `execution="compile"` compiles the same tensor computation. Existing CUDA/C++ scientific kernels and omitted-option native behavior are preserved. Source Release and target PyPI `7.1.0` wheel publication verification are pending; historical 7.0.0 does not contain this feature. See [installation](installation.md) and [release status](status.md).
+The additive V16 backend is selected through the existing `starwave.scalar / vrz / vti / elastic / visco_gsls` entry points. With `backend="torch"`, PyTorch tensor operations perform the forward and autograd generates its derivatives; `execution="compile"` compiles the same tensor computation. Existing CUDA/C++ scientific kernels and omitted-option native behavior are preserved. The [7.1.0 Linux wheel](https://pypi.org/project/starwave/7.1.0/) includes this backend; historical 7.0.0 does not. There is no macOS wheel: Mac MPS requires authorized complete V16 source. See [installation](installation.md) and [release status](status.md).
 
 (torch-selection)=
 ## Explicit backend and device selection
@@ -244,4 +244,4 @@ If the same environment also uses native elastic/GSLS, changed Python entries ch
 
 ## Scalar2D MPS notebook
 
-The source notebook L2_True_StarWave_Acoustic_MPS.ipynb and matching .py use plain import starwave, explicit PROJECT_ROOT resource loading, and no implicit installation/build. They preserve dt=0.003, nt=2000, 30 shots / 5 batches, 500 epochs, Adam lr=10, checkpoint_interval=32 and compile_steps=4. Spatial accuracy and compile block length are independent. Install the reviewed current source and restart Python; disable PYTORCH_ENABLE_MPS_FALLBACK. Unsupported operators or compilation fail explicitly without CPU/eager fallback. Existing 7.0.0 binaries do not provide this update; publication verification remains pending.
+The source notebook L2_True_StarWave_Acoustic_MPS.ipynb and matching .py use plain import starwave, explicit PROJECT_ROOT resource loading, and no implicit installation/build. They preserve dt=0.003, nt=2000, 30 shots / 5 batches, 500 epochs, Adam lr=10, checkpoint_interval=32 and compile_steps=4. Spatial accuracy and compile block length are independent. Install the reviewed current source and restart Python; disable PYTORCH_ENABLE_MPS_FALLBACK. Unsupported operators or compilation fail explicitly without CPU/eager fallback. The published 7.1.0 wheel is Linux-only. It cannot be installed for Mac MPS; use the reviewed complete V16 source. Historical 7.0.0 binaries do not provide this update.

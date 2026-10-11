@@ -1,7 +1,7 @@
 (visco-gsls)=
 # GSLS 黏声学 API（V16）
 
-本页对应 V16 源码 `0.1.0.dev16`。二维 `starwave.visco_gsls` 是当前唯一黏声入口；单机制 SLS 通过显式 `mode="sls_compat", n_mechanisms=1` 使用。独立 `visco_sls`、`prepare_visco_sls` 和 `visco_sls_native_status` 已移除。既有公开 PyPI `7.0.0` 不包含 GSLS；更新此手册不表示发布了新 wheel。详见[文档状态](status.md)及[安装](installation.md)。
+本页对应 V16 源码 `0.1.0.dev16`。二维 `starwave.visco_gsls` 是当前唯一黏声入口；单机制 SLS 通过显式 `mode="sls_compat", n_mechanisms=1` 使用。独立 `visco_sls`、`prepare_visco_sls` 和 `visco_sls_native_status` 已移除。已发布的 [PyPI 7.1.0](https://pypi.org/project/starwave/7.1.0/) 包含此 GSLS API；历史 `7.0.0` 不包含。详见[文档状态](status.md)及[安装](installation.md)。
 
 支持固定空间变密度、float32/float64、Vp/Q/source/provider 参数一阶梯度。原生 CPU/CUDA 支持 full/checkpoint；显式 Torch 支持 full/checkpoint 与 eager/compile。所有主传播入口均新增执行选项，原生默认行为保持；详见 [PyTorch 后端](pytorch-backend.md)。
 

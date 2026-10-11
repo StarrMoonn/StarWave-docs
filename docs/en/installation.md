@@ -1,12 +1,12 @@
 # Installation
 
-The current API targets the additive [PyTorch backend](pytorch-backend.md) in V16 / `0.1.0.dev16`; source Release and target PyPI `7.1.0` wheel publication verification are pending. Historical PyPI **7.0.0** is a V14 binary without GSLS or the unified Torch backend and cannot run the new examples.
+The current API is available in [StarWave 7.1.0](https://pypi.org/project/starwave/7.1.0/), published from V16 / `0.1.0.dev16`, including GSLS and the additive [PyTorch backend](pytorch-backend.md). Historical PyPI **7.0.0** is a V14 binary without these features. See [Status](status.md) for the exact public artifact and verification scope.
 
-The source repository is private; use complete authorized V16 source. No unverified new-version pip command is advertised before publication verification. Historical 7.0.0 requirements and commands remain below as a clearly separate legacy channel.
+Use the prebuilt 7.1.0 wheel on supported Linux x86_64 hosts. The source repository is private; source users need complete authorized V16 source. There is no macOS wheel or PyPI sdist: Mac MPS requires the source installation below and only the documented Scalar2D configuration is eligible.
 
 ## V16 pure Torch installation and execution
 
-Run directly from the complete V16 source root, or optionally register it:
+Linux wheel users can select the Torch backend directly after installing 7.1.0 below. For source use, including Mac MPS, run from the complete V16 source root, or optionally register it:
 
 ```bash
 python -m pip install --no-deps --no-build-isolation -e .
@@ -16,7 +16,7 @@ Explicit `backend="torch"` supports CPU/CUDA full/checkpoint without propagation
 
 ## V16 native build
 
-Native paths require matching complete source/library builds. The new Python entries change elastic/GSLS source-closure identity even though scientific CUDA/C++ kernels are unchanged. Rebuild and restart; do not edit an old build manifest. Only pure Torch calls can omit the native build below.
+Source users of native paths require matching complete source/library builds; the Linux wheel already includes its matching libraries. The new Python entries change elastic/GSLS source-closure identity even though scientific CUDA/C++ kernels are unchanged. Rebuild and restart; do not edit an old build manifest. Source-only Torch use can omit the native build below; wheel users do not need these build commands.
 
 
 Use an installed CUDA Toolkit/C++ toolchain matching PyTorch. From the complete source root:
@@ -42,25 +42,27 @@ A complete source checkout runs without pip registration. Optional registration 
 python -m pip install --no-deps -e .
 ```
 
-The following wheel requirements and commands describe only the historical 7.0.0 channel.
+The following requirements and commands install the verified public 7.1.0 wheel.
 
+(historical-7-0-0-wheel-requirements)=
 (runtime-requirements)=
-## Historical 7.0.0 wheel requirements
+## 7.1.0 wheel requirements
 
-| Component | StarWave 7.0.0 wheel requirement |
+| Component | StarWave 7.1.0 wheel requirement |
 |---|---|
 | Operating system | Linux x86_64, glibc ≥ 2.35 |
 | C++ runtime | libstdc++ providing GLIBCXX_3.4.30 / CXXABI_1.3.13 symbols or newer |
-| Python | 3.10–3.12 |
-| PyTorch / NumPy | PyTorch 2.5.x; NumPy ≥ 1.23 |
-| GPU | NVIDIA CUDA for scalar 2D/3D, VRZ/VTI, and elastic boundary; elastic full and SLS native_cpu support CPU; SLS torch is an explicit reference backend |
+| Python | ≥ 3.10 and < 3.13 (3.10–3.12) |
+| PyTorch / NumPy | PyTorch ≥ 2.5 and < 2.6; NumPy ≥ 1.23 |
+| Backend / device | Native scalar 2D/3D, VRZ/VTI and elastic boundary require NVIDIA CUDA; elastic full and GSLS native_cpu support CPU. Explicit Torch full/checkpoint supports CPU/CUDA across all five propagators |
 | Compilation targets | SASS 70/75/80/86/89/90 and compute80 PTX |
 
-Installing the prebuilt wheel does not require nvcc or a local CUDA Toolkit. A conservative target for the Linux driver is 520.61.05 or newer, and the driver must also support the actual GPU. WSL uses the Windows host driver; see the [WSL guidance](wsl.md). The A30 and RTX 4060 Laptop are covered by the compilation targets; device-level numerical and performance tests of the public 7.0.0 wheel are still pending. A separate development-version A30 run is documented below.
+Installing the prebuilt wheel does not require nvcc or a local CUDA Toolkit. A conservative target for the Linux driver is 520.61.05 or newer, and the driver must also support the actual GPU. WSL uses the Windows host driver; see the [WSL guidance](wsl.md). The A30 and RTX 4060 Laptop are covered by the compilation targets; device-level numerical and performance tests of the public 7.1.0 wheel are still pending. A separate development-version A30 run is documented below.
 
-The version information above comes from the [PyPI 7.0.0 release description](https://pypi.org/project/starwave/7.0.0/); see [Documentation Status](status.md) for artifact identity and verification scope. The public release contains only a Linux wheel, with no sdist. This wheel cannot be used directly on native Windows, macOS, or ARM hosts.
+The version information above comes from the [PyPI 7.1.0 release description](https://pypi.org/project/starwave/7.1.0/); see [Documentation Status](status.md) for artifact identity and verification scope. The public release contains only a Linux wheel, with no sdist. This wheel cannot be used directly on native Windows, macOS, or ARM hosts.
 
-## Install the historical 7.0.0 wheel
+(install-the-historical-7-0-0-wheel)=
+## Install the public 7.1.0 wheel
 
 Run the following commands in a Linux or WSL 2 Linux terminal that meets the requirements. Choose Python 3.10–3.12; this example uses 3.12.
 
@@ -69,15 +71,16 @@ python3.12 -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
 python -m pip install torch==2.5.1 --index-url https://download.pytorch.org/whl/cu118
-python -m pip install --only-binary=starwave starwave==7.0.0
+python -m pip install --only-binary=starwave starwave==7.1.0
 python -m pip check
 ```
 
 The PyTorch installation command follows the [PyTorch previous-versions page](https://pytorch.org/get-started/previous-versions/). `cu118` is the starting configuration for validating this version; it does not mean that other PyTorch versions have been validated. Restart Python or the notebook kernel after upgrading StarWave.
 
-## Upgrade to V16 source
+(upgrade-to-v16-source)=
+## Upgrade to V16 / 7.1.0
 
-V16 has one viscoacoustic entry point, `starwave.visco_gsls`; independent `visco_sls` and its preparation/status helpers are removed. Single-mechanism calculations explicitly use `mode="sls_compat", n_mechanisms=1`; changing only the function name would select default Hao1 instead. Source version `0.1.0.dev16` and public wheel `7.0.0` identify different distributions.
+V16 has one viscoacoustic entry point, `starwave.visco_gsls`; independent `visco_sls` and its preparation/status helpers are removed. Single-mechanism calculations explicitly use `mode="sls_compat", n_mechanisms=1`; changing only the function name would select default Hao1 instead. Source version `0.1.0.dev16` identifies the frozen source underlying the public `7.1.0` wheel; the distribution version numbers differ.
 
 Source users must pair this version's Python package with rebuilt native libraries, following the instructions supplied with the source. When upgrading from a version earlier than 6.0.0, Scalar2D PML, boundary, and full-history layouts have changed; matching core ABI layouts do not make old libraries reusable, and compatibility guards must not be bypassed. The public wheel needs no local compilation. After upgrading or replacing loaded libraries, restart Python / the notebook kernel, then repeat native preparation and small forward/gradient checks.
 
@@ -104,7 +107,7 @@ In a fresh Python process, before the first native preparation, the wheel should
 The documentation site's build environment is separate from the computational runtime environment. Reading or building the documentation does not require a GPU.
 
 
-Elastic uses a separate preparation entry point: call `starwave.prepare_elastic([0])` on the GPU main thread, or `starwave.prepare_elastic()` with `memory="full"` for CPU. See {ref}`Elastic Function <elastic>` for parameters and vp/vs/rho conversion. Scalar3D has no CPU propagation path. GPU, DataParallel and long-FWI acceptance scopes are listed in [Status](status.md).
+Elastic uses a separate preparation entry point: call `starwave.prepare_elastic([0])` on the GPU main thread, or `starwave.prepare_elastic()` with `memory="full"` for CPU. See {ref}`Elastic Function <elastic>` for parameters and vp/vs/rho conversion. Native Scalar3D has no CPU propagation path; V16 Torch Scalar3D supports CPU/CUDA. GPU, DataParallel and long-FWI acceptance scopes are listed in [Status](status.md).
 
 ## V16 GSLS preparation and backend selection
 
@@ -124,7 +127,7 @@ Select the corresponding CUDA kernel and run every cell from the beginning. Each
 
 ```{admonition} Measured environment · 2026-10-05
 :class: sw-run-note
-NVIDIA A30 · Python 3.10.18 · PyTorch 2.5.1 / CUDA 11.8 · installed StarWave **0.1.0.dev9**. The server results below check a small workflow in this development-version environment. They do not establish device validation of the public **2.0.0, 4.0.0, 5.0.0, 6.0.0, or 7.0.0 wheel**.
+NVIDIA A30 · Python 3.10.18 · PyTorch 2.5.1 / CUDA 11.8 · installed StarWave **0.1.0.dev9**. The server results below check a small workflow in this development-version environment. They do not establish device validation of the public **2.0.0, 4.0.0, 5.0.0, 6.0.0, 7.0.0, or 7.1.0 wheel**.
 ```
 
 ## Small experiment design

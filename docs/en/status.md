@@ -1,8 +1,20 @@
 # Documentation Status and References
 
-## V16 / PyTorch backend · publication verification pending
+## V16 / 7.1.0 · 2026-10-11
 
-The current manual documents the additive [PyTorch backend](pytorch-backend.md) for V16 / `0.1.0.dev16`. Final remote identity verification of the V16 source Release, development commit and target PyPI `7.1.0` wheel is pending; planned publication is not reported as completed. Existing [7.0.0](https://pypi.org/project/starwave/7.0.0/) is a historical V14 binary without GSLS or the unified Torch backend.
+<span id="v16-pytorch-backend-publication-verification-pending"></span>
+
+[StarWave 7.1.0](https://pypi.org/project/starwave/7.1.0/) was published on 2026-10-11 from frozen V16 source `0.1.0.dev16`, commit `5a224dbb1e86154ff034bbedaf67c0e4cf7a1b6a`. It includes GSLS and the additive [PyTorch backend](pytorch-backend.md). The sole distribution is `starwave-7.1.0-py3-none-manylinux_2_35_x86_64.whl` (17,628,561 bytes), with no sdist. It targets Linux x86_64 / glibc ≥ 2.35, Python ≥ 3.10 and < 3.13, and PyTorch ≥ 2.5 and < 2.6. Historical [7.0.0](https://pypi.org/project/starwave/7.0.0/) remains the V14 binary without GSLS or the unified Torch backend.
+
+The independently downloaded public wheel matches the verified artifact SHA-256:
+
+```text
+36a0be76af997e2d31de8313cab00ff59d79f7537055c829df2bfdee0ff61e88
+```
+
+Its receipt pins source-manifest SHA-256 `f682ff0a836c0c259cd03a2e760460d68426cc5688e4852f8c62a151804694dc`. The [publication workflow](https://github.com/StarrMoonn/StarWave/actions/runs/38108561775) passed artifact verification, Python 3.10/3.11/3.12 pre-publication host/CPU checks, publishing, and installation from public PyPI on all three Python versions. These checks do not establish new-binary GPU numerical, multi-GPU, long-FWI or performance acceptance.
+
+There is no macOS wheel. Mac MPS use requires authorized complete V16 source and remains limited to the Scalar2D configuration below. The later FreeSurface and VRR candidates are not included in V16 / PyPI 7.1.0.
 
 - scalar/VRZ/VTI/elastic add backend, execution, checkpoint_interval and compile_steps; GSLS adds execution/compile_steps and Torch checkpoint. Existing positional arguments, native defaults and scientific CUDA/C++ kernels are preserved.
 - Torch offers CPU/CUDA full/checkpoint and eager/compile. It has no boundary, AMP, elastic callbacks/offload or sampled material gradients. MPS is supported only for Scalar2D accuracy=4 float32 with backend="torch", full/checkpoint and eager/compile. Other MPS combinations, including Scalar3D, VRZ, VTI, elastic and GSLS, are rejected. No final Mac hardware, 500-epoch FWI or performance acceptance is claimed. See [Usage](usage.md), [GSLS](visco-gsls.md) and the backend page for complete parameters and limits.

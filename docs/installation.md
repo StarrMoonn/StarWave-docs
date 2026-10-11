@@ -1,12 +1,12 @@
 # 安装
 
-当前 API 面向 V16 / `0.1.0.dev16` 的新增 [PyTorch 后端](pytorch-backend.md)；源码 Release 与目标 PyPI `7.1.0` wheel 的发布核验待完成。历史 PyPI **7.0.0** 是 V14 二进制，不含 GSLS 或统一 Torch 后端，不适用于新增示例。
+当前 API 已由 [StarWave 7.1.0](https://pypi.org/project/starwave/7.1.0/) 提供，来自 V16 / `0.1.0.dev16`，包含 GSLS 和新增 [PyTorch 后端](pytorch-backend.md)。历史 PyPI **7.0.0** 是不含这些功能的 V14 二进制。公开文件身份及核验范围见[文档状态](status.md)。
 
-源码仓库为私有仓库；使用已获授权的完整 V16 源码。未完成发布核验前，不提供未经确认的新版本 pip 命令。下文保留历史 7.0.0 安装条件与命令，明确作为旧渠道。
+受支持的 Linux x86_64 主机可安装预编译 7.1.0 wheel。源码仓库为私有仓库；源码用户需使用已获授权的完整 V16 源码。本次没有 macOS wheel 或 PyPI sdist；Mac MPS 必须按下文从源码安装，且仅支持文档限定的 Scalar2D 配置。
 
 ## V16 纯 Torch 安装与运行
 
-在完整 V16 源码根目录中，可直接运行，或选择可选注册：
+Linux wheel 用户完成下文 7.1.0 安装后，可直接选择 Torch 后端。源码使用（包括 Mac MPS）可从完整 V16 源码根目录直接运行，或选择可选注册：
 
 ```bash
 python -m pip install --no-deps --no-build-isolation -e .
@@ -16,7 +16,7 @@ python -m pip install --no-deps --no-build-isolation -e .
 
 ## V16 原生构建
 
-如果仍使用原生路径，必须从完整匹配源码构建。新增 Python 入口改变 elastic/GSLS 源闭包身份；即使 CUDA/C++ 数值核没有变化，也应重建并重启，不能手改旧构建 manifest。只有纯 Torch 调用才可省略下面的原生构建。
+源码用户使用原生路径时，必须从完整匹配源码构建；Linux wheel 已包含配套原生库。新增 Python 入口改变 elastic/GSLS 源闭包身份；即使 CUDA/C++ 数值核没有变化，也应重建并重启，不能手改旧构建 manifest。源码的纯 Torch 调用可省略下面的原生构建；wheel 用户无需执行这些构建命令。
 
 
 使用已安装且与 PyTorch 匹配的 CUDA Toolkit/C++ 工具链。在完整源码根目录执行：
@@ -42,25 +42,25 @@ GSLS 源码构建输出为 `native/build/gsls/`；通用 `STARWAVE_BUILD_DIR` �
 python -m pip install --no-deps -e .
 ```
 
-以下 wheel 条件与命令仅描述历史 7.0.0 渠道。
+以下条件与命令用于安装已核验的公开 7.1.0 wheel。
 
 (runtime-requirements)=
-## 历史 7.0.0 wheel 运行条件
+## 7.1.0 wheel 运行条件
 
-| 项目 | StarWave 7.0.0 wheel 要求 |
+| 项目 | StarWave 7.1.0 wheel 要求 |
 |---|---|
 | 系统 | Linux x86_64，glibc ≥ 2.35 |
 | C++ 运行库 | libstdc++ 提供 GLIBCXX_3.4.30 / CXXABI_1.3.13 或更新符号 |
-| Python | 3.10–3.12 |
-| PyTorch / NumPy | PyTorch 2.5.x；NumPy ≥ 1.23 |
-| GPU | scalar 2D/3D、VRZ/VTI 与 elastic boundary 需要 NVIDIA CUDA；elastic full 与 SLS native_cpu 支持 CPU；SLS torch 为显式参考后端 |
+| Python | ≥ 3.10 且 < 3.13（3.10–3.12） |
+| PyTorch / NumPy | PyTorch ≥ 2.5 且 < 2.6；NumPy ≥ 1.23 |
+| 后端 / 设备 | 原生 scalar 2D/3D、VRZ/VTI 与 elastic boundary 需要 NVIDIA CUDA；elastic full 与 GSLS native_cpu 支持 CPU。五种传播入口的显式 Torch full/checkpoint 均支持 CPU/CUDA |
 | 编译目标 | SASS 70/75/80/86/89/90 与 compute80 PTX |
 
-安装预编译 wheel 不需要 nvcc 或本地 CUDA Toolkit。Linux 驱动保守目标为 520.61.05 或更新，同时必须支持实际 GPU；WSL 使用 Windows 主机驱动，见 [WSL 说明](wsl.md)。A30 与 RTX 4060 Laptop 属于编译目标覆盖范围；公开 7.0.0 wheel 的实机数值与性能测试仍待完成。下文另列开发版 A30 实测记录。
+安装预编译 wheel 不需要 nvcc 或本地 CUDA Toolkit。Linux 驱动保守目标为 520.61.05 或更新，同时必须支持实际 GPU；WSL 使用 Windows 主机驱动，见 [WSL 说明](wsl.md)。A30 与 RTX 4060 Laptop 属于编译目标覆盖范围；公开 7.1.0 wheel 的实机数值与性能测试仍待完成。下文另列开发版 A30 实测记录。
 
-以上版本信息来自 [PyPI 7.0.0 发布说明](https://pypi.org/project/starwave/7.0.0/)，发行文件身份及核验范围见[文档状态](status.md)。公开发行仅有 Linux wheel，没有 sdist；原生 Windows、macOS、ARM 主机不能直接使用这一 wheel。
+以上版本信息来自 [PyPI 7.1.0 发布说明](https://pypi.org/project/starwave/7.1.0/)，发行文件身份及核验范围见[文档状态](status.md)。公开发行仅有 Linux wheel，没有 sdist；原生 Windows、macOS、ARM 主机不能直接使用这一 wheel。
 
-## 安装历史 7.0.0 wheel
+## 安装公开 7.1.0 wheel
 
 以下命令在符合条件的 Linux 或 WSL 2 Linux 终端中执行。选择 Python 3.10–3.12；示例使用 3.12。
 
@@ -69,15 +69,15 @@ python3.12 -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
 python -m pip install torch==2.5.1 --index-url https://download.pytorch.org/whl/cu118
-python -m pip install --only-binary=starwave starwave==7.0.0
+python -m pip install --only-binary=starwave starwave==7.1.0
 python -m pip check
 ```
 
 PyTorch 安装命令依据 [PyTorch 历史版本页面](https://pytorch.org/get-started/previous-versions/)。`cu118` 是此版本的起始验证配置，不代表其它 PyTorch 版本已被验证。升级 StarWave 后重启 Python 或 Notebook kernel。
 
-## 升级到 V16 源码
+## 升级到 V16 / 7.1.0
 
-V16 的唯一黏声入口为 `starwave.visco_gsls`；独立 `visco_sls` 及其准备/状态入口已移除。单机制计算须显式使用 `mode="sls_compat", n_mechanisms=1`，不能只更换函数名而沿用默认 Hao1。源码编号 `0.1.0.dev16` 与公开 wheel `7.0.0` 是不同发行身份。
+V16 的唯一黏声入口为 `starwave.visco_gsls`；独立 `visco_sls` 及其准备/状态入口已移除。单机制计算须显式使用 `mode="sls_compat", n_mechanisms=1`，不能只更换函数名而沿用默认 Hao1。源码编号 `0.1.0.dev16` 是公开 `7.1.0` wheel 所依据的冻结源码版本；二者采用不同发行版本号。
 
 源码用户必须使用这一版本配套的 Python 包与重新构建的原生库，按随源码提供的构建说明操作。从早于 6.0.0 的版本升级时，Scalar2D 的 PML、边界与 full 历史布局已改变；即使核心 ABI 布局相同，旧库也不能复用或通过绕过兼容检查加载。安装公开 wheel 不需要自行编译。升级或替换已加载的库后，重启 Python / Notebook kernel，再执行原生准备与小规模正演/梯度检查。
 
@@ -124,7 +124,7 @@ python -m jupyter lab
 
 ```{admonition} 实测环境 · 2026-10-05
 :class: sw-run-note
-NVIDIA A30 · Python 3.10.18 · PyTorch 2.5.1 / CUDA 11.8 · 安装的 StarWave 版本 **0.1.0.dev9**。以下服务器结果验证的是这个开发版环境的小规模流程，不能据此宣称公开 **2.0.0、4.0.0、5.0.0、6.0.0 或 7.0.0 wheel** 已通过实机验收。
+NVIDIA A30 · Python 3.10.18 · PyTorch 2.5.1 / CUDA 11.8 · 安装的 StarWave 版本 **0.1.0.dev9**。以下服务器结果验证的是这个开发版环境的小规模流程，不能据此宣称公开 **2.0.0、4.0.0、5.0.0、6.0.0、7.0.0 或 7.1.0 wheel** 已通过实机验收。
 ```
 
 ## 小规模实验设计

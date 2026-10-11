@@ -1,6 +1,6 @@
 # Frequently Asked Questions
 
-V16 adds the [PyTorch backend](pytorch-backend.md): explicit CPU/CUDA full/checkpoint without propagation native libraries; MPS is supported only for Scalar2D accuracy=4 float32 with backend="torch", full/checkpoint and eager/compile. Other MPS combinations, including Scalar3D, VRZ, VTI, elastic and GSLS, are rejected. No final Mac hardware, 500-epoch FWI or performance acceptance is claimed. AMP remains unsupported. Source Release and PyPI `7.1.0` wheel publication verification are pending. Wheel-platform and CUDA-loading answers below describe historical 7.0.0 / native paths. For Torch memory pressure, evaluate checkpoint intervals; larger intervals do not guarantee lower peaks.
+V16 adds the [PyTorch backend](pytorch-backend.md): explicit CPU/CUDA full/checkpoint without propagation native libraries; MPS is supported only for Scalar2D accuracy=4 float32 with backend="torch", full/checkpoint and eager/compile. Other MPS combinations, including Scalar3D, VRZ, VTI, elastic and GSLS, are rejected. No final Mac hardware, 500-epoch FWI or performance acceptance is claimed. AMP remains unsupported. [PyPI 7.1.0](https://pypi.org/project/starwave/7.1.0/) is published for Linux x86_64 only. Mac MPS requires authorized complete V16 source. Wheel-platform and CUDA-loading answers below describe the current Linux wheel and native paths. For Torch memory pressure, evaluate checkpoint intervals; larger intervals do not guarantee lower peaks.
 
 ## Why can't pip find a compatible StarWave version?
 
@@ -8,7 +8,7 @@ Check that you are using Linux x86_64, Python 3.10–3.12, and glibc ≥2.35, an
 
 ## Do I need to compile CUDA code?
 
-The historical public 7.0.0 wheel does not require compilation or an nvcc installation. Scalar/VRZ/VTI and elastic boundary require a compatible GPU and driver; elastic full also runs on CPU. If integrity or compatibility checks fail, reinstall the corresponding wheel in the same environment and restart Python. Do not expect the documentation project to contain private build tools.
+The public 7.1.0 wheel does not require compilation or an nvcc installation. Native scalar/VRZ/VTI and elastic boundary require a compatible GPU and driver; elastic full and GSLS native_cpu also run on CPU. Explicit Torch full/checkpoint paths need no propagation native libraries. If integrity or compatibility checks fail, reinstall the corresponding wheel in the same environment and restart Python. Do not expect the documentation project to contain private build tools.
 
 ## Why does prepare_native fail even though import succeeds?
 
