@@ -14,10 +14,15 @@ from playwright.sync_api import sync_playwright
 PROJECT = Path(__file__).resolve().parents[1]
 API_NAMES = ('scalar', 'vrz', 'vti', 'elastic',
              'common.vpvsrho_to_lambmubuoyancy', 'common.lambmubuoyancy_to_vpvsrho',
+             'visco_gsls', 'prepare_visco_gsls', 'visco_gsls_native_status',
              'native_status', 'prepare_native', 'prepare_elastic')
 ELASTIC_SECTIONS = ('elastic', 'elastic-axes', 'elastic-returns', 'elastic-memory',
                     'elastic-examples', 'elastic-notes', 'elastic-conversions')
 VRR_SECTIONS = ('vrr', 'vrr-install', 'vrr-backends', 'vrr-physics', 'vrr-top', 'vrr-example', 'vrr-status')
+GSLS_SECTIONS = ('visco-gsls', 'visco-gsls-modes', 'visco-gsls-physics',
+                 'visco-gsls-gradients', 'visco-gsls-stability', 'visco-gsls-memory',
+                 'visco-gsls-example', 'visco-gsls-coefficients', 'visco-gsls-provider',
+                 'visco-gsls-runtime', 'visco-gsls-references')
 USAGE_TARGETS = tuple(
     target
     for name in ('scalar', 'vrz', 'vti')
@@ -25,8 +30,8 @@ USAGE_TARGETS = tuple(
                    f'{name}-examples', f'{name}-notes')
 ) + ('scalar-time-sampling', 'scalar-memory', 'scalar-3d-example') + ELASTIC_SECTIONS + ('elastic-function', 'usage', 'propagators', 'native-runtime',
                        'native-status', 'prepare-native', 'native-notes',
-                       'native-examples', 'prepare-elastic', 'other-exports') + VRR_SECTIONS + ('vrr-function',)
-TOC_TARGETS = ('scalar', 'vrz', 'vrr', 'vti', 'elastic', 'elastic-conversions',
+                       'native-examples', 'prepare-elastic', 'other-exports') + VRR_SECTIONS + GSLS_SECTIONS + ('vrr-function', 'gsls-function', 'visco-gsls-function')
+TOC_TARGETS = ('scalar', 'vrz', 'vrr', 'vti', 'elastic', 'visco-gsls', 'elastic-conversions',
                'native-status', 'prepare-native', 'prepare-elastic', 'other-exports')
 RECONSTRUCTION_SECTIONS = ('reconstruction', 'reconstruction-scalar3d', 'reconstruction-state',
                            'reconstruction-tape', 'reconstruction-reverse',
@@ -38,7 +43,7 @@ CHAPTERS = {
     'about', 'presentation', 'installation', 'docker', 'wsl', 'quickstart', 'modeling/conventions',
     'modeling/scalar', 'modeling/gradient', 'modeling/acquisition', 'modeling/wave-propagation',
     'modeling/reconstruction', 'inversion/fwi',
-    'inversion/dataparallel', 'inversion/inr', 'usage', 'visco-gsls', 'pytorch-backend', 'faq',
+    'inversion/dataparallel', 'inversion/inr', 'usage', 'pytorch-backend', 'faq',
     'release-notes', 'status', 'examples/index', 'examples/enclosed',
     'examples/surface', 'examples/layered', 'examples/reproduce',
 }
@@ -77,7 +82,7 @@ def check_navigation(page, locale, relative):
     paths = {urlsplit(link['href']).path for link in links}
     expected = {f'/{locale}/{chapter}.html' for chapter in CHAPTERS}
     assert expected <= paths, f'Missing chapters on {relative}: {expected - paths}'
-    assert not any(path.endswith(('/visco-sls.html', '/examples/visco-sls.html', '/vrr.html')) for path in paths), relative
+    assert not any(path.endswith(('/visco-sls.html', '/examples/visco-sls.html', '/vrr.html', '/visco-gsls.html')) for path in paths), relative
     assert not any('/api/' in path or path.endswith(('/modeling/vrz.html', '/modeling/vti.html')) for path in paths), relative
     wave_links = [link for link in links if urlsplit(link['href']).path == f'/{locale}/modeling/wave-propagation.html']
     assert len(wave_links) == 1 and wave_links[0]['text'] == ('波传播' if locale == 'zh' else 'Wave propagation'), (relative, wave_links)
@@ -169,7 +174,7 @@ def check_usage(page, locale, output):
     title = main.locator('#usage > h1').evaluate("e => ({size:parseFloat(getComputedStyle(e).fontSize),font:getComputedStyle(e).fontFamily,weight:getComputedStyle(e).fontWeight})")
     assert abs(title['size'] - 40.8) < .01 and 'Georgia' in title['font'] and title['weight'] == '400', title
     for name, label in (('scalar', 'Scalar Function'), ('vrz', 'VRZ Function'),
-                        ('vrr', 'VRR Function'), ('vti', 'VTI Function'), ('elastic', 'Elastic Function')):
+                        ('vrr', 'VRR Function'), ('vti', 'VTI Function'), ('elastic', 'Elastic Function'), ('visco-gsls', 'GSLS Function')):
         heading = main.locator(f'#{name} > h2')
         assert heading.evaluate("e => e.firstChild.textContent.trim()") == label
         assert abs(heading.evaluate('e => parseFloat(getComputedStyle(e).fontSize)') - 30.6) < .01
@@ -177,7 +182,7 @@ def check_usage(page, locale, output):
     assert not main.locator('h3').evaluate_all("items => items.some(e => ['Function', '函数'].includes(e.firstChild.textContent.trim()))")
     overview = main.locator('#propagators')
     assert overview.locator('code.xref').all_text_contents() == ['starwave.scalar()', 'starwave.vrz()', 'starwave_vrr.vrr()', 'starwave.vti()', 'starwave.elastic()', 'starwave.visco_gsls()']
-    assert overview.locator('a[href="visco-gsls.html#starwave.visco_gsls"] > code.xref').count() == 1
+    assert overview.locator('a[href="#starwave.visco_gsls"] > code.xref').count() == 1
     assert overview.locator(':scope > p code.literal').all_text_contents() == ['B', 'S', 'R', 'T', 'D']
     overview_rows = overview.locator('p').evaluate_all("""items => items.map(p => {
         const prose = getComputedStyle(p);
@@ -208,7 +213,8 @@ def check_usage(page, locale, output):
     for name, count in (('scalar', 20), ('vrz', 22), ('starwave_vrr.vrr', 21), ('vti', 24), ('elastic', 66),
                         ('common.vpvsrho_to_lambmubuoyancy', 4),
                         ('common.lambmubuoyancy_to_vpvsrho', 4),
-                        ('prepare_native', 1), ('prepare_elastic', 1)):
+                        ('prepare_native', 1), ('prepare_elastic', 1), ('visco_gsls', 23),
+                        ('prepare_visco_gsls', 2), ('visco_gsls_native_status', 1)):
         fullname = name if name == 'starwave_vrr.vrr' else f'starwave.{name}'
         parameters = main.locator(f'dt[id="{fullname}"]').locator('..').locator('dl.field-list > dd').first.locator('p')
         assert parameters.count() == count, (locale, name, parameters.count())
@@ -238,7 +244,7 @@ def check_usage(page, locale, output):
         assert section.locator(':scope > h2, :scope > h3').count() == 1, (locale, name)
     # The long native signature must wrap within the article, including on the
     # narrowest phone. The conversions remain independent, linkable API entries.
-    for name in ('starwave_vrr.vrr', 'elastic', 'common.vpvsrho_to_lambmubuoyancy',
+    for name in ('starwave_vrr.vrr', 'visco_gsls', 'prepare_visco_gsls', 'visco_gsls_native_status', 'elastic', 'common.vpvsrho_to_lambmubuoyancy',
                  'common.lambmubuoyancy_to_vpvsrho', 'prepare_elastic'):
         fullname = name if name == 'starwave_vrr.vrr' else f'starwave.{name}'
         signature = main.locator(f'dt[id="{fullname}"]')
@@ -249,7 +255,7 @@ def check_usage(page, locale, output):
     toc_links = toc.locator('a').evaluate_all('(items) => items.map(a => a.getAttribute("href"))')
     assert toc_links and all(link.startswith('#') for link in toc_links), toc_links
     assert [unquote(link[1:]) for link in toc_links] == list(TOC_TARGETS), toc_links
-    assert toc.locator('a').all_text_contents()[:5] == ['Scalar Function', 'VRZ Function', 'VRR Function', 'VTI Function', 'Elastic Function']
+    assert toc.locator('a').all_text_contents()[:6] == ['Scalar Function', 'VRZ Function', 'VRR Function', 'VTI Function', 'Elastic Function', 'GSLS Function']
     assert all(unquote(link[1:]) in ids for link in toc_links), toc_links
     assert toc.evaluate("e => Boolean(e.compareDocumentPosition(document.getElementById('starwave.scalar')) & Node.DOCUMENT_POSITION_FOLLOWING)"), locale
     width = page.viewport_size['width']
@@ -257,7 +263,7 @@ def check_usage(page, locale, output):
     page.screenshot(path=str(output / f'{locale}-usage-top-{width}.png'))
     overview.locator('h2').evaluate("e => e.scrollIntoView({block: 'start'})")
     page.screenshot(path=str(output / f'{locale}-usage-overview-{width}.png'))
-    for name in ('scalar', 'vrz', 'vrr', 'vti', 'elastic'):
+    for name in ('scalar', 'vrz', 'vrr', 'vti', 'elastic', 'visco-gsls'):
         main.locator(f'#{name} > h2').evaluate("e => e.scrollIntoView({block: 'start'})")
         page.screenshot(path=str(output / f'{locale}-usage-{name}-heading-{width}.png'))
     main.locator('[id="starwave.scalar"]').evaluate("e => e.scrollIntoView({block: 'start'})")
@@ -271,7 +277,7 @@ def check_usage(page, locale, output):
     assert 'source_amplitudes' in text, locale
     fields.evaluate("e => e.scrollIntoView({block: 'start'})")
     page.screenshot(path=str(output / f'{locale}-usage-scalar-fields-{width}.png'))
-    for name in ('starwave_vrr.vrr', 'elastic', 'common.vpvsrho_to_lambmubuoyancy',
+    for name in ('starwave_vrr.vrr', 'visco_gsls', 'prepare_visco_gsls', 'visco_gsls_native_status', 'elastic', 'common.vpvsrho_to_lambmubuoyancy',
                  'common.lambmubuoyancy_to_vpvsrho', 'prepare_elastic'):
         fullname = name if name == 'starwave_vrr.vrr' else f'starwave.{name}'
         signature = main.locator(f'[id="{fullname}"]')
@@ -284,7 +290,7 @@ def check_usage(page, locale, output):
     toc.locator('a[href="#scalar"]').click()
     assert urlsplit(page.url).fragment == 'scalar'
     assert page.locator('[id="scalar"]').count() == 1
-    for target in ('vrr', 'elastic', 'elastic-conversions', 'prepare-elastic'):
+    for target in ('vrr', 'elastic', 'visco-gsls', 'elastic-conversions', 'prepare-elastic'):
         toc.locator(f'a[href="#{target}"]').click()
         assert urlsplit(page.url).fragment == target, (locale, target)
         assert main.locator(f'section[id="{target}"]').count() == 1, (locale, target)
@@ -743,9 +749,11 @@ def check_presentation(page, base, locale, output):
 
 
 def check_gsls_api(page, base, locale, output):
-    page.goto(base + locale + '/visco-gsls.html', wait_until='networkidle')
-    main = page.locator('.sw-api-page')
+    page.goto(base + locale + '/usage.html#visco-gsls', wait_until='networkidle')
+    main = page.locator('[role="main"] #visco-gsls')
     assert main.count() == 1
+    assert main.evaluate("e => e.previousElementSibling.id") == 'elastic'
+    assert main.evaluate("e => e.nextElementSibling.id") == 'native-runtime'
     assert main.locator('dl.py.function').count() == 3
     for name in ('visco_gsls', 'prepare_visco_gsls', 'visco_gsls_native_status'):
         assert main.locator('[id="starwave.' + name + '"]').count() == 1
@@ -755,14 +763,16 @@ def check_gsls_api(page, base, locale, output):
     for name in ('visco_sls', 'prepare_visco_sls', 'visco_sls_native_status'):
         assert main.locator('[id="starwave.' + name + '"]').count() == 0
     assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
-    assert abs(main.locator(':scope > h1').evaluate('e => parseFloat(getComputedStyle(e).fontSize)') - 40.8) < .01
-    page.screenshot(path=str(output / f'{locale}-gsls-api-{page.viewport_size["width"]}.png'), full_page=True)
-    page.goto(base + locale + '/visco-gsls.html#visco-gsls-gradients')
+    assert main.locator(':scope > h2').inner_text().startswith('GSLS Function')
+    assert abs(main.locator(':scope > h2').evaluate('e => parseFloat(getComputedStyle(e).fontSize)') - 30.6) < .01
+    page.screenshot(path=str(output / f'{locale}-gsls-api-{page.viewport_size["width"]}.png'))
+    page.goto(base + locale + '/usage.html?from=gsls-check#visco-gsls-gradients')
     other = 'en' if locale == 'zh' else 'zh'
     open_mobile_menu(page)
     page.locator(f'[data-sw-language="{other}"]').click()
-    assert urlsplit(page.url).path == f'/{other}/visco-gsls.html'
+    assert urlsplit(page.url).path == f'/{other}/usage.html'
     assert urlsplit(page.url).fragment == 'visco-gsls-gradients'
+    assert urlsplit(page.url).query == 'from=gsls-check'
 
 
 def check_search(page, base):
@@ -793,7 +803,7 @@ def check_search(page, base):
         index = page.evaluate('Search._index')
         assert 'usage' in index['docnames'] and not any(name.startswith('api/') for name in index['docnames']), index['docnames']
         assert {'modeling/wave-propagation', 'modeling/acquisition', 'modeling/reconstruction', 'docker', 'presentation'} <= set(index['docnames'])
-        assert not {'modeling/vrz', 'modeling/vti'} & set(index['docnames'])
+        assert not {'modeling/vrz', 'modeling/vti', 'visco-gsls', 'vrr'} & set(index['docnames'])
         # Sphinx groups dotted functions under starwave.common rather than
         # starwave. Preserve all original search assertions and cover both.
         objects = {
@@ -805,7 +815,7 @@ def check_search(page, base):
         assert set(API_NAMES) <= objects.keys(), objects
         assert all(index['docnames'][objects[name]] == 'usage' for name in API_NAMES), objects
         for name in ('visco_gsls', 'prepare_visco_gsls', 'visco_gsls_native_status'):
-            assert name in objects and index['docnames'][objects[name]] == 'visco-gsls', objects
+            assert name in objects and index['docnames'][objects[name]] == 'usage', objects
         other = 'zh' if locale == 'en' else 'en'
         open_mobile_menu(page)
         page.locator(f'[data-sw-language="{other}"]').click()
@@ -896,7 +906,7 @@ def check_sls_retirement(page, base):
     for locale in ('zh', 'en'):
         page.goto(base + locale + '/index.html', wait_until='networkidle')
         assert page.locator('a[href*="examples/visco-sls"], a[href*="_static/sls/"]').count() == 0
-        page.goto(base + locale + '/visco-gsls.html', wait_until='networkidle')
+        page.goto(base + locale + '/usage.html#visco-gsls', wait_until='networkidle')
         assert page.locator('[id="starwave.visco_gsls"]').count() == 1
         assert page.locator('a[href*="examples/visco-sls"], a[href*="_static/sls/"]').count() == 0
 
@@ -1015,12 +1025,17 @@ def check(root, browser_path=None):
             assert plain.locator('.sw-page-toc').is_visible()
             plain.locator('.sw-page-toc a[href="#scalar"]').click()
             assert urlsplit(plain.url).fragment == 'scalar'
-            for target in ('vrr', 'elastic', 'elastic-conversions', 'prepare-elastic'):
+            for target in ('vrr', 'elastic', 'visco-gsls', 'elastic-conversions', 'prepare-elastic'):
                 plain.locator(f'.sw-page-toc a[href="#{target}"]').click()
                 assert urlsplit(plain.url).fragment == target
             plain.locator('[data-sw-language="zh"]').click()
             assert urlsplit(plain.url).path == '/zh/usage.html'
             for prefix in ('', 'zh/', 'en/'):
+                for old in ('visco-gsls.html', 'visco-sls.html'):
+                    plain.goto(base + prefix + old)
+                    plain.locator('[data-sw-language="en"]').click()
+                    assert urlsplit(plain.url).path == '/en/usage.html'
+                    assert urlsplit(plain.url).fragment == 'visco-gsls'
                 plain.goto(base + prefix + 'vrr.html')
                 plain.locator('[data-sw-language="en"]').click()
                 assert urlsplit(plain.url).path == '/en/usage.html'

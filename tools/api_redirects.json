@@ -90,7 +90,7 @@
       }
     },
     "visco-sls.html": {
-      "target_page": "visco-gsls.html",
+      "target_page": "usage.html",
       "default": "visco-gsls",
       "fragments": {
         "visco-sls": "visco-gsls-function",
@@ -138,6 +138,51 @@
         "vrr-status": "vrr-status",
         "sw-section-7": "vrr-status",
         "starwave_vrr.vrr": "starwave_vrr.vrr"
+      }
+    },
+    "visco-gsls.html": {
+      "default": "visco-gsls",
+      "target_page": "usage.html",
+      "fragments": {
+        "visco-gsls": "visco-gsls",
+        "gsls-api-v16": "visco-gsls",
+        "sw-section-0": "visco-gsls",
+        "visco-gsls-function": "visco-gsls",
+        "sw-section-1": "visco-gsls",
+        "id1": "visco-gsls",
+        "visco-gsls-modes": "visco-gsls-modes",
+        "q": "visco-gsls-modes",
+        "sw-section-2": "visco-gsls-modes",
+        "visco-gsls-physics": "visco-gsls-physics",
+        "sw-section-3": "visco-gsls-physics",
+        "id2": "visco-gsls-physics",
+        "visco-gsls-gradients": "visco-gsls-gradients",
+        "pml": "visco-gsls-gradients",
+        "sw-section-4": "visco-gsls-gradients",
+        "visco-gsls-stability": "visco-gsls-stability",
+        "sw-section-5": "visco-gsls-stability",
+        "id3": "visco-gsls-stability",
+        "visco-gsls-memory": "visco-gsls-memory",
+        "full-checkpoint": "visco-gsls-memory",
+        "sw-section-6": "visco-gsls-memory",
+        "visco-gsls-example": "visco-gsls-example",
+        "cpu": "visco-gsls-example",
+        "sw-section-7": "visco-gsls-example",
+        "visco-gsls-coefficients": "visco-gsls-coefficients",
+        "sw-section-8": "visco-gsls-coefficients",
+        "id4": "visco-gsls-coefficients",
+        "visco-gsls-provider": "visco-gsls-provider",
+        "material-model": "visco-gsls-provider",
+        "sw-section-9": "visco-gsls-provider",
+        "visco-gsls-runtime": "visco-gsls-runtime",
+        "sw-section-10": "visco-gsls-runtime",
+        "id5": "visco-gsls-runtime",
+        "visco-gsls-references": "visco-gsls-references",
+        "sw-section-11": "visco-gsls-references",
+        "id6": "visco-gsls-references",
+        "starwave.visco_gsls": "starwave.visco_gsls",
+        "starwave.prepare_visco_gsls": "starwave.prepare_visco_gsls",
+        "starwave.visco_gsls_native_status": "starwave.visco_gsls_native_status"
       }
     }
   },
@@ -232,7 +277,7 @@
       }
     },
     "visco-sls.html": {
-      "target_page": "visco-gsls.html",
+      "target_page": "usage.html",
       "default": "visco-gsls",
       "fragments": {
         "visco-sls": "visco-gsls-function",
@@ -292,6 +337,51 @@
         "source-and-validation-scope": "vrr-status",
         "sw-section-7": "vrr-status",
         "starwave_vrr.vrr": "starwave_vrr.vrr"
+      }
+    },
+    "visco-gsls.html": {
+      "default": "visco-gsls",
+      "target_page": "usage.html",
+      "fragments": {
+        "visco-gsls": "visco-gsls",
+        "gsls-viscoacoustic-api-v16": "visco-gsls",
+        "sw-section-0": "visco-gsls",
+        "visco-gsls-function": "visco-gsls",
+        "sw-section-1": "visco-gsls",
+        "id1": "visco-gsls",
+        "visco-gsls-modes": "visco-gsls-modes",
+        "modes-q-and-reference-velocity": "visco-gsls-modes",
+        "sw-section-2": "visco-gsls-modes",
+        "visco-gsls-physics": "visco-gsls-physics",
+        "source-coordinates-sampling-and-input-domain": "visco-gsls-physics",
+        "sw-section-3": "visco-gsls-physics",
+        "visco-gsls-gradients": "visco-gsls-gradients",
+        "gradients-padding-and-pml": "visco-gsls-gradients",
+        "sw-section-4": "visco-gsls-gradients",
+        "visco-gsls-stability": "visco-gsls-stability",
+        "time-step-guard": "visco-gsls-stability",
+        "sw-section-5": "visco-gsls-stability",
+        "visco-gsls-memory": "visco-gsls-memory",
+        "full-and-checkpoint-memory": "visco-gsls-memory",
+        "sw-section-6": "visco-gsls-memory",
+        "visco-gsls-example": "visco-gsls-example",
+        "minimal-call-and-complete-cpu-example": "visco-gsls-example",
+        "sw-section-7": "visco-gsls-example",
+        "visco-gsls-coefficients": "visco-gsls-coefficients",
+        "material-and-spectrum-helpers": "visco-gsls-coefficients",
+        "sw-section-8": "visco-gsls-coefficients",
+        "visco-gsls-provider": "visco-gsls-provider",
+        "advanced-material-model-protocol": "visco-gsls-provider",
+        "sw-section-9": "visco-gsls-provider",
+        "visco-gsls-runtime": "visco-gsls-runtime",
+        "native-preparation-build-and-restart": "visco-gsls-runtime",
+        "sw-section-10": "visco-gsls-runtime",
+        "visco-gsls-references": "visco-gsls-references",
+        "scope-and-references": "visco-gsls-references",
+        "sw-section-11": "visco-gsls-references",
+        "starwave.visco_gsls": "starwave.visco_gsls",
+        "starwave.prepare_visco_gsls": "starwave.prepare_visco_gsls",
+        "starwave.visco_gsls_native_status": "starwave.visco_gsls_native_status"
       }
     }
   },
@@ -386,7 +476,7 @@
       }
     },
     "visco-sls.html": {
-      "target_page": "visco-gsls.html",
+      "target_page": "usage.html",
       "default": "visco-gsls",
       "fragments": {
         "visco-sls": "visco-gsls-function",
@@ -434,6 +524,51 @@
         "vrr-status": "vrr-status",
         "sw-section-7": "vrr-status",
         "starwave_vrr.vrr": "starwave_vrr.vrr"
+      }
+    },
+    "visco-gsls.html": {
+      "default": "visco-gsls",
+      "target_page": "usage.html",
+      "fragments": {
+        "visco-gsls": "visco-gsls",
+        "gsls-api-v16": "visco-gsls",
+        "sw-section-0": "visco-gsls",
+        "visco-gsls-function": "visco-gsls",
+        "sw-section-1": "visco-gsls",
+        "id1": "visco-gsls",
+        "visco-gsls-modes": "visco-gsls-modes",
+        "q": "visco-gsls-modes",
+        "sw-section-2": "visco-gsls-modes",
+        "visco-gsls-physics": "visco-gsls-physics",
+        "sw-section-3": "visco-gsls-physics",
+        "id2": "visco-gsls-physics",
+        "visco-gsls-gradients": "visco-gsls-gradients",
+        "pml": "visco-gsls-gradients",
+        "sw-section-4": "visco-gsls-gradients",
+        "visco-gsls-stability": "visco-gsls-stability",
+        "sw-section-5": "visco-gsls-stability",
+        "id3": "visco-gsls-stability",
+        "visco-gsls-memory": "visco-gsls-memory",
+        "full-checkpoint": "visco-gsls-memory",
+        "sw-section-6": "visco-gsls-memory",
+        "visco-gsls-example": "visco-gsls-example",
+        "cpu": "visco-gsls-example",
+        "sw-section-7": "visco-gsls-example",
+        "visco-gsls-coefficients": "visco-gsls-coefficients",
+        "sw-section-8": "visco-gsls-coefficients",
+        "id4": "visco-gsls-coefficients",
+        "visco-gsls-provider": "visco-gsls-provider",
+        "material-model": "visco-gsls-provider",
+        "sw-section-9": "visco-gsls-provider",
+        "visco-gsls-runtime": "visco-gsls-runtime",
+        "sw-section-10": "visco-gsls-runtime",
+        "id5": "visco-gsls-runtime",
+        "visco-gsls-references": "visco-gsls-references",
+        "sw-section-11": "visco-gsls-references",
+        "id6": "visco-gsls-references",
+        "starwave.visco_gsls": "starwave.visco_gsls",
+        "starwave.prepare_visco_gsls": "starwave.prepare_visco_gsls",
+        "starwave.visco_gsls_native_status": "starwave.visco_gsls_native_status"
       }
     }
   }

@@ -46,12 +46,16 @@ USAGE_SECTIONS = ('usage', 'propagators', 'scalar', 'scalar-details',
                   'vrr-physics', 'vrr-top', 'vrr-example', 'vrr-status', 'vti', 'vti-details',
                   'vti-examples', 'vti-notes', 'elastic', 'elastic-axes',
                   'elastic-returns', 'elastic-memory', 'elastic-examples',
-                  'elastic-notes', 'elastic-conversions', 'native-runtime',
+                  'elastic-notes', 'elastic-conversions',
+                  'visco-gsls', 'visco-gsls-modes', 'visco-gsls-physics',
+                  'visco-gsls-gradients', 'visco-gsls-stability', 'visco-gsls-memory',
+                  'visco-gsls-example', 'visco-gsls-coefficients', 'visco-gsls-provider',
+                  'visco-gsls-runtime', 'visco-gsls-references', 'native-runtime',
                   'native-status', 'prepare-native', 'native-notes',
                   'native-examples', 'prepare-elastic', 'other-exports')
 # New content receives new numbers even when inserted before older sections.
 USAGE_NUMBERS = (0, 1, 2, 4, 5, 31, 32, 33, 6, 7, 9, 10, 11, 34, 35, 36, 37, 38, 39, 40, 12, 14, 15, 16,
-                 23, 24, 25, 26, 27, 28, 29, 17, 18, 19, 20, 21, 30, 22)
+                 23, 24, 25, 26, 27, 28, 29, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 17, 18, 19, 20, 21, 30, 22)
 MODELING_FRAGMENTS = {'modeling/vrz.md', 'modeling/vti.md'}
 WAVE_SECTIONS = ('wave-propagation', 'wave-vrz', 'wave-vrz-details', 'wave-vrz-limits',
                  'wave-vti', 'wave-vti-details', 'wave-vti-limits')
@@ -252,12 +256,7 @@ def build(destination):
         if relative == 'modeling/reconstruction.html':
             stable = RECONSTRUCTION_SECTIONS
             numbers = RECONSTRUCTION_NUMBERS
-        if relative == 'visco-gsls.html':
-            stable = re.findall(r'^\((visco-gsls[^)]*)\)=\n#+ ', (PROJECT / 'docs' / 'visco-gsls.md').read_text(), re.M)
-            assert len(stable) == len(pairs[0]), 'GSLS anchors must cover every section'
         rendered = [add_anchors(text, stable, numbers) for text in texts]
-        if relative == 'visco-gsls.html':
-            rendered = [text.replace('<section id=', '<section class="sw-api-page" id=', 1) for text in rendered]
         if relative.startswith('examples/'):
             rendered = [text.replace('<section id=', '<section class="sw-example-page" id=', 1) for text in rendered]
         path.write_text(rendered[0], encoding='utf-8')

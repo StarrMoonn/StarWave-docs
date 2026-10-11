@@ -94,7 +94,20 @@
     "vrr-example": "vrr-example",
     "vrr-status": "vrr-status",
     "vrr-function": "vrr",
-    "vrr-api": "vrr"
+    "vrr-api": "vrr",
+    "visco-gsls": "visco-gsls",
+    "visco-gsls-modes": "visco-gsls-modes",
+    "visco-gsls-physics": "visco-gsls-physics",
+    "visco-gsls-gradients": "visco-gsls-gradients",
+    "visco-gsls-stability": "visco-gsls-stability",
+    "visco-gsls-memory": "visco-gsls-memory",
+    "visco-gsls-example": "visco-gsls-example",
+    "visco-gsls-coefficients": "visco-gsls-coefficients",
+    "visco-gsls-provider": "visco-gsls-provider",
+    "visco-gsls-runtime": "visco-gsls-runtime",
+    "visco-gsls-references": "visco-gsls-references",
+    "visco-gsls-function": "visco-gsls",
+    "gsls-function": "visco-gsls"
   },
   "en": {
     "usage": "usage",
@@ -191,6 +204,19 @@
     "vrr-example": "vrr-example",
     "vrr-status": "vrr-status",
     "vrr-function": "vrr",
-    "vrr-api": "vrr"
+    "vrr-api": "vrr",
+    "visco-gsls": "visco-gsls",
+    "visco-gsls-modes": "visco-gsls-modes",
+    "visco-gsls-physics": "visco-gsls-physics",
+    "visco-gsls-gradients": "visco-gsls-gradients",
+    "visco-gsls-stability": "visco-gsls-stability",
+    "visco-gsls-memory": "visco-gsls-memory",
+    "visco-gsls-example": "visco-gsls-example",
+    "visco-gsls-coefficients": "visco-gsls-coefficients",
+    "visco-gsls-provider": "visco-gsls-provider",
+    "visco-gsls-runtime": "visco-gsls-runtime",
+    "visco-gsls-references": "visco-gsls-references",
+    "visco-gsls-function": "visco-gsls",
+    "gsls-function": "visco-gsls"
   }
 }

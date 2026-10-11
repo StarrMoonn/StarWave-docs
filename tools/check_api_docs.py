@@ -143,8 +143,11 @@ def check_gsls_contract(project, contracts):
     for locale in ('zh', 'en'):
         docs = project / 'docs' / ('en' if locale == 'en' else '')
         assert not (docs / 'visco-sls.md').exists(), 'Removed standalone SLS API page persists'
-        text = (docs / 'visco-gsls.md').read_text(encoding='utf-8')
-        for anchor in ('function', 'physics', 'gradients', 'stability', 'example', 'runtime', 'references', 'modes', 'provider', 'memory', 'coefficients'):
+        text = (docs / 'usage.md').read_text(encoding='utf-8')
+        assert not (docs / 'visco-gsls.md').exists(), 'GSLS must be documented within Usage'
+        assert '(visco-gsls)=\n## GSLS Function' in text
+        assert text.index('(elastic)=') < text.index('(visco-gsls)=') < text.index('(native-runtime)=')
+        for anchor in ('physics', 'gradients', 'stability', 'example', 'runtime', 'references', 'modes', 'provider', 'memory', 'coefficients'):
             assert f'(visco-gsls-{anchor})=' in text, f'{locale}: missing GSLS section {anchor}'
         section = text.split('(visco-gsls-example)=', 1)[1].split('(visco-gsls-runtime)=', 1)[0]
         snippets.append(re.findall(r'^```python\n(.*?)^```', section, re.M | re.S))

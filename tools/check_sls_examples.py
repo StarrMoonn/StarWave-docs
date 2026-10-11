@@ -35,7 +35,7 @@ def check(root):
             errors.append('Missing old SLS API migration redirect: ' + locale)
         else:
             content = redirect.read_text(encoding='utf-8')
-            if not all(marker in content for marker in ('location.replace', 'noindex, follow', 'visco-gsls.html')) or '<article' in content or 'py function' in content:
+            if not all(marker in content for marker in ('location.replace', 'noindex, follow', 'usage.html', 'visco-gsls')) or '<article' in content or 'py function' in content:
                 errors.append('Old SLS API URL is not a redirect-only document: ' + locale)
     for path in root.rglob('*'):
         if path.is_file() and ('sls' in path.name.lower() and 'gsls' not in path.name.lower()) and path.name != 'visco-sls.html':

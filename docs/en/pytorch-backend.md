@@ -45,7 +45,7 @@ compile_steps changes execution block size, not dt, nt, accuracy, shots, loss or
 | elastic | 2D/3D | float32/64 | lamb, mu, buoyancy, sources, initial physical/PML states |
 | GSLS | 2D | float32/64 | vp, q, source, material-provider tensor parameters; fixed rho |
 
-All listed CPU/CUDA paths support orders 2/4/6/8 with full/checkpoint; MPS supports only Scalar2D accuracy=4 float32. Each equation retains its own axes, source units/scaling, recording clock, CFL and resampling contract; they are not interchangeable. See [Usage](usage.md) and [GSLS](visco-gsls.md). GSLS retains hao1, band_fit, sls_compat and material_model. A single mechanism explicitly requires `mode="sls_compat", n_mechanisms=1`; independent SLS APIs are not restored.
+All listed CPU/CUDA paths support orders 2/4/6/8 with full/checkpoint; MPS supports only Scalar2D accuracy=4 float32. Each equation retains its own axes, source units/scaling, recording clock, CFL and resampling contract; they are not interchangeable. See [Usage](usage.md) and {ref}`GSLS <visco-gsls>`. GSLS retains hao1, band_fit, sls_compat and material_model. A single mechanism explicitly requires `mode="sls_compat", n_mechanisms=1`; independent SLS APIs are not restored.
 
 scalar/VRZ/VTI replicate edge values but freeze gradients through the extension, retaining the crop-image convention. Finite differences at outer model edges that regenerate padding differentiate a different map; distinguish interior-direction checks. GSLS accumulates the complete replicated-padding gradient back into the physical model. Torch VRZ full/checkpoint requires `boundary_buffer >= accuracy//2`.
 

@@ -113,7 +113,7 @@ Elastic uses a separate preparation entry point: call `starwave.prepare_elastic(
 
 ## V16 GSLS preparation and backend selection
 
-V16 GSLS uses separate preparation: call `starwave.prepare_visco_gsls(backend="cuda", device="cuda:0")` on the CUDA main thread, or `starwave.prepare_visco_gsls(backend="native_cpu")` for CPU. `starwave.visco_gsls_native_status(backend="cuda")` only reports status. Preparation defaults to CPU while propagation defaults to CUDA; select explicitly, without automatic fallback. `backend="torch"` supports full/checkpoint and eager/compile without a native build. See the [GSLS API](visco-gsls.md) for the complete contract and CPU example.
+V16 GSLS uses separate preparation: call `starwave.prepare_visco_gsls(backend="cuda", device="cuda:0")` on the CUDA main thread, or `starwave.prepare_visco_gsls(backend="native_cpu")` for CPU. `starwave.visco_gsls_native_status(backend="cuda")` only reports status. Preparation defaults to CPU while propagation defaults to CUDA; select explicitly, without automatic fallback. `backend="torch"` supports full/checkpoint and eager/compile without a native build. See the {ref}`GSLS API <visco-gsls>` for the complete contract and CPU example.
 
 (installation-smoke)=
 ## Notebook 01: Executed smoke test

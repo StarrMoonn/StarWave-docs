@@ -329,7 +329,7 @@
       "compile_steps": "int"
     },
     "return": "tuple[torch.Tensor]",
-    "page": "visco-gsls",
+    "page": "usage",
     "semantics": {
       "model_dimensions": [
         2
@@ -423,7 +423,7 @@
       "device": "str | torch.device | None"
     },
     "return": "dict",
-    "page": "visco-gsls"
+    "page": "usage"
   },
   "visco_gsls_native_status": {
     "signature": "(backend='native_cpu')",
@@ -431,6 +431,6 @@
       "backend": "str"
     },
     "return": "dict",
-    "page": "visco-gsls"
+    "page": "usage"
   }
 }

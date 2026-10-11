@@ -375,7 +375,7 @@ def check(root):
             if alias not in pages[usage].ids or pages[usage].id_sections.get(alias) != pages[usage].id_sections.get(target):
                 errors.append(f'Legacy Usage anchor drift: {locale}/{alias} -> {target}')
         for name, label in (('scalar', 'Scalar Function'), ('vrz', 'VRZ Function'),
-                            ('vrr', 'VRR Function'), ('vti', 'VTI Function'), ('elastic', 'Elastic Function')):
+                            ('vrr', 'VRR Function'), ('vti', 'VTI Function'), ('elastic', 'Elastic Function'), ('visco-gsls', 'GSLS Function')):
             if content.count(f'<h2>{label}<a') != 1:
                 errors.append(f'Missing or repeated Usage function heading: {locale}/{name}')
         if re.search(r'<h3>(?:Function|函数)<a', content):
@@ -387,7 +387,7 @@ def check(root):
             errors.append(f'Usage section cannot switch language: {locale}')
         index = (root / locale / 'searchindex.js').read_text(encoding='utf-8')
         docnames = json.loads(index.removeprefix('Search.setIndex(').removesuffix(')'))['docnames']
-        if not {'usage', 'visco-gsls', 'pytorch-backend'} <= set(docnames) or {'visco-sls', 'vrr'} & set(docnames) or any(name.startswith('api/') for name in docnames):
+        if not {'usage', 'pytorch-backend'} <= set(docnames) or {'visco-sls', 'visco-gsls', 'vrr'} & set(docnames) or any(name.startswith('api/') for name in docnames):
             errors.append(f'API search entries are duplicated or missing: {locale}')
         if not {'modeling/wave-propagation', 'modeling/acquisition', 'modeling/reconstruction', 'docker', 'presentation'} <= set(docnames) or {'modeling/vrz', 'modeling/vti'} & set(docnames):
             errors.append(f'Modeling search entries are duplicated or missing: {locale}')

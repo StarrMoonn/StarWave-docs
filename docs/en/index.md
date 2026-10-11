@@ -142,7 +142,6 @@ Reproduce <examples/reproduce>
 
 Usage <usage>
 PyTorch backend <pytorch-backend>
-GSLS Function <visco-gsls>
 ```
 
 ```{toctree}

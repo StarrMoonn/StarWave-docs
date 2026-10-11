@@ -15,7 +15,7 @@ receipt 固定的源码清单 SHA-256 为 `f682ff0a836c0c259cd03a2e760460d68426c
 本次没有 macOS wheel。Mac MPS 需使用已获授权的完整 V16 源码，且仅限下述 Scalar2D 配置。后续 dev 自由表面工作和独立打包的 {ref}`VRR 扩展 <vrr>` 不在 V16 / PyPI 7.1.0 中。VRR 手册现覆盖 `904c9106bdb883325df8586b7c3412f7814a9737` 的经审阅源码整合；这是文档更新，不是新包发布。用户提供的设备报告与文档/CPU 检查、公开 wheel 验证分别记录。
 
 - scalar/VRZ/VTI/elastic 新增 backend、execution、checkpoint_interval、compile_steps；GSLS 新增 execution、compile_steps 并扩展 Torch checkpoint。旧位置参数、原生默认行为和科学 CUDA/C++ 核保留。
-- Torch 提供 CPU/CUDA full/checkpoint、eager/compile；没有 Torch boundary、AMP、elastic callbacks/offload 或抽样材料梯度。MPS 仅支持 Scalar2D accuracy=4 float32，使用 backend="torch"、full/checkpoint 与 eager/compile；Scalar3D、VRZ、VTI、elastic、GSLS 和其他 MPS 组合明确拒绝。本次不宣称最终 Mac 实机、500 轮 FWI 或性能验收通过。完整参数和限制见 [Usage](usage.md)、[GSLS](visco-gsls.md) 和后端页。
+- Torch 提供 CPU/CUDA full/checkpoint、eager/compile；没有 Torch boundary、AMP、elastic callbacks/offload 或抽样材料梯度。MPS 仅支持 Scalar2D accuracy=4 float32，使用 backend="torch"、full/checkpoint 与 eager/compile；Scalar3D、VRZ、VTI、elastic、GSLS 和其他 MPS 组合明确拒绝。本次不宣称最终 Mac 实机、500 轮 FWI 或性能验收通过。完整参数和限制见 [Usage](usage.md)、{ref}`GSLS <visco-gsls>` 和后端页。
 - Torch elastic 对所有内部步求导；原生材料梯度按 CFL ratio × sampling_interval 抽样。精确跨后端比较须 ratio=1，不能把这个差别称作编译误差。
 - 文档 gate 核对双语完整签名、默认值、参数覆盖和示例语法，不导入传播库。CPU/文档通过不能替代最终 GPU、DataParallel、长程 FWI 或性能验收；已有示例、图件、PDF 保留原版本与证据范围。
 
@@ -26,7 +26,7 @@ receipt 固定的源码清单 SHA-256 为 `f682ff0a836c0c259cd03a2e760460d68426c
 
 V15 手册当时依据已发布的 [V15 源码 Release](https://github.com/StarrMoonn/StarWave/releases/tag/V15)，源码版本 `0.1.0.dev15`，对应提交 `2508543ccc1dc3015b07806e6e240dd88c8e871e`。Release 发布与 PyPI 二进制发行分开：原公开 **7.0.0** 未更新，不包含 GSLS，也不包含独立 SLS 的源码清理。
 
-V15 黏声入口为 [GSLS](visco-gsls.md)：二维、固定空间变密度、原生 CPU/CUDA full/checkpoint、显式 Torch full、一阶 Vp/Q/source/provider 梯度。独立 SLS API/生产源码/构建入口已移除，单机制显式选择 `mode="sls_compat", n_mechanisms=1`。本手册不发布传播实现、CUDA 源码或完整源码归档。
+V15 黏声入口为 {ref}`GSLS <visco-gsls>`：二维、固定空间变密度、原生 CPU/CUDA full/checkpoint、显式 Torch full、一阶 Vp/Q/source/provider 梯度。独立 SLS API/生产源码/构建入口已移除，单机制显式选择 `mode="sls_compat", n_mechanisms=1`。本手册不发布传播实现、CUDA 源码或完整源码归档。
 
 参数和物理说明以该 V15 源码契约为准。默认 Hao1 的 Q 为名义 Q0；Vp 是参考相速度；训练材料且 PML 非零时须固定覆盖非松弛速度的 `max_vel`。不支持三维、rho 梯度、boundary 或传播高阶导数。完整限制见 GSLS 页，显式构建和重启步骤见[安装](installation.md)。
 

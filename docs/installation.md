@@ -110,7 +110,7 @@ starwave.prepare_native([0])
 
 ## V16 GSLS 准备与后端选择
 
-V16 GSLS 使用独立准备入口：CUDA 主线程调用 `starwave.prepare_visco_gsls(backend="cuda", device="cuda:0")`，CPU 调用 `starwave.prepare_visco_gsls(backend="native_cpu")`。`starwave.visco_gsls_native_status(backend="cuda")` 只查看状态。准备默认 CPU，传播默认 CUDA，建议始终显式指定；不自动回退。`backend="torch"` 支持 full/checkpoint 与 eager/compile，无需原生构建。见 [GSLS API](visco-gsls.md) 的完整契约与 CPU 示例。
+V16 GSLS 使用独立准备入口：CUDA 主线程调用 `starwave.prepare_visco_gsls(backend="cuda", device="cuda:0")`，CPU 调用 `starwave.prepare_visco_gsls(backend="native_cpu")`。`starwave.visco_gsls_native_status(backend="cuda")` 只查看状态。准备默认 CPU，传播默认 CUDA，建议始终显式指定；不自动回退。`backend="torch"` 支持 full/checkpoint 与 eager/compile，无需原生构建。见 {ref}`GSLS API <visco-gsls>` 的完整契约与 CPU 示例。
 
 (installation-smoke)=
 ## Notebook 01：实际运行检查

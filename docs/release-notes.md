@@ -15,7 +15,7 @@ receipt 固定的源码清单 SHA-256 为 `f682ff0a836c0c259cd03a2e760460d68426c
 本次没有 macOS wheel。Mac MPS 需使用已获授权的完整 V16 源码，且仅限下述 Scalar2D 配置。后续 dev 自由表面工作和独立打包的 {ref}`VRR 扩展 <vrr>` 不在 V16 / PyPI 7.1.0 中。VRR 手册现覆盖 `904c9106bdb883325df8586b7c3412f7814a9737` 的经审阅源码整合；这是文档更新，不是新包发布。用户提供的设备报告与文档/CPU 检查、公开 wheel 验证分别记录。
 
 - scalar/VRZ/VTI/elastic 新增 backend、execution、checkpoint_interval、compile_steps；GSLS 新增 execution、compile_steps 并扩展 Torch checkpoint。旧位置参数、原生默认行为和科学 CUDA/C++ 核保留。
-- Torch 提供 CPU/CUDA full/checkpoint、eager/compile；没有 Torch boundary、AMP、elastic callbacks/offload 或抽样材料梯度。MPS 仅支持 Scalar2D accuracy=4 float32，使用 backend="torch"、full/checkpoint 与 eager/compile；Scalar3D、VRZ、VTI、elastic、GSLS 和其他 MPS 组合明确拒绝。本次不宣称最终 Mac 实机、500 轮 FWI 或性能验收通过。完整参数和限制见 [Usage](usage.md)、[GSLS](visco-gsls.md) 和后端页。
+- Torch 提供 CPU/CUDA full/checkpoint、eager/compile；没有 Torch boundary、AMP、elastic callbacks/offload 或抽样材料梯度。MPS 仅支持 Scalar2D accuracy=4 float32，使用 backend="torch"、full/checkpoint 与 eager/compile；Scalar3D、VRZ、VTI、elastic、GSLS 和其他 MPS 组合明确拒绝。本次不宣称最终 Mac 实机、500 轮 FWI 或性能验收通过。完整参数和限制见 [Usage](usage.md)、{ref}`GSLS <visco-gsls>` 和后端页。
 - Torch elastic 对所有内部步求导；原生材料梯度按 CFL ratio × sampling_interval 抽样。精确跨后端比较须 ratio=1，不能把这个差别称作编译误差。
 - 文档 gate 核对双语完整签名、默认值、参数覆盖和示例语法，不导入传播库。CPU/文档通过不能替代最终 GPU、DataParallel、长程 FWI 或性能验收；已有示例、图件、PDF 保留原版本与证据范围。
 
@@ -26,7 +26,7 @@ receipt 固定的源码清单 SHA-256 为 `f682ff0a836c0c259cd03a2e760460d68426c
 
 [V15 源码 Release](https://github.com/StarrMoonn/StarWave/releases/tag/V15) 已发布，源码版本为 `0.1.0.dev15`，提交 `2508543ccc1dc3015b07806e6e240dd88c8e871e`。本次没有更新 PyPI：公开 7.0.0 仍是历史 V14 二进制，不能用于当前 GSLS 调用。
 
-- [GSLS](visco-gsls.md) 成为唯一黏声接口；独立 `visco_sls` 及其准备/状态入口移除。单机制使用 `mode="sls_compat", n_mechanisms=1`。
+- {ref}`GSLS <visco-gsls>` 成为唯一黏声接口；独立 `visco_sls` 及其准备/状态入口移除。单机制使用 `mode="sls_compat", n_mechanisms=1`。
 - 二维固定可变密度，原生 CPU/CUDA full/checkpoint、显式 Torch full；Vp/Q/source/provider 参数一阶梯度。默认 Hao1、显式 band_fit 与 sls_compat 各有不同 Q 语义，不能直接互换。
 - 原有 scalar/VRZ/VTI/elastic 的科学实现、签名与默认值保持不变。GSLS ABI 2 / semantics 1 / capabilities 255 要求配套重建和重启；`compile_all.py` 覆盖 core、elastic、GSLS 三库，CPU GSLS 单独显式构建。
 - 导航和当前 API 直接介绍 GSLS。旧独立 SLS API、实验页面和下载均从当前手册移除；原始材料保留在 Git 历史中，不改标为 GSLS。

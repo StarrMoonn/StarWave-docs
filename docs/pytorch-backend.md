@@ -45,7 +45,7 @@ compile_steps 只改变执行块大小，不改变 dt、nt、精度、炮数、l
 | elastic | 2D/3D | float32/64 | lamb、mu、buoyancy、源、初始物理/PML 状态 |
 | GSLS | 2D | float32/64 | vp、q、源、材料 provider 张量参数；rho 固定 |
 
-上述 CPU/CUDA 路径支持 2/4/6/8 阶 full/checkpoint；MPS 仅支持 Scalar2D accuracy=4 float32。各方程继续使用自己的轴序、源单位、源尺度、采样时刻、CFL 与重采样契约，不能相互套用。详见 [Usage](usage.md) 与 [GSLS](visco-gsls.md)。GSLS 保留 hao1、band_fit、sls_compat、material_model；单机制仅显式 `mode="sls_compat", n_mechanisms=1`，不恢复独立 SLS API。
+上述 CPU/CUDA 路径支持 2/4/6/8 阶 full/checkpoint；MPS 仅支持 Scalar2D accuracy=4 float32。各方程继续使用自己的轴序、源单位、源尺度、采样时刻、CFL 与重采样契约，不能相互套用。详见 [Usage](usage.md) 与 {ref}`GSLS <visco-gsls>`。GSLS 保留 hao1、band_fit、sls_compat、material_model；单机制仅显式 `mode="sls_compat", n_mechanisms=1`，不恢复独立 SLS API。
 
 scalar/VRZ/VTI 复制延拓值，但延拓区模型梯度冻结，保留 crop-image 约定。若对外边缘做有限差分且重新生成延拓，得到的是另一映射；应区分内部模型方向检查。GSLS 的复制延拓梯度完整累加回物理模型。Torch VRZ full/checkpoint 要求 `boundary_buffer >= accuracy//2`。
 
