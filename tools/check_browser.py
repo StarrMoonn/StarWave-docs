@@ -21,11 +21,14 @@ API_NAMES = ('scalar', 'scalar_born', 'ScalarBorn', 'ScalarBorn.forward', 'vrz',
 BORN_SECTIONS = ('born', 'born-backends', 'born-conventions', 'born-gradients', 'born-callbacks', 'born-returns', 'born-module', 'born-forward', 'born-example', 'born-build', 'born-scope')
 ELASTIC_SECTIONS = ('elastic', 'elastic-axes', 'elastic-returns', 'elastic-memory',
                     'elastic-examples', 'elastic-notes', 'elastic-conversions')
-VRR_SECTIONS = ('vrr', 'vrr-install', 'vrr-backends', 'vrr-physics', 'vrr-top', 'vrr-example', 'vrr-status')
+VRR_SECTIONS = ('vrr', 'vrr-reference', 'vrr-install', 'vrr-backends', 'vrr-physics', 'vrr-top', 'vrr-example', 'vrr-status')
 GSLS_SECTIONS = ('visco-gsls', 'visco-gsls-modes', 'visco-gsls-physics',
                  'visco-gsls-gradients', 'visco-gsls-stability', 'visco-gsls-memory',
                  'visco-gsls-example', 'visco-gsls-coefficients', 'visco-gsls-provider',
                  'visco-gsls-runtime', 'visco-gsls-references')
+V19_HELPER_SECTIONS = ('elastic-native-status', 'scalar-illumination', 'illumination-seal',
+                       'illumination-reduce', 'illumination-close', 'precondition-gradient',
+                       'ricker', 'backend-capabilities')
 USAGE_TARGETS = tuple(
     target
     for name in ('scalar', 'vrz', 'vti')
@@ -33,7 +36,7 @@ USAGE_TARGETS = tuple(
                    f'{name}-examples', f'{name}-notes')
 ) + ('scalar-time-sampling', 'scalar-memory', 'scalar-3d-example') + ELASTIC_SECTIONS + ('elastic-function', 'usage', 'propagators', 'native-runtime',
                        'native-status', 'prepare-native', 'native-notes',
-                       'native-examples', 'prepare-elastic', 'other-exports') + BORN_SECTIONS + VRR_SECTIONS + GSLS_SECTIONS + ('born-function',) + ('vrr-function', 'gsls-function', 'visco-gsls-function')
+                       'native-examples', 'prepare-elastic', 'other-exports') + BORN_SECTIONS + VRR_SECTIONS + GSLS_SECTIONS + V19_HELPER_SECTIONS + ('born-function',) + ('vrr-function', 'gsls-function', 'visco-gsls-function')
 TOC_TARGETS = ('scalar', 'born', 'vrz', 'vrr', 'vti', 'elastic', 'visco-gsls', 'elastic-conversions',
                'native-status', 'prepare-native', 'prepare-elastic', 'other-exports')
 RECONSTRUCTION_SECTIONS = ('reconstruction', 'reconstruction-scalar3d', 'reconstruction-state',
@@ -334,7 +337,9 @@ def check_heading_language_switches(page, base):
             return {id: section.id, stable: section.dataset.swAnchor,
                     permalink: heading?.querySelector('.headerlink')?.getAttribute('href')};
         })""")
-        assert len(sections) == len(USAGE_SECTIONS), (locale, sections)
+        assert len(sections) == len(USAGE_SECTIONS), (locale, len(sections), len(USAGE_SECTIONS),
+            'missing', set(USAGE_SECTIONS) - {section['stable'] for section in sections},
+            'unexpected', {section['stable'] for section in sections} - set(USAGE_SECTIONS))
         assert {section['stable'] for section in sections} == set(USAGE_SECTIONS), (locale, sections)
         for section in sections:
             assert section['permalink'] == '#' + section['id'], (locale, section)
@@ -365,7 +370,7 @@ def check_heading_language_switches(page, base):
     page.goto(base + 'en/installation.html?from=chapter#runtime-requirements')
     runtime_section = page.locator('#runtime-requirements').evaluate(
         'e => e.closest("section[data-sw-section]").dataset.swSection')
-    assert runtime_section == 'sw-section-3'  # V16 Torch/native sections precede legacy wheel requirements.
+    assert runtime_section == 'sw-section-3'  # V19 source/native sections precede the published wheel channel.
     open_mobile_menu(page)
     page.locator('[data-sw-language="zh"]').click()
     assert urlsplit(page.url).path == '/zh/installation.html'
