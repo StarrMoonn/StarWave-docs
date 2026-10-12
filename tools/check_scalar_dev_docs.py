@@ -25,7 +25,7 @@ def without_annotations(args):
 
 def check(source_root=None):
     snapshot = json.loads((ROOT / 'tools/scalar_dev_api_contract.json').read_text())
-    assert snapshot['source_commit'] == 'e040aa9b8225ab387f7e4853bfe6162f5351f5d5'
+    assert snapshot['source_commit'] == 'fba1f496b890f2dbaf3fbb3011d39f6d723cfea1'
     released_file = ROOT / 'tools/api_contract.json'
     assert hashlib.sha256(released_file.read_bytes()).hexdigest() == snapshot['released_contract_sha256'], 'Released API contract must not be silently refreshed'
     released = json.loads(released_file.read_text())['scalar']

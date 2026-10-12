@@ -34,7 +34,7 @@
       },
       "return": "tuple[torch.Tensor, ...]",
       "semantics": {
-        "reviewed_channel": "unreleased-dev",
+        "reviewed_channel": "published-source",
         "source_gradient_by_dimension": {
           "2": true,
           "3": true
@@ -77,11 +77,14 @@
     }
   },
   "released_contract_sha256": "3ab09ba9b61863f3358b00a052b18a555f4ad0b87336df079bb8f23e812d4c9b",
-  "source_commit": "e040aa9b8225ab387f7e4853bfe6162f5351f5d5",
-  "source_manifest_sha256": "73b45086bcbbe57d4e89bac2e7d0a115066d743d91459011bb4f15f60a9f1520",
-  "planned_release_targets": {
+  "source_commit": "fba1f496b890f2dbaf3fbb3011d39f6d723cfea1",
+  "source_manifest_sha256": "e250e04eceed07e72254f0d430ad4e749aef9e3f8d2b63b74cce300bcde6bb49",
+  "reviewed_dev_commit": "e040aa9b8225ab387f7e4853bfe6162f5351f5d5",
+  "publication": {
     "source_release": "V18",
-    "pypi": "9.0.0",
-    "publication": "pending verification"
+    "source_published_at": "2026-10-12T01:59:54Z",
+    "pypi_target": "9.0.0",
+    "pypi_status": "pending",
+    "latest_verified_pypi": "7.1.0"
   }
 }

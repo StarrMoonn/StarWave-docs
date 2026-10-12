@@ -22,7 +22,7 @@ GSLS: [visco_gsls](#visco-gsls). 独立源码扩展：[VRR Function](#vrr)，不
 
 本参考面向已审查的 V17 源码 `0.1.0.dev17`，包括 Born、已合并的平顶边界行为与导入时原生初始化。[Release V17](https://github.com/StarrMoonn/StarWave/releases/tag/V17) 已发布，PyPI `8.0.0` 尚待发布；已发布的 `7.1.0` wheel 是 V16 基线，不会因文档更新获得这些变化。详见[文档状态](status.md)。原有位置参数与原生默认行为保留；显式 [PyTorch 后端](pytorch-backend.md) 选项仍遵循各方程的限制。下方逐项列出完整签名、参数、返回与限制。
 
-下方 Scalar 节明确描述后续未发布 dev API，其版本说明优先于本页 V17 基线。
+下方 Scalar 节明确描述后续 V18 API，其版本说明优先于本页 V17 基线。
 
 6.0.0 的内部存储和 PML 转置维护见[发布说明](release-notes.md)，二维存储变化见[scalar 说明](modeling/scalar.md)。它们不引入新的公共参数；源码升级需重新构建配套原生库。
 
@@ -50,9 +50,9 @@ GSLS: [visco_gsls](#visco-gsls). 独立源码扩展：[VRR Function](#vrr)，不
 (scalar)=
 ## Scalar Function
 
-本 Scalar 节描述由 `bc63dd3c3e438256e46fce3a1738b94e6c9a2970` 审阅并合入 dev `e040aa9b8225ab387f7e4853bfe6162f5351f5d5` 的未发布扩展，须使用匹配源码；原生执行还需重编译对应库。冻结 V17（`27c2e14b184b94d8031a5b3a83c25b1ed3d4ac67`）、8.0.0 发布基线与已发布 7.1.0 均保留较早的 20 参数 scalar API：没有终态/回调关键字，二维源固定，不支持任意零面；V17 只支持已说明的顶部零宽排列。下方其它传播器仍遵循各自发布契约。
+本 Scalar 节描述由 `bc63dd3c3e438256e46fce3a1738b94e6c9a2970` 审阅并合入 dev `e040aa9b8225ab387f7e4853bfe6162f5351f5d5` 的 V18 扩展，须使用匹配源码；原生执行还需重编译对应库。冻结 V17（`27c2e14b184b94d8031a5b3a83c25b1ed3d4ac67`）、8.0.0 发布基线与已发布 7.1.0 均保留较早的 20 参数 scalar API：没有终态/回调关键字，二维源固定，不支持任意零面；V17 只支持已说明的顶部零宽排列。下方其它传播器仍遵循各自发布契约。
 
-本次计划发布为 V18 源码与 PyPI 9.0.0；发布状态和 wheel 验收仍待确认。已核验产物可用前，请使用审阅过的源码。这些功能不会倒写进 V17 或 8.0.0 基线。
+[Release V18](https://github.com/StarrMoonn/StarWave/releases/tag/V18) 已发布，冻结提交为 `fba1f496b890f2dbaf3fbb3011d39f6d723cfea1`，保留已审 dev `e040aa9` 的 scalar API。PyPI **9.0.0 仍待发布**；7.1.0 仍是已核验的最新公开 wheel。这些功能请使用匹配的 V18 源码。V17 与 8.0.0 基线保持不变。
 
 ```{py:function} starwave.scalar(v: torch.Tensor, grid_spacing: float | int | list[float] | tuple[float, ...], dt: float | int, *, source_amplitudes: torch.Tensor, source_locations: torch.Tensor, receiver_locations: torch.Tensor, accuracy: int=8, pml_freq: float | int=25.0, pml_width: int | list[int] | tuple[int, ...]=20, boundary_buffer: int=5, memory: str='boundary', max_vel: float | int | None=None, freq_taper_frac: float | int=0.0, time_pad_frac: float | int=0.0, time_taper: bool=False, illumination: ScalarIllumination | None=None, backend: str | None=None, execution: str='eager', checkpoint_interval: int | None=None, compile_steps: int=1, return_wavefield: bool=False, forward_callback: Callable | None=None, callback_frequency: int=1) -> tuple[torch.Tensor, ...]
 
@@ -142,7 +142,7 @@ receiver_amplitudes, = starwave.scalar(
 完整、无数据文件依赖的输入构造与一次 FWI 更新见[快速入门](quickstart.md)和[FWI](inversion/fwi.md)。默认 `pml_freq=25.0` 不会随源频率自动调整。
 
 
-未发布 dev 的 CPU 示例：仅终态 loss、可训练二维源、全零面、空接收器与 checkpoint 安全观测。它只检查小规模梯度接线，不代表目标波场收敛或 GPU 验收。
+V18 的 CPU 示例：仅终态 loss、可训练二维源、全零面、空接收器与 checkpoint 安全观测。它只检查小规模梯度接线，不代表目标波场收敛或 GPU 验收。
 
 <!-- scalar-dev:example:start -->
 ```python
@@ -197,7 +197,7 @@ scalar 使用保守系数 0.6，按全部模型轴间距与 `max(abs(v))`（或�
 (scalar-3d-example)=
 ### 三维可运行调用：速度与源的一阶梯度
 
-取得未发布 dev scalar 源码、构建匹配原生库并确保可见逻辑 CUDA 设备 0 可用后，可运行下面的独立小例子。模型采用 `[x,y,z]`，间距为 `[dx,dy,dz]`，坐标是网格下标。loss 仅检查求导接线。此代码已检查语法与接口；本次文档维护未运行 GPU，不把断言视为已通过的数值验收。
+取得V18 scalar 源码、构建匹配原生库并确保可见逻辑 CUDA 设备 0 可用后，可运行下面的独立小例子。模型采用 `[x,y,z]`，间距为 `[dx,dy,dz]`，坐标是网格下标。loss 仅检查求导接线。此代码已检查语法与接口；本次文档维护未运行 GPU，不把断言视为已通过的数值验收。
 
 ```python
 import torch

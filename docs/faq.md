@@ -24,9 +24,9 @@ Born 属于 V17 源码（`starwave.scalar_born` / `starwave.ScalarBorn`），原
 
 不相同。V17 按方程限定逐面宽度与物理闭合。scalar/VRZ 只允许最后一轴顶部零宽，其余面等宽且为正；外部 halo 固定为零，不是奇反射表面，scalar 同时拒绝 illumination。VTI 为顶部零法向牵引，elastic 为第一轴改进真空表面，GSLS 为二维压力释放闭合。Born 独立接受逐面非负宽度，零面使用固定零 ghost。请遵守[模型约定](modeling/conventions.md)及各自 [Usage](usage.md) 契约，不能把 Born 较宽的宽度取值域套给 scalar。
 
-未发布 dev `e040aa9b8225ab387f7e4853bfe6162f5351f5d5` 的 scalar 新增任意零面组合（正宽度仍须相等）、二维/三维可训练源、可选可微最终物理波场与诊断前向回调。这些是源码开发功能，不在冻结 V17/其 8.0.0 发布基线或 7.1.0 中。23 参数契约见 [Scalar Function](usage.md#scalar-function)，较早的 20 参数发布快照仍单独固定。 VRZ 与 VTI 仍拒绝任意零面。可微全波场 loss 使用 dev scalar 返回终态，回调快照仅供观测。
+V18 scalar（审阅基于 dev `e040aa9b8225ab387f7e4853bfe6162f5351f5d5`） 新增任意零面组合（正宽度仍须相等）、二维/三维可训练源、可选可微最终物理波场与诊断前向回调。这些源码功能，不在冻结 V17/其 8.0.0 发布基线或 7.1.0 中。23 参数契约见 [Scalar Function](usage.md#scalar-function)，较早的 20 参数发布快照仍单独固定。 VRZ 与 VTI 仍拒绝任意零面。可微全波场 loss 使用 dev scalar 返回终态，回调快照仅供观测。
 
-本次计划发布为 V18 源码与 PyPI 9.0.0；发布状态和 wheel 验收仍待确认。已核验产物可用前，请使用审阅过的源码。这些功能不会倒写进 V17 或 8.0.0 基线。
+[Release V18](https://github.com/StarrMoonn/StarWave/releases/tag/V18) 已发布，冻结提交为 `fba1f496b890f2dbaf3fbb3011d39f6d723cfea1`，保留已审 dev `e040aa9` 的 scalar API。PyPI **9.0.0 仍待发布**；7.1.0 仍是已核验的最新公开 wheel。这些功能请使用匹配的 V18 源码。V17 与 8.0.0 基线保持不变。
 
 ## A30 / RTX 4060 Laptop 可以运行吗？
 

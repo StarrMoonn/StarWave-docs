@@ -5,11 +5,11 @@ StarWave V17 源码契约双语使用手册，基于 Sphinx、Read the Docs 主�
 Bilingual user documentation for StarWave V17 source, with the published V16 / 7.1.0 wheel documented separately, built with Sphinx, the Read the Docs theme, and MyST Markdown. Each language contains the complete manual and a separate search index. The API presentation takes organizational cues from Deepwave while preserving StarWave’s own public contracts.
 
 
-The Scalar reference now separately documents an unreleased development extension at dev `e040aa9b8225ab387f7e4853bfe6162f5351f5d5`: 23 parameters, arbitrary zero-face subsets with equal positive widths, trainable 2D/3D sources, differentiable terminal-wavefield loss and read-only diagnostic callbacks. Callback snapshots are detached observations and do not carry loss gradients. Frozen V17/8.0.0 and the 7.1.0 wheel retain the old scalar API; other propagator contracts are unchanged. The target-wavefield notebook stays in the authorized source at `notebook/Scalar2D_Target_Wavefield.ipynb`.
+The Scalar reference now separately documents the V18 extension reviewed at dev `e040aa9b8225ab387f7e4853bfe6162f5351f5d5`: 23 parameters, arbitrary zero-face subsets with equal positive widths, trainable 2D/3D sources, differentiable terminal-wavefield loss and read-only diagnostic callbacks. Callback snapshots are detached observations and do not carry loss gradients. Frozen V17/8.0.0 and the 7.1.0 wheel retain the old scalar API; other propagator contracts are unchanged. The target-wavefield notebook stays in the authorized source at `notebook/Scalar2D_Target_Wavefield.ipynb`.
 
-本次计划发布为 V18 源码与 PyPI 9.0.0；发布状态和 wheel 验收仍待确认。已核验产物可用前，请使用审阅过的源码。这些功能不会倒写进 V17 或 8.0.0 基线。
+[Release V18](https://github.com/StarrMoonn/StarWave/releases/tag/V18) 已发布，冻结提交为 `fba1f496b890f2dbaf3fbb3011d39f6d723cfea1`，保留已审 dev `e040aa9` 的 scalar API。PyPI **9.0.0 仍待发布**；7.1.0 仍是已核验的最新公开 wheel。这些功能请使用匹配的 V18 源码。V17 与 8.0.0 基线保持不变。
 
-The planned release targets are V18 source and PyPI 9.0.0; publication and wheel validation are still pending. Until verified artifacts are available, use the reviewed source. These features are not retroactively part of V17 or the 8.0.0 baseline.
+[Release V18](https://github.com/StarrMoonn/StarWave/releases/tag/V18) is published at `fba1f496b890f2dbaf3fbb3011d39f6d723cfea1`, preserving the reviewed scalar API from dev `e040aa9`. PyPI **9.0.0 is still pending**; 7.1.0 remains the latest verified published wheel. Use matching V18 source for these features. V17 and the 8.0.0 baseline remain unchanged.
 
 ## V17 source, Born and flat-top boundaries
 

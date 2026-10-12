@@ -22,7 +22,7 @@ GSLS: [visco_gsls](#visco-gsls). Independent source extension: [VRR Function](#v
 
 This reference targets reviewed V17 source `0.1.0.dev17`, including Born, the merged flat-top boundary behavior and import-time native initialization. [Release V17](https://github.com/StarrMoonn/StarWave/releases/tag/V17) is published; PyPI `8.0.0` publication remains pending; the published `7.1.0` wheel is the V16 baseline and does not gain these changes through a documentation update. See [Status](status.md). Existing positional arguments and native defaults are preserved; explicit [PyTorch backend](pytorch-backend.md) options retain their equation-specific limits. Complete signatures, parameters, returns and limits follow.
 
-The Scalar section below explicitly documents a later unreleased dev API; its version warning takes precedence over this page’s V17 baseline.
+The Scalar section below explicitly documents the later V18 API; its version warning takes precedence over this page’s V17 baseline.
 
 See [Release Notes](release-notes.md) for 6.0.0 internal storage and PML-transpose maintenance, and [Scalar](modeling/scalar.md) for 2D storage changes. These introduce no new public parameters; source upgrades require rebuilt matching native libraries.
 
@@ -50,9 +50,9 @@ Notation: `B` is the number of shots, `S` the sources per shot, `R` the receiver
 (scalar)=
 ## Scalar Function
 
-This Scalar section describes the unreleased dev extension reviewed from `bc63dd3c3e438256e46fce3a1738b94e6c9a2970` and merged into dev `e040aa9b8225ab387f7e4853bfe6162f5351f5d5`. Use that matching source; native execution also requires its rebuilt library. Frozen V17 (`27c2e14b184b94d8031a5b3a83c25b1ed3d4ac67`), the 8.0.0 release baseline and published 7.1.0 retain the earlier 20-parameter scalar API: no terminal-field/callback keywords, fixed 2D sources, and no arbitrary zero-face selection. V17 supports only its documented top-zero layout. The other propagators below retain their separate release contracts.
+This Scalar section describes the V18 extension reviewed from `bc63dd3c3e438256e46fce3a1738b94e6c9a2970` and merged into dev `e040aa9b8225ab387f7e4853bfe6162f5351f5d5`. Use that matching source; native execution also requires its rebuilt library. Frozen V17 (`27c2e14b184b94d8031a5b3a83c25b1ed3d4ac67`), the 8.0.0 release baseline and published 7.1.0 retain the earlier 20-parameter scalar API: no terminal-field/callback keywords, fixed 2D sources, and no arbitrary zero-face selection. V17 supports only its documented top-zero layout. The other propagators below retain their separate release contracts.
 
-The planned release targets are V18 source and PyPI 9.0.0; publication and wheel validation are still pending. Until verified artifacts are available, use the reviewed source. These features are not retroactively part of V17 or the 8.0.0 baseline.
+[Release V18](https://github.com/StarrMoonn/StarWave/releases/tag/V18) is published at `fba1f496b890f2dbaf3fbb3011d39f6d723cfea1`, preserving the reviewed scalar API from dev `e040aa9`. PyPI **9.0.0 is still pending**; 7.1.0 remains the latest verified published wheel. Use matching V18 source for these features. V17 and the 8.0.0 baseline remain unchanged.
 
 ```{py:function} starwave.scalar(v: torch.Tensor, grid_spacing: float | int | list[float] | tuple[float, ...], dt: float | int, *, source_amplitudes: torch.Tensor, source_locations: torch.Tensor, receiver_locations: torch.Tensor, accuracy: int=8, pml_freq: float | int=25.0, pml_width: int | list[int] | tuple[int, ...]=20, boundary_buffer: int=5, memory: str='boundary', max_vel: float | int | None=None, freq_taper_frac: float | int=0.0, time_pad_frac: float | int=0.0, time_taper: bool=False, illumination: ScalarIllumination | None=None, backend: str | None=None, execution: str='eager', checkpoint_interval: int | None=None, compile_steps: int=1, return_wavefield: bool=False, forward_callback: Callable | None=None, callback_frequency: int=1) -> tuple[torch.Tensor, ...]
 
@@ -142,7 +142,7 @@ receiver_amplitudes, = starwave.scalar(
 For complete input construction without external data files and one FWI update, see [Quickstart](quickstart.md) and [FWI](inversion/fwi.md). The default `pml_freq=25.0` does not automatically track the source frequency.
 
 
-Unreleased-dev CPU example: terminal-only loss, trainable 2D source, all-zero faces, empty receivers and checkpoint-safe observation. It is a small gradient-wiring check, not target-wavefield convergence or GPU acceptance.
+V18 CPU example: terminal-only loss, trainable 2D source, all-zero faces, empty receivers and checkpoint-safe observation. It is a small gradient-wiring check, not target-wavefield convergence or GPU acceptance.
 
 <!-- scalar-dev:example:start -->
 ```python
@@ -197,7 +197,7 @@ Sources are FFT-upsampled before source-location velocity scaling. Records are t
 (scalar-3d-example)=
 ### Runnable 3D call: first-order velocity and source gradients
 
-With the unreleased dev scalar source, its matching rebuilt native library, and visible logical CUDA device 0 available, the following is a standalone small example. The model uses `[x,y,z]`, spacing is `[dx,dy,dz]`, and coordinates are grid indices. The loss only checks gradient wiring. Syntax and interface have been checked; this documentation update did not execute the GPU example, so these assertions are not numerical acceptance results.
+With the V18 scalar source, its matching rebuilt native library, and visible logical CUDA device 0 available, the following is a standalone small example. The model uses `[x,y,z]`, spacing is `[dx,dy,dz]`, and coordinates are grid indices. The loss only checks gradient wiring. Syntax and interface have been checked; this documentation update did not execute the GPU example, so these assertions are not numerical acceptance results.
 
 ```python
 import torch

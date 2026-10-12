@@ -5,9 +5,9 @@
 
 另行安装的 {ref}`VRR 源码扩展 <vrr>` 使用 `starwave_vrr.vrr`，与主包传播入口分开，也不在 7.1.0 中。其显式 Torch 模式支持 CPU/CUDA float32/64、full/checkpoint 与 eager/compile；原生 CUDA float32 full/boundary 须独立构建。扩展安装和限制见该页。
 
-未发布 dev `e040aa9b8225ab387f7e4853bfe6162f5351f5d5` 的 scalar 新增任意零面组合（正宽度仍须相等）、二维/三维可训练源、可选可微最终物理波场与诊断前向回调。这些是源码开发功能，不在冻结 V17/其 8.0.0 发布基线或 7.1.0 中。23 参数契约见 [Scalar Function](usage.md#scalar-function)，较早的 20 参数发布快照仍单独固定。
+V18 scalar（审阅基于 dev `e040aa9b8225ab387f7e4853bfe6162f5351f5d5`） 新增任意零面组合（正宽度仍须相等）、二维/三维可训练源、可选可微最终物理波场与诊断前向回调。这些源码功能，不在冻结 V17/其 8.0.0 发布基线或 7.1.0 中。23 参数契约见 [Scalar Function](usage.md#scalar-function)，较早的 20 参数发布快照仍单独固定。
 
-本次计划发布为 V18 源码与 PyPI 9.0.0；发布状态和 wheel 验收仍待确认。已核验产物可用前，请使用审阅过的源码。这些功能不会倒写进 V17 或 8.0.0 基线。
+[Release V18](https://github.com/StarrMoonn/StarWave/releases/tag/V18) 已发布，冻结提交为 `fba1f496b890f2dbaf3fbb3011d39f6d723cfea1`，保留已审 dev `e040aa9` 的 scalar API。PyPI **9.0.0 仍待发布**；7.1.0 仍是已核验的最新公开 wheel。这些功能请使用匹配的 V18 源码。V17 与 8.0.0 基线保持不变。
 
 (torch-selection)=
 ## 显式选择后端与设备
@@ -44,7 +44,7 @@ compile_steps 只改变执行块大小，不改变 dt、nt、精度、炮数、l
 
 | Torch 入口 | 维度 | dtype | 一阶梯度 |
 |---|---|---|---|
-| scalar（未发布 dev） | 2D/3D | float32 | 二维/三维均支持 v 与源；可选终态 loss |
+| scalar（V18） | 2D/3D | float32 | 二维/三维均支持 v 与源；可选终态 loss |
 | scalar_born | 1D/2D/3D | float32/64 | v、scatter（δv）、源、背景/散射/PML 初始状态 |
 | VRZ | 2D | float32 | v 与 impedance 或 density；源固定 |
 | VTI | 2D/3D | float32 | vp、epsilon、delta、rho；源固定 |
@@ -106,7 +106,7 @@ assert v.grad is not None and torch.isfinite(v.grad).all()
 
 下列为已准备有效输入后的接线片段，不是完整实验。四个入口显式列出全部可选参数；GSLS 的完整参数调用见 {ref}`GSLS 示例 <visco-gsls-example>`。None 初态表示从零状态开始，不省略 API 覆盖。不能把不同方程的 source / geometry / 模型变量直接共用。
 
-这份 scalar 完整选项列表要求未发布 dev 源码；上方简单 CPU 示例未使用新参数，仍兼容发布基线。
+这份 scalar 完整选项列表要求V18 源码；上方简单 CPU 示例未使用新参数，仍兼容发布基线。
 
 <!-- torch-api:scalar:full:start -->
 ```python

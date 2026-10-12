@@ -1,11 +1,11 @@
 # Release Notes
 
 
-**Planned V18 / PyPI 9.0.0 scalar extension**
+**Published V18 scalar extension; PyPI 9.0.0 pending**
 
-Unreleased dev `e040aa9b8225ab387f7e4853bfe6162f5351f5d5` scalar adds arbitrary zero-face subsets (positive widths still equal), trainable 2D/3D sources, optional differentiable terminal physical fields and diagnostic forward callbacks. These are source-only development features, absent from frozen V17/its 8.0.0 release baseline and from 7.1.0. See [Scalar Function](usage.md#scalar-function) for the 23-parameter contract; the older 20-parameter release snapshot remains separately pinned.
+V18 scalar (reviewed at dev `e040aa9b8225ab387f7e4853bfe6162f5351f5d5`) adds arbitrary zero-face subsets (positive widths still equal), trainable 2D/3D sources, optional differentiable terminal physical fields and diagnostic forward callbacks. These source features are absent from frozen V17/its 8.0.0 release baseline and from 7.1.0. See [Scalar Function](usage.md#scalar-function) for the 23-parameter contract; the older 20-parameter release snapshot remains separately pinned.
 
-The planned release targets are V18 source and PyPI 9.0.0; publication and wheel validation are still pending. Until verified artifacts are available, use the reviewed source. These features are not retroactively part of V17 or the 8.0.0 baseline.
+[Release V18](https://github.com/StarrMoonn/StarWave/releases/tag/V18) is published at `fba1f496b890f2dbaf3fbb3011d39f6d723cfea1`, preserving the reviewed scalar API from dev `e040aa9`. PyPI **9.0.0 is still pending**; 7.1.0 remains the latest verified published wheel. Use matching V18 source for these features. V17 and the 8.0.0 baseline remain unchanged.
 
 ## V17 source, Born and flat-top boundaries
 
