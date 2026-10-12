@@ -20,6 +20,8 @@ VRZ 的输入采集形状、等间距限制和单元素返回元组与 scalar �
 
 梯度回到调用时选择的参数化：训练 `v` 与 `Z` 和训练 `v` 与 `rho` 是不同的优化问题。不得不经链式法则就互换两种梯度。
 
+V17 源码在 `[x,z]` 轴序下接受顶部零宽 `[A,A,0,A]`，其余面为同一正整数 A。外部 `accuracy//2` 格 halo 固定零，物理 `z=0` 仍活动，顶部无 PML/buffer。它属于 scalar/VRZ 截断模板闭合，不是奇反射，也不保证高阶表面精度。CUDA full/boundary 与 Torch full/checkpoint 保留固定源和裁剪模型梯度约定。公开 7.1.0 不含此行为，见 [Usage](../usage.md#vrz-function)。
+
 ## 限制
 
 正值检查、数值可表示性检查与 CFL 规划不能保证任意强阻抗反差的空间稳定性。近零值及强反差可能导致病态。VRZ 不提供照明；签名中的 `illumination` 仅保留兼容位置，须为 `None`。实机 VRZ 数值、梯度与 FWI 验收待完成。

@@ -1,5 +1,16 @@
 # 发布说明
 
+## V17 源码、Born 与平顶边界
+
+[Release V17](https://github.com/StarrMoonn/StarWave/releases/tag/V17) 已发布，冻结源码版本为 `0.1.0.dev17`，提交 `27c2e14b184b94d8031a5b3a83c25b1ed3d4ac67`。PyPI **8.0.0 尚未发布**。目前可安装的 **7.1.0 wheel 仍是下文记录的 V16 二进制**，不包含 Born 或 V17 的平顶边界、导入初始化变更。
+
+- 主包新增 `starwave.scalar_born` 与 `starwave.ScalarBorn`：一维/二维/三维常密度声学 Born，散射参数为速度扰动 δv，返回背景/散射记录及终态。原生 CPU full、原生 CUDA full/boundary 与显式 Torch CPU/CUDA full/checkpoint 各有独立契约，见 [Born Function](usage.md#born-function)。
+- 平顶行为依方程区分：scalar/VRZ 为最后一轴顶部零宽 PML 的固定零 halo；VTI 约束法向牵引为零；elastic 采用第一轴的改进真空自由表面；GSLS 采用二维压力释放闭合。Born 保留独立的逐面非负宽度与零 ghost 约定，不能相互套用，见[模型约定](modeling/conventions.md)。
+- 显式编译后，导入会准备已有原生库与共享 dispatch；不编译、不初始化 CUDA、不选择设备、不分配波场，也不传播。手动 prepare 可用于显式检查，但不是首次传播的必需步骤。未构建的库可跳过并使用受支持的显式 Torch 路径；保留的无效构建会报错，不静默忽略。
+- 冻结 V17 归档的 `compile_all.py` 构建 core/elastic/GSLS，Born 另需 `python compile_born.py --arch 80`。后续已审 dev `3f2b24d` 将 Born 纳入 `compile_all.py`，一次构建/核验四个库；仍保留 `python compile_born.py --cpu-only`。独立 `starwave_vrr` 扩展继续单独安装/构建，见[安装](installation.md)。
+
+本手册只发布公开契约与合成示例，不包含私有科学实现或源码归档。Release 发布、源码/构建身份、文档检查、CPU 检查与目标 GPU/多卡/FWI 验收分别记录。既有实测教程、图件、PDF 与哈希保留原版本和证据范围；以下均为历史快照，其中 V16 wheel 仍是目前可安装的公开二进制。
+
 ## V16 / 7.1.0 · 2026-10-11
 
 [StarWave 7.1.0](https://pypi.org/project/starwave/7.1.0/) 已于 2026-10-11 发布，来自冻结的 V16 源码 `0.1.0.dev16`，提交 `5a224dbb1e86154ff034bbedaf67c0e4cf7a1b6a`，包含 GSLS 和新增 [PyTorch 后端](pytorch-backend.md)。唯一发行文件为 `starwave-7.1.0-py3-none-manylinux_2_35_x86_64.whl`（17,628,561 字节），无 sdist。运行平台为 Linux x86_64 / glibc ≥ 2.35，要求 Python ≥ 3.10 且 < 3.13、PyTorch ≥ 2.5 且 < 2.6。历史 [7.0.0](https://pypi.org/project/starwave/7.0.0/) 仍为不含 GSLS 或统一 Torch 后端的 V14 二进制。
@@ -12,7 +23,7 @@
 
 receipt 固定的源码清单 SHA-256 为 `f682ff0a836c0c259cd03a2e760460d68426cc5688e4852f8c62a151804694dc`。[发布工作流](https://github.com/StarrMoonn/StarWave/actions/runs/38108561775) 已通过发行文件核验、Python 3.10/3.11/3.12 发布前主机/CPU 检查、发布及三个 Python 版本的公开 PyPI 回装。这些检查不能证明新二进制的 GPU 数值、多卡、长程 FWI 或性能验收通过。
 
-本次没有 macOS wheel。Mac MPS 需使用已获授权的完整 V16 源码，且仅限下述 Scalar2D 配置。后续 dev 自由表面工作和独立打包的 {ref}`VRR 扩展 <vrr>` 不在 V16 / PyPI 7.1.0 中。VRR 手册现覆盖 `904c9106bdb883325df8586b7c3412f7814a9737` 的经审阅源码整合；这是文档更新，不是新包发布。用户提供的设备报告与文档/CPU 检查、公开 wheel 验证分别记录。
+本次没有 macOS wheel。Mac MPS 需使用已获授权的完整 V16 源码，且仅限下述 Scalar2D 配置。后续 dev 自由表面工作和独立打包的 {ref}`VRR 扩展 <vrr>` 不在 V16 / PyPI 7.1.0 中。此前 VRR 文档审阅覆盖 `904c9106bdb883325df8586b7c3412f7814a9737` 的经审阅源码整合；这是文档更新，不是新包发布。用户提供的设备报告与文档/CPU 检查、公开 wheel 验证分别记录。
 
 - scalar/VRZ/VTI/elastic 新增 backend、execution、checkpoint_interval、compile_steps；GSLS 新增 execution、compile_steps 并扩展 Torch checkpoint。旧位置参数、原生默认行为和科学 CUDA/C++ 核保留。
 - Torch 提供 CPU/CUDA full/checkpoint、eager/compile；没有 Torch boundary、AMP、elastic callbacks/offload 或抽样材料梯度。MPS 仅支持 Scalar2D accuracy=4 float32，使用 backend="torch"、full/checkpoint 与 eager/compile；Scalar3D、VRZ、VTI、elastic、GSLS 和其他 MPS 组合明确拒绝。本次不宣称最终 Mac 实机、500 轮 FWI 或性能验收通过。完整参数和限制见 [Usage](usage.md)、{ref}`GSLS <visco-gsls>` 和后端页。

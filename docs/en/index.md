@@ -19,6 +19,8 @@
 </div>
 ```
 
+This manual follows V17 source, including [Born](usage.md#born-function) and equation-specific flat-top boundaries. The published 7.1.0 wheel remains V16; 8.0.0 is not yet published. Check [installation](installation.md) for the appropriate source or wheel channel.
+
 (home-capabilities)=
 ## From physical models to learnable models
 
@@ -27,7 +29,7 @@
   <div>
     <svg class="sw-capability-icon" viewBox="0 0 96 64" width="96" height="64" aria-hidden="true" focusable="false"><path d="M10 33h13c5 0 5-18 10-18s7 36 12 36 5-30 10-30 6 12 11 12h20"/><path class="sw-icon-soft" d="M14 46h10m39 0h19M18 56h12m28 0h19"/></svg>
     <h3>Connect models to observations</h3>
-    <p>CUDA wave propagation for 2D/3D scalar acoustics, 2D VRZ, 2D/3D acoustic VTI, and 2D GSLS viscoacoustics. Clear entry points for different descriptions of the medium.</p>
+    <p>Differentiable propagation for scalar acoustics, acoustic Born scattering, VRZ, acoustic VTI, elasticity and GSLS viscoacoustics. Each entry has its own supported devices and physical conventions.</p>
     <a href="usage.html#propagators">Explore the propagators <span aria-hidden="true">→</span></a>
   </div>
   <div>

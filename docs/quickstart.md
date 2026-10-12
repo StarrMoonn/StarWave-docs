@@ -1,10 +1,10 @@
 # 快速入门：一个合成炮集
 
-本页保留二维入门接线。公开 6.0.0 的三维模型、非等间距与速度/源一阶梯度示例见{ref}`三维 scalar 调用 <scalar-3d-example>`；两种维数沿用同一函数签名。
+本页保留兼容公开 7.1.0 基线的二维 scalar 入门接线。当前源码的三维模型、非等间距与速度/源一阶梯度示例见{ref}`三维 scalar 调用 <scalar-3d-example>`。V17 专属 [Born](usage.md#born-function) 提供独立 CPU 示例及背景/散射返回契约；7.1.0 不含 Born，8.0.0 尚未发布。
 
 目标是检查从模型、震源、采集几何到记录张量的接线。示例现场创建 32×32 的小速度模型、一炮一源和 16 个接收点；不下载数据，不保存结果，不执行编译。
 
-先完成[安装与原生库准备](installation.md)，再下载 {download}`scalar_demo.py <../examples/scalar_demo.py>`。
+先按[安装](installation.md)准备匹配的原生库。V17 导入即准备已有原生 dispatch，脚本中的显式 prepare 在该版本是可选设备检查，对 V16 wheel 仍有用；导入不会编译或传播。再下载 {download}`scalar_demo.py <../examples/scalar_demo.py>`。
 
 ```bash
 python scalar_demo.py --mode forward --device 0

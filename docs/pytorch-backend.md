@@ -1,9 +1,9 @@
 (pytorch-backend)=
 # PyTorch 后端
 
-V16 的统一新增后端通过原有 `starwave.scalar / vrz / vti / elastic / visco_gsls` 入口选择。使用 `backend="torch"`，正演由 PyTorch 张量运算执行，反传由 autograd 生成；`execution="compile"` 编译同一张量计算。旧 CUDA/C++ 科学核和省略新参数时的原生行为保留。已发布的 [7.1.0 Linux wheel](https://pypi.org/project/starwave/7.1.0/) 包含此后端；历史 7.0.0 不含此功能。本次没有 macOS wheel，Mac MPS 需使用已获授权的完整 V16 源码，见[安装](installation.md)和[发行状态](status.md)。
+统一 PyTorch 后端通过 `starwave.scalar / scalar_born / vrz / vti / elastic / visco_gsls` 选择。使用 `backend="torch"` 时，正演由张量运算执行、反传由 autograd 生成；`execution="compile"` 编译同一计算。V16 引入其中五个非 Born 入口，已由 [7.1.0 Linux wheel](https://pypi.org/project/starwave/7.1.0/) 提供。V17 新增 Born 与本页说明的方程专属平顶边界、导入行为；**8.0.0 尚未发布**。没有 macOS wheel，受支持的 Mac MPS 配置需要授权源码，见[安装](installation.md)和[发行状态](status.md)。
 
-另行安装的 {ref}`VRR 源码扩展 <vrr>` 使用 `starwave_vrr.vrr`，不是主包第六个入口，也不在 7.1.0 中。其显式 Torch 模式支持 CPU/CUDA float32/64、full/checkpoint 与 eager/compile；原生 CUDA float32 full/boundary 须独立构建。扩展安装和限制见该页。
+另行安装的 {ref}`VRR 源码扩展 <vrr>` 使用 `starwave_vrr.vrr`，与主包传播入口分开，也不在 7.1.0 中。其显式 Torch 模式支持 CPU/CUDA float32/64、full/checkpoint 与 eager/compile；原生 CUDA float32 full/boundary 须独立构建。扩展安装和限制见该页。
 
 (torch-selection)=
 ## 显式选择后端与设备
@@ -12,7 +12,7 @@ V16 的统一新增后端通过原有 `starwave.scalar / vrz / vti / elastic / v
 - GSLS 默认 `backend="cuda"`，`backend="native_cpu"` 仍表示原生 C++ CPU 实现。`backend="torch"` 与 native_cpu 不同。
 - Torch 支持 CPU/CUDA；模型设备决定执行设备。请自行把输入安排在同一设备，不自动搬移模型；`backend="cpu"` 无效。MPS 仅支持 Scalar2D accuracy=4 float32，使用 backend="torch"、full/checkpoint 与 eager/compile；Scalar3D、VRZ、VTI、elastic、GSLS 和其他 MPS 组合明确拒绝。本次不宣称最终 Mac 实机、500 轮 FWI 或性能验收通过。
 - scalar/VRZ/VTI 原默认 `memory="boundary"` 保留。切换 Torch 时必须同时显式选择 `memory="full"` 或 `"checkpoint"`，否则报错，不静默替换存储策略。
-- Torch 不需要传播原生库、nvcc 或 `compile_all.py`；eager 不需要原生编译。compile 需要当前 PyTorch 的 Inductor 工具链，CUDA 使用其适用的 Triton 环境；失败不回退 eager。此项并不使历史 Linux wheel 可安装到其他平台。
+- Torch 传播不依赖原生库、nvcc 或 `compile_all.py`；eager 不需要原生编译。V17 导入仍会加载/准备已有原生库与共享 dispatch，但不编译、不初始化 CUDA、不传播。未构建的库允许显式 Torch 使用，保留的无效构建会报错。手动 prepare 可选，也不要求串行传播预热。compile 需要当前 PyTorch 的 Inductor 工具链，CUDA 使用其适用的 Triton 环境；失败不回退 eager。此项并不使历史 Linux wheel 可安装到其他平台。
 
 (torch-memory)=
 ## 后端、执行和内存表
@@ -20,9 +20,10 @@ V16 的统一新增后端通过原有 `starwave.scalar / vrz / vti / elastic / v
 | 入口 / 后端 | 设备 | memory | 默认 / 限制 |
 |---|---|---|---|
 | scalar / VRZ / VTI 原生 | CUDA | full、boundary | 默认 boundary；不接受 checkpoint |
+| Born 原生 | CPU/CUDA float32/64 | full；boundary 仅 CUDA | 默认 full；无原生 checkpoint |
 | elastic 原生 | CPU/CUDA | full；boundary 仅 CUDA | 默认 full；原有卸载/压缩条件独立保留 |
 | GSLS 原生 | CUDA 或显式 native_cpu | full、checkpoint | 默认 full；None 间隔按形状和所需历史估算 |
-| 五个入口，backend="torch" | CPU/CUDA | full、checkpoint | scalar/VRZ/VTI 必须覆盖原 boundary 默认；eager/compile 均支持 |
+| 六个主包入口，backend="torch" | CPU/CUDA | full、checkpoint | scalar/VRZ/VTI 必须覆盖原 boundary 默认；eager/compile 均支持 |
 
 | 选项 | 默认 | Torch 含义 / 拒绝条件 |
 |---|---|---|
@@ -40,6 +41,7 @@ compile_steps 只改变执行块大小，不改变 dt、nt、精度、炮数、l
 | Torch 入口 | 维度 | dtype | 一阶梯度 |
 |---|---|---|---|
 | scalar | 2D/3D | float32 | v；source 仅 3D |
+| scalar_born | 1D/2D/3D | float32/64 | v、scatter（δv）、源、背景/散射/PML 初始状态 |
 | VRZ | 2D | float32 | v 与 impedance 或 density；源固定 |
 | VTI | 2D/3D | float32 | vp、epsilon、delta、rho；源固定 |
 | elastic | 2D/3D | float32/64 | lamb、mu、buoyancy、源、初始物理/PML 状态 |
@@ -55,16 +57,20 @@ Torch elastic 对每个内部时间步求导，要求 `model_gradient_sampling_i
 
 Torch scalar/VRZ/VTI 与 GSLS 会检查传入记录的反传余切量；NaN/Inf 直接报错。有限 loss 不保证其记录梯度有限，调用者须检查目标函数与求导链。
 
+V17 Torch Born 要求 `python_backend=False`、`model_gradient_sampling_interval=1`、device 历史且不压缩；选择 `memory="full"` 或 `"checkpoint"` 与 eager/compile。完整状态 checkpoint 保留背景/散射初始状态、源、`v`、`scatter` 的梯度。Born 支持观察用途的 forward callback，拒绝 backward callback。首次 compile 可能较慢，失败不回退 eager。Born 的背景算子不同于 `starwave.scalar`，观测应与其返回的背景记录配对。完整签名、返回、轴序及原生梯度抽样语义见 [Born Function](usage.md#born-function)。
+
+V17 的 Torch 平顶限制仍按方程区分：scalar/VRZ 使用固定零外部 halo，VTI 为零法向牵引，elastic 为改进真空表面，GSLS 为奇压力/偶竖直面闭合。Born 的零面 ghost 约定独立。设备允许范围不变；MPS 仍只限 Scalar2D accuracy=4 float32，目标设备的自由表面验收另行记录，见[模型约定](modeling/conventions.md)。
+
 (torch-example)=
 ## CPU 最小独立示例
 
-需要提供新后端的 V16 源码环境。此小例子检查接线，不证明 FWI 收敛；本手册构建仅静态检查代码，不执行传播。切换 CUDA 时显式更改 device 并把全部张量放到该设备；切换编译时设置 execution="compile"，compile_steps 可尝试 4。
+此 scalar 示例可使用匹配源码环境或 7.1.0 wheel。此小例子检查接线，不证明 FWI 收敛；本手册构建仅静态检查代码，不执行传播。切换 CUDA 时显式更改 device 并把全部张量放到该设备；切换编译时设置 execution="compile"，compile_steps 可尝试 4。
 
 ```python
 import torch
 import starwave
 
-# Explicit CPU Torch propagation; no native-library preparation.
+# Explicit CPU Torch propagation; no manual native preparation needed.
 device = torch.device("cpu")
 v = torch.full((24, 20), 1800.0, device=device,
                dtype=torch.float32, requires_grad=True)
@@ -246,4 +252,4 @@ outputs = starwave.elastic(lamb, mu, buoyancy, grid_spacing, dt,
 
 ## Scalar2D MPS Notebook
 
-源码中的 L2_True_StarWave_Acoustic_MPS.ipynb 和同步 .py 直接 import starwave，仅用 PROJECT_ROOT 显式读取资源，不隐式安装或构建。保留 dt=0.003、nt=2000、30 炮/5 批、500 epochs、Adam lr=10、checkpoint_interval=32 与 compile_steps=4；空间阶数与编译块长度独立。安装本次审阅源码后重启 Python，禁用 PYTORCH_ENABLE_MPS_FALLBACK；不支持的算子或编译失败直接报错，不回退 CPU/eager。已发布的 7.1.0 wheel 仅适用于 Linux，不能用于 Mac MPS 安装；Mac 使用已审完整 V16 源码。历史 7.0.0 二进制不含本更新。
+源码中的 L2_True_StarWave_Acoustic_MPS.ipynb 和同步 .py 直接 import starwave，仅用 PROJECT_ROOT 显式读取资源，不隐式安装或构建。保留 dt=0.003、nt=2000、30 炮/5 批、500 epochs、Adam lr=10、checkpoint_interval=32 与 compile_steps=4；空间阶数与编译块长度独立。安装本次审阅源码后重启 Python，禁用 PYTORCH_ENABLE_MPS_FALLBACK；不支持的算子或编译失败直接报错，不回退 CPU/eager。已发布的 7.1.0 wheel 仅适用于 Linux，不能用于 Mac MPS 安装；Mac 使用已审完整源码。历史 7.0.0 二进制不含本更新。

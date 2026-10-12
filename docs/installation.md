@@ -1,24 +1,24 @@
 # 安装
 
-当前 API 已由 [StarWave 7.1.0](https://pypi.org/project/starwave/7.1.0/) 提供，来自 V16 / `0.1.0.dev16`，包含 GSLS 和新增 [PyTorch 后端](pytorch-backend.md)。历史 PyPI **7.0.0** 是不含这些功能的 V14 二进制。公开文件身份及核验范围见[文档状态](status.md)。
+本手册面向 [V17 源码](https://github.com/StarrMoonn/StarWave/releases/tag/V17)，版本 `0.1.0.dev17`、提交 `27c2e14b184b94d8031a5b3a83c25b1ed3d4ac67`，包含 Born 与已合并的平顶边界、导入行为。PyPI **8.0.0 尚未发布**。目前可安装的 [7.1.0 wheel](https://pypi.org/project/starwave/7.1.0/) 是包含 GSLS 和 [PyTorch 后端](pytorch-backend.md)的 V16 基线，不含 V17 新增内容。发行文件及证据范围见[文档状态](status.md)。
 
-另行安装的 {ref}`VRR 源码扩展 <vrr>` 使用 `starwave_vrr.vrr`，不是主包第六个入口，也不在 7.1.0 中。其显式 Torch 模式支持 CPU/CUDA float32/64、full/checkpoint 与 eager/compile；原生 CUDA float32 full/boundary 须独立构建。扩展安装和限制见该页。
+另行安装的 {ref}`VRR 源码扩展 <vrr>` 使用 `starwave_vrr.vrr`，与主包传播入口分开，也不在 7.1.0 中。其显式 Torch 模式支持 CPU/CUDA float32/64、full/checkpoint 与 eager/compile；原生 CUDA float32 full/boundary 须独立构建。扩展安装和限制见该页。
 
-受支持的 Linux x86_64 主机可安装预编译 7.1.0 wheel。源码仓库为私有仓库；源码用户需使用已获授权的完整 V16 源码。本次没有 macOS wheel 或 PyPI sdist；Mac MPS 必须按下文从源码安装，且仅支持文档限定的 Scalar2D 配置。
+受支持的 Linux x86_64 主机可安装预编译 7.1.0 wheel。源码仓库为私有仓库；源码用户需使用已获授权的完整 V17 源码。本次没有 macOS wheel 或 PyPI sdist；Mac MPS 必须按下文从源码安装，且仅支持文档限定的 Scalar2D 配置。
 
-## V16 纯 Torch 安装与运行
+## 源码与 wheel 的 Torch 安装和运行
 
-Linux wheel 用户完成下文 7.1.0 安装后，可直接选择 Torch 后端。源码使用（包括 Mac MPS）可从完整 V16 源码根目录直接运行，或选择可选注册：
+Linux wheel 用户完成下文 7.1.0 安装后，可直接选择 Torch 后端。源码使用（包括 Mac MPS）可从完整 V17 源码根目录直接运行，或选择可选注册：
 
 ```bash
 python -m pip install --no-deps --no-build-isolation -e .
 ```
 
-显式 `backend="torch"` 支持 CPU/CUDA full/checkpoint，不加载传播原生库，不需要 nvcc 或 compile_all.py；eager/compile 与模型设备分别选择。compile 使用当前 PyTorch Inductor 工具链，失败明确报错，不回退 eager。MPS 仅支持 Scalar2D accuracy=4 float32，使用 backend="torch"、full/checkpoint 与 eager/compile；Scalar3D、VRZ、VTI、elastic、GSLS 和其他 MPS 组合明确拒绝。本次不宣称最终 Mac 实机、500 轮 FWI 或性能验收通过。 AMP 仍拒绝。可从 {ref}`CPU 独立示例 <torch-example>` 开始。
+显式 `backend="torch"` 支持 CPU/CUDA full/checkpoint，传播不依赖原生库，不需要 nvcc 或 compile_all.py；V17 导入仍会准备已存在的原生构建；eager/compile 与模型设备分别选择。compile 使用当前 PyTorch Inductor 工具链，失败明确报错，不回退 eager。MPS 仅支持 Scalar2D accuracy=4 float32，使用 backend="torch"、full/checkpoint 与 eager/compile；Scalar3D、VRZ、VTI、elastic、GSLS 和其他 MPS 组合明确拒绝。本次不宣称最终 Mac 实机、500 轮 FWI 或性能验收通过。 AMP 仍拒绝。可从 {ref}`CPU 独立示例 <torch-example>` 开始。
 
-## V16 原生构建
+## V17 与后续 dev 原生构建
 
-源码用户使用原生路径时，必须从完整匹配源码构建；Linux wheel 已包含配套原生库。新增 Python 入口改变 elastic/GSLS 源闭包身份；即使 CUDA/C++ 数值核没有变化，也应重建并重启，不能手改旧构建 manifest。源码的纯 Torch 调用可省略下面的原生构建；wheel 用户无需执行这些构建命令。
+原生源码路径必须使用完整匹配的源码/库构建；7.1.0 wheel 已自带其配套的 V16 原生库。V17 改变了原生边界/构建契约。更新源码后应重建并重启，不手改旧 manifest 或绕过兼容检查。受支持的纯 Torch 源码路径可省略原生编译，但导入仍会加载已有原生构建，并执行各后端规定的兼容检查。
 
 
 使用已安装且与 PyTorch 匹配的 CUDA Toolkit/C++ 工具链。在完整源码根目录执行：
@@ -27,7 +27,16 @@ python -m pip install --no-deps --no-build-isolation -e .
 python compile_all.py --arch 80
 ```
 
-该命令构建/核验 core（scalar/VRZ/VTI）、elastic、GSLS 三个 CUDA 库。A30 使用 `80`，RTX 4060 使用 `89`；选择实际 GPU 架构。`combined_build.py` 仅覆盖 core/elastic。仅构建 GSLS 时显式选择 CUDA 或 CPU：
+对于后续已审 dev `3f2b24d`，该命令构建/核验 core（scalar/VRZ/VTI）、elastic、GSLS、Born 四个库。不可变的 V17 归档中，同一命令只构建 core/elastic/GSLS；Born 需另外构建：
+
+```bash
+# Required after compile_all.py for frozen V17; also usable separately on later dev.
+python compile_born.py --arch 80
+# Alternative for native CPU full only:
+python compile_born.py --cpu-only
+```
+
+A30 使用 `80`，RTX 4060 使用 `89`，也可选择实际 GPU 架构。`combined_build.py` 只覆盖 core/elastic。Born 属于主包 API，但原生库独立；7.1.0 不含 Born。纯 Torch Born CPU/CUDA full/checkpoint 不需要 Born 原生构建。VRR 仍单独安装/构建。仅构建 GSLS 时显式选择 CUDA 或 CPU：
 
 ```bash
 # GSLS CUDA
@@ -36,7 +45,7 @@ python compile_visco_gsls.py --arch 80
 python compile_visco_gsls.py --backend cpu
 ```
 
-GSLS 源码构建输出为 `native/build/gsls/`；通用 `STARWAVE_BUILD_DIR` 覆盖时使用其 `gsls/` 子目录。构建和运行须指向同一套源码/库，不能混用独立旧库。GSLS ABI 2 / semantics 1 / capabilities 255 与 core ABI 2 分别核验。更新后重启 Python / Notebook kernel；编译或载入成功不等于 GPU 数值验收。
+GSLS 源码构建输出为 `native/build/gsls/`；通用 `STARWAVE_BUILD_DIR` 覆盖时使用其 `gsls/` 子目录。构建和运行须指向同一套源码/库，不能混用独立旧库。原生兼容性根据各后端的配套构建核验；历史 V16 wheel 保留已记录的构建身份。更新后重启 Python / Notebook kernel；编译或载入成功不等于 GPU 数值验收。
 
 完整源码可不经 pip 注册直接运行；可选注册与编译分开，安装不会隐式构建：
 
@@ -97,20 +106,20 @@ print(torch.__version__, torch.version.cuda)
 print(torch.cuda.is_available())
 status = starwave.native_status()
 print({key: status[key] for key in ("library_exists", "library_loaded")})
-# 在主线程中，使用当前进程可见的逻辑设备编号：
+# V17 可选的显式设备检查；V16 原生示例仍需此准备：
 starwave.prepare_native([0])
 ```
 
-在全新 Python 进程、首次原生准备之前，wheel 应报告库文件存在且尚未加载。`prepare_native` 成功表示初始化与兼容检查通过，不能代替正演与梯度数值验收。随后运行[快速入门](quickstart.md)的小规模检查。
+V17 的 `import starwave` 在返回前准备已有 core/elastic/Born/GSLS 原生库与共享 dispatch；已安装且可导入的 VRR 扩展也会单独准备。导入不编译、不初始化 CUDA、不选设备、不分配波场，也不传播。导入前配置构建路径，更新后重建并重启。未构建的库允许跳过并使用受支持的显式 Torch；保留的无效构建会报错。手动 prepare 是可选设备检查，不再要求串行预热。较早的 V16 / 7.1.0 wheel 仍在 prepare 前保持 core 库未加载。导入或 prepare 均不能代替正演/梯度数值检查，接着运行[快速入门](quickstart.md)。
 
 文档站本身的构建环境独立于计算环境；仅阅读或构建文档不需要 GPU。
 
 
-弹性传播使用独立准备入口：GPU 主线程调用 `starwave.prepare_elastic([0])`，CPU 调用 `starwave.prepare_elastic()` 并选择 `memory="full"`。完整参数与 vp/vs/rho 转换见 {ref}`Elastic Function <elastic>`。原生 scalar3D 没有 CPU 路径；V16 Torch scalar3D 可在 CPU/CUDA 上运行。GPU、DataParallel 与长程 FWI 验收范围见[文档状态](status.md)。
+弹性传播保留 V17 可选的独立准备入口（较早原生工作流仍需准备）：GPU 主线程调用 `starwave.prepare_elastic([0])`，CPU 调用 `starwave.prepare_elastic()` 并选择 `memory="full"`。完整参数与 vp/vs/rho 转换见 {ref}`Elastic Function <elastic>`。原生 scalar3D 没有 CPU 路径；V16 Torch scalar3D 可在 CPU/CUDA 上运行。GPU、DataParallel 与长程 FWI 验收范围见[文档状态](status.md)。
 
-## V16 GSLS 准备与后端选择
+## GSLS 准备与后端选择
 
-V16 GSLS 使用独立准备入口：CUDA 主线程调用 `starwave.prepare_visco_gsls(backend="cuda", device="cuda:0")`，CPU 调用 `starwave.prepare_visco_gsls(backend="native_cpu")`。`starwave.visco_gsls_native_status(backend="cuda")` 只查看状态。准备默认 CPU，传播默认 CUDA，建议始终显式指定；不自动回退。`backend="torch"` 支持 full/checkpoint 与 eager/compile，无需原生构建。见 {ref}`GSLS API <visco-gsls>` 的完整契约与 CPU 示例。
+GSLS 保留 V17 可选的独立准备入口（较早原生工作流仍需准备）：CUDA 主线程调用 `starwave.prepare_visco_gsls(backend="cuda", device="cuda:0")`，CPU 调用 `starwave.prepare_visco_gsls(backend="native_cpu")`。`starwave.visco_gsls_native_status(backend="cuda")` 只查看状态。准备默认 CPU，传播默认 CUDA，建议始终显式指定；不自动回退。`backend="torch"` 支持 full/checkpoint 与 eager/compile，无需原生构建。见 {ref}`GSLS API <visco-gsls>` 的完整契约与 CPU 示例。
 
 (installation-smoke)=
 ## Notebook 01：实际运行检查

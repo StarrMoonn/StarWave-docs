@@ -107,7 +107,8 @@
     "visco-gsls-runtime": "visco-gsls-runtime",
     "visco-gsls-references": "visco-gsls-references",
     "visco-gsls-function": "visco-gsls",
-    "gsls-function": "visco-gsls"
+    "gsls-function": "visco-gsls",
+    "born-function": "born"
   },
   "en": {
     "usage": "usage",
@@ -217,6 +218,7 @@
     "visco-gsls-runtime": "visco-gsls-runtime",
     "visco-gsls-references": "visco-gsls-references",
     "visco-gsls-function": "visco-gsls",
-    "gsls-function": "visco-gsls"
+    "gsls-function": "visco-gsls",
+    "born-function": "born"
   }
 }

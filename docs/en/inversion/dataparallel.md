@@ -25,7 +25,7 @@ class ScalarForward(torch.nn.Module):
         )[0]
 
 device_ids = [0, 1]  # Replace with logical IDs visible to the current process.
-starwave.prepare_native(device_ids)  # Call in the main thread before creating multi-GPU workers.
+starwave.prepare_native(device_ids)  # Optional V17 device check; V16 uses explicit preparation.
 primary = torch.device(f"cuda:{device_ids[0]}")
 module = ScalarForward(initial_velocity.to(primary))
 parallel = torch.nn.DataParallel(module, device_ids=device_ids, dim=0)
@@ -40,6 +40,10 @@ optimizer.step()
 ```
 
 The three inputs have shapes `[B,S,T]`, `[B,S,D]`, and `[B,R,D]`, respectively, and use the same `B` in a given call. Each replica receives the full model and a subset of shots. Records are gathered on the first GPU before a single global objective is computed. Keep other fixed models in buffers or explicitly fixed parameters.
+
+V17 import prepares existing native libraries and shared dispatch before worker calls, without initializing CUDA or running propagation. Ordinary first parallel propagation requires neither mandatory manual prepare nor serial warm-up. Keep explicit device checks in the main thread if used; build before import and restart after updates. Missing native builds require selecting a supported explicit Torch path; an invalid retained build fails. The V16 / 7.1.0 wheel retains its older explicit preparation workflow.
+
+The same model-versus-shot distinction applies when adapting Born: `v` and `scatter` belong in the replicated module, while sources and background/scattered receiver geometry split consistently by shot. Born returns terminal states and two record tensors, so design the wrapper to select the intended records explicitly. See [Born Function](../usage.md#born-function); this page does not establish Born multi-GPU acceptance.
 
 ## Checks before use
 

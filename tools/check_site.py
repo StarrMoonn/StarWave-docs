@@ -374,12 +374,15 @@ def check(root):
         for alias, target in aliases.items():
             if alias not in pages[usage].ids or pages[usage].id_sections.get(alias) != pages[usage].id_sections.get(target):
                 errors.append(f'Legacy Usage anchor drift: {locale}/{alias} -> {target}')
-        for name, label in (('scalar', 'Scalar Function'), ('vrz', 'VRZ Function'),
+        for name, label in (('scalar', 'Scalar Function'), ('born', 'Born Function'), ('vrz', 'VRZ Function'),
                             ('vrr', 'VRR Function'), ('vti', 'VTI Function'), ('elastic', 'Elastic Function'), ('visco-gsls', 'GSLS Function')):
             if content.count(f'<h2>{label}<a') != 1:
                 errors.append(f'Missing or repeated Usage function heading: {locale}/{name}')
         if re.search(r'<h3>(?:Function|函数)<a', content):
             errors.append(f'Redundant Usage function subheading: {locale}')
+        for name in ('scalar_born', 'ScalarBorn', 'ScalarBorn.forward'):
+            if f'starwave.{name}' not in pages[usage].ids:
+                errors.append(f'Missing Born API anchor: {locale}/{name}')
         if 'starwave_vrr.vrr' not in pages[usage].ids:
             errors.append(f'Missing independent VRR API anchor in Usage: {locale}')
         other = pages[root / ('en' if locale == 'zh' else 'zh') / 'usage.html']

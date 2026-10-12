@@ -19,6 +19,8 @@
 </div>
 ```
 
+本手册依据 V17 源码，包含 [Born](usage.md#born-function) 与方程专属平顶边界。已发布 7.1.0 wheel 仍为 V16，8.0.0 尚未发布；请按[安装](installation.md)区分源码与 wheel 渠道。
+
 (home-capabilities)=
 ## 从物理模型，到可学习的模型
 
@@ -27,7 +29,7 @@
   <div>
     <svg class="sw-capability-icon" viewBox="0 0 96 64" width="96" height="64" aria-hidden="true" focusable="false"><path d="M10 33h13c5 0 5-18 10-18s7 36 12 36 5-30 10-30 6 12 11 12h20"/><path class="sw-icon-soft" d="M14 46h10m39 0h19M18 56h12m28 0h19"/></svg>
     <h3>用波场，连接模型与观测</h3>
-    <p>CUDA 波传播覆盖二维/三维标量声学、二维 VRZ、二维/三维声学 VTI 与二维 GSLS 声学，为不同介质参数化提供清晰的建模入口。</p>
+    <p>可微分传播覆盖标量声学、声学 Born 散射、VRZ、声学 VTI、弹性与 GSLS 黏声；各入口有自己的设备支持和物理约定。</p>
     <a href="usage.html#propagators">探索传播接口 <span aria-hidden="true">→</span></a>
   </div>
   <div>

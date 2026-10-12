@@ -20,6 +20,8 @@ VRZ has the same acquisition input shapes, equal-spacing restriction, and single
 
 Gradients are returned for the parameterization selected in the call. Training `v` and `Z` and training `v` and `rho` are different optimization problems. Do not interchange these gradients without applying the chain rule.
 
+V17 source accepts top-zero `[A,A,0,A]` for `[x,z]`, with the other faces equal positive A. The exterior `accuracy//2` halo is fixed zero, physical `z=0` remains active, and top PML/buffer is absent. This is the scalar/VRZ truncated-stencil closure, not odd reflection or a high-order surface-accuracy guarantee. CUDA full/boundary and Torch full/checkpoint retain the fixed source and cropped model-gradient conventions. Published 7.1.0 does not include this behavior; see [Usage](../usage.md#vrz-function).
+
 ## Limitations
 
 Positivity checks, numerical representability checks, and CFL planning do not guarantee spatial stability for arbitrarily strong impedance contrasts. Near-zero values and strong contrasts can cause ill-conditioning. VRZ does not provide illumination. The `illumination` argument in the signature is retained only for compatibility and must be `None`. Numerical, gradient, and FWI validation of VRZ on actual devices is still pending.

@@ -1,5 +1,16 @@
 # Release Notes
 
+## V17 source, Born and flat-top boundaries
+
+[Release V17](https://github.com/StarrMoonn/StarWave/releases/tag/V17) is published from frozen source `0.1.0.dev17`, commit `27c2e14b184b94d8031a5b3a83c25b1ed3d4ac67`. PyPI **8.0.0 has not been published**. The available **7.1.0 wheel remains the V16 binary** recorded below; it does not contain Born or the V17 flat-top/import changes.
+
+- The main package adds `starwave.scalar_born` and `starwave.ScalarBorn`: 1D/2D/3D constant-density acoustic Born, velocity perturbation δv, background/scattered records and final states. Native CPU full, native CUDA full/boundary, and explicit Torch CPU/CUDA full/checkpoint have distinct contracts. See [Born Function](usage.md#born-function).
+- Flat-top behavior is equation-specific: scalar/VRZ use a last-axis top-zero fixed halo; VTI enforces zero normal traction; elastic uses a first-axis improved-vacuum surface; GSLS uses its 2D pressure-release closure. Born retains its own nonnegative per-face zero-ghost convention. These are not interchangeable free-surface implementations; see [model conventions](modeling/conventions.md).
+- After explicit compilation, import prepares available native libraries and shared dispatch. It does not compile, initialize CUDA, select devices, allocate wavefields or propagate. Manual preparation is optional for explicit checks. Missing builds permit supported explicit Torch paths; a retained invalid build fails rather than being silently ignored.
+- The frozen V17 archive's `compile_all.py` builds core/elastic/GSLS; add `python compile_born.py --arch 80` for Born. Reviewed later dev `3f2b24d` integrates Born into `compile_all.py`, building/verifying all four libraries. `python compile_born.py --cpu-only` remains available. The independent `starwave_vrr` extension stays separately installed/built. See [installation](installation.md).
+
+The manual publishes public contracts and synthetic examples only. It contains no private scientific implementation or source archive. Release publication, source/build identity, documentation checks, CPU checks and target-GPU/multi-GPU/FWI acceptance remain separate evidence. Existing measured tutorials, figures, PDFs and hashes retain their original versions and scope. The records below are historical snapshots, including the currently available V16 wheel.
+
 ## V16 / 7.1.0 · 2026-10-11
 
 <span id="v16-pytorch-backend-publication-verification-pending"></span>
@@ -14,7 +25,7 @@ The independently downloaded public wheel matches the verified artifact SHA-256:
 
 Its receipt pins source-manifest SHA-256 `f682ff0a836c0c259cd03a2e760460d68426cc5688e4852f8c62a151804694dc`. The [publication workflow](https://github.com/StarrMoonn/StarWave/actions/runs/38108561775) passed artifact verification, Python 3.10/3.11/3.12 pre-publication host/CPU checks, publishing, and installation from public PyPI on all three Python versions. These checks do not establish new-binary GPU numerical, multi-GPU, long-FWI or performance acceptance.
 
-There is no macOS wheel. Mac MPS use requires authorized complete V16 source and remains limited to the Scalar2D configuration below. The later dev free-surface work and independently packaged {ref}`VRR extension <vrr>` are not included in V16 / PyPI 7.1.0. The VRR manual now covers the reviewed source integration at `904c9106bdb883325df8586b7c3412f7814a9737`; this is a documentation update, not a new package release. User-supplied device reports remain distinct from documentation/CPU checks and public-wheel validation.
+There is no macOS wheel. Mac MPS use requires authorized complete V16 source and remains limited to the Scalar2D configuration below. The later dev free-surface work and independently packaged {ref}`VRR extension <vrr>` are not included in V16 / PyPI 7.1.0. The earlier VRR documentation review covered the source integration at `904c9106bdb883325df8586b7c3412f7814a9737`; this is a documentation update, not a new package release. User-supplied device reports remain distinct from documentation/CPU checks and public-wheel validation.
 
 - scalar/VRZ/VTI/elastic add backend, execution, checkpoint_interval and compile_steps; GSLS adds execution/compile_steps and Torch checkpoint. Existing positional arguments, native defaults and scientific CUDA/C++ kernels are preserved.
 - Torch offers CPU/CUDA full/checkpoint and eager/compile. It has no boundary, AMP, elastic callbacks/offload or sampled material gradients. MPS is supported only for Scalar2D accuracy=4 float32 with backend="torch", full/checkpoint and eager/compile. Other MPS combinations, including Scalar3D, VRZ, VTI, elastic and GSLS, are rejected. No final Mac hardware, 500-epoch FWI or performance acceptance is claimed. See [Usage](usage.md), {ref}`GSLS <visco-gsls>` and the backend page for complete parameters and limits.

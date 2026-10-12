@@ -1,6 +1,8 @@
 # 常见问题
 
-V16 新增 [PyTorch 后端](pytorch-backend.md)，可在 CPU/CUDA 上显式使用 full/checkpoint，无需传播原生库；MPS 仅支持 Scalar2D accuracy=4 float32，使用 backend="torch"、full/checkpoint 与 eager/compile；Scalar3D、VRZ、VTI、elastic、GSLS 和其他 MPS 组合明确拒绝。本次不宣称最终 Mac 实机、500 轮 FWI 或性能验收通过。 AMP 仍不支持。[PyPI 7.1.0](https://pypi.org/project/starwave/7.1.0/) 已发布，仅适用于 Linux x86_64。Mac MPS 需使用已获授权的完整 V16 源码。下方 wheel 平台和 CUDA 载入问答描述当前 Linux wheel 与原生路径。Torch 显存不足时可评估 checkpoint 间隔，较大间隔不保证更低峰值。
+当前源码手册覆盖已发布 V17 的 Born、平顶边界与导入契约。**PyPI 8.0.0 尚未发布，7.1.0 仍为 V16。** V17 功能需要匹配的授权源码，见[安装](installation.md)与 [Born Function](usage.md#born-function)。
+
+V16 新增 [PyTorch 后端](pytorch-backend.md)，可在 CPU/CUDA 上显式使用 full/checkpoint，无需传播原生库；MPS 仅支持 Scalar2D accuracy=4 float32，使用 backend="torch"、full/checkpoint 与 eager/compile；Scalar3D、VRZ、VTI、elastic、GSLS 和其他 MPS 组合明确拒绝。本次不宣称最终 Mac 实机、500 轮 FWI 或性能验收通过。 AMP 仍不支持。[PyPI 7.1.0](https://pypi.org/project/starwave/7.1.0/) 已发布，仅适用于 Linux x86_64。Mac MPS 需使用已获授权的完整源码。下方 wheel 平台和 CUDA 载入问答描述当前 Linux wheel 与原生路径。Torch 显存不足时可评估 checkpoint 间隔，较大间隔不保证更低峰值。
 
 ## 为什么 pip 找不到可用的 StarWave 版本？
 
@@ -12,7 +14,15 @@ V16 新增 [PyTorch 后端](pytorch-backend.md)，可在 CPU/CUDA 上显式使�
 
 ## import 成功，为什么 prepare_native 失败？
 
-导入阶段不加载原生库。检查 PyTorch 2.5.x 的 CUDA 可用性、逻辑设备号、Linux C++ 运行库、驱动与包完整性。WSL 应使用 Windows 主机的 NVIDIA 驱动。加载错误不宜直接归结为 GPU 架构未覆盖。
+V17 导入会准备已有原生库与共享 dispatch，但不编译、不初始化 CUDA，也不传播。显式 prepare helper 仍可用于设备检查；import 成功不证明 CUDA 设备可用。未构建的库可跳过以使用受支持的显式 Torch，但保留的无效库/构建会报错，不静默忽略。导入前配置构建路径，更新后重建匹配源码并重启。较早的 7.1.0/V16 wheel 使用显式原生准备；其 CUDA 路径需检查 PyTorch 2.5.x 的 CUDA 可用性、逻辑设备号、C++ 运行库、驱动与包完整性。WSL 使用 Windows 主机驱动，不宜把加载错误直接归因于架构未覆盖。
+
+## Born 在哪里，如何构建？
+
+Born 属于 V17 源码（`starwave.scalar_born` / `starwave.ScalarBorn`），原生库独立。冻结 V17 的三库 `compile_all.py` 之后须单独运行 `python compile_born.py --arch 80`；后续已审 dev `3f2b24d` 的统一构建已覆盖包括 Born 的四库。`python compile_born.py --cpu-only` 仍是独立 CPU 选项。显式 Torch Born CPU/CUDA full/checkpoint 不需要 Born 原生构建；VRR 扩展仍使用自己的安装包与构建入口。7.1.0 wheel 不包含这些新增源码能力。
+
+## 将 pml_width 设为零，各方程的自由表面相同吗？
+
+不相同。V17 按方程限定逐面宽度与物理闭合。scalar/VRZ 只允许最后一轴顶部零宽，其余面等宽且为正；外部 halo 固定为零，不是奇反射表面，scalar 同时拒绝 illumination。VTI 为顶部零法向牵引，elastic 为第一轴改进真空表面，GSLS 为二维压力释放闭合。Born 独立接受逐面非负宽度，零面使用固定零 ghost。请遵守[模型约定](modeling/conventions.md)及各自 [Usage](usage.md) 契约，不能把 Born 较宽的宽度取值域套给 scalar。
 
 ## A30 / RTX 4060 Laptop 可以运行吗？
 

@@ -222,6 +222,8 @@ def check_torch_backend_docs(project, contracts):
 
 def check(wheel_path=None, source_root=None):
     project = Path(__file__).resolve().parents[1]
+    from check_born_docs import check as check_born
+    check_born(source_root)
     contracts = json.loads((project / 'tools' / 'api_contract.json').read_text())
     assert set(contracts) == set(MODULES), 'Public contract inventory changed'
     check_scalar3d_examples(project, contracts['scalar'])
@@ -249,6 +251,9 @@ def check(wheel_path=None, source_root=None):
                 r'^```\{py:function\} starwave\.([A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*)(\([^\n]+|\(\)[^\n]*)\n(.*?)^```',
                 text, re.M | re.S,
             ):
+                if name == 'scalar_born':
+                    # Independently checked against its own immutable V17 AST snapshot.
+                    continue
                 assert name not in functions, f'{locale}: duplicate API directive: {name}'
                 assert name in contracts, f'{locale}: unexpected API directive: {name}'
                 function = parse_signature(signature)

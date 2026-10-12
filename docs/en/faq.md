@@ -1,6 +1,8 @@
 # Frequently Asked Questions
 
-V16 adds the [PyTorch backend](pytorch-backend.md): explicit CPU/CUDA full/checkpoint without propagation native libraries; MPS is supported only for Scalar2D accuracy=4 float32 with backend="torch", full/checkpoint and eager/compile. Other MPS combinations, including Scalar3D, VRZ, VTI, elastic and GSLS, are rejected. No final Mac hardware, 500-epoch FWI or performance acceptance is claimed. AMP remains unsupported. [PyPI 7.1.0](https://pypi.org/project/starwave/7.1.0/) is published for Linux x86_64 only. Mac MPS requires authorized complete V16 source. Wheel-platform and CUDA-loading answers below describe the current Linux wheel and native paths. For Torch memory pressure, evaluate checkpoint intervals; larger intervals do not guarantee lower peaks.
+The current source manual covers published V17 and its Born/flat-top/import contracts. **PyPI 8.0.0 is not published; 7.1.0 remains V16.** Features described for V17 require the matching authorized source. See [installation](installation.md) and [Born Function](usage.md#born-function).
+
+V16 adds the [PyTorch backend](pytorch-backend.md): explicit CPU/CUDA full/checkpoint without propagation native libraries; MPS is supported only for Scalar2D accuracy=4 float32 with backend="torch", full/checkpoint and eager/compile. Other MPS combinations, including Scalar3D, VRZ, VTI, elastic and GSLS, are rejected. No final Mac hardware, 500-epoch FWI or performance acceptance is claimed. AMP remains unsupported. [PyPI 7.1.0](https://pypi.org/project/starwave/7.1.0/) is published for Linux x86_64 only. Mac MPS requires authorized complete source. Wheel-platform and CUDA-loading answers below describe the current Linux wheel and native paths. For Torch memory pressure, evaluate checkpoint intervals; larger intervals do not guarantee lower peaks.
 
 ## Why can't pip find a compatible StarWave version?
 
@@ -12,7 +14,15 @@ The public 7.1.0 wheel does not require compilation or an nvcc installation. Nat
 
 ## Why does prepare_native fail even though import succeeds?
 
-Importing the package does not load the native library. Check CUDA availability in PyTorch 2.5.x, logical device IDs, the Linux C++ runtime, the driver, and package integrity. WSL should use the Windows host's NVIDIA driver. A loading error should not be immediately attributed to missing GPU architecture coverage.
+V17 import prepares existing native libraries and shared dispatch without compiling, initializing CUDA or propagating. Explicit prepare helpers remain optional device checks; import success does not prove a usable CUDA device. Missing unbuilt libraries permit supported explicit Torch use, but a retained invalid library/build raises rather than being silently ignored. Set build paths before import, rebuild matching source, and restart after changes. The older 7.1.0/V16 wheel uses explicit native preparation. For its CUDA path, check PyTorch 2.5.x CUDA availability, logical device IDs, the C++ runtime, driver and package integrity. WSL uses the Windows host driver; do not assume a loading error means missing architecture coverage.
+
+## Where are Born and its build command?
+
+Born is part of V17 source (`starwave.scalar_born` / `starwave.ScalarBorn`), with its own native library. Frozen V17 requires `python compile_born.py --arch 80` after its three-library `compile_all.py`; later reviewed dev `3f2b24d` includes Born in the four-library unified build. `python compile_born.py --cpu-only` remains the standalone CPU option. Explicit Torch Born CPU/CUDA full/checkpoint requires no native Born build. The separate VRR extension retains its own package and build. None of these source additions is supplied by the 7.1.0 wheel.
+
+## Does setting pml_width to zero give every equation the same free surface?
+
+No. V17 accepts different face layouts and physical closures per equation. Scalar/VRZ allow only the last-axis top face zero, with equal positive widths elsewhere; their exterior halo is fixed zero, not an odd-reflection surface, and scalar illumination is rejected. VTI uses a zero-normal-traction top, elastic a first-axis improved-vacuum surface, and GSLS a 2D pressure-release closure. Born independently accepts nonnegative per-face widths with fixed-zero ghost cells. Follow [model conventions](modeling/conventions.md) and the individual [Usage](usage.md) contracts; do not transfer Born's broader width domain to scalar.
 
 ## Can I run it on an A30 or RTX 4060 Laptop?
 

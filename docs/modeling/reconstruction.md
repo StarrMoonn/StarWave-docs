@@ -3,7 +3,7 @@
 
 本章说明原生 full/boundary 伴随与波场重建。Torch checkpoint 采用正向重算和 autograd，不使用本章的 boundary 逆重建或历史公式；见 [PyTorch 后端](../pytorch-backend.md)。
 
-本章先介绍 5.0.0 的 Scalar3D Radius-M 六面压力重建，再保留既有弹性重建推导。
+本章先介绍 5.0.0 的 Scalar3D Radius-M 六面压力重建，再保留既有 4.0.0 弹性重建推导。其中对称正 PML 几何与公式保持历史范围，不能直接用于 V17 顶部零宽几何。V17 scalar 保留所需顶部条带而不回退 full；elastic 采用改进真空准备。Born 另有背景/散射重建契约。当前差异见[模型约定](conventions.md)与 [Born Function](../usage.md#born-function)。
 
 StarWave 弹性传播的 `memory="boundary"` 模式，在损失梯度反向传播时逐步重建正演物理场，用**边界带与终态物理场**替代按时间保存的全体积材料导数历史。本章解释 4.0.0 源码契约中的原生二维／三维方法。参数与调用示例见 {ref}`Elastic Function <elastic>` 及其{ref}`内存选项 <elastic-memory>`。
 
@@ -229,7 +229,7 @@ H=d\,\mathbf1[\lambda\text{ or }\mu]
 - **原生执行：** CUDA 二维／三维、`float32`／`float64`、精度阶数 2／4／6／8，`storage_mode="device"`、无压缩、`python_backend=False`。每个物理方向的尺寸必须大于两倍差分半径。详见 {ref}`API 限制 <elastic-notes>`。
 - **时间采样：** CFL 子步倍率为 {math}`q` 时，记 `model_gradient_sampling_interval` 为 {math}`I`，材料梯度步长为 {math}`s=qI`，权重为 {math}`\kappa_n=s\mathbf1[n\bmod s=0]`。边界记录、状态／源伴随与 PML 时间滤波仍按每个实际内部步推进。与原生 `full` 对齐，指遵循同一套采样材料梯度约定；当 {math}`s>1` 时，不能据此声称等同于全部内部步的材料自动微分。
 - **时间尾部：** 当前路径推进完整步长分组，即 {math}`N=\lfloor N_\mathrm{requested}/s\rfloor s`，余下内部接收行先补零，再进入前端降采样。没有完整分组的边界情况不是受支持的空操作，不应依赖它。
-- **表面与求导：** 弹性 API 没有通用 `free_surface` 开关；某侧 PML 设为零本身不等于无牵引自由表面。密度求导还要求有效交错浮力非零。原生高阶导数不受支持；正演回调是只读观察器，边界模式不支持反向回调。
+- **表面与求导：** 历史 4.0.0 弹性契约没有通用 `free_surface` 开关，任意一侧 PML 设为零不等于无牵引物理。V17 新增仅第一轴顶部零宽的改进真空路径：第 0 行固定真空，第 1 行为首个固体应力行，其他面宽度为正；拒绝传入初始状态、`origin` 和 `survey_pad`。密度求导还要求有效交错浮力非零。原生高阶导数不受支持；正演回调是只读观察器，边界模式不支持反向回调。
 
 源码测试定义了 full／boundary 对比、多阶数与多精度、非对称／零 PML、体力源与压力源、CFL 子步、非零物理／PML 初态、共享／逐炮模型和长轨迹测试。测试文件的存在是**验证规范**，不是每个 GPU 或公开 wheel 已通过所有案例的证据。源版本发布记录的是 CPU／静态检查，并明确未重新执行 CUDA 数值等价验收。本次文档更新没有运行 GPU 实验，详见[文档状态](../status.md)。
 
