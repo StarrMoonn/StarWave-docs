@@ -1,8 +1,8 @@
 # 常见问题
 
-当前源码手册覆盖已发布 V17 的 Born、平顶边界与导入契约。**PyPI 8.0.0 尚未发布，7.1.0 仍为 V16。** V17 功能需要匹配的授权源码，见[安装](installation.md)与 [Born Function](usage.md#born-function)。
+[V19 Release](https://github.com/StarrMoonn/StarWave/releases/tag/V19) 已发布；本手册对应冻结源码 `0.1.0.dev19`、提交 `46d32877e3336d531520a696d5f2e074e6f4ef74`。[PyPI **9.1.0**](https://pypi.org/project/starwave/9.1.0/) 已发布，对应 V19 源码契约并包含集成 VRR。现有 [9.0.0 wheel](https://pypi.org/project/starwave/9.0.0/) 仍对应 V18，不含集成 VRR。
 
-V16 新增 [PyTorch 后端](pytorch-backend.md)，可在 CPU/CUDA 上显式使用 full/checkpoint，无需传播原生库；MPS 仅支持 Scalar2D accuracy=4 float32，使用 backend="torch"、full/checkpoint 与 eager/compile；Scalar3D、VRZ、VTI、elastic、GSLS 和其他 MPS 组合明确拒绝。本次不宣称最终 Mac 实机、500 轮 FWI 或性能验收通过。 AMP 仍不支持。[PyPI 7.1.0](https://pypi.org/project/starwave/7.1.0/) 已发布，仅适用于 Linux x86_64。Mac MPS 需使用已获授权的完整源码。下方 wheel 平台和 CUDA 载入问答描述当前 Linux wheel 与原生路径。Torch 显存不足时可评估 checkpoint 间隔，较大间隔不保证更低峰值。
+[PyTorch 后端](pytorch-backend.md)支持显式 CPU/CUDA full/checkpoint，无需传播原生构建。MPS 仍仅限 Scalar2D accuracy=4 float32，需要源码安装；AMP 不支持。已发布 9.0.0 Linux wheel 对应 V18；在 9.1.0 发布核验前，VRR 需使用 V19 源码。更大的 checkpoint 间隔不保证更低峰值内存。
 
 ## 为什么 pip 找不到可用的 StarWave 版本？
 
@@ -10,23 +10,23 @@ V16 新增 [PyTorch 后端](pytorch-backend.md)，可在 CPU/CUDA 上显式使�
 
 ## 需要编译 CUDA 吗？
 
-使用公开 7.1.0 wheel 不需要编译或安装 nvcc。原生 scalar/VRZ/VTI 和 elastic boundary 需要兼容 GPU/驱动；elastic full 与 GSLS native_cpu 也可在 CPU 上运行。显式 Torch full/checkpoint 路径无需传播原生库。如果完整性或兼容检查失败，在相同环境重装对应 wheel 并重启 Python；不要指望文档项目包含私有构建工具。
+使用已发布 9.0.0 wheel 不需要编译或安装 nvcc。原生 scalar/VRZ/VTI 和 elastic boundary 需要兼容 GPU/驱动；elastic full 与 GSLS native_cpu 也可在 CPU 上运行。显式 Torch full/checkpoint 路径无需传播原生库。如果完整性或兼容检查失败，在相同环境重装对应 wheel 并重启 Python；不要指望文档项目包含私有构建工具。
 
 ## import 成功，为什么 prepare_native 失败？
 
-V17 导入会准备已有原生库与共享 dispatch，但不编译、不初始化 CUDA，也不传播。显式 prepare helper 仍可用于设备检查；import 成功不证明 CUDA 设备可用。未构建的库可跳过以使用受支持的显式 Torch，但保留的无效库/构建会报错，不静默忽略。导入前配置构建路径，更新后重建匹配源码并重启。较早的 7.1.0/V16 wheel 使用显式原生准备；其 CUDA 路径需检查 PyTorch 2.5.x 的 CUDA 可用性、逻辑设备号、C++ 运行库、驱动与包完整性。WSL 使用 Windows 主机驱动，不宜把加载错误直接归因于架构未覆盖。
+V19 导入会准备已有原生库与共享 dispatch，但不编译、不初始化 CUDA，也不传播。显式 prepare helper 仍可用于设备检查；import 成功不证明 CUDA 设备可用。未构建的库可跳过以使用受支持的显式 Torch，但保留的无效库/构建会报错，不静默忽略。导入前配置构建路径，更新后重建匹配源码并重启。较早的 7.1.0/V16 wheel 使用显式原生准备；其 CUDA 路径需检查 PyTorch 2.5.x 的 CUDA 可用性、逻辑设备号、C++ 运行库、驱动与包完整性。WSL 使用 Windows 主机驱动，不宜把加载错误直接归因于架构未覆盖。
 
 ## Born 在哪里，如何构建？
 
-Born 属于 V17 源码（`starwave.scalar_born` / `starwave.ScalarBorn`），原生库独立。冻结 V17 的三库 `compile_all.py` 之后须单独运行 `python compile_born.py --arch 80`；后续已审 dev `3f2b24d` 的统一构建已覆盖包括 Born 的四库。`python compile_born.py --cpu-only` 仍是独立 CPU 选项。显式 Torch Born CPU/CUDA full/checkpoint 不需要 Born 原生构建；VRR 扩展仍使用自己的安装包与构建入口。7.1.0 wheel 不包含这些新增源码能力。
+V19 根包包含 `starwave.scalar_born` / `starwave.ScalarBorn` 与 `starwave.vrr`。`python compile_all.py --arch 80` 构建 core、elastic、GSLS、Born、VRR。`python compile_born.py --cpu-only` 为原生 CPU full 选项；`python -m starwave._vrr.build --arch 80` 可仅重建 VRR。显式 Torch Born/VRR CPU/CUDA full/checkpoint 无需原生构建。见[安装](installation.md)。
 
 ## 将 pml_width 设为零，各方程的自由表面相同吗？
 
-不相同。V17 按方程限定逐面宽度与物理闭合。scalar/VRZ 只允许最后一轴顶部零宽，其余面等宽且为正；外部 halo 固定为零，不是奇反射表面，scalar 同时拒绝 illumination。VTI 为顶部零法向牵引，elastic 为第一轴改进真空表面，GSLS 为二维压力释放闭合。Born 独立接受逐面非负宽度，零面使用固定零 ghost。请遵守[模型约定](modeling/conventions.md)及各自 [Usage](usage.md) 契约，不能把 Born 较宽的宽度取值域套给 scalar。
+不相同。V19 scalar 接受任意零宽面组合（含全零 PML），其余正宽度须相等；零面使用固定零 halo，不是奇反射。VRZ 仍限最后一轴顶部零宽。VTI 使用零法向牵引，elastic 为第一轴改进真空表面，GSLS 为二维压力释放闭合，VRR 保留自己的顶部表面限制。Born 独立接受逐面非负宽度与固定零 ghost。请遵守[模型约定](modeling/conventions.md)及各自 [Usage](usage.md) 契约。
 
-V18 scalar（审阅基于 dev `e040aa9b8225ab387f7e4853bfe6162f5351f5d5`） 新增任意零面组合（正宽度仍须相等）、二维/三维可训练源、可选可微最终物理波场与诊断前向回调。这些源码功能，不在冻结 V17/其 8.0.0 发布基线或 7.1.0 中。23 参数契约见 [Scalar Function](usage.md#scalar-function)，较早的 20 参数发布快照仍单独固定。 VRZ 与 VTI 仍拒绝任意零面。可微全波场 loss 使用 dev scalar 返回终态，回调快照仅供观测。
+V19 保留 V18 的 23 参数 scalar 契约：任意零宽面组合（正宽度仍须相等）、二维/三维可训练源、可微最终物理波场与诊断前向回调。终态可用于 loss，回调快照为 detached 观测，不能传递 loss 梯度。见 [Scalar Function](usage.md#scalar-function)。
 
-[Release V18](https://github.com/StarrMoonn/StarWave/releases/tag/V18) 已发布，冻结提交为 `fba1f496b890f2dbaf3fbb3011d39f6d723cfea1`，保留已审 dev `e040aa9` 的 scalar API。[PyPI 9.0.0](https://pypi.org/project/starwave/9.0.0/) 已发布，受支持的 Linux x86_64 主机可安装包含这些功能的 wheel，条件和命令见[安装](installation.md)。V17 与未发布的 8.0.0 基线保持不变；7.1.0 为历史 V16 wheel。
+
 
 ## A30 / RTX 4060 Laptop 可以运行吗？
 

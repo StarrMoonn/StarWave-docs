@@ -1,6 +1,8 @@
 (reconstruction)=
 # 波场反传重建
 
+下方推导保留其原始版本范围。当前 V19 scalar 支持任意零面组合且正 PML 面宽相等，不能直接将对称正 PML 公式套用于这些几何。当前各方程限制见 [Usage](../usage.md)与[模型约定](conventions.md)。
+
 本章说明原生 full/boundary 伴随与波场重建。Torch checkpoint 采用正向重算和 autograd，不使用本章的 boundary 逆重建或历史公式；见 [PyTorch 后端](../pytorch-backend.md)。
 
 本章先介绍 5.0.0 的 Scalar3D Radius-M 六面压力重建，再保留既有 4.0.0 弹性重建推导。其中对称正 PML 几何与公式保持历史范围，不能直接用于 V17 顶部零宽几何。V17 scalar 保留所需顶部条带而不回退 full；elastic 采用改进真空准备。Born 另有背景/散射重建契约。当前差异见[模型约定](conventions.md)与 [Born Function](../usage.md#born-function)。

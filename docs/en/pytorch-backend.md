@@ -1,22 +1,24 @@
 (pytorch-backend)=
 # PyTorch backend
 
-The unified PyTorch backend is selected through `starwave.scalar / scalar_born / vrz / vti / elastic / visco_gsls`. With `backend="torch"`, tensor operations perform forward propagation and autograd generates derivatives; `execution="compile"` compiles that computation. V16 introduced the five non-Born entries supplied by the [7.1.0 Linux wheel](https://pypi.org/project/starwave/7.1.0/). V17 adds Born and the equation-specific flat-top/import behavior documented here; **8.0.0 is not published**. There is no macOS wheel: supported Mac MPS use requires authorized source. See [installation](installation.md) and [release status](status.md).
+[V19 Release](https://github.com/StarrMoonn/StarWave/releases/tag/V19) is published. This manual follows frozen source `0.1.0.dev19`, commit `46d32877e3336d531520a696d5f2e074e6f4ef74`. [PyPI **9.1.0**](https://pypi.org/project/starwave/9.1.0/) is published with the V19 source contract and integrated VRR. The existing [9.0.0 wheel](https://pypi.org/project/starwave/9.0.0/) remains V18 and excludes integrated VRR.
 
-The separately installed {ref}`VRR source extension <vrr>` uses `starwave_vrr.vrr`, separate from the main-package entry points. It is absent from 7.1.0. Its explicit Torch mode supports CPU/CUDA float32/64 full/checkpoint and eager/compile; native CUDA float32 full/boundary requires its own build. Follow that page for extension installation and limits.
+The unified PyTorch backend is selected through `starwave.scalar / scalar_born / vrz / vrr / vti / elastic / visco_gsls`. Explicit `backend="torch"` uses tensor operations and autograd; `execution="compile"` compiles that computation. Supported Mac MPS use requires source installation and remains limited to Scalar2D accuracy=4 float32.
 
-V18 scalar (reviewed at dev `e040aa9b8225ab387f7e4853bfe6162f5351f5d5`) adds arbitrary zero-face subsets (positive widths still equal), trainable 2D/3D sources, optional differentiable terminal physical fields and diagnostic forward callbacks. These source features are absent from frozen V17/its 8.0.0 release baseline and from 7.1.0. See [Scalar Function](usage.md#scalar-function) for the 23-parameter contract; the older 20-parameter release snapshot remains separately pinned.
+V19 integrates {ref}`VRR <vrr>` as `starwave.vrr`. Root installation and `compile_all.py` include VRR; no separate `starwave_vrr` installation is needed. VRR supports explicit Torch CPU/CUDA float32/64 full/checkpoint with eager/compile, and native CUDA float32 full/boundary. Device, gradient and boundary restrictions remain equation-specific.
 
-[Release V18](https://github.com/StarrMoonn/StarWave/releases/tag/V18) is published at `fba1f496b890f2dbaf3fbb3011d39f6d723cfea1`, preserving the reviewed scalar API from dev `e040aa9`. [PyPI 9.0.0](https://pypi.org/project/starwave/9.0.0/) is now published with these features for supported Linux x86_64 hosts; see [installation](installation.md) for requirements and commands. V17 and the unpublished 8.0.0 baseline remain unchanged; 7.1.0 is the historical V16 wheel.
+V19 preserves the V18 23-parameter scalar contract: arbitrary zero-face subsets (positive widths must remain equal), trainable 2D/3D sources, differentiable terminal physical fields and diagnostic forward callbacks. Terminal returns can carry a loss; callback snapshots are detached observations and cannot carry loss gradients. See [Scalar Function](usage.md#scalar-function).
+
+
 
 (torch-selection)=
 ## Explicit backend and device selection
 
 - scalar/VRZ/VTI/elastic default to `backend=None`, a compatibility marker retaining native behavior, never an automatic Torch selection. `backend="cuda"` requires CUDA models.
 - GSLS still defaults to `backend="cuda"`; `backend="native_cpu"` means the native C++ CPU implementation, distinct from `backend="torch"`.
-- Torch supports CPU/CUDA and follows model devices. Arrange inputs on the same device; models are not moved implicitly. `backend="cpu"` is invalid. MPS is supported only for Scalar2D accuracy=4 float32 with backend="torch", full/checkpoint and eager/compile. Other MPS combinations, including Scalar3D, VRZ, VTI, elastic and GSLS, are rejected. No final Mac hardware, 500-epoch FWI or performance acceptance is claimed.
+- Torch supports CPU/CUDA and follows model devices. Arrange inputs on the same device; models are not moved implicitly. `backend="cpu"` is invalid. MPS is supported only for Scalar2D accuracy=4 float32 with backend="torch", full/checkpoint and eager/compile. Other MPS combinations, including Born, Scalar3D, VRZ, VRR, VTI, elastic and GSLS, are rejected. No final Mac hardware, 500-epoch FWI or performance acceptance is claimed.
 - scalar/VRZ/VTI retain `memory="boundary"` by default. When selecting Torch, also explicitly select `memory="full"` or `"checkpoint"`; otherwise the call fails rather than silently changing storage strategy.
-- Torch propagation does not require native libraries or nvcc/`compile_all.py`; eager needs no native build. V17 import still loads/prepares existing native libraries and shared dispatch without compiling, initializing CUDA or propagating. Missing builds permit explicit Torch use; retained invalid builds fail. Manual prepare is optional, and no serial propagation warm-up is required. Compile requires the current PyTorch Inductor toolchain and, for CUDA, its applicable Triton environment. Failure does not fall back to eager. This does not make the historical Linux wheel installable on other platforms.
+- Torch propagation does not require native libraries or nvcc/`compile_all.py`; eager needs no native build. V19 import still loads/prepares existing native libraries and shared dispatch without compiling, initializing CUDA or propagating. Missing builds permit explicit Torch use; retained invalid builds fail. Manual prepare is optional, and no serial propagation warm-up is required. Compile requires the current PyTorch Inductor toolchain and, for CUDA, its applicable Triton environment. Failure does not fall back to eager. This does not make the historical Linux wheel installable on other platforms.
 
 (torch-memory)=
 ## Backend, execution and memory table
@@ -27,7 +29,8 @@ V18 scalar (reviewed at dev `e040aa9b8225ab387f7e4853bfe6162f5351f5d5`) adds arb
 | Born native | CPU/CUDA float32/64 | full; boundary only on CUDA | Default full; no native checkpoint |
 | Native elastic | CPU/CUDA | full; boundary on CUDA only | full default; existing offload/compression conditions remain separate |
 | Native GSLS | CUDA or explicit native_cpu | full, checkpoint | full default; None interval uses a shape/history estimate |
-| All six main-package entries, backend="torch" | CPU/CUDA | full, checkpoint | Override scalar/VRZ/VTI boundary default; eager/compile both supported |
+| Native VRR | CUDA float32 | full, boundary | boundary default; Torch is selected explicitly |
+| All seven main-package entries, backend="torch" | CPU/CUDA | full, checkpoint | Override scalar/VRZ/VRR/VTI boundary default; eager/compile both supported |
 
 | Option | Default | Torch meaning / rejections |
 |---|---|---|
@@ -44,16 +47,17 @@ compile_steps changes execution block size, not dt, nt, accuracy, shots, loss or
 
 | Torch entry | Dimensions | dtype | First-order gradients |
 |---|---|---|---|
-| scalar (V18) | 2D/3D | float32 | v and source in both dimensions; optional terminal-field loss |
+| scalar (V19) | 2D/3D | float32 | v and source in both dimensions; optional terminal-field loss |
 | scalar_born | 1D/2D/3D | float32/64 | v, scatter (δv), source, initial background/scattered/PML states |
 | VRZ | 2D | float32 | v and impedance or density; fixed source |
+| VRR | 2D | float32/64 | v, rx, rz and source |
 | VTI | 2D/3D | float32 | vp, epsilon, delta, rho; fixed source |
 | elastic | 2D/3D | float32/64 | lamb, mu, buoyancy, sources, initial physical/PML states |
 | GSLS | 2D | float32/64 | vp, q, source, material-provider tensor parameters; fixed rho |
 
 All listed CPU/CUDA paths support orders 2/4/6/8 with full/checkpoint; MPS supports only Scalar2D accuracy=4 float32. Each equation retains its own axes, source units/scaling, recording clock, CFL and resampling contract; they are not interchangeable. See [Usage](usage.md) and {ref}`GSLS <visco-gsls>`. GSLS retains hao1, band_fit, sls_compat and material_model. A single mechanism explicitly requires `mode="sls_compat", n_mechanisms=1`; independent SLS APIs are not restored.
 
-scalar/VRZ/VTI replicate edge values but freeze gradients through the extension, retaining the crop-image convention. Finite differences at outer model edges that regenerate padding differentiate a different map; distinguish interior-direction checks. GSLS accumulates the complete replicated-padding gradient back into the physical model. Torch VRZ full/checkpoint requires `boundary_buffer >= accuracy//2`.
+scalar/VRZ/VTI replicate edge values but freeze gradients through the extension, retaining the crop-image convention. Finite differences at outer model edges that regenerate padding differentiate a different map; distinguish interior-direction checks. GSLS and VRR accumulate the complete replicated-padding gradient back into the physical model. Torch VRZ full/checkpoint requires `boundary_buffer >= accuracy//2`.
 
 Torch elastic differentiates every internal step and requires `model_gradient_sampling_interval=1`. Native material gradients are sampled at `CFL step_ratio × model_gradient_sampling_interval`. Even interval=1 can differ from complete AD when step_ratio>1. Exact native/Torch material-gradient comparisons also require step_ratio=1; this backend semantic distinction is not caused by compilation.
 
@@ -61,16 +65,18 @@ Explicitly rejected: Torch boundary, MPS outside the Scalar2D accuracy=4 float32
 
 Torch scalar/VRZ/VTI and GSLS validate incoming recording cotangents and reject NaN/Inf. A finite loss does not guarantee a finite recording gradient; inspect the objective and differentiation chain.
 
-V17 Torch Born accepts `python_backend=False`, `model_gradient_sampling_interval=1`, device history and no compression; use `memory="full"` or `"checkpoint"` with eager/compile. Complete-state checkpoints preserve gradients to background/scattered initial states, sources, `v` and `scatter`. Born forward callbacks are supported as observers; backward callbacks are rejected. The first compile can be expensive, and errors do not fall back to eager. Its background operator is not `starwave.scalar`; compare observations against Born's returned background records. See [Born Function](usage.md#born-function) for full signatures, returns, axes and sampled native-gradient semantics.
+V19 Torch Born accepts `python_backend=False`, `model_gradient_sampling_interval=1`, device history and no compression; use `memory="full"` or `"checkpoint"` with eager/compile. Complete-state checkpoints preserve gradients to background/scattered initial states, sources, `v` and `scatter`. Born forward callbacks are supported as observers; backward callbacks are rejected. The first compile can be expensive, and errors do not fall back to eager. Its background operator is not `starwave.scalar`; compare observations against Born's returned background records. See [Born Function](usage.md#born-function) for full signatures, returns, axes and sampled native-gradient semantics.
 
-V17 flat-top restrictions remain equation-specific on Torch: scalar/VRZ use fixed-zero exterior halos, VTI zero normal traction, elastic an improved-vacuum surface, and GSLS odd-pressure/even-vertical-face closure. Born's zero-face ghost convention is separate. Device eligibility is unchanged; MPS remains limited to Scalar2D accuracy=4 float32, with target-device free-surface acceptance separately scoped. See [model conventions](modeling/conventions.md).
+V19 flat-top restrictions remain equation-specific on Torch: scalar/VRZ use fixed-zero exterior halos, VTI zero normal traction, elastic an improved-vacuum surface, and GSLS odd-pressure/even-vertical-face closure. Born's zero-face ghost convention is separate. Device eligibility is unchanged; MPS remains limited to Scalar2D accuracy=4 float32, with target-device free-surface acceptance separately scoped. See [model conventions](modeling/conventions.md).
 
-Current-dev scalar supports return_wavefield and forward_callback on CPU/CUDA full/checkpoint eager/compile. Callbacks run after user-clock intervals and the final step, outside checkpoint replay. The returned terminal field is differentiable; callback snapshots are detached diagnostics. Existing source scaling and frozen-extension/cropped model gradients remain unchanged. No new MPS acceptance is claimed.
+V19 scalar supports return_wavefield and forward_callback on CPU/CUDA full/checkpoint eager/compile. Callbacks run after user-clock intervals and the final step, outside checkpoint replay. The returned terminal field is differentiable; callback snapshots are detached diagnostics. Existing source scaling and frozen-extension/cropped model gradients remain unchanged. No new MPS acceptance is claimed.
+
+Scalar allows arbitrary zero-face subsets; VRZ and VRR retain their documented top-only zero-face layouts. These domains must not be inferred from shared fixed-zero halo wording.
 
 (torch-example)=
 ## Standalone CPU example
 
-Use a matching source environment or the 7.1.0 wheel for this scalar-only example. This small example checks wiring, not FWI convergence; the manual build statically checks code without executing propagation. For CUDA, change device explicitly and place all tensors there. For compilation, select execution="compile" and optionally try compile_steps=4.
+Use V19 source or the published 9.0.0 wheel for this scalar-only example; it is also compatible with historical 7.1.0. This small example checks wiring, not FWI convergence; the manual build statically checks code without executing propagation. For CUDA, change device explicitly and place all tensors there. For compilation, select execution="compile" and optionally try compile_steps=4.
 
 ```python
 import torch
@@ -106,7 +112,7 @@ A separate CPU smoke passed on V16 source with Python 3.12.14 and PyTorch 2.14.1
 
 These are wiring fragments assuming valid prepared inputs, not complete experiments. Every optional parameter is explicit for four entries; the complete GSLS call is in the {ref}`GSLS examples <visco-gsls-example>`. None initial states mean zero initialization, not omitted API coverage. Do not reuse source/geometry/model variables between different equations without applying their contracts.
 
-This complete scalar option list requires the V18 source. The simple CPU example above omits new arguments and remains release-compatible.
+This complete scalar option list requires V19 source. The simple CPU example above omits new arguments and remains release-compatible.
 
 <!-- torch-api:scalar:full:start -->
 ```python
@@ -257,8 +263,8 @@ outputs = starwave.elastic(lamb, mu, buoyancy, grid_spacing, dt,
 
 Time first compilation/warmup separately from steady-state forward + loss + backward + optimizer.step, and record allocated/reserved peaks separately. Shape, dtype, shot count, order or gradient-requirement changes may recompile. Only code can be cached, never stale model fields/coefficients/gradients. An eager/compile speedup is not a speedup over native CUDA.
 
-If the same environment also uses native elastic/GSLS, changed Python entries change the source-closure identity. Rebuild from matching complete source and restart; never edit an old manifest by hand. See [installation](installation.md). Documentation and CPU interface checks do not replace target GPU, DataParallel, long FWI or performance acceptance. Existing Scalar3D figures, tutorials and presentation retain their historical evidence scope and are not relabelled as V16 results.
+When using native backends, rebuild from matching complete source and restart after changes. Import does not perform runtime source/library hash or version audits. See [installation](installation.md). Documentation and CPU interface checks do not replace target GPU, DataParallel, long FWI or performance acceptance. Existing Scalar3D figures, tutorials and presentation retain their historical evidence scope and are not relabelled as V19 results.
 
 ## Scalar2D MPS notebook
 
-The source notebook L2_True_StarWave_Acoustic_MPS.ipynb and matching .py use plain import starwave, explicit PROJECT_ROOT resource loading, and no implicit installation/build. They preserve dt=0.003, nt=2000, 30 shots / 5 batches, 500 epochs, Adam lr=10, checkpoint_interval=32 and compile_steps=4. Spatial accuracy and compile block length are independent. Install the reviewed current source and restart Python; disable PYTORCH_ENABLE_MPS_FALLBACK. Unsupported operators or compilation fail explicitly without CPU/eager fallback. The published 7.1.0 wheel is Linux-only. It cannot be installed for Mac MPS; use the reviewed complete source. Historical 7.0.0 binaries do not provide this update.
+The source notebook notebook/Scalar/Scalar2D_Marmousi2_L2_MPS_TorchCompile.ipynb and matching .py use plain import starwave, explicit PROJECT_ROOT resource loading, and no implicit installation/build. They preserve dt=0.003, nt=2000, 30 shots / 5 batches, 500 epochs, Adam lr=10, checkpoint_interval=32 and compile_steps=4. Spatial accuracy and compile block length are independent. Install the reviewed current source and restart Python; disable PYTORCH_ENABLE_MPS_FALLBACK. Unsupported operators or compilation fail explicitly without CPU/eager fallback. Use the pinned complete V19 source for this Mac MPS route. The published V19 / 9.1.0 wheel is Linux-only and cannot be installed on macOS.

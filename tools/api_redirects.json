@@ -137,7 +137,7 @@
         "sw-section-6": "vrr-example",
         "vrr-status": "vrr-status",
         "sw-section-7": "vrr-status",
-        "starwave_vrr.vrr": "starwave_vrr.vrr"
+        "starwave_vrr.vrr": "starwave.vrr"
       }
     },
     "visco-gsls.html": {
@@ -336,7 +336,7 @@
         "vrr-status": "vrr-status",
         "source-and-validation-scope": "vrr-status",
         "sw-section-7": "vrr-status",
-        "starwave_vrr.vrr": "starwave_vrr.vrr"
+        "starwave_vrr.vrr": "starwave.vrr"
       }
     },
     "visco-gsls.html": {
@@ -523,7 +523,7 @@
         "sw-section-6": "vrr-example",
         "vrr-status": "vrr-status",
         "sw-section-7": "vrr-status",
-        "starwave_vrr.vrr": "starwave_vrr.vrr"
+        "starwave_vrr.vrr": "starwave.vrr"
       }
     },
     "visco-gsls.html": {

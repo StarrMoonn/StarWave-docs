@@ -15,7 +15,7 @@
 
 ## 当前可用方式
 
-使用 [PyPI wheel 安装](installation.md)，并按安装页检查系统、Python、PyTorch 与 GPU 条件。已获源码授权的用户可按随源码提供的说明安装。
+使用 V18 / 9.0.0 的 [PyPI wheel 安装](installation.md)，并按安装页检查系统、Python、PyTorch 与 GPU 条件。已获源码授权的用户可按随源码提供的说明安装。
 
 ## 待确认的发布信息
 
@@ -24,3 +24,5 @@
 - 对应版本的系统与 GPU 运行条件，以及实际验证范围
 
 镜像仓库与发布安排尚待确认，容器构建与 GPU 测试尚未执行。本页暂不提供容器运行示例。
+
+[V19 Release](https://github.com/StarrMoonn/StarWave/releases/tag/V19) 已发布；本手册对应冻结源码 `0.1.0.dev19`、提交 `46d32877e3336d531520a696d5f2e074e6f4ef74`。[PyPI **9.1.0**](https://pypi.org/project/starwave/9.1.0/) 已发布，对应 V19 源码契约并包含集成 VRR。现有 [9.0.0 wheel](https://pypi.org/project/starwave/9.0.0/) 仍对应 V18，不含集成 VRR。

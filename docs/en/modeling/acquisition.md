@@ -68,7 +68,7 @@ for locations in (source_locations, receiver_locations):
     assert torch.all((0 <= locations[..., 1]) & (locations[..., 1] < nz))
 ```
 
-For scalar, `source_amplitudes` is the fixed normalized forcing `f`, not a per-step pressure increment; do not multiply it by `-v² dt²` yourself. The waveform amplitude here is an illustrative choice. See [Usage](../usage.md) for source units, time handling, and differences between propagators.
+In this example, scalar `source_amplitudes` is fixed normalized forcing `f`, not a per-step pressure increment; do not multiply it by `-v² dt²` yourself. The waveform amplitude here is an illustrative choice. See [Usage](../usage.md) for source units, time handling, and differences between propagators.
 
 ## Connect to the propagator
 

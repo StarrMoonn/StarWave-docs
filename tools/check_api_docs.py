@@ -228,6 +228,8 @@ def check(wheel_path=None, source_root=None):
     project = Path(__file__).resolve().parents[1]
     from check_born_docs import check as check_born
     check_born(source_root)
+    from check_vrr_docs import check as check_vrr
+    check_vrr(source_root)
     released_contracts = json.loads((project / 'tools' / 'api_contract.json').read_text())
     from check_scalar_dev_docs import check as check_scalar_dev
     scalar_dev = check_scalar_dev(source_root)
@@ -259,7 +261,7 @@ def check(wheel_path=None, source_root=None):
                 r'^```\{py:function\} starwave\.([A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*)(\([^\n]+|\(\)[^\n]*)\n(.*?)^```',
                 text, re.M | re.S,
             ):
-                if name == 'scalar_born':
+                if name in ('scalar_born', 'vrr', 'vrr_reference', 'elastic_native_status', 'precondition_gradient', 'wavelets.ricker', 'torch_backend.backend_capabilities'):
                     # Independently checked against its own immutable V17 AST snapshot.
                     continue
                 assert name not in functions, f'{locale}: duplicate API directive: {name}'
@@ -352,7 +354,7 @@ def check(wheel_path=None, source_root=None):
             assert not {'visco_sls', 'prepare_visco_sls', 'visco_sls_native_status'} & set(public), 'Removed standalone SLS APIs are exported'
     counts = {name: len(parameter_defaults(languages['zh'][name])) for name in MODULES}
     print(f'PASS: both languages: typed signatures, descriptions/defaults {counts}, {len(MODULES)} return contracts; {blocks} Python blocks parsed as Python 3.10.')
-    print(f'PASS: all {len(MODULES)} V16 signatures match verified {WHEEL_VERSION} binary wheel; metadata, source identity and four native-library receipt hashes match. No propagation libraries were imported or executed.' if wheel_path else f'PASS: bilingual docs match released APIs plus the isolated unreleased scalar contract; current-dev AST only with --source-root; immutable {WHEEL_VERSION} wheel contract only with --wheel.')
+    print(f'PASS: all {len(MODULES)} V16 signatures match verified {WHEEL_VERSION} binary wheel; metadata, source identity and four native-library receipt hashes match. No propagation libraries were imported or executed.' if wheel_path else f'PASS: bilingual docs match released APIs plus V19 scalar/VRR contracts; frozen-source AST with --source-root; immutable {WHEEL_VERSION} wheel contract only with --wheel.')
 
 
 if __name__ == '__main__':

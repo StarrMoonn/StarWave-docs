@@ -1,22 +1,24 @@
 (pytorch-backend)=
 # PyTorch 后端
 
-统一 PyTorch 后端通过 `starwave.scalar / scalar_born / vrz / vti / elastic / visco_gsls` 选择。使用 `backend="torch"` 时，正演由张量运算执行、反传由 autograd 生成；`execution="compile"` 编译同一计算。V16 引入其中五个非 Born 入口，已由 [7.1.0 Linux wheel](https://pypi.org/project/starwave/7.1.0/) 提供。V17 新增 Born 与本页说明的方程专属平顶边界、导入行为；**8.0.0 尚未发布**。没有 macOS wheel，受支持的 Mac MPS 配置需要授权源码，见[安装](installation.md)和[发行状态](status.md)。
+[V19 Release](https://github.com/StarrMoonn/StarWave/releases/tag/V19) 已发布；本手册对应冻结源码 `0.1.0.dev19`、提交 `46d32877e3336d531520a696d5f2e074e6f4ef74`。[PyPI **9.1.0**](https://pypi.org/project/starwave/9.1.0/) 已发布，对应 V19 源码契约并包含集成 VRR。现有 [9.0.0 wheel](https://pypi.org/project/starwave/9.0.0/) 仍对应 V18，不含集成 VRR。
 
-另行安装的 {ref}`VRR 源码扩展 <vrr>` 使用 `starwave_vrr.vrr`，与主包传播入口分开，也不在 7.1.0 中。其显式 Torch 模式支持 CPU/CUDA float32/64、full/checkpoint 与 eager/compile；原生 CUDA float32 full/boundary 须独立构建。扩展安装和限制见该页。
+统一 PyTorch 后端通过 `starwave.scalar / scalar_born / vrz / vrr / vti / elastic / visco_gsls` 选择。显式 `backend="torch"` 使用张量计算与 autograd；`execution="compile"` 编译同一计算。Mac MPS 需要源码安装，仍限 Scalar2D accuracy=4 float32。
 
-V18 scalar（审阅基于 dev `e040aa9b8225ab387f7e4853bfe6162f5351f5d5`） 新增任意零面组合（正宽度仍须相等）、二维/三维可训练源、可选可微最终物理波场与诊断前向回调。这些源码功能，不在冻结 V17/其 8.0.0 发布基线或 7.1.0 中。23 参数契约见 [Scalar Function](usage.md#scalar-function)，较早的 20 参数发布快照仍单独固定。
+V19 将 {ref}`VRR <vrr>` 纳入主包，入口为 `starwave.vrr`，根目录安装与 `compile_all.py` 已覆盖 VRR，无需独立安装 `starwave_vrr`。VRR 显式 Torch 支持 CPU/CUDA float32/64、full/checkpoint 与 eager/compile；原生 CUDA 支持 float32 full/boundary。各方程的设备、梯度和边界限制仍独立。
 
-[Release V18](https://github.com/StarrMoonn/StarWave/releases/tag/V18) 已发布，冻结提交为 `fba1f496b890f2dbaf3fbb3011d39f6d723cfea1`，保留已审 dev `e040aa9` 的 scalar API。[PyPI 9.0.0](https://pypi.org/project/starwave/9.0.0/) 已发布，受支持的 Linux x86_64 主机可安装包含这些功能的 wheel，条件和命令见[安装](installation.md)。V17 与未发布的 8.0.0 基线保持不变；7.1.0 为历史 V16 wheel。
+V19 保留 V18 的 23 参数 scalar 契约：任意零宽面组合（正宽度仍须相等）、二维/三维可训练源、可微最终物理波场与诊断前向回调。终态可用于 loss，回调快照为 detached 观测，不能传递 loss 梯度。见 [Scalar Function](usage.md#scalar-function)。
+
+
 
 (torch-selection)=
 ## 显式选择后端与设备
 
 - scalar/VRZ/VTI/elastic 的 `backend=None` 是保留原生行为的兼容默认值，不是自动选择 Torch。`backend="cuda"` 要求 CUDA 模型。
 - GSLS 默认 `backend="cuda"`，`backend="native_cpu"` 仍表示原生 C++ CPU 实现。`backend="torch"` 与 native_cpu 不同。
-- Torch 支持 CPU/CUDA；模型设备决定执行设备。请自行把输入安排在同一设备，不自动搬移模型；`backend="cpu"` 无效。MPS 仅支持 Scalar2D accuracy=4 float32，使用 backend="torch"、full/checkpoint 与 eager/compile；Scalar3D、VRZ、VTI、elastic、GSLS 和其他 MPS 组合明确拒绝。本次不宣称最终 Mac 实机、500 轮 FWI 或性能验收通过。
+- Torch 支持 CPU/CUDA；模型设备决定执行设备。请自行把输入安排在同一设备，不自动搬移模型；`backend="cpu"` 无效。MPS 仅支持 Scalar2D accuracy=4 float32，使用 backend="torch"、full/checkpoint 与 eager/compile；Born、Scalar3D、VRZ、VRR、VTI、elastic、GSLS 和其他 MPS 组合明确拒绝。本次不宣称最终 Mac 实机、500 轮 FWI 或性能验收通过。
 - scalar/VRZ/VTI 原默认 `memory="boundary"` 保留。切换 Torch 时必须同时显式选择 `memory="full"` 或 `"checkpoint"`，否则报错，不静默替换存储策略。
-- Torch 传播不依赖原生库、nvcc 或 `compile_all.py`；eager 不需要原生编译。V17 导入仍会加载/准备已有原生库与共享 dispatch，但不编译、不初始化 CUDA、不传播。未构建的库允许显式 Torch 使用，保留的无效构建会报错。手动 prepare 可选，也不要求串行传播预热。compile 需要当前 PyTorch 的 Inductor 工具链，CUDA 使用其适用的 Triton 环境；失败不回退 eager。此项并不使历史 Linux wheel 可安装到其他平台。
+- Torch 传播不依赖原生库、nvcc 或 `compile_all.py`；eager 不需要原生编译。V19 导入仍会加载/准备已有原生库与共享 dispatch，但不编译、不初始化 CUDA、不传播。未构建的库允许显式 Torch 使用，保留的无效构建会报错。手动 prepare 可选，也不要求串行传播预热。compile 需要当前 PyTorch 的 Inductor 工具链，CUDA 使用其适用的 Triton 环境；失败不回退 eager。此项并不使历史 Linux wheel 可安装到其他平台。
 
 (torch-memory)=
 ## 后端、执行和内存表
@@ -27,7 +29,8 @@ V18 scalar（审阅基于 dev `e040aa9b8225ab387f7e4853bfe6162f5351f5d5`） 新�
 | Born 原生 | CPU/CUDA float32/64 | full；boundary 仅 CUDA | 默认 full；无原生 checkpoint |
 | elastic 原生 | CPU/CUDA | full；boundary 仅 CUDA | 默认 full；原有卸载/压缩条件独立保留 |
 | GSLS 原生 | CUDA 或显式 native_cpu | full、checkpoint | 默认 full；None 间隔按形状和所需历史估算 |
-| 六个主包入口，backend="torch" | CPU/CUDA | full、checkpoint | scalar/VRZ/VTI 必须覆盖原 boundary 默认；eager/compile 均支持 |
+| 原生 VRR | CUDA float32 | full、boundary | 默认 boundary；Torch 须显式选择 |
+| 七个主包入口，backend="torch" | CPU/CUDA | full、checkpoint | scalar/VRZ/VRR/VTI 必须覆盖原 boundary 默认；eager/compile 均支持 |
 
 | 选项 | 默认 | Torch 含义 / 拒绝条件 |
 |---|---|---|
@@ -44,16 +47,17 @@ compile_steps 只改变执行块大小，不改变 dt、nt、精度、炮数、l
 
 | Torch 入口 | 维度 | dtype | 一阶梯度 |
 |---|---|---|---|
-| scalar（V18） | 2D/3D | float32 | 二维/三维均支持 v 与源；可选终态 loss |
+| scalar（V19） | 2D/3D | float32 | 二维/三维均支持 v 与源；可选终态 loss |
 | scalar_born | 1D/2D/3D | float32/64 | v、scatter（δv）、源、背景/散射/PML 初始状态 |
 | VRZ | 2D | float32 | v 与 impedance 或 density；源固定 |
+| VRR | 2D | float32/64 | v、rx、rz 与源 |
 | VTI | 2D/3D | float32 | vp、epsilon、delta、rho；源固定 |
 | elastic | 2D/3D | float32/64 | lamb、mu、buoyancy、源、初始物理/PML 状态 |
 | GSLS | 2D | float32/64 | vp、q、源、材料 provider 张量参数；rho 固定 |
 
 上述 CPU/CUDA 路径支持 2/4/6/8 阶 full/checkpoint；MPS 仅支持 Scalar2D accuracy=4 float32。各方程继续使用自己的轴序、源单位、源尺度、采样时刻、CFL 与重采样契约，不能相互套用。详见 [Usage](usage.md) 与 {ref}`GSLS <visco-gsls>`。GSLS 保留 hao1、band_fit、sls_compat、material_model；单机制仅显式 `mode="sls_compat", n_mechanisms=1`，不恢复独立 SLS API。
 
-scalar/VRZ/VTI 复制延拓值，但延拓区模型梯度冻结，保留 crop-image 约定。若对外边缘做有限差分且重新生成延拓，得到的是另一映射；应区分内部模型方向检查。GSLS 的复制延拓梯度完整累加回物理模型。Torch VRZ full/checkpoint 要求 `boundary_buffer >= accuracy//2`。
+scalar/VRZ/VTI 复制延拓值，但延拓区模型梯度冻结，保留 crop-image 约定。若对外边缘做有限差分且重新生成延拓，得到的是另一映射；应区分内部模型方向检查。GSLS 与 VRR 的复制延拓梯度完整累加回物理模型。Torch VRZ full/checkpoint 要求 `boundary_buffer >= accuracy//2`。
 
 Torch elastic 对每个内部时间步求导，要求 `model_gradient_sampling_interval=1`。原生材料梯度按 `CFL step_ratio × model_gradient_sampling_interval` 抽样；即使 interval=1，step_ratio>1 时也可能与完整 AD 不同。精确 native/Torch 材料梯度对照还需 step_ratio=1；这是后端梯度语义差别，不能归因于 compile。
 
@@ -61,16 +65,18 @@ Torch elastic 对每个内部时间步求导，要求 `model_gradient_sampling_i
 
 Torch scalar/VRZ/VTI 与 GSLS 会检查传入记录的反传余切量；NaN/Inf 直接报错。有限 loss 不保证其记录梯度有限，调用者须检查目标函数与求导链。
 
-V17 Torch Born 要求 `python_backend=False`、`model_gradient_sampling_interval=1`、device 历史且不压缩；选择 `memory="full"` 或 `"checkpoint"` 与 eager/compile。完整状态 checkpoint 保留背景/散射初始状态、源、`v`、`scatter` 的梯度。Born 支持观察用途的 forward callback，拒绝 backward callback。首次 compile 可能较慢，失败不回退 eager。Born 的背景算子不同于 `starwave.scalar`，观测应与其返回的背景记录配对。完整签名、返回、轴序及原生梯度抽样语义见 [Born Function](usage.md#born-function)。
+V19 Torch Born 要求 `python_backend=False`、`model_gradient_sampling_interval=1`、device 历史且不压缩；选择 `memory="full"` 或 `"checkpoint"` 与 eager/compile。完整状态 checkpoint 保留背景/散射初始状态、源、`v`、`scatter` 的梯度。Born 支持观察用途的 forward callback，拒绝 backward callback。首次 compile 可能较慢，失败不回退 eager。Born 的背景算子不同于 `starwave.scalar`，观测应与其返回的背景记录配对。完整签名、返回、轴序及原生梯度抽样语义见 [Born Function](usage.md#born-function)。
 
-V17 的 Torch 平顶限制仍按方程区分：scalar/VRZ 使用固定零外部 halo，VTI 为零法向牵引，elastic 为改进真空表面，GSLS 为奇压力/偶竖直面闭合。Born 的零面 ghost 约定独立。设备允许范围不变；MPS 仍只限 Scalar2D accuracy=4 float32，目标设备的自由表面验收另行记录，见[模型约定](modeling/conventions.md)。
+V19 的 Torch 平顶限制仍按方程区分：scalar/VRZ 使用固定零外部 halo，VTI 为零法向牵引，elastic 为改进真空表面，GSLS 为奇压力/偶竖直面闭合。Born 的零面 ghost 约定独立。设备允许范围不变；MPS 仍只限 Scalar2D accuracy=4 float32，目标设备的自由表面验收另行记录，见[模型约定](modeling/conventions.md)。
 
-当前 dev scalar 在 CPU/CUDA full/checkpoint eager/compile 支持 return_wavefield 与 forward_callback。回调在用户时钟间隔及末步更新后执行，不在 checkpoint 重算中重复。返回终态可微，回调快照为 detached 诊断；源缩放与冻结扩边/裁切模型梯度约定不变。未新增 MPS 验收。
+V19 scalar 在 CPU/CUDA full/checkpoint eager/compile 支持 return_wavefield 与 forward_callback。回调在用户时钟间隔及末步更新后执行，不在 checkpoint 重算中重复。返回终态可微，回调快照为 detached 诊断；源缩放与冻结扩边/裁切模型梯度约定不变。未新增 MPS 验收。
+
+scalar 允许任意零宽面组合；VRZ、VRR 仍保留各自仅顶部零宽的布局限制。不能因为同用固定零 halo 就推断它们允许相同的零面组合。
 
 (torch-example)=
 ## CPU 最小独立示例
 
-此 scalar 示例可使用匹配源码环境或 7.1.0 wheel。此小例子检查接线，不证明 FWI 收敛；本手册构建仅静态检查代码，不执行传播。切换 CUDA 时显式更改 device 并把全部张量放到该设备；切换编译时设置 execution="compile"，compile_steps 可尝试 4。
+此 scalar 示例可使用 V19 源码或已发布的 9.0.0 wheel，也兼容历史 7.1.0。此小例子检查接线，不证明 FWI 收敛；本手册构建仅静态检查代码，不执行传播。切换 CUDA 时显式更改 device 并把全部张量放到该设备；切换编译时设置 execution="compile"，compile_steps 可尝试 4。
 
 ```python
 import torch
@@ -106,7 +112,7 @@ assert v.grad is not None and torch.isfinite(v.grad).all()
 
 下列为已准备有效输入后的接线片段，不是完整实验。四个入口显式列出全部可选参数；GSLS 的完整参数调用见 {ref}`GSLS 示例 <visco-gsls-example>`。None 初态表示从零状态开始，不省略 API 覆盖。不能把不同方程的 source / geometry / 模型变量直接共用。
 
-这份 scalar 完整选项列表要求V18 源码；上方简单 CPU 示例未使用新参数，仍兼容发布基线。
+这份 scalar 完整选项列表要求 V19 源码；上方简单 CPU 示例未使用新参数，仍兼容发布基线。
 
 <!-- torch-api:scalar:full:start -->
 ```python
@@ -257,8 +263,8 @@ outputs = starwave.elastic(lamb, mu, buoyancy, grid_spacing, dt,
 
 首次编译/预热与稳态 forward + loss + backward + optimizer.step 分开计时，同时记录 allocated/reserved 峰值。形状、精度、炮数、阶数或求导需求变化可能重新编译；缓存仅可复用代码，不可复用旧模型波场/系数/梯度。eager/compile 的收益不能解释成相对原生 CUDA 的加速比。
 
-如果同一环境还运行原生 elastic/GSLS，Python 入口变化会使源闭包身份变化，须从完整匹配源码重新构建并重启进程，不手改旧 manifest；见[安装](installation.md)。文档及 CPU 接口核验不能替代目标设备 GPU、DataParallel、长时 FWI 或性能验收。原有 Scalar3D 图件、教程与演示文稿保留各自历史证据范围，不改标为 V16 运行结果。
+若同一环境还运行原生后端，源码更新后须从完整匹配源码重新构建并重启；导入不执行运行时源码/库哈希或版本审计。见[安装](installation.md)。文档及 CPU 接口核验不能替代目标设备 GPU、DataParallel、长时 FWI 或性能验收。原有 Scalar3D 图件、教程与演示文稿保留各自历史证据范围，不改标为 V19 运行结果。
 
 ## Scalar2D MPS Notebook
 
-源码中的 L2_True_StarWave_Acoustic_MPS.ipynb 和同步 .py 直接 import starwave，仅用 PROJECT_ROOT 显式读取资源，不隐式安装或构建。保留 dt=0.003、nt=2000、30 炮/5 批、500 epochs、Adam lr=10、checkpoint_interval=32 与 compile_steps=4；空间阶数与编译块长度独立。安装本次审阅源码后重启 Python，禁用 PYTORCH_ENABLE_MPS_FALLBACK；不支持的算子或编译失败直接报错，不回退 CPU/eager。已发布的 7.1.0 wheel 仅适用于 Linux，不能用于 Mac MPS 安装；Mac 使用已审完整源码。历史 7.0.0 二进制不含本更新。
+源码中的 notebook/Scalar/Scalar2D_Marmousi2_L2_MPS_TorchCompile.ipynb 和同步 .py 直接 import starwave，仅用 PROJECT_ROOT 显式读取资源，不隐式安装或构建。保留 dt=0.003、nt=2000、30 炮/5 批、500 epochs、Adam lr=10、checkpoint_interval=32 与 compile_steps=4；空间阶数与编译块长度独立。安装本次审阅源码后重启 Python，禁用 PYTORCH_ENABLE_MPS_FALLBACK；不支持的算子或编译失败直接报错，不回退 CPU/eager。此 Mac MPS 路径使用固定的完整 V19 源码。当前已发布 V19 / 9.1.0 wheel 仅限 Linux，不能在 macOS 安装。

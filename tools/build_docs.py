@@ -61,6 +61,13 @@ BORN_SECTIONS = ('born', 'born-backends', 'born-conventions', 'born-gradients', 
 _born_insert = USAGE_SECTIONS.index('vrz')
 USAGE_SECTIONS = USAGE_SECTIONS[:_born_insert] + BORN_SECTIONS + USAGE_SECTIONS[_born_insert:]
 USAGE_NUMBERS = USAGE_NUMBERS[:_born_insert] + tuple(range(52, 52 + len(BORN_SECTIONS))) + USAGE_NUMBERS[_born_insert:]
+# V19 helper/reference sections: preserve all pre-existing positional anchors.
+_vrr_ref_insert = USAGE_SECTIONS.index('vrr-install')
+USAGE_SECTIONS = USAGE_SECTIONS[:_vrr_ref_insert] + ('vrr-reference',) + USAGE_SECTIONS[_vrr_ref_insert:]
+USAGE_NUMBERS = USAGE_NUMBERS[:_vrr_ref_insert] + (63,) + USAGE_NUMBERS[_vrr_ref_insert:]
+V19_HELPER_SECTIONS = ('elastic-native-status', 'scalar-illumination', 'illumination-seal', 'illumination-reduce', 'illumination-close', 'precondition-gradient', 'ricker', 'backend-capabilities')
+USAGE_SECTIONS += V19_HELPER_SECTIONS
+USAGE_NUMBERS += tuple(range(64, 64 + len(V19_HELPER_SECTIONS)))
 MODELING_FRAGMENTS = {'modeling/vrz.md', 'modeling/vti.md'}
 WAVE_SECTIONS = ('wave-propagation', 'wave-vrz', 'wave-vrz-details', 'wave-vrz-limits',
                  'wave-vti', 'wave-vti-details', 'wave-vti-limits')

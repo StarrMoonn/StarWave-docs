@@ -1,4 +1,4 @@
-"""Validate the independent source-extension manual without importing StarWave."""
+"""Validate the integrated V19 manual without importing StarWave."""
 import argparse
 import ast
 import json
@@ -27,7 +27,7 @@ def check(source_root=None):
         for block in blocks:
             ast.parse(block, feature_version=(3, 10))
         signature, body = re.search(
-            r'^```\{py:function\} starwave_vrr\.vrr([^\n]+)\n(.*?)^```',
+            r'^```\{py:function\} starwave\.vrr([^\n]+)\n(.*?)^```',
             text, re.M | re.S).groups()
         documented = ast.parse('def f' + signature + ': pass', feature_version=(3, 10)).body[0]
         pinned = ast.parse('def f' + contract['documented_signature'] + ': pass', feature_version=(3, 10)).body[0]
@@ -56,9 +56,8 @@ def check(source_root=None):
                            'checkpoint_interval': 10, 'compile_steps': 1}.items():
             assert ast.literal_eval(values[key]) == value
         examples.append(ast.dump(example))
-        for required in ('starwave-vrr', 'starwave_vrr', '7.1.0', 'extensions/vrr',
-                         'ABI 3', '[w,w,0,w]', 'MPS', 'float32/float64',
-                         contract['source_dev_commit'], contract['source_feature_commit']):
+        for required in ('starwave.vrr', 'starwave.vrr_reference', 'V19', 'compile_all.py',
+                         '[w,w,0,w]', 'MPS', 'float32/float64', contract['source_dev_commit']):
             assert required in text, f'{locale}: missing scope marker {required}'
         assert 'VRR Function <vrr>' not in (folder / 'index.md').read_text()
         assert '- [VRZ Function](#vrz)\n- [VRR Function](#vrr)\n- [VTI Function](#vti)' in usage
@@ -70,8 +69,8 @@ def check(source_root=None):
         module = ast.parse(source.read_text(), feature_version=(3, 10))
         actual = next(node for node in module.body if isinstance(node, ast.FunctionDef) and node.name == 'vrr')
         assert ast.dump(actual.args) == ast.dump(expected), 'Authorized source signature drift'
-        print('PASS: independent VRR signature matches supplied source via AST; no runtime imported.')
-    print(f'PASS: independent VRR bilingual signature, {len(names)} parameters/defaults, example and source-only scope.')
+        print('PASS: integrated V19 VRR signature matches supplied source via AST; no runtime imported.')
+    print(f'PASS: integrated V19 VRR bilingual signature, {len(names)} parameters/defaults, example and V19 scope.')
 
 
 if __name__ == '__main__':

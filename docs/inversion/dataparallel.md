@@ -25,7 +25,7 @@ class ScalarForward(torch.nn.Module):
         )[0]
 
 device_ids = [0, 1]  # 替换成当前进程可见的逻辑编号。
-starwave.prepare_native(device_ids)  # V17 可选设备检查；V16 使用显式准备。
+starwave.prepare_native(device_ids)  # V19 可选设备检查；V16 使用显式准备。
 primary = torch.device(f"cuda:{device_ids[0]}")
 module = ScalarForward(initial_velocity.to(primary))
 parallel = torch.nn.DataParallel(module, device_ids=device_ids, dim=0)
@@ -41,7 +41,7 @@ optimizer.step()
 
 这里的三个输入分别为 `[B,S,T]`、`[B,S,D]`、`[B,R,D]`，同一调用使用相同 `B`。每个副本获得完整模型和部分炮；记录汇总到首卡后计算一次全局目标函数。固定的其它模型应使用 buffer 或显式固定参数持有。
 
-V17 导入在工作线程调用前准备已有原生库与共享 dispatch，不初始化 CUDA，也不运行传播。正常首次并行传播不再要求手动 prepare 或串行预热；如保留显式设备检查，应在主线程调用。先构建再导入，更新后重启。缺少原生构建时须选择受支持的显式 Torch 路径；保留的无效构建会报错。V16 / 7.1.0 wheel 仍使用较早的显式准备流程。
+V19 导入在工作线程调用前准备已有原生库与共享 dispatch，不初始化 CUDA，也不运行传播。正常首次并行传播不再要求手动 prepare 或串行预热；如保留显式设备检查，应在主线程调用。先构建再导入，更新后重启。缺少原生构建时须选择受支持的显式 Torch 路径；保留的无效构建会报错。V16 / 7.1.0 wheel 仍使用较早的显式准备流程。
 
 改接 Born 时也要区分模型与炮维：`v`、`scatter` 由复制的 Module 持有，源及背景/散射接收几何一致地按炮拆分。Born 返回终态和两个记录张量，wrapper 应显式选择所需记录。见 [Born Function](../usage.md#born-function)；本页不构成 Born 多卡验收。
 

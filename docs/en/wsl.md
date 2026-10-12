@@ -1,6 +1,8 @@
 # Windows and WSL 2
 
-StarWave 6.0.0 has no native Windows wheel. Running CUDA propagation on Windows requires a WSL 2 Linux user environment, an available NVIDIA GPU, and a Windows NVIDIA driver that supports GPU computing in WSL.
+StarWave 9.0.0 has no native Windows wheel. Running CUDA propagation on Windows requires a WSL 2 Linux user environment, an available NVIDIA GPU, and a Windows NVIDIA driver that supports GPU computing in WSL.
+
+[V19 Release](https://github.com/StarrMoonn/StarWave/releases/tag/V19) is published. This manual follows frozen source `0.1.0.dev19`, commit `46d32877e3336d531520a696d5f2e074e6f4ef74`. [PyPI **9.1.0**](https://pypi.org/project/starwave/9.1.0/) is published with the V19 source contract and integrated VRR. The existing [9.0.0 wheel](https://pypi.org/project/starwave/9.0.0/) remains V18 and excludes integrated VRR.
 
 ## Setup order
 

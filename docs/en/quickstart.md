@@ -1,10 +1,12 @@
 # Quickstart: A Synthetic Shot Gather
 
-This page retains the 2D scalar introductory wiring, compatible with the published 7.1.0 baseline. For current source 3D models, unequal spacing and first-order velocity/source gradients, see the {ref}`3D scalar call <scalar-3d-example>`. V17-only [Born](usage.md#born-function) has a separate CPU example and background/scattered return contract; it is not part of 7.1.0, and 8.0.0 is not published.
+[V19 Release](https://github.com/StarrMoonn/StarWave/releases/tag/V19) is published. This manual follows frozen source `0.1.0.dev19`, commit `46d32877e3336d531520a696d5f2e074e6f4ef74`. [PyPI **9.1.0**](https://pypi.org/project/starwave/9.1.0/) is published with the V19 source contract and integrated VRR. The existing [9.0.0 wheel](https://pypi.org/project/starwave/9.0.0/) remains V18 and excludes integrated VRR.
+
+The 2D scalar introductory wiring below also works with the historical 7.1.0 baseline. Current 3D velocity/source gradients are documented in the {ref}`3D scalar call <scalar-3d-example>`; [Born](usage.md#born-function) has a separate CPU example.
 
 The goal is to check the connections between the model, source, acquisition geometry, and recorded tensor. The example creates a small 32×32 velocity model, one shot with one source, and 16 receivers. It downloads no data, saves no results, and performs no compilation.
 
-First complete [installation](installation.md) with matching native libraries. V17 import prepares existing native dispatch; the script's explicit prepare call is an optional device check there and remains useful for the V16 wheel. Import never compiles or propagates. Then download {download}`scalar_demo.py <../examples/scalar_demo.py>`.
+First complete [installation](installation.md) with matching native libraries. V19 import prepares existing native dispatch; the script's explicit prepare call is an optional device check there and remains useful for the V16 wheel. Import never compiles or propagates. Then download {download}`scalar_demo.py <../examples/scalar_demo.py>`.
 
 ```bash
 python scalar_demo.py --mode forward --device 0

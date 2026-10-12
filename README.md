@@ -1,53 +1,22 @@
 # StarWave-docs · 中文 / English
 
-StarWave V17 源码契约双语使用手册，基于 Sphinx、Read the Docs 主题和 MyST Markdown。完整中文和英文版本覆盖安装、正演、反演、API 与演示文稿；每种语言独立构建、导航和搜索。API 采用 Deepwave 风格的类型签名、参数、返回、注意事项及示例组织，所有说明针对 StarWave 原创编写。
+StarWave V19 源码契约双语使用手册，使用 Sphinx、Read the Docs 主题与 MyST Markdown；每种语言独立构建、导航和搜索。
 
-Bilingual user documentation for StarWave V17 source, with the published V16 / 7.1.0 wheel documented separately, built with Sphinx, the Read the Docs theme, and MyST Markdown. Each language contains the complete manual and a separate search index. The API presentation takes organizational cues from Deepwave while preserving StarWave’s own public contracts.
+Bilingual documentation for the StarWave V19 source contract. The complete Chinese and English manuals have independent builds, navigation and search.
 
+[V19 Release](https://github.com/StarrMoonn/StarWave/releases/tag/V19) 已发布；本手册对应冻结源码 `0.1.0.dev19`、提交 `46d32877e3336d531520a696d5f2e074e6f4ef74`。[PyPI **9.1.0**](https://pypi.org/project/starwave/9.1.0/) 已发布，对应 V19 源码契约并包含集成 VRR。现有 [9.0.0 wheel](https://pypi.org/project/starwave/9.0.0/) 仍对应 V18，不含集成 VRR。
 
-The Scalar reference now separately documents the V18 extension reviewed at dev `e040aa9b8225ab387f7e4853bfe6162f5351f5d5`: 23 parameters, arbitrary zero-face subsets with equal positive widths, trainable 2D/3D sources, differentiable terminal-wavefield loss and read-only diagnostic callbacks. Callback snapshots are detached observations and do not carry loss gradients. Frozen V17/8.0.0 and the 7.1.0 wheel retain the old scalar API; other propagator contracts are unchanged. The target-wavefield notebook stays in the authorized source at `notebook/Scalar2D_Target_Wavefield.ipynb`.
+[V19 Release](https://github.com/StarrMoonn/StarWave/releases/tag/V19) is published. This manual follows frozen source `0.1.0.dev19`, commit `46d32877e3336d531520a696d5f2e074e6f4ef74`. [PyPI **9.1.0**](https://pypi.org/project/starwave/9.1.0/) is published with the V19 source contract and integrated VRR. The existing [9.0.0 wheel](https://pypi.org/project/starwave/9.0.0/) remains V18 and excludes integrated VRR.
 
-[Release V18](https://github.com/StarrMoonn/StarWave/releases/tag/V18) 已发布，冻结提交为 `fba1f496b890f2dbaf3fbb3011d39f6d723cfea1`，保留已审 dev `e040aa9` 的 scalar API。[PyPI 9.0.0](https://pypi.org/project/starwave/9.0.0/) 已发布，受支持的 Linux x86_64 主机可安装包含这些功能的 wheel，条件和命令见[安装](docs/installation.md)。V17 与未发布的 8.0.0 基线保持不变；7.1.0 为历史 V16 wheel。
+## V19 integrated package and examples
 
-[Release V18](https://github.com/StarrMoonn/StarWave/releases/tag/V18) is published at `fba1f496b890f2dbaf3fbb3011d39f6d723cfea1`, preserving the reviewed scalar API from dev `e040aa9`. [PyPI 9.0.0](https://pypi.org/project/starwave/9.0.0/) is now published with these features for supported Linux x86_64 hosts; see [installation](docs/en/installation.md) for requirements and commands. V17 and the unpublished 8.0.0 baseline remain unchanged; 7.1.0 is the historical V16 wheel.
+The current main package exposes scalar, Born, VRZ, VRR, VTI, elastic and GSLS propagation. Root installation and `compile_all.py` cover all five native groups including VRR; use `starwave.vrr`, not a separate extension installation. V19 preserves the 23-parameter Scalar API and its differentiable terminal output; callbacks remain detached diagnostics.
 
-## V17 source, Born and flat-top boundaries
+The authorized source contains paired `notebook/Scalar/Scalar2D_TargetWavefield_CUDA.py` / `.ipynb` and `notebook/Scalar/Scalar2D_TargetWavefield_TorchCompile.py` / `.ipynb`. Historical tutorial assets remain unchanged. PyPI 9.1.0 is published with verified artifact identity and CPU checks; the historical 9.0.0 wheel remains V18 without VRR.
 
-[Release V17](https://github.com/StarrMoonn/StarWave/releases/tag/V17) is published from frozen source `0.1.0.dev17`, commit `27c2e14b184b94d8031a5b3a83c25b1ed3d4ac67`. PyPI **8.0.0 has not been published**. The historical **7.1.0 wheel remains the V16 binary** recorded below; it does not contain Born or the V17 flat-top/import changes.
+## Release channels and evidence
 
-- The main package adds `starwave.scalar_born` and `starwave.ScalarBorn`: 1D/2D/3D constant-density acoustic Born, velocity perturbation δv, background/scattered records and final states. Native CPU full, native CUDA full/boundary, and explicit Torch CPU/CUDA full/checkpoint have distinct contracts. See [Born Function](docs/en/usage.md#born-function).
-- Flat-top behavior is equation-specific: scalar/VRZ use a last-axis top-zero fixed halo; VTI enforces zero normal traction; elastic uses a first-axis improved-vacuum surface; GSLS uses its 2D pressure-release closure. Born retains its own nonnegative per-face zero-ghost convention. These are not interchangeable free-surface implementations; see [model conventions](docs/en/modeling/conventions.md).
-- After explicit compilation, import prepares available native libraries and shared dispatch. It does not compile, initialize CUDA, select devices, allocate wavefields or propagate. Manual preparation is optional for explicit checks. Missing builds permit supported explicit Torch paths; a retained invalid build fails rather than being silently ignored.
-- The frozen V17 archive's `compile_all.py` builds core/elastic/GSLS; add `python compile_born.py --arch 80` for Born. Reviewed later dev `3f2b24d` integrates Born into `compile_all.py`, building/verifying all four libraries. `python compile_born.py --cpu-only` remains available. The independent `starwave_vrr` extension stays separately installed/built. See [installation](docs/en/installation.md).
-
-The manual publishes public contracts and synthetic examples only. It contains no private scientific implementation or source archive. Release publication, source/build identity, documentation checks, CPU checks and target-GPU/multi-GPU/FWI acceptance remain separate evidence. Existing measured tutorials, figures, PDFs and hashes retain their original versions and scope. The records below are historical snapshots, including the currently available V16 wheel.
-
-## V16 / 7.1.0 · 2026-10-11
-
-[StarWave 7.1.0](https://pypi.org/project/starwave/7.1.0/) was published on 2026-10-11 from frozen V16 source `0.1.0.dev16`, commit `5a224dbb1e86154ff034bbedaf67c0e4cf7a1b6a`. It includes GSLS and the additive [PyTorch backend](docs/en/pytorch-backend.md). The sole distribution is `starwave-7.1.0-py3-none-manylinux_2_35_x86_64.whl` (17,628,561 bytes), with no sdist. It targets Linux x86_64 / glibc ≥ 2.35, Python ≥ 3.10 and < 3.13, and PyTorch ≥ 2.5 and < 2.6. Historical [7.0.0](https://pypi.org/project/starwave/7.0.0/) remains the V14 binary without GSLS or the unified Torch backend.
-
-The independently downloaded public wheel matches the verified artifact SHA-256:
-
-```text
-36a0be76af997e2d31de8313cab00ff59d79f7537055c829df2bfdee0ff61e88
-```
-
-Its receipt pins source-manifest SHA-256 `f682ff0a836c0c259cd03a2e760460d68426cc5688e4852f8c62a151804694dc`. The [publication workflow](https://github.com/StarrMoonn/StarWave/actions/runs/38108561775) passed artifact verification, Python 3.10/3.11/3.12 pre-publication host/CPU checks, publishing, and installation from public PyPI on all three Python versions. These checks do not establish new-binary GPU numerical, multi-GPU, long-FWI or performance acceptance.
-
-There is no macOS wheel. Mac MPS use requires authorized complete V16 source and remains limited to the Scalar2D configuration below. The later dev free-surface work and independently packaged [VRR source extension](docs/en/usage.md#vrr-function) are not included in V16 / PyPI 7.1.0. The bilingual Usage VRR Function section documents reviewed dev runtime `904c9106bdb883325df8586b7c3412f7814a9737`, separate installation/build, the `starwave_vrr.vrr` public API and bounded validation scope; no private implementation or source archive is published.
-
-- scalar/VRZ/VTI/elastic add backend, execution, checkpoint_interval and compile_steps; GSLS adds execution/compile_steps and Torch checkpoint. Existing positional arguments, native defaults and scientific CUDA/C++ kernels are preserved.
-- Torch offers CPU/CUDA full/checkpoint and eager/compile. MPS is limited to Scalar2D accuracy=4 float32 with backend="torch", full/checkpoint and eager/compile; other MPS combinations are rejected. It has no boundary, AMP, elastic callbacks/offload or sampled material gradients. Final Mac hardware and 500-epoch FWI acceptance remain pending. See [Usage](docs/en/usage.md), [GSLS](docs/en/usage.md#gsls-function) and the backend page for complete parameters and limits.
-- Torch elastic differentiates every internal step; native material gradients sample at CFL ratio × sampling_interval. Exact cross-backend comparisons require ratio=1; this distinction is not a compilation error.
-- Documentation gates check bilingual complete signatures, defaults, parameter coverage and snippet syntax without importing propagation libraries. CPU/documentation checks do not replace final GPU, DataParallel, long FWI or performance acceptance. Existing examples, figures and PDFs retain their original version/evidence scope.
-
-V15 and older records below describe their historical snapshots only.
-
-## V15 GSLS · 2026-10-10
-
-The historical V15 API follows the published [V15 source Release](https://github.com/StarrMoonn/StarWave/releases/tag/V15), version `0.1.0.dev15`, commit `2508543ccc1dc3015b07806e6e240dd88c8e871e`. PyPI 7.0.0 remains an unchanged historical V14 binary and does not provide GSLS. The bilingual GSLS reference, now inside Usage, replaces the independent SLS API; single-mechanism calculations explicitly use `mode="sls_compat", n_mechanisms=1`. Installation distinguishes three-library CUDA source builds from the separate GSLS CPU build and the legacy wheel channel.
-
-Example remains above Usage. The independent SLS API, Marmousi2 experiment pages and their assets/downloads are retired from the current manual. Original materials remain recoverable in Git history; they are not republished or relabelled as GSLS FWI results. This documentation update makes no final integrated GPU, multi-GPU, long-FWI or performance claim and publishes no propagation implementation or source archive.
+Use the current [Chinese installation guide](docs/installation.md) or [English installation guide](docs/en/installation.md). Historical V18 and earlier release receipts, binary hashes, migration instructions and validation limits are preserved in the bilingual [Release Notes](docs/en/release-notes.md). Source publication, binary publication, CPU checks and GPU numerical acceptance are separate evidence.
 
 ## 构建 / Build
 
@@ -62,6 +31,7 @@ python -m pip install -r docs/requirements.txt
 python tools/build_docs.py
 python tools/check_site.py _build/html
 python tools/check_api_docs.py
+python tools/check_v19_api_contracts.py --check tools/v19_api_contract.json --docs docs
 python tools/check_scalar_dev_docs.py
 python tools/check_born_docs.py
 python tools/check_vrr_docs.py
@@ -73,18 +43,19 @@ Open http://127.0.0.1:8000/zh/ or http://127.0.0.1:8000/en/. `build_docs.py` run
 
 The homepage introduces differentiable wave propagation with the supplied StarWave logo, three concise capabilities, a PyTorch/autograd fragment, and direct installation, Quickstart and Usage links. The large homepage headline is sans-serif; English reading text and smaller headings use a Georgia system stack with a serif fallback, following the Deepwave reading hierarchy at roughly 17px. Code stays monospace. The homepage uses original wave, gradient and network icons instead of a comparison table or numbered feature labels. Small locally served Noto Sans CJK SC glyph subsets keep the Chinese homepage and Usage sans-serif across systems; their full OFL 1.1 license and provenance are included in `docs/_static/fonts/`. English article text follows the requested serif hierarchy; the sidebar retains the RTD theme typography. The selected logo SVGs and favicon are unchanged user-provided assets, checked for safe SVG content and hashes; no broader logo license is declared.
 
-The left sidebar uses short, single-line chapter labels and includes an About StarWave overview with SWEEP/Deepwave attribution. It is a flat list of major chapters, with a prominent Search docs field and a left-side clickable submit icon and no expand/collapse buttons. Usage links the scalar, Born, VRZ, independent VRR, VTI, elastic, GSLS, material-conversion and native-helper documentation on its main page. Forward Modeling includes an Acquisition guide with an original two-shot geometry diagram and a combined Wave propagation chapter whose VRZ/VTI text comes from single-source includes. Docker has an explicitly unreleased installation placeholder; no container image or command is advertised. Other chapters have local page directories.
+The left sidebar uses short, single-line chapter labels and includes an About StarWave overview with SWEEP/Deepwave attribution. It is a flat list of major chapters, with a prominent Search docs field and a left-side clickable submit icon and no expand/collapse buttons. Usage links the scalar, Born, VRZ, integrated VRR, VTI, elastic, GSLS, material-conversion and native-helper documentation on its main page. Forward Modeling includes an Acquisition guide with an original two-shot geometry diagram and a combined Wave propagation chapter whose VRZ/VTI text comes from single-source includes. Docker has an explicitly unreleased installation placeholder; no container image or command is advertised. Other chapters have local page directories.
 
 Each page has an accessible language switch. Section and Python-object anchors survive switching; the original root-level URLs, including `/api/scalar.html`, redirect to their corresponding Chinese pages (old API pages now map directly to Usage) while retaining query parameters and mapped legacy fragments. Original VRZ/VTI modeling URLs also redirect to their sections within Wave propagation, without duplicate search entries. Without JavaScript, compatibility pages expose links to both languages. Search runs entirely in the selected language’s static index.
 
 ## 检查 / Checks
 
+- `check_v19_api_contracts.py`: 31-callable frozen-source inventory, current bilingual signature/name/kind/default checks and parameter coverage; optional source path performs AST comparison without importing StarWave.
 - `check_site.py`: local links, anchors, resources, complete locale coverage, independent search assets, English translation coverage, Python syntax and restricted-content guardrails.
 - `check_presentation_asset.py` (also run by `check_site.py`): the reviewed PDF's SHA-256, exactly 30 slides, an image hash for each reviewed watermark-bearing page, absence of active PDF actions or embedded files, and a strict publication allowlist. These checks preserve the independently reviewed pixels; they do not claim to recognize a watermark automatically.
-- `check_scalar_dev_docs.py`: isolated current-dev scalar contract, exactly three additive options, preserved 20-parameter release snapshot, source AST and bilingual terminal-only checkpoint example.
-- `check_born_docs.py`: separately pinned V17 source AST contract for scalar_born / ScalarBorn / forward (47/13/41 parameters), exact defaults/types/returns, bilingual checkpoint example and source-only scope; optional `--source-root` checks the reviewed source file SHA-256 and AST without importing it. The 12 original API snapshots remain unchanged.
-- `check_vrr_docs.py`: independent extension signature/defaults, parameter coverage, bilingual examples and source-only scope; optional `--source-root` compares the authorized local source through AST without importing it.
-- `check_api_docs.py`: typed function signatures, types/defaults/descriptions, released scalar 20 / dev scalar 23 / VRZ 22 / VTI 24 / elastic 66 parameter coverage, material conversions, native helpers, GSLS contracts, return contracts and Python snippets. The checked-in public contract snapshot prevents cross-language agreement from hiding interface drift.
+- `check_scalar_dev_docs.py`: isolated current V19 scalar contract, exactly three additive options, preserved 20-parameter release snapshot, source AST and bilingual terminal-only checkpoint example.
+- `check_born_docs.py`: preserved Born signature snapshot with V19 source AST and file-hash verification for scalar_born / ScalarBorn / forward (47/13/41 parameters), exact defaults/types/returns, bilingual checkpoint example and V19 scope; optional `--source-root` checks the reviewed source file SHA-256 and AST without importing it. The 12 original API snapshots remain unchanged.
+- `check_vrr_docs.py`: integrated VRR signature/defaults, parameter coverage, bilingual examples and V19 scope; optional `--source-root` compares the authorized local source through AST without importing it.
+- `check_api_docs.py`: typed function signatures, types/defaults/descriptions, historical scalar 20 / current scalar 23 / VRZ 22 / VTI 24 / elastic 66 parameter coverage, material conversions, native helpers, GSLS contracts, return contracts and Python snippets. The checked-in public contract snapshot prevents cross-language agreement from hiding interface drift.
 - `check_tutorial_assets.py`: clean notebook/script parity, numerical-source provenance, safe metadata, configuration and measured-result invariants.
 - Optional `--wheel PATH`: verifies the pinned 7.1.0 binary wheel SHA-256, package/platform metadata, native-library receipt hashes, and signatures through AST parsing, without importing or running StarWave. Wheels are never part of the source or published site.
 
@@ -110,35 +81,12 @@ The browser checks cover desktop/mobile layout, section and API switching, legac
 
 ## 内容边界 / Scope
 
-This repository contains documentation, original synthetic usage examples and build tooling. It contains no propagation implementation, binary libraries, private datasets or internal records. It neither imports StarWave through autodoc nor publishes source pages. Main-package API documentation follows the V17 source contract, including Born, equation-specific flat-top boundaries and import-time initialization; the V16 / 7.1.0 wheel contract remains a separately identified baseline; historical release records retain their distinct evidence scope; the three original tutorials now include measured A30 / StarWave 0.1.0.dev9 results and clean notebook downloads. Those historical tutorials do not establish public-wheel GPU validation, full adjoint correctness or general performance and convergence. The new Scalar3D Example chapter separately reports bounded source-build numerical checks and measured four-GPU experiments, including incomplete surface-only recovery. See the manual’s documentation-status page.
+This repository contains documentation, original synthetic usage examples and build tooling. It contains no propagation implementation, binary libraries, private datasets or internal records. It neither imports StarWave through autodoc nor publishes source pages. Main-package API documentation follows the V19 source contract, including integrated VRR, Born, the 23-parameter scalar API, equation-specific boundaries and import-time initialization; the V16 / 7.1.0 wheel contract remains a separately identified baseline; historical release records retain their distinct evidence scope; the three original tutorials now include measured A30 / StarWave 0.1.0.dev9 results and clean notebook downloads. Those historical tutorials do not establish public-wheel GPU validation, full adjoint correctness or general performance and convergence. The new Scalar3D Example chapter separately reports bounded source-build numerical checks and measured four-GPU experiments, including incomplete surface-only recovery. See the manual’s documentation-status page.
 
 No new software or documentation license is declared on behalf of the owners.
 
 The Presentation chapter publishes only the approved original 30-slide watermarked PDF. The editable slide deck, authoring files, and reference presentations are not distributed in this repository or the built site. The PDF has no new open-license grant. Visible watermarks help identify the source; they are not an unremovable protection mechanism. No external PDF viewer service or JavaScript viewer bundle is used.
 
-## Elastic documentation maintenance · 2026-10-08
+## Historical tutorials and examples
 
-The existing single-page Usage now documents the published V11 / 4.0.0 elastic contract, explicit material conversions, and the separate elastic preparation helper. Source/wheel signature parity and exact return order were reviewed without executing GPU propagation. Existing scalar/VRZ/VTI API content, historical tutorial assets, styling, attribution and compatibility anchors are preserved. Review scope and the published wheel hash are recorded in each language's Status and Release Notes pages. For the current 7.1.0 binary archive, use `python tools/check_api_docs.py --wheel PATH_TO_7.1.0_WHEEL` for optional local verification; do not commit the wheel.
-
-## Wavefield Reconstruction chapter
-
-The bilingual Forward Modeling navigation now includes Reconstruction / 波场反传重建. The chapter derives the pinned 4.0.0 elastic boundary method, distinguishes forward reconstruction from the discrete adjoint, documents the physical velocity/traction tape and temporal-filter transpose, and gives exact payload formulas with sampling and validation limits. Four original vector schematics per language are reproducible with `tools/draw_reconstruction.py`; outlined text keeps labels consistent without a network font dependency. Keyboard-scrollable figure regions preserve readable labels on narrow screens. No software source or measured GPU results were changed.
-
-## Scalar3D API update · 2026-10-08
-
-The 5.0.0 manual adds source-verified 2D/3D scalar dispatch, model-axis coordinates, one-element receiver tuple returns, first-order velocity gradients in 2D/3D and source-waveform gradients in 3D, temporal-resampling adjoint semantics, and radius-M six-face boundary storage with internal terminal pressure fields. Scalar exposes no public initial/final states, and 2D sources remain fixed. The nine public signatures match the SHA-256-pinned 5.0.0 wheel. Existing VRZ, VTI and Elastic contract bodies, historical tutorial evidence and legacy anchors are preserved. New source-build example results are a separate documentation deliverable and are not claimed as wheel GPU validation.
-
-## Scalar3D Example chapter
-
-The flat sidebar now places **Example** directly above **Usage** in both languages. It contains an overview, enclosed-anomaly, surface-only-anomaly and undulating-layer experiments, and report/reproduction downloads. The 21 original plots retain their exact pixels, detailed localized captions, keyboard-scrollable mobile regions and full-resolution links. The report PDF is a repagination of the original Chinese HTML report. Numerical consistency, interior-only directional checks, fixed-model objective, training-pass averages, gradient normalization, and incomplete surface-only recovery remain explicitly distinguished.
-
-Run `python tools/check_scalar3d_examples.py _build/html` to verify the asset allowlist, hashes, plots, navigation order, bilingual sections and downloads. The historical 2D tutorials are preserved; the Scalar3D Example content is 3D-only.
-
-## V13 / 6.0.0 maintenance · 2026-10-09
-
-Installation and compatibility guidance now cover the V13 / 6.0.0 internal-storage update. Scalar2D compact PML, Radius-M boundary storage, compact full history (retaining boundary_buffer, with the full layout preserved for illumination), and PML-transpose corrections are summarized without changing API calls. Elastic full/boundary no longer use L2 shot-group trajectory scheduling; the existing kernel mapping, including 3D forward shot loops, is retained. Source users must rebuild matching native libraries and restart. Existing tutorials and Scalar3D Example assets keep their original versions, hashes, and evidence scopes. No private implementation, helper module, new test report, or general speedup claim is published. The optional checker is pinned to the published 6.0.0 binary wheel and verifies its metadata, two native-library receipt hashes, and all nine signatures. The official PyPI version record and an independent public download match the 16,674,439-byte artifact and its SHA-256. Python 3.10–3.12 host/CPU installation checks and a clean public-PyPI installation passed; none establishes GPU numerical or performance acceptance.
-
-
-## Retired V14 SLS documentation
-
-The V14 / 7.0.0 release and its recorded verification facts remain in the dated release history. Its independent SLS API pages, Marmousi2 example, figures and downloads have been removed from the current manual in favor of the GSLS reference. Original versions remain in Git history. No old result is presented as GSLS validation.
+The original 0.1.0.dev9 tutorials, the bounded Scalar3D experiments and the reconstruction chapter retain their historical evidence and asset hashes. They are not rerun or relabelled as V19 results. See [Status](docs/en/status.md), [Scalar3D examples](docs/en/examples/index.md), and [Release Notes](docs/en/release-notes.md) for scope and history.

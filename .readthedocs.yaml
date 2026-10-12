@@ -9,6 +9,7 @@ build:
         - python tools/build_docs.py --output "$READTHEDOCS_OUTPUT/html"
         - python tools/check_site.py "$READTHEDOCS_OUTPUT/html"
         - python tools/check_api_docs.py
+        - python tools/check_v19_api_contracts.py --check tools/v19_api_contract.json --docs docs
 sphinx:
   configuration: docs/conf.py
   fail_on_warning: true

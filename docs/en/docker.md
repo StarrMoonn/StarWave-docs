@@ -15,7 +15,7 @@ This page reserves the Docker installation entry for StarWave. No StarWave conta
 
 ## Available now
 
-Use the [PyPI wheel installation](installation.md) and check its system, Python, PyTorch, and GPU requirements. Users with authorized source access can follow the instructions provided with that source.
+Use the V18 / 9.0.0 [PyPI wheel installation](installation.md) and check its system, Python, PyTorch, and GPU requirements. Users with authorized source access can follow the instructions provided with that source.
 
 ## Release details pending
 
@@ -24,3 +24,5 @@ Use the [PyPI wheel installation](installation.md) and check its system, Python,
 - System and GPU runtime requirements for the image version, with the scope of actual validation
 
 The image repository and publication plan are still to be confirmed. Container builds and GPU tests have not been performed. Container execution examples are not available on this page yet.
+
+[V19 Release](https://github.com/StarrMoonn/StarWave/releases/tag/V19) is published. This manual follows frozen source `0.1.0.dev19`, commit `46d32877e3336d531520a696d5f2e074e6f4ef74`. [PyPI **9.1.0**](https://pypi.org/project/starwave/9.1.0/) is published with the V19 source contract and integrated VRR. The existing [9.0.0 wheel](https://pypi.org/project/starwave/9.0.0/) remains V18 and excludes integrated VRR.

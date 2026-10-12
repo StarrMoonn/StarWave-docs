@@ -1,0 +1,2869 @@
+{
+  "schema": 1,
+  "source_commit": "46d32877e3336d531520a696d5f2e074e6f4ef74",
+  "scope": "AST signatures and declared exports; runtime semantics in Usage; not GPU acceptance",
+  "exports": [
+    "vrr",
+    "vrr_reference",
+    "scalar_born",
+    "ScalarBorn",
+    "visco_gsls",
+    "prepare_visco_gsls",
+    "visco_gsls_native_status",
+    "scalar",
+    "vrz",
+    "vti",
+    "elastic",
+    "elastic_native_status",
+    "prepare_elastic",
+    "native_status",
+    "prepare_native",
+    "ScalarIllumination",
+    "IlluminationFields",
+    "precondition_gradient"
+  ],
+  "additional_direct_attributes": [
+    "common",
+    "wavelets",
+    "IGNORE_LOCATION"
+  ],
+  "dataclass_fields": {
+    "starwave.IlluminationFields": [
+      {
+        "name": "source",
+        "annotation": "torch.Tensor"
+      },
+      {
+        "name": "receiver",
+        "annotation": "torch.Tensor"
+      },
+      {
+        "name": "pseudo_hessian",
+        "annotation": "torch.Tensor"
+      },
+      {
+        "name": "shots",
+        "annotation": "int"
+      }
+    ]
+  },
+  "apis": {
+    "starwave.scalar": {
+      "source": "starwave/scalar.py",
+      "line": 24,
+      "parameters": [
+        {
+          "name": "v",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "grid_spacing",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "dt",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "source_amplitudes",
+          "kind": "KEYWORD_ONLY",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "source_locations",
+          "kind": "KEYWORD_ONLY",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "receiver_locations",
+          "kind": "KEYWORD_ONLY",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "accuracy",
+          "kind": "KEYWORD_ONLY",
+          "default": "8",
+          "annotation": null
+        },
+        {
+          "name": "pml_freq",
+          "kind": "KEYWORD_ONLY",
+          "default": "25.0",
+          "annotation": null
+        },
+        {
+          "name": "pml_width",
+          "kind": "KEYWORD_ONLY",
+          "default": "20",
+          "annotation": null
+        },
+        {
+          "name": "boundary_buffer",
+          "kind": "KEYWORD_ONLY",
+          "default": "5",
+          "annotation": null
+        },
+        {
+          "name": "memory",
+          "kind": "KEYWORD_ONLY",
+          "default": "'boundary'",
+          "annotation": null
+        },
+        {
+          "name": "max_vel",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        },
+        {
+          "name": "freq_taper_frac",
+          "kind": "KEYWORD_ONLY",
+          "default": "0.0",
+          "annotation": null
+        },
+        {
+          "name": "time_pad_frac",
+          "kind": "KEYWORD_ONLY",
+          "default": "0.0",
+          "annotation": null
+        },
+        {
+          "name": "time_taper",
+          "kind": "KEYWORD_ONLY",
+          "default": "False",
+          "annotation": null
+        },
+        {
+          "name": "illumination",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        },
+        {
+          "name": "backend",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        },
+        {
+          "name": "execution",
+          "kind": "KEYWORD_ONLY",
+          "default": "'eager'",
+          "annotation": null
+        },
+        {
+          "name": "checkpoint_interval",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        },
+        {
+          "name": "compile_steps",
+          "kind": "KEYWORD_ONLY",
+          "default": "1",
+          "annotation": null
+        },
+        {
+          "name": "return_wavefield",
+          "kind": "KEYWORD_ONLY",
+          "default": "False",
+          "annotation": null
+        },
+        {
+          "name": "forward_callback",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        },
+        {
+          "name": "callback_frequency",
+          "kind": "KEYWORD_ONLY",
+          "default": "1",
+          "annotation": null
+        }
+      ],
+      "return_annotation": null
+    },
+    "starwave.vrz": {
+      "source": "starwave/vrz.py",
+      "line": 18,
+      "parameters": [
+        {
+          "name": "v",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "grid_spacing",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "dt",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "impedance",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        },
+        {
+          "name": "density",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        },
+        {
+          "name": "source_amplitudes",
+          "kind": "KEYWORD_ONLY",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "source_locations",
+          "kind": "KEYWORD_ONLY",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "receiver_locations",
+          "kind": "KEYWORD_ONLY",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "accuracy",
+          "kind": "KEYWORD_ONLY",
+          "default": "8",
+          "annotation": null
+        },
+        {
+          "name": "pml_freq",
+          "kind": "KEYWORD_ONLY",
+          "default": "25.0",
+          "annotation": null
+        },
+        {
+          "name": "pml_width",
+          "kind": "KEYWORD_ONLY",
+          "default": "20",
+          "annotation": null
+        },
+        {
+          "name": "boundary_buffer",
+          "kind": "KEYWORD_ONLY",
+          "default": "5",
+          "annotation": null
+        },
+        {
+          "name": "memory",
+          "kind": "KEYWORD_ONLY",
+          "default": "'boundary'",
+          "annotation": null
+        },
+        {
+          "name": "max_vel",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        },
+        {
+          "name": "freq_taper_frac",
+          "kind": "KEYWORD_ONLY",
+          "default": "0.0",
+          "annotation": null
+        },
+        {
+          "name": "time_pad_frac",
+          "kind": "KEYWORD_ONLY",
+          "default": "0.0",
+          "annotation": null
+        },
+        {
+          "name": "time_taper",
+          "kind": "KEYWORD_ONLY",
+          "default": "False",
+          "annotation": null
+        },
+        {
+          "name": "illumination",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        },
+        {
+          "name": "backend",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        },
+        {
+          "name": "execution",
+          "kind": "KEYWORD_ONLY",
+          "default": "'eager'",
+          "annotation": null
+        },
+        {
+          "name": "checkpoint_interval",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        },
+        {
+          "name": "compile_steps",
+          "kind": "KEYWORD_ONLY",
+          "default": "1",
+          "annotation": null
+        }
+      ],
+      "return_annotation": null
+    },
+    "starwave.vrr": {
+      "source": "starwave/_vrr/api.py",
+      "line": 120,
+      "parameters": [
+        {
+          "name": "v",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "grid_spacing",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "dt",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "rx",
+          "kind": "KEYWORD_ONLY",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "rz",
+          "kind": "KEYWORD_ONLY",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "source_amplitudes",
+          "kind": "KEYWORD_ONLY",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "source_locations",
+          "kind": "KEYWORD_ONLY",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "receiver_locations",
+          "kind": "KEYWORD_ONLY",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "accuracy",
+          "kind": "KEYWORD_ONLY",
+          "default": "8",
+          "annotation": null
+        },
+        {
+          "name": "pml_freq",
+          "kind": "KEYWORD_ONLY",
+          "default": "25.0",
+          "annotation": null
+        },
+        {
+          "name": "pml_width",
+          "kind": "KEYWORD_ONLY",
+          "default": "20",
+          "annotation": null
+        },
+        {
+          "name": "boundary_buffer",
+          "kind": "KEYWORD_ONLY",
+          "default": "5",
+          "annotation": null
+        },
+        {
+          "name": "memory",
+          "kind": "KEYWORD_ONLY",
+          "default": "'boundary'",
+          "annotation": null
+        },
+        {
+          "name": "max_vel",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        },
+        {
+          "name": "freq_taper_frac",
+          "kind": "KEYWORD_ONLY",
+          "default": "0.0",
+          "annotation": null
+        },
+        {
+          "name": "time_pad_frac",
+          "kind": "KEYWORD_ONLY",
+          "default": "0.0",
+          "annotation": null
+        },
+        {
+          "name": "time_taper",
+          "kind": "KEYWORD_ONLY",
+          "default": "False",
+          "annotation": null
+        },
+        {
+          "name": "backend",
+          "kind": "KEYWORD_ONLY",
+          "default": "'cuda'",
+          "annotation": null
+        },
+        {
+          "name": "execution",
+          "kind": "KEYWORD_ONLY",
+          "default": "'eager'",
+          "annotation": null
+        },
+        {
+          "name": "checkpoint_interval",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        },
+        {
+          "name": "compile_steps",
+          "kind": "KEYWORD_ONLY",
+          "default": "1",
+          "annotation": null
+        }
+      ],
+      "return_annotation": null
+    },
+    "starwave.vrr_reference": {
+      "source": "starwave/_vrr/api.py",
+      "line": 140,
+      "parameters": [
+        {
+          "name": "v",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "grid_spacing",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "dt",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "rx",
+          "kind": "KEYWORD_ONLY",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "rz",
+          "kind": "KEYWORD_ONLY",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "source_amplitudes",
+          "kind": "KEYWORD_ONLY",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "source_locations",
+          "kind": "KEYWORD_ONLY",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "receiver_locations",
+          "kind": "KEYWORD_ONLY",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "accuracy",
+          "kind": "KEYWORD_ONLY",
+          "default": "8",
+          "annotation": null
+        },
+        {
+          "name": "pml_freq",
+          "kind": "KEYWORD_ONLY",
+          "default": "25.0",
+          "annotation": null
+        },
+        {
+          "name": "pml_width",
+          "kind": "KEYWORD_ONLY",
+          "default": "20",
+          "annotation": null
+        },
+        {
+          "name": "boundary_buffer",
+          "kind": "KEYWORD_ONLY",
+          "default": "5",
+          "annotation": null
+        },
+        {
+          "name": "memory",
+          "kind": "KEYWORD_ONLY",
+          "default": "'full'",
+          "annotation": null
+        },
+        {
+          "name": "max_vel",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        },
+        {
+          "name": "freq_taper_frac",
+          "kind": "KEYWORD_ONLY",
+          "default": "0.0",
+          "annotation": null
+        },
+        {
+          "name": "time_pad_frac",
+          "kind": "KEYWORD_ONLY",
+          "default": "0.0",
+          "annotation": null
+        },
+        {
+          "name": "time_taper",
+          "kind": "KEYWORD_ONLY",
+          "default": "False",
+          "annotation": null
+        }
+      ],
+      "return_annotation": null
+    },
+    "starwave.vti": {
+      "source": "starwave/vti.py",
+      "line": 16,
+      "parameters": [
+        {
+          "name": "vp",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "epsilon",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "delta",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "rho",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "grid_spacing",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "dt",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "source_amplitudes",
+          "kind": "KEYWORD_ONLY",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "source_locations",
+          "kind": "KEYWORD_ONLY",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "receiver_locations",
+          "kind": "KEYWORD_ONLY",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "source_fields",
+          "kind": "KEYWORD_ONLY",
+          "default": "('sH', 'sV')",
+          "annotation": null
+        },
+        {
+          "name": "receiver_fields",
+          "kind": "KEYWORD_ONLY",
+          "default": "('vz',)",
+          "annotation": null
+        },
+        {
+          "name": "accuracy",
+          "kind": "KEYWORD_ONLY",
+          "default": "4",
+          "annotation": null
+        },
+        {
+          "name": "pml_freq",
+          "kind": "KEYWORD_ONLY",
+          "default": "25.0",
+          "annotation": null
+        },
+        {
+          "name": "pml_width",
+          "kind": "KEYWORD_ONLY",
+          "default": "20",
+          "annotation": null
+        },
+        {
+          "name": "boundary_buffer",
+          "kind": "KEYWORD_ONLY",
+          "default": "5",
+          "annotation": null
+        },
+        {
+          "name": "memory",
+          "kind": "KEYWORD_ONLY",
+          "default": "'boundary'",
+          "annotation": null
+        },
+        {
+          "name": "max_vel",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        },
+        {
+          "name": "freq_taper_frac",
+          "kind": "KEYWORD_ONLY",
+          "default": "0.0",
+          "annotation": null
+        },
+        {
+          "name": "time_pad_frac",
+          "kind": "KEYWORD_ONLY",
+          "default": "0.0",
+          "annotation": null
+        },
+        {
+          "name": "time_taper",
+          "kind": "KEYWORD_ONLY",
+          "default": "False",
+          "annotation": null
+        },
+        {
+          "name": "backend",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        },
+        {
+          "name": "execution",
+          "kind": "KEYWORD_ONLY",
+          "default": "'eager'",
+          "annotation": null
+        },
+        {
+          "name": "checkpoint_interval",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        },
+        {
+          "name": "compile_steps",
+          "kind": "KEYWORD_ONLY",
+          "default": "1",
+          "annotation": null
+        }
+      ],
+      "return_annotation": null
+    },
+    "starwave.elastic": {
+      "source": "starwave/elastic.py",
+      "line": 76,
+      "parameters": [
+        {
+          "name": "lamb",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": "torch.Tensor"
+        },
+        {
+          "name": "mu",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": "torch.Tensor"
+        },
+        {
+          "name": "buoyancy",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": "torch.Tensor"
+        },
+        {
+          "name": "grid_spacing",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": "Union[float, Sequence[float]]"
+        },
+        {
+          "name": "dt",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": "float"
+        },
+        {
+          "name": "source_amplitudes_z",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "source_amplitudes_y",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "source_amplitudes_x",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "source_amplitudes_p",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "source_locations_z",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "source_locations_y",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "source_locations_x",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "source_locations_p",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "receiver_locations_z",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "receiver_locations_y",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "receiver_locations_x",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "receiver_locations_p",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "accuracy",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "4",
+          "annotation": "int"
+        },
+        {
+          "name": "pml_width",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "20",
+          "annotation": "Union[int, Sequence[int]]"
+        },
+        {
+          "name": "pml_freq",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[float]"
+        },
+        {
+          "name": "max_vel",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[float]"
+        },
+        {
+          "name": "survey_pad",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[Union[int, Sequence[Optional[int]]]]"
+        },
+        {
+          "name": "vz_0",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "vy_0",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "vx_0",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "sigmazz_0",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "sigmayz_0",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "sigmaxz_0",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "sigmayy_0",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "sigmaxy_0",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "sigmaxx_0",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "m_vzz_0",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "m_vzy_0",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "m_vzx_0",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "m_vyz_0",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "m_vxz_0",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "m_vyy_0",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "m_vyx_0",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "m_vxy_0",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "m_vxx_0",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "m_sigmazzz_0",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "m_sigmayzy_0",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "m_sigmaxzx_0",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "m_sigmayzz_0",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "m_sigmaxzz_0",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "m_sigmayyy_0",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "m_sigmaxyy_0",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "m_sigmaxyx_0",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "m_sigmaxxx_0",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "origin",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[Sequence[int]]"
+        },
+        {
+          "name": "nt",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[int]"
+        },
+        {
+          "name": "model_gradient_sampling_interval",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "1",
+          "annotation": "int"
+        },
+        {
+          "name": "freq_taper_frac",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "0.0",
+          "annotation": "float"
+        },
+        {
+          "name": "time_pad_frac",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "0.0",
+          "annotation": "float"
+        },
+        {
+          "name": "time_taper",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "False",
+          "annotation": "bool"
+        },
+        {
+          "name": "forward_callback",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[common.Callback]"
+        },
+        {
+          "name": "callback_frequency",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "1",
+          "annotation": "int"
+        },
+        {
+          "name": "python_backend",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "False",
+          "annotation": "Union[Literal['eager', 'jit', 'compile'], bool]"
+        },
+        {
+          "name": "storage_mode",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "'device'",
+          "annotation": "Literal['device', 'cpu', 'disk', 'none']"
+        },
+        {
+          "name": "storage_path",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "'.'",
+          "annotation": "str"
+        },
+        {
+          "name": "storage_compression",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "False",
+          "annotation": "bool"
+        },
+        {
+          "name": "memory",
+          "kind": "KEYWORD_ONLY",
+          "default": "'full'",
+          "annotation": "Literal['full', 'boundary', 'checkpoint']"
+        },
+        {
+          "name": "backend",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        },
+        {
+          "name": "execution",
+          "kind": "KEYWORD_ONLY",
+          "default": "'eager'",
+          "annotation": null
+        },
+        {
+          "name": "checkpoint_interval",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        },
+        {
+          "name": "compile_steps",
+          "kind": "KEYWORD_ONLY",
+          "default": "1",
+          "annotation": null
+        }
+      ],
+      "return_annotation": "Tuple[torch.Tensor, ...]"
+    },
+    "starwave.scalar_born": {
+      "source": "starwave/scalar_born.py",
+      "line": 231,
+      "parameters": [
+        {
+          "name": "v",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": "torch.Tensor"
+        },
+        {
+          "name": "scatter",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": "torch.Tensor"
+        },
+        {
+          "name": "grid_spacing",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": "Union[float, Sequence[float]]"
+        },
+        {
+          "name": "dt",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": "float"
+        },
+        {
+          "name": "source_amplitudes",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "source_locations",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "receiver_locations",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "bg_receiver_locations",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "accuracy",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "4",
+          "annotation": "int"
+        },
+        {
+          "name": "pml_width",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "20",
+          "annotation": "Union[int, Sequence[int]]"
+        },
+        {
+          "name": "pml_freq",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[float]"
+        },
+        {
+          "name": "max_vel",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[float]"
+        },
+        {
+          "name": "survey_pad",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[Union[int, Sequence[Optional[int]]]]"
+        },
+        {
+          "name": "wavefield_0",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "wavefield_m1",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "psiz_m1",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "psiy_m1",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "psix_m1",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "zetaz_m1",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "zetay_m1",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "zetax_m1",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "wavefield_sc_0",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "wavefield_sc_m1",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "psiz_sc_m1",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "psiy_sc_m1",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "psix_sc_m1",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "zetaz_sc_m1",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "zetay_sc_m1",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "zetax_sc_m1",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "origin",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[Sequence[int]]"
+        },
+        {
+          "name": "nt",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[int]"
+        },
+        {
+          "name": "model_gradient_sampling_interval",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "1",
+          "annotation": "int"
+        },
+        {
+          "name": "freq_taper_frac",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "0.0",
+          "annotation": "float"
+        },
+        {
+          "name": "time_pad_frac",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "0.0",
+          "annotation": "float"
+        },
+        {
+          "name": "time_taper",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "False",
+          "annotation": "bool"
+        },
+        {
+          "name": "forward_callback",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[common.Callback]"
+        },
+        {
+          "name": "backward_callback",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[common.Callback]"
+        },
+        {
+          "name": "callback_frequency",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "1",
+          "annotation": "int"
+        },
+        {
+          "name": "python_backend",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "False",
+          "annotation": "Union[Literal['eager', 'jit', 'compile'], bool]"
+        },
+        {
+          "name": "storage_mode",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "'device'",
+          "annotation": "Literal['device', 'cpu', 'disk', 'none']"
+        },
+        {
+          "name": "storage_path",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "'.'",
+          "annotation": "str"
+        },
+        {
+          "name": "storage_compression",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "False",
+          "annotation": "bool"
+        },
+        {
+          "name": "memory",
+          "kind": "KEYWORD_ONLY",
+          "default": "'full'",
+          "annotation": "Literal['full', 'boundary', 'checkpoint']"
+        },
+        {
+          "name": "backend",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        },
+        {
+          "name": "execution",
+          "kind": "KEYWORD_ONLY",
+          "default": "'eager'",
+          "annotation": null
+        },
+        {
+          "name": "checkpoint_interval",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        },
+        {
+          "name": "compile_steps",
+          "kind": "KEYWORD_ONLY",
+          "default": "1",
+          "annotation": null
+        }
+      ],
+      "return_annotation": "Tuple[torch.Tensor, ...]"
+    },
+    "starwave.ScalarBorn": {
+      "source": "starwave/scalar_born.py",
+      "line": 67,
+      "parameters": [
+        {
+          "name": "v",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": "torch.Tensor"
+        },
+        {
+          "name": "scatter",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": "torch.Tensor"
+        },
+        {
+          "name": "grid_spacing",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": "Union[float, Sequence[float]]"
+        },
+        {
+          "name": "v_requires_grad",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "False",
+          "annotation": "bool"
+        },
+        {
+          "name": "scatter_requires_grad",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "False",
+          "annotation": "bool"
+        },
+        {
+          "name": "storage_mode",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "'device'",
+          "annotation": "Literal['device', 'cpu', 'disk', 'none']"
+        },
+        {
+          "name": "storage_path",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "'.'",
+          "annotation": "str"
+        },
+        {
+          "name": "storage_compression",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "False",
+          "annotation": "bool"
+        },
+        {
+          "name": "memory",
+          "kind": "KEYWORD_ONLY",
+          "default": "'full'",
+          "annotation": "Literal['full', 'boundary', 'checkpoint']"
+        },
+        {
+          "name": "backend",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        },
+        {
+          "name": "execution",
+          "kind": "KEYWORD_ONLY",
+          "default": "'eager'",
+          "annotation": null
+        },
+        {
+          "name": "checkpoint_interval",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        },
+        {
+          "name": "compile_steps",
+          "kind": "KEYWORD_ONLY",
+          "default": "1",
+          "annotation": null
+        }
+      ],
+      "return_annotation": "None"
+    },
+    "starwave.ScalarBorn.forward": {
+      "source": "starwave/scalar_born.py",
+      "line": 128,
+      "parameters": [
+        {
+          "name": "dt",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": "float"
+        },
+        {
+          "name": "source_amplitudes",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "source_locations",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "receiver_locations",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "bg_receiver_locations",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "accuracy",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "4",
+          "annotation": "int"
+        },
+        {
+          "name": "pml_width",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "20",
+          "annotation": "Union[int, Sequence[int]]"
+        },
+        {
+          "name": "pml_freq",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[float]"
+        },
+        {
+          "name": "max_vel",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[float]"
+        },
+        {
+          "name": "survey_pad",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[Union[int, Sequence[Optional[int]]]]"
+        },
+        {
+          "name": "wavefield_0",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "wavefield_m1",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "psiz_m1",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "psiy_m1",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "psix_m1",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "zetaz_m1",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "zetay_m1",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "zetax_m1",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "wavefield_sc_0",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "wavefield_sc_m1",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "psiz_sc_m1",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "psiy_sc_m1",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "psix_sc_m1",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "zetaz_sc_m1",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "zetay_sc_m1",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "zetax_sc_m1",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.Tensor]"
+        },
+        {
+          "name": "origin",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[Sequence[int]]"
+        },
+        {
+          "name": "nt",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[int]"
+        },
+        {
+          "name": "model_gradient_sampling_interval",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "1",
+          "annotation": "int"
+        },
+        {
+          "name": "freq_taper_frac",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "0.0",
+          "annotation": "float"
+        },
+        {
+          "name": "time_pad_frac",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "0.0",
+          "annotation": "float"
+        },
+        {
+          "name": "time_taper",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "False",
+          "annotation": "bool"
+        },
+        {
+          "name": "forward_callback",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[common.Callback]"
+        },
+        {
+          "name": "backward_callback",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[common.Callback]"
+        },
+        {
+          "name": "callback_frequency",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "1",
+          "annotation": "int"
+        },
+        {
+          "name": "python_backend",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "False",
+          "annotation": "Union[Literal['eager', 'jit', 'compile'], bool]"
+        },
+        {
+          "name": "memory",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        },
+        {
+          "name": "backend",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        },
+        {
+          "name": "execution",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        },
+        {
+          "name": "checkpoint_interval",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        },
+        {
+          "name": "compile_steps",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        }
+      ],
+      "return_annotation": "Tuple[torch.Tensor, ...]"
+    },
+    "starwave.visco_gsls": {
+      "source": "starwave/visco_gsls.py",
+      "line": 185,
+      "parameters": [
+        {
+          "name": "vp",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "q",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "rho",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "grid_spacing",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "dt",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "source_amplitudes",
+          "kind": "KEYWORD_ONLY",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "source_locations",
+          "kind": "KEYWORD_ONLY",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "receiver_locations",
+          "kind": "KEYWORD_ONLY",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "f_ref",
+          "kind": "KEYWORD_ONLY",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "accuracy",
+          "kind": "KEYWORD_ONLY",
+          "default": "4",
+          "annotation": null
+        },
+        {
+          "name": "pml_width",
+          "kind": "KEYWORD_ONLY",
+          "default": "20",
+          "annotation": null
+        },
+        {
+          "name": "memory",
+          "kind": "KEYWORD_ONLY",
+          "default": "'full'",
+          "annotation": null
+        },
+        {
+          "name": "max_vel",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        },
+        {
+          "name": "backend",
+          "kind": "KEYWORD_ONLY",
+          "default": "'cuda'",
+          "annotation": null
+        },
+        {
+          "name": "mode",
+          "kind": "KEYWORD_ONLY",
+          "default": "'hao1'",
+          "annotation": null
+        },
+        {
+          "name": "frequency_band",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        },
+        {
+          "name": "n_mechanisms",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        },
+        {
+          "name": "fit_tolerance",
+          "kind": "KEYWORD_ONLY",
+          "default": "0.05",
+          "annotation": null
+        },
+        {
+          "name": "strict",
+          "kind": "KEYWORD_ONLY",
+          "default": "False",
+          "annotation": null
+        },
+        {
+          "name": "material_model",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        },
+        {
+          "name": "checkpoint_interval",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        },
+        {
+          "name": "execution",
+          "kind": "KEYWORD_ONLY",
+          "default": "'eager'",
+          "annotation": null
+        },
+        {
+          "name": "compile_steps",
+          "kind": "KEYWORD_ONLY",
+          "default": "1",
+          "annotation": null
+        }
+      ],
+      "return_annotation": null
+    },
+    "starwave.prepare_visco_gsls": {
+      "source": "starwave/_visco_gsls_native.py",
+      "line": 74,
+      "parameters": [
+        {
+          "name": "backend",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "'native_cpu'",
+          "annotation": null
+        },
+        {
+          "name": "device",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": null
+        }
+      ],
+      "return_annotation": null
+    },
+    "starwave.visco_gsls_native_status": {
+      "source": "starwave/_visco_gsls_native.py",
+      "line": 47,
+      "parameters": [
+        {
+          "name": "backend",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "'native_cpu'",
+          "annotation": null
+        }
+      ],
+      "return_annotation": null
+    },
+    "starwave.native_status": {
+      "source": "starwave/_native.py",
+      "line": 36,
+      "parameters": [],
+      "return_annotation": null
+    },
+    "starwave.prepare_native": {
+      "source": "starwave/_native.py",
+      "line": 47,
+      "parameters": [
+        {
+          "name": "device_ids",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": null
+        }
+      ],
+      "return_annotation": null
+    },
+    "starwave.elastic_native_status": {
+      "source": "starwave/elastic_runtime.py",
+      "line": 8,
+      "parameters": [],
+      "return_annotation": null
+    },
+    "starwave.prepare_elastic": {
+      "source": "starwave/elastic_runtime.py",
+      "line": 17,
+      "parameters": [
+        {
+          "name": "device_ids",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": null
+        }
+      ],
+      "return_annotation": null
+    },
+    "starwave.ScalarIllumination": {
+      "source": "starwave/illumination.py",
+      "line": 82,
+      "parameters": [
+        {
+          "name": "expected_shots",
+          "kind": "KEYWORD_ONLY",
+          "default": "<required>",
+          "annotation": null
+        }
+      ],
+      "return_annotation": null
+    },
+    "starwave.ScalarIllumination.seal": {
+      "source": "starwave/illumination.py",
+      "line": 118,
+      "parameters": [],
+      "return_annotation": null
+    },
+    "starwave.ScalarIllumination.reduce": {
+      "source": "starwave/illumination.py",
+      "line": 196,
+      "parameters": [
+        {
+          "name": "device",
+          "kind": "KEYWORD_ONLY",
+          "default": "<required>",
+          "annotation": null
+        }
+      ],
+      "return_annotation": null
+    },
+    "starwave.ScalarIllumination.close": {
+      "source": "starwave/illumination.py",
+      "line": 110,
+      "parameters": [],
+      "return_annotation": null
+    },
+    "starwave.precondition_gradient": {
+      "source": "starwave/illumination.py",
+      "line": 251,
+      "parameters": [
+        {
+          "name": "gradient",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "fields",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "mode",
+          "kind": "KEYWORD_ONLY",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "damping",
+          "kind": "KEYWORD_ONLY",
+          "default": "0.01",
+          "annotation": null
+        }
+      ],
+      "return_annotation": null
+    },
+    "starwave.common.vpvsrho_to_lambmubuoyancy": {
+      "source": "starwave/common.py",
+      "line": 17,
+      "parameters": [
+        {
+          "name": "vp",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": "torch.Tensor"
+        },
+        {
+          "name": "vs",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": "torch.Tensor"
+        },
+        {
+          "name": "rho",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": "torch.Tensor"
+        },
+        {
+          "name": "eps",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "1e-15",
+          "annotation": "float"
+        }
+      ],
+      "return_annotation": "Tuple[torch.Tensor, torch.Tensor, torch.Tensor]"
+    },
+    "starwave.common.lambmubuoyancy_to_vpvsrho": {
+      "source": "starwave/common.py",
+      "line": 31,
+      "parameters": [
+        {
+          "name": "lamb",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": "torch.Tensor"
+        },
+        {
+          "name": "mu",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": "torch.Tensor"
+        },
+        {
+          "name": "buoyancy",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": "torch.Tensor"
+        },
+        {
+          "name": "eps",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "1e-15",
+          "annotation": "float"
+        }
+      ],
+      "return_annotation": "Tuple[torch.Tensor, torch.Tensor, torch.Tensor]"
+    },
+    "starwave.wavelets.ricker": {
+      "source": "starwave/_deepwave/wavelets.py",
+      "line": 9,
+      "parameters": [
+        {
+          "name": "freq",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": "float"
+        },
+        {
+          "name": "length",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": "int"
+        },
+        {
+          "name": "dt",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": "float"
+        },
+        {
+          "name": "peak_time",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": "float"
+        },
+        {
+          "name": "dtype",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": "Optional[torch.dtype]"
+        }
+      ],
+      "return_annotation": "torch.Tensor"
+    },
+    "starwave.torch_backend.backend_capabilities": {
+      "source": "starwave/torch_backend/_backends.py",
+      "line": 34,
+      "parameters": [
+        {
+          "name": "equation",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "None",
+          "annotation": null
+        }
+      ],
+      "return_annotation": null
+    },
+    "starwave.torch_backend.scalar": {
+      "source": "starwave/torch_backend/scalar.py",
+      "line": 23,
+      "parameters": [
+        {
+          "name": "v",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "grid_spacing",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "dt",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "source_amplitudes",
+          "kind": "KEYWORD_ONLY",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "source_locations",
+          "kind": "KEYWORD_ONLY",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "receiver_locations",
+          "kind": "KEYWORD_ONLY",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "accuracy",
+          "kind": "KEYWORD_ONLY",
+          "default": "8",
+          "annotation": null
+        },
+        {
+          "name": "pml_freq",
+          "kind": "KEYWORD_ONLY",
+          "default": "25.0",
+          "annotation": null
+        },
+        {
+          "name": "pml_width",
+          "kind": "KEYWORD_ONLY",
+          "default": "20",
+          "annotation": null
+        },
+        {
+          "name": "boundary_buffer",
+          "kind": "KEYWORD_ONLY",
+          "default": "5",
+          "annotation": null
+        },
+        {
+          "name": "memory",
+          "kind": "KEYWORD_ONLY",
+          "default": "'full'",
+          "annotation": null
+        },
+        {
+          "name": "max_vel",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        },
+        {
+          "name": "freq_taper_frac",
+          "kind": "KEYWORD_ONLY",
+          "default": "0.0",
+          "annotation": null
+        },
+        {
+          "name": "time_pad_frac",
+          "kind": "KEYWORD_ONLY",
+          "default": "0.0",
+          "annotation": null
+        },
+        {
+          "name": "time_taper",
+          "kind": "KEYWORD_ONLY",
+          "default": "False",
+          "annotation": null
+        },
+        {
+          "name": "illumination",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        },
+        {
+          "name": "backend",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        },
+        {
+          "name": "execution",
+          "kind": "KEYWORD_ONLY",
+          "default": "'eager'",
+          "annotation": null
+        },
+        {
+          "name": "checkpoint_interval",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        },
+        {
+          "name": "compile_steps",
+          "kind": "KEYWORD_ONLY",
+          "default": "1",
+          "annotation": null
+        },
+        {
+          "name": "return_wavefield",
+          "kind": "KEYWORD_ONLY",
+          "default": "False",
+          "annotation": null
+        },
+        {
+          "name": "forward_callback",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        },
+        {
+          "name": "callback_frequency",
+          "kind": "KEYWORD_ONLY",
+          "default": "1",
+          "annotation": null
+        }
+      ],
+      "return_annotation": null
+    },
+    "starwave.torch_backend.vrz": {
+      "source": "starwave/torch_backend/vrz.py",
+      "line": 17,
+      "parameters": [
+        {
+          "name": "v",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "grid_spacing",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "dt",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "impedance",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        },
+        {
+          "name": "density",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        },
+        {
+          "name": "source_amplitudes",
+          "kind": "KEYWORD_ONLY",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "source_locations",
+          "kind": "KEYWORD_ONLY",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "receiver_locations",
+          "kind": "KEYWORD_ONLY",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "accuracy",
+          "kind": "KEYWORD_ONLY",
+          "default": "8",
+          "annotation": null
+        },
+        {
+          "name": "pml_freq",
+          "kind": "KEYWORD_ONLY",
+          "default": "25.0",
+          "annotation": null
+        },
+        {
+          "name": "pml_width",
+          "kind": "KEYWORD_ONLY",
+          "default": "20",
+          "annotation": null
+        },
+        {
+          "name": "boundary_buffer",
+          "kind": "KEYWORD_ONLY",
+          "default": "5",
+          "annotation": null
+        },
+        {
+          "name": "memory",
+          "kind": "KEYWORD_ONLY",
+          "default": "'full'",
+          "annotation": null
+        },
+        {
+          "name": "max_vel",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        },
+        {
+          "name": "freq_taper_frac",
+          "kind": "KEYWORD_ONLY",
+          "default": "0.0",
+          "annotation": null
+        },
+        {
+          "name": "time_pad_frac",
+          "kind": "KEYWORD_ONLY",
+          "default": "0.0",
+          "annotation": null
+        },
+        {
+          "name": "time_taper",
+          "kind": "KEYWORD_ONLY",
+          "default": "False",
+          "annotation": null
+        },
+        {
+          "name": "illumination",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        },
+        {
+          "name": "backend",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        },
+        {
+          "name": "execution",
+          "kind": "KEYWORD_ONLY",
+          "default": "'eager'",
+          "annotation": null
+        },
+        {
+          "name": "checkpoint_interval",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        },
+        {
+          "name": "compile_steps",
+          "kind": "KEYWORD_ONLY",
+          "default": "1",
+          "annotation": null
+        }
+      ],
+      "return_annotation": null
+    },
+    "starwave.torch_backend.vti": {
+      "source": "starwave/torch_backend/vti.py",
+      "line": 15,
+      "parameters": [
+        {
+          "name": "vp",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "epsilon",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "delta",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "rho",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "grid_spacing",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "dt",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "source_amplitudes",
+          "kind": "KEYWORD_ONLY",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "source_locations",
+          "kind": "KEYWORD_ONLY",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "receiver_locations",
+          "kind": "KEYWORD_ONLY",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "source_fields",
+          "kind": "KEYWORD_ONLY",
+          "default": "('sH', 'sV')",
+          "annotation": null
+        },
+        {
+          "name": "receiver_fields",
+          "kind": "KEYWORD_ONLY",
+          "default": "('vz',)",
+          "annotation": null
+        },
+        {
+          "name": "accuracy",
+          "kind": "KEYWORD_ONLY",
+          "default": "4",
+          "annotation": null
+        },
+        {
+          "name": "pml_freq",
+          "kind": "KEYWORD_ONLY",
+          "default": "25.0",
+          "annotation": null
+        },
+        {
+          "name": "pml_width",
+          "kind": "KEYWORD_ONLY",
+          "default": "20",
+          "annotation": null
+        },
+        {
+          "name": "boundary_buffer",
+          "kind": "KEYWORD_ONLY",
+          "default": "5",
+          "annotation": null
+        },
+        {
+          "name": "memory",
+          "kind": "KEYWORD_ONLY",
+          "default": "'full'",
+          "annotation": null
+        },
+        {
+          "name": "max_vel",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        },
+        {
+          "name": "freq_taper_frac",
+          "kind": "KEYWORD_ONLY",
+          "default": "0.0",
+          "annotation": null
+        },
+        {
+          "name": "time_pad_frac",
+          "kind": "KEYWORD_ONLY",
+          "default": "0.0",
+          "annotation": null
+        },
+        {
+          "name": "time_taper",
+          "kind": "KEYWORD_ONLY",
+          "default": "False",
+          "annotation": null
+        },
+        {
+          "name": "backend",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        },
+        {
+          "name": "execution",
+          "kind": "KEYWORD_ONLY",
+          "default": "'eager'",
+          "annotation": null
+        },
+        {
+          "name": "checkpoint_interval",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        },
+        {
+          "name": "compile_steps",
+          "kind": "KEYWORD_ONLY",
+          "default": "1",
+          "annotation": null
+        }
+      ],
+      "return_annotation": null
+    },
+    "starwave.torch_backend.elastic": {
+      "source": "starwave/torch_backend/elastic.py",
+      "line": 11,
+      "parameters": [
+        {
+          "name": "lamb",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "mu",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "buoyancy",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "grid_spacing",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "dt",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "memory",
+          "kind": "KEYWORD_ONLY",
+          "default": "'full'",
+          "annotation": null
+        },
+        {
+          "name": "execution",
+          "kind": "KEYWORD_ONLY",
+          "default": "'eager'",
+          "annotation": null
+        },
+        {
+          "name": "checkpoint_interval",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        },
+        {
+          "name": "compile_steps",
+          "kind": "KEYWORD_ONLY",
+          "default": "1",
+          "annotation": null
+        },
+        {
+          "name": "kwargs",
+          "kind": "VAR_KEYWORD",
+          "default": "<required>",
+          "annotation": null
+        }
+      ],
+      "return_annotation": null
+    },
+    "starwave.torch_backend.scalar_born": {
+      "source": "starwave/torch_backend/scalar_born.py",
+      "line": 10,
+      "parameters": [
+        {
+          "name": "v",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "scatter",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "grid_spacing",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "dt",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "memory",
+          "kind": "KEYWORD_ONLY",
+          "default": "'full'",
+          "annotation": null
+        },
+        {
+          "name": "backend",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        },
+        {
+          "name": "execution",
+          "kind": "KEYWORD_ONLY",
+          "default": "'eager'",
+          "annotation": null
+        },
+        {
+          "name": "checkpoint_interval",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        },
+        {
+          "name": "compile_steps",
+          "kind": "KEYWORD_ONLY",
+          "default": "1",
+          "annotation": null
+        },
+        {
+          "name": "kwargs",
+          "kind": "VAR_KEYWORD",
+          "default": "<required>",
+          "annotation": null
+        }
+      ],
+      "return_annotation": null
+    },
+    "starwave.torch_backend.visco_gsls": {
+      "source": "starwave/torch_backend/visco_gsls.py",
+      "line": 47,
+      "parameters": [
+        {
+          "name": "vp",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "q",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "rho",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "grid_spacing",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "dt",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "source_amplitudes",
+          "kind": "KEYWORD_ONLY",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "source_locations",
+          "kind": "KEYWORD_ONLY",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "receiver_locations",
+          "kind": "KEYWORD_ONLY",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "f_ref",
+          "kind": "KEYWORD_ONLY",
+          "default": "<required>",
+          "annotation": null
+        },
+        {
+          "name": "accuracy",
+          "kind": "KEYWORD_ONLY",
+          "default": "4",
+          "annotation": null
+        },
+        {
+          "name": "pml_width",
+          "kind": "KEYWORD_ONLY",
+          "default": "20",
+          "annotation": null
+        },
+        {
+          "name": "memory",
+          "kind": "KEYWORD_ONLY",
+          "default": "'full'",
+          "annotation": null
+        },
+        {
+          "name": "max_vel",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        },
+        {
+          "name": "backend",
+          "kind": "KEYWORD_ONLY",
+          "default": "'torch'",
+          "annotation": null
+        },
+        {
+          "name": "mode",
+          "kind": "KEYWORD_ONLY",
+          "default": "'hao1'",
+          "annotation": null
+        },
+        {
+          "name": "frequency_band",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        },
+        {
+          "name": "n_mechanisms",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        },
+        {
+          "name": "fit_tolerance",
+          "kind": "KEYWORD_ONLY",
+          "default": "0.05",
+          "annotation": null
+        },
+        {
+          "name": "strict",
+          "kind": "KEYWORD_ONLY",
+          "default": "False",
+          "annotation": null
+        },
+        {
+          "name": "material_model",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        },
+        {
+          "name": "checkpoint_interval",
+          "kind": "KEYWORD_ONLY",
+          "default": "None",
+          "annotation": null
+        },
+        {
+          "name": "execution",
+          "kind": "KEYWORD_ONLY",
+          "default": "'eager'",
+          "annotation": null
+        },
+        {
+          "name": "compile_steps",
+          "kind": "KEYWORD_ONLY",
+          "default": "1",
+          "annotation": null
+        }
+      ],
+      "return_annotation": null
+    }
+  }
+}

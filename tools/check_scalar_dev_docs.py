@@ -1,4 +1,4 @@
-"""Isolated current-dev scalar contract; released API snapshots remain immutable."""
+"""Frozen V19 scalar contract; released API snapshots remain immutable."""
 import argparse
 import ast
 import copy
@@ -58,10 +58,10 @@ def check(source_root=None):
         assert ast.dump(parse(signature)) == ast.dump(expected), f'{locale}: scalar dev signature drift'
         assert re.findall(r'^:param (\w+):', body, re.M) == [p.arg for p in expected.args.args + expected.args.kwonlyargs]
         assert dict(re.findall(r'^:type (\w+): `(.+)`$', body, re.M)) == contract['types']
-        for marker in ('20', 'V17', 'V18', '7.1.0', '8.0.0', '9.0.0', snapshot['feature_commit'], snapshot['source_commit'],
-                       'return_wavefield', 'forward_callback', 'callback_frequency',
+        for marker in ('20', 'V17', 'V18', 'V19', 'return_wavefield', 'forward_callback', 'callback_frequency',
                        'internal_step', 'internal_dt', 'state.time', '[B,0,D]',
-                       'notebook/Scalar2D_Target_Wavefield.ipynb', 'notebook/Scalar2D_Target_Wavefield.py'):
+                       'notebook/Scalar/Scalar2D_TargetWavefield_CUDA.ipynb',
+                       'notebook/Scalar/Scalar2D_TargetWavefield_TorchCompile.py'):
             assert marker in text, f'{locale}: missing dev scope marker {marker}'
         assert 'notebook-dev/' not in text
         example = text.split('<!-- scalar-dev:example:start -->', 1)[1].split('<!-- scalar-dev:example:end -->', 1)[0]
@@ -81,7 +81,7 @@ def check(source_root=None):
     assert snippets[0] == snippets[1], 'Bilingual dev scalar examples differ'
     if source_root:
         source = Path(source_root) / snapshot['source_file']
-        assert hashlib.sha256(source.read_bytes()).hexdigest() == snapshot['source_sha256'], 'Current-dev scalar source identity differs from reviewed snapshot'
+        assert hashlib.sha256(source.read_bytes()).hexdigest() == json.loads((ROOT / 'tools/v19_source_hashes.json').read_text())[snapshot['source_file']], 'Scalar source differs from frozen V19'
         tree = ast.parse(source.read_text(), feature_version=(3, 10))
         actual = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == 'scalar')
         assert without_annotations(actual.args) == without_annotations(expected.args)
@@ -91,8 +91,8 @@ def check(source_root=None):
         assert ast.literal_eval(torch_api.args.kw_defaults[index]) == 'full'
         torch_api.args.kw_defaults[index] = ast.Constant(value='boundary')
         assert without_annotations(torch_api.args) == without_annotations(actual.args)
-        print('PASS: current-dev scalar and direct Torch ASTs match; only direct Torch memory default differs.')
-    print('PASS: isolated scalar dev 23-parameter contract, immutable released 20-parameter baseline, callbacks and bilingual terminal-only example.')
+        print('PASS: V19 scalar and direct Torch ASTs match; only direct Torch memory default differs.')
+    print('PASS: V19 scalar 23-parameter contract, immutable released 20-parameter baseline, callbacks and bilingual terminal-only example.')
     return contract
 
 

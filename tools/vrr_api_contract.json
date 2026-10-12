@@ -1,11 +1,11 @@
 {
-  "namespace": "starwave_vrr.vrr",
-  "distribution": "starwave-vrr",
-  "version": "0.1.0.dev1",
+  "namespace": "starwave.vrr",
+  "distribution": "starwave",
+  "version": "0.1.0.dev19",
   "signature": "(v, grid_spacing, dt, *, rx, rz, source_amplitudes, source_locations, receiver_locations, accuracy=8, pml_freq=25.0, pml_width=20, boundary_buffer=5, memory=\"boundary\", max_vel=None, freq_taper_frac=0.0, time_pad_frac=0.0, time_taper=False, backend=\"cuda\", execution=\"eager\", checkpoint_interval=None, compile_steps=1)",
   "source_feature_commit": "e8ccf9b0fe70edd023fc4c6d0319abae6c203c65",
-  "source_file": "extensions/vrr/starwave_vrr/api.py",
-  "source_dev_commit": "904c9106bdb883325df8586b7c3412f7814a9737",
+  "source_file": "starwave/_vrr/api.py",
+  "source_dev_commit": "46d32877e3336d531520a696d5f2e074e6f4ef74",
   "types": {
     "v": "torch.Tensor",
     "rx": "torch.Tensor",

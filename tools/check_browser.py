@@ -12,10 +12,12 @@ from urllib.parse import parse_qsl, quote, unquote, urlsplit
 from playwright.sync_api import sync_playwright
 
 PROJECT = Path(__file__).resolve().parents[1]
-API_NAMES = ('scalar', 'scalar_born', 'ScalarBorn', 'ScalarBorn.forward', 'vrz', 'vti', 'elastic',
+API_NAMES = ('scalar', 'scalar_born', 'ScalarBorn', 'ScalarBorn.forward', 'vrz', 'vrr', 'vrr_reference', 'vti', 'elastic',
              'common.vpvsrho_to_lambmubuoyancy', 'common.lambmubuoyancy_to_vpvsrho',
              'visco_gsls', 'prepare_visco_gsls', 'visco_gsls_native_status',
-             'native_status', 'prepare_native', 'prepare_elastic')
+             'native_status', 'prepare_native', 'prepare_elastic', 'elastic_native_status', 'ScalarIllumination',
+             'ScalarIllumination.seal', 'ScalarIllumination.reduce', 'ScalarIllumination.close',
+             'precondition_gradient', 'wavelets.ricker', 'torch_backend.backend_capabilities')
 BORN_SECTIONS = ('born', 'born-backends', 'born-conventions', 'born-gradients', 'born-callbacks', 'born-returns', 'born-module', 'born-forward', 'born-example', 'born-build', 'born-scope')
 ELASTIC_SECTIONS = ('elastic', 'elastic-axes', 'elastic-returns', 'elastic-memory',
                     'elastic-examples', 'elastic-notes', 'elastic-conversions')
@@ -141,7 +143,7 @@ def check_vrr(page, base, output):
             page.goto(base + locale + '/usage.html?from=vrr-check#vrr')
             main = page.locator('[role="main"]')
             assert main.locator('#vrr > h2').inner_text().startswith('VRR Function')
-            assert main.locator('[id="starwave_vrr.vrr"]').count() == 1
+            assert main.locator('[id="starwave.vrr"]').count() == 1
             assert main.locator('#vrr').evaluate("e => e.previousElementSibling.id") == 'vrz'
             assert main.locator('#vrr').evaluate("e => e.nextElementSibling.id") == 'vti'
             assert main.locator('[id="vrr-api"]').count() == 1
@@ -153,7 +155,7 @@ def check_vrr(page, base, output):
             assert urlsplit(page.url).path == f'/{other}/usage.html'
             assert urlsplit(page.url).query == 'from=vrr-check'
             assert unquote(urlsplit(page.url).fragment) == 'vrr'
-            assert page.locator('[id="starwave_vrr.vrr"]').count() == 1
+            assert page.locator('[id="starwave.vrr"]').count() == 1
             close_mobile_menu(page)
         page.set_viewport_size({'width': 1440, 'height': 1000})
         page.goto(base + locale + '/usage.html')
@@ -207,7 +209,7 @@ def check_usage(page, locale, output):
         assert 'Georgia' in heading.evaluate('e => getComputedStyle(e).fontFamily')
     assert not main.locator('h3').evaluate_all("items => items.some(e => ['Function', '函数'].includes(e.firstChild.textContent.trim()))")
     overview = main.locator('#propagators')
-    assert overview.locator('code.xref').all_text_contents() == ['starwave.scalar()', 'starwave.scalar_born()', 'starwave.vrz()', 'starwave_vrr.vrr()', 'starwave.vti()', 'starwave.elastic()', 'starwave.visco_gsls()']
+    assert overview.locator('code.xref').all_text_contents() == ['starwave.scalar()', 'starwave.scalar_born()', 'starwave.vrz()', 'starwave.vrr()', 'starwave.vti()', 'starwave.elastic()', 'starwave.visco_gsls()']
     assert overview.locator('a[href="#starwave.visco_gsls"] > code.xref').count() == 1
     assert overview.locator(':scope > p code.literal').all_text_contents() == ['B', 'S', 'R', 'T', 'D']
     overview_rows = overview.locator('p').evaluate_all("""items => items.map(p => {
@@ -236,12 +238,12 @@ def check_usage(page, locale, output):
         assert 'monospace' in metrics['font'] and metrics['variant'] == 'lining-nums', metrics
         assert max(g['ascent'] for g in metrics['glyphs']) - min(g['ascent'] for g in metrics['glyphs']) <= 2, metrics
         assert all(g['descent'] <= 1 for g in metrics['glyphs']), metrics
-    for name, count in (('scalar', 23), ('scalar_born', 47), ('ScalarBorn', 13), ('ScalarBorn.forward', 41), ('vrz', 22), ('starwave_vrr.vrr', 21), ('vti', 24), ('elastic', 66),
+    for name, count in (('scalar', 23), ('scalar_born', 47), ('ScalarBorn', 13), ('ScalarBorn.forward', 41), ('vrz', 22), ('starwave.vrr', 21), ('vti', 24), ('elastic', 66),
                         ('common.vpvsrho_to_lambmubuoyancy', 4),
                         ('common.lambmubuoyancy_to_vpvsrho', 4),
                         ('prepare_native', 1), ('prepare_elastic', 1), ('visco_gsls', 23),
                         ('prepare_visco_gsls', 2), ('visco_gsls_native_status', 1)):
-        fullname = name if name == 'starwave_vrr.vrr' else f'starwave.{name}'
+        fullname = name if name == 'starwave.vrr' else f'starwave.{name}'
         parameters = main.locator(f'dt[id="{fullname}"]').locator('..').locator('dl.field-list > dd').first.locator('p')
         assert parameters.count() == count, (locale, name, parameters.count())
         rows = parameters.evaluate_all("""items => items.map(p => ({
@@ -250,7 +252,7 @@ def check_usage(page, locale, output):
             sizes: [p, ...p.querySelectorAll('strong, code, span, em')].map(e => parseFloat(getComputedStyle(e).fontSize))
         }))""")
         assert all(row['name'] and row['type'] and all(size == 17 for size in row['sizes']) for row in rows), (locale, name, rows)
-    for signature in main.locator('dt.sig[id^="starwave."], dt.sig[id="starwave_vrr.vrr"]').all():
+    for signature in main.locator('dt.sig[id^="starwave."], dt.sig[id="starwave.vrr"]').all():
         style = signature.evaluate("e => { const s = getComputedStyle(e); return {font:s.fontFamily,size:parseFloat(s.fontSize),line:parseFloat(s.lineHeight),border:s.borderTopWidth,bg:s.backgroundColor}; }")
         assert 'Consolas' in style['font'] and 'monospace' in style['font'] and style['size'] == 17, style
         assert style['border'] == '0px' and style['bg'] == 'rgba(0, 0, 0, 0)', style
@@ -270,9 +272,9 @@ def check_usage(page, locale, output):
         assert section.locator(':scope > h2, :scope > h3').count() == 1, (locale, name)
     # The long native signature must wrap within the article, including on the
     # narrowest phone. The conversions remain independent, linkable API entries.
-    for name in ('scalar_born', 'ScalarBorn', 'ScalarBorn.forward', 'starwave_vrr.vrr', 'visco_gsls', 'prepare_visco_gsls', 'visco_gsls_native_status', 'elastic', 'common.vpvsrho_to_lambmubuoyancy',
+    for name in ('scalar_born', 'ScalarBorn', 'ScalarBorn.forward', 'starwave.vrr', 'visco_gsls', 'prepare_visco_gsls', 'visco_gsls_native_status', 'elastic', 'common.vpvsrho_to_lambmubuoyancy',
                  'common.lambmubuoyancy_to_vpvsrho', 'prepare_elastic'):
-        fullname = name if name == 'starwave_vrr.vrr' else f'starwave.{name}'
+        fullname = name if name == 'starwave.vrr' else f'starwave.{name}'
         signature = main.locator(f'dt[id="{fullname}"]')
         assert signature.evaluate('e => e.scrollWidth <= e.clientWidth + 1'), (locale, name, page.viewport_size)
     toc = page.locator('.sw-page-toc')
@@ -303,9 +305,9 @@ def check_usage(page, locale, output):
     assert 'source_amplitudes' in text, locale
     fields.evaluate("e => e.scrollIntoView({block: 'start'})")
     page.screenshot(path=str(output / f'{locale}-usage-scalar-fields-{width}.png'))
-    for name in ('scalar_born', 'ScalarBorn', 'ScalarBorn.forward', 'starwave_vrr.vrr', 'visco_gsls', 'prepare_visco_gsls', 'visco_gsls_native_status', 'elastic', 'common.vpvsrho_to_lambmubuoyancy',
+    for name in ('scalar_born', 'ScalarBorn', 'ScalarBorn.forward', 'starwave.vrr', 'visco_gsls', 'prepare_visco_gsls', 'visco_gsls_native_status', 'elastic', 'common.vpvsrho_to_lambmubuoyancy',
                  'common.lambmubuoyancy_to_vpvsrho', 'prepare_elastic'):
-        fullname = name if name == 'starwave_vrr.vrr' else f'starwave.{name}'
+        fullname = name if name == 'starwave.vrr' else f'starwave.{name}'
         signature = main.locator(f'[id="{fullname}"]')
         signature.evaluate("e => e.scrollIntoView({block: 'start'})")
         page.screenshot(path=str(output / f'{locale}-usage-{name}-signature-{width}.png'))
@@ -1028,8 +1030,8 @@ def check(root, browser_path=None):
             page.go_forward()
             page.wait_for_url(base + 'zh/usage.html?q=illumination#scalar-examples')
             assert urlsplit(page.url).path == '/zh/usage.html'
-            for name in API_NAMES + ('starwave_vrr.vrr',):
-                fullname = name if name == 'starwave_vrr.vrr' else f'starwave.{name}'
+            for name in API_NAMES:
+                fullname = name if name == 'starwave.vrr' else f'starwave.{name}'
                 page.goto(base + f'zh/usage.html#{fullname}')
                 open_mobile_menu(page)
                 page.locator('[data-sw-language="en"]').click()

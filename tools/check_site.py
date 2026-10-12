@@ -383,7 +383,7 @@ def check(root):
         for name in ('scalar_born', 'ScalarBorn', 'ScalarBorn.forward'):
             if f'starwave.{name}' not in pages[usage].ids:
                 errors.append(f'Missing Born API anchor: {locale}/{name}')
-        if 'starwave_vrr.vrr' not in pages[usage].ids:
+        if 'starwave.vrr' not in pages[usage].ids:
             errors.append(f'Missing independent VRR API anchor in Usage: {locale}')
         other = pages[root / ('en' if locale == 'zh' else 'zh') / 'usage.html']
         if any(anchor not in other.ids for anchor in anchors):

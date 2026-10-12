@@ -59,7 +59,7 @@ def check(source_root=None):
             assert f'(born-{section})=' in text, f'{locale}: missing {section}'
         for marker in ('δv', '1D/2D/3D', 'float32/64', 'MPS', 'AMP', 'CFL_ratio*k',
                        'state.step', 'state.dt', '10/14/18', 'out[-2]', 'out[-1]',
-                       'compile_born.py --cpu-only', 'compile_all.py', '7.1.0', '8.0.0', SOURCE_COMMIT):
+                       'compile_born.py --cpu-only', 'compile_all.py', 'V19'):
             assert marker in text, f'{locale}: missing scope marker {marker}'
         blocks = re.findall(r'^```python\n(.*?)^```', text, re.M | re.S)
         assert len(blocks) == 1, f'{locale}: exact standalone Born example required'
@@ -78,7 +78,7 @@ def check(source_root=None):
     assert snippets[0] == snippets[1], 'Bilingual Born executable examples drifted'
     if source_root:
         source = Path(source_root) / contract['source_file']
-        assert hashlib.sha256(source.read_bytes()).hexdigest() == contract['source_sha256'], 'Born source differs from pinned reviewed V17 file'
+        assert hashlib.sha256(source.read_bytes()).hexdigest() == json.loads((ROOT / 'tools/v19_source_hashes.json').read_text())[contract['source_file']], 'Born source differs from frozen V19 file'
         tree = ast.parse(source.read_text(), feature_version=(3, 10))
         module = next(n for n in tree.body if isinstance(n, ast.ClassDef) and n.name == 'ScalarBorn')
         nodes = {'scalar_born': next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == 'scalar_born'),

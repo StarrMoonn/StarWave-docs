@@ -68,7 +68,7 @@ for locations in (source_locations, receiver_locations):
     assert torch.all((0 <= locations[..., 1]) & (locations[..., 1] < nz))
 ```
 
-对 scalar，`source_amplitudes` 是固定的归一化 forcing `f`，不是每步压力增量；不要额外乘以 `-v² dt²`。本例的波形幅值只是演示选择。源单位、时间处理及其它传播函数的差异见 [Usage](../usage.md)。
+本例中 scalar 的 `source_amplitudes` 采用固定归一化 forcing `f`，不是每步压力增量；不要额外乘以 `-v² dt²`。本例的波形幅值只是演示选择。源单位、时间处理及其它传播函数的差异见 [Usage](../usage.md)。
 
 ## 接入传播函数
 

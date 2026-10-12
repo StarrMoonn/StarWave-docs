@@ -19,7 +19,7 @@
 </div>
 ```
 
-This manual follows V17 source, including [Born](usage.md#born-function) and equation-specific flat-top boundaries. The published 7.1.0 wheel remains V16; 8.0.0 is not yet published. Check [installation](installation.md) for the appropriate source or wheel channel.
+[V19 Release](https://github.com/StarrMoonn/StarWave/releases/tag/V19) is published. This manual follows frozen source `0.1.0.dev19`, commit `46d32877e3336d531520a696d5f2e074e6f4ef74`. [PyPI **9.1.0**](https://pypi.org/project/starwave/9.1.0/) is published with the V19 source contract and integrated VRR. The existing [9.0.0 wheel](https://pypi.org/project/starwave/9.0.0/) remains V18 and excludes integrated VRR.
 
 (home-capabilities)=
 ## From physical models to learnable models
@@ -29,7 +29,7 @@ This manual follows V17 source, including [Born](usage.md#born-function) and equ
   <div>
     <svg class="sw-capability-icon" viewBox="0 0 96 64" width="96" height="64" aria-hidden="true" focusable="false"><path d="M10 33h13c5 0 5-18 10-18s7 36 12 36 5-30 10-30 6 12 11 12h20"/><path class="sw-icon-soft" d="M14 46h10m39 0h19M18 56h12m28 0h19"/></svg>
     <h3>Connect models to observations</h3>
-    <p>Differentiable propagation for scalar acoustics, acoustic Born scattering, VRZ, acoustic VTI, elasticity and GSLS viscoacoustics. Each entry has its own supported devices and physical conventions.</p>
+    <p>Differentiable propagation for scalar acoustics, acoustic Born scattering, VRZ, vector-reflectivity VRR, acoustic VTI, elasticity and GSLS viscoacoustics. Each entry has its own supported devices and physical conventions.</p>
     <a href="usage.html#propagators">Explore the propagators <span aria-hidden="true">→</span></a>
   </div>
   <div>

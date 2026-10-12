@@ -1,6 +1,8 @@
 (reconstruction)=
 # Wavefield Reconstruction
 
+The derivations below retain their original version scope. Current V19 scalar supports arbitrary zero-face subsets with equal positive PML widths; do not apply symmetric-positive-PML formulas blindly to those geometries. Current equation-specific restrictions are in [Usage](../usage.md) and [model conventions](conventions.md).
+
 This chapter describes native full/boundary adjoints and wavefield reconstruction. Torch checkpoint uses forward replay and autograd rather than this boundary inverse or history formulas; see the [PyTorch backend](../pytorch-backend.md).
 
 This chapter first explains 5.0.0 Scalar3D Radius-M six-face pressure reconstruction, followed by the existing 4.0.0 elastic derivation. Their symmetric positive-PML geometry and formulas are historical scope, not the new V17 top-zero geometry. V17 scalar keeps required top strips without a full fallback; elastic uses improved-vacuum preparation. Born has a separate background/scattered reconstruction contract. See [model conventions](conventions.md) and [Born Function](../usage.md#born-function) for current differences.

@@ -1,6 +1,6 @@
 # Usage
 
-GSLS: [visco_gsls](#visco-gsls). Independent source extension: [VRR Function](#vrr), outside the 7.1.0 wheel.
+GSLS: [visco_gsls](#visco-gsls). VRR: [starwave.vrr](#vrr). Both are included in the V19 root package.
 
 ```{container} sw-page-toc
 
@@ -20,9 +20,7 @@ GSLS: [visco_gsls](#visco-gsls). Independent source extension: [VRR Function](#v
 - [Other exported names and scope](#other-exports)
 ```
 
-This reference targets reviewed V17 source `0.1.0.dev17`, including Born, the merged flat-top boundary behavior and import-time native initialization. [Release V17](https://github.com/StarrMoonn/StarWave/releases/tag/V17) is published; PyPI `8.0.0` publication remains pending; the published `7.1.0` wheel is the V16 baseline and does not gain these changes through a documentation update. See [Status](status.md). Existing positional arguments and native defaults are preserved; explicit [PyTorch backend](pytorch-backend.md) options retain their equation-specific limits. Complete signatures, parameters, returns and limits follow.
-
-The Scalar section below explicitly documents the later V18 API; its version warning takes precedence over this page’s V17 baseline.
+This reference targets frozen V19 source `0.1.0.dev19`, commit `46d32877e3336d531520a696d5f2e074e6f4ef74`, published as [Release V19](https://github.com/StarrMoonn/StarWave/releases/tag/V19). All signatures below are checked against that source, including the 23-parameter Scalar API and integrated `starwave.vrr`. The final PyPI 9.1.0 wheel is published, with verified artifact identity and CPU checks; published 9.0.0 is the historical V18 wheel. Source, wheel and device-validation evidence remain separate. See [Status](status.md) and [installation](installation.md).
 
 See [Release Notes](release-notes.md) for 6.0.0 internal storage and PML-transpose maintenance, and [Scalar](modeling/scalar.md) for 2D storage changes. These introduce no new public parameters; source upgrades require rebuilt matching native libraries.
 
@@ -31,13 +29,13 @@ The page organization follows the Sphinx Python API style of the [official Deepw
 (propagators)=
 ## Propagators at a glance
 
-- {py:func}`starwave.scalar`: `2D/3D` scalar acoustics; velocity model `v`; default records tuple, optional dev terminal physical wavefield.
+- {py:func}`starwave.scalar`: `2D/3D` scalar acoustics; velocity model `v`; default records tuple, optional terminal physical wavefield.
 
-- {py:func}`starwave.scalar_born`: `1D/2D/3D` constant-density acoustic Born; velocity perturbation δv, background/scattered records and terminal states. V17 source; 8.0.0 publication pending.
+- {py:func}`starwave.scalar_born`: `1D/2D/3D` constant-density acoustic Born; velocity perturbation δv, background/scattered records and terminal states. Included in V19.
 
 - {py:func}`starwave.vrz`: `2D` variable-density acoustics; `v` plus exactly one `impedance` / `density` parameterization.
 
-- {py:func}`starwave_vrr.vrr`: `2D` acoustic vector reflectivity; independent `v, rx, rz` fields. Separately installed source extension, outside the 7.1.0 wheel.
+- {py:func}`starwave.vrr`: `2D` acoustic vector reflectivity; independent `v, rx, rz` fields. Integrated in the root package.
 
 - {py:func}`starwave.vti`: `2D/3D` acoustic VTI; `vp, epsilon, delta, rho`; returns recordings in the selected component order.
 
@@ -50,9 +48,7 @@ Notation: `B` is the number of shots, `S` the sources per shot, `R` the receiver
 (scalar)=
 ## Scalar Function
 
-This Scalar section describes the V18 extension reviewed from `bc63dd3c3e438256e46fce3a1738b94e6c9a2970` and merged into dev `e040aa9b8225ab387f7e4853bfe6162f5351f5d5`. Use that matching source; native execution also requires its rebuilt library. Frozen V17 (`27c2e14b184b94d8031a5b3a83c25b1ed3d4ac67`), the 8.0.0 release baseline and published 7.1.0 retain the earlier 20-parameter scalar API: no terminal-field/callback keywords, fixed 2D sources, and no arbitrary zero-face selection. V17 supports only its documented top-zero layout. The other propagators below retain their separate release contracts.
-
-[Release V18](https://github.com/StarrMoonn/StarWave/releases/tag/V18) is published at `fba1f496b890f2dbaf3fbb3011d39f6d723cfea1`, preserving the reviewed scalar API from dev `e040aa9`. [PyPI 9.0.0](https://pypi.org/project/starwave/9.0.0/) is now published with these features for supported Linux x86_64 hosts; see [installation](installation.md) for requirements and commands. V17 and the unpublished 8.0.0 baseline remain unchanged; 7.1.0 is the historical V16 wheel.
+V19 retains the 23-parameter Scalar contract introduced in V18: arbitrary zero-face subsets (equal positive widths), trainable 2D/3D sources, optional differentiable terminal fields, and read-only diagnostic callbacks. V18 / 9.0.0 introduced this API; V17 / unpublished 8.0.0 and V16 / 7.1.0 retain the historical 20-parameter contract. Native execution requires matching rebuilt libraries.
 
 ```{py:function} starwave.scalar(v: torch.Tensor, grid_spacing: float | int | list[float] | tuple[float, ...], dt: float | int, *, source_amplitudes: torch.Tensor, source_locations: torch.Tensor, receiver_locations: torch.Tensor, accuracy: int=8, pml_freq: float | int=25.0, pml_width: int | list[int] | tuple[int, ...]=20, boundary_buffer: int=5, memory: str='boundary', max_vel: float | int | None=None, freq_taper_frac: float | int=0.0, time_pad_frac: float | int=0.0, time_taper: bool=False, illumination: ScalarIllumination | None=None, backend: str | None=None, execution: str='eager', checkpoint_interval: int | None=None, compile_steps: int=1, return_wavefield: bool=False, forward_callback: Callable | None=None, callback_frequency: int=1) -> tuple[torch.Tensor, ...]
 
@@ -74,7 +70,7 @@ Propagates scalar acoustic waves on a 2D or 3D grid selected by `v.ndim`, with i
 :type accuracy: `int`
 :param pml_freq: **Default `25.0`; keyword-only.** Positive, finite frequency used to configure the PML, typically in Hz; also used for spatial-sampling diagnostics. It does not generate a waveform or automatically measure the source frequency. Choose it for the actual experiment.
 :type pml_freq: `float | int`
-:param pml_width: **Default `20`; keyword-only.** Nonnegative integer thickness in cells or four/six nonnegative face widths for 2D/3D. Any subset of faces may be zero, including scalar 0/all-zero; all positive widths must still equal one A. Order is `[x-low,x-high,z-low,z-high]` / `[x-low,x-high,y-low,y-high,z-low,z-high]`. Zero faces use fixed-zero FD ghosts without PML/buffer; physical boundary samples remain active. Negative/noninteger/bool values and unequal positive widths are rejected. This dev scalar-only domain does not broaden VRZ/VTI.
+:param pml_width: **Default `20`; keyword-only.** Nonnegative integer thickness in cells or four/six nonnegative face widths for 2D/3D. Any subset of faces may be zero, including scalar 0/all-zero; all positive widths must still equal one A. Order is `[x-low,x-high,z-low,z-high]` / `[x-low,x-high,y-low,y-high,z-low,z-high]`. Zero faces use fixed-zero FD ghosts without PML/buffer; physical boundary samples remain active. Negative/noninteger/bool values and unequal positive widths are rejected. This scalar-only domain does not broaden VRZ/VTI.
 :type pml_width: `int | list[int] | tuple[int, ...]`
 :param boundary_buffer: **Default `5`; keyword-only.** Nonnegative buffer in spatial grid cells, not a number of time steps or a checkpoint interval. Boundary mode requires at least `accuracy // 2 + 1`, which is 5 at eighth order; full mode allows 0. All absorbing sides use total padding `pml_width + boundary_buffer + accuracy // 2`; each zero-width face uses only `accuracy // 2` halo cells, without PML or buffer on that face.
 :type boundary_buffer: `int`
@@ -142,7 +138,7 @@ receiver_amplitudes, = starwave.scalar(
 For complete input construction without external data files and one FWI update, see [Quickstart](quickstart.md) and [FWI](inversion/fwi.md). The default `pml_freq=25.0` does not automatically track the source frequency.
 
 
-V18 CPU example: terminal-only loss, trainable 2D source, all-zero faces, empty receivers and checkpoint-safe observation. It is a small gradient-wiring check, not target-wavefield convergence or GPU acceptance.
+V19 CPU example: terminal-only loss, trainable 2D source, all-zero faces, empty receivers and checkpoint-safe observation. It is a small gradient-wiring check, not target-wavefield convergence or GPU acceptance.
 
 <!-- scalar-dev:example:start -->
 ```python
@@ -180,7 +176,7 @@ for gradient in (v.grad, source.grad):
 ```
 <!-- scalar-dev:example:end -->
 
-The authorized current-dev source contains the full user target-wavefield example at `notebook/Scalar2D_Target_Wavefield.ipynb`, with paired `notebook/Scalar2D_Target_Wavefield.py`. Open it from that source checkout; this public manual does not redistribute the private notebook, report assets or datasets. It optimizes sources against a terminal-field target and keeps callback snapshots diagnostic. User-supplied RTX 4060/A30 results describe the reviewed feature branch; they are not cloud GPU reruns or validation of a released wheel.
+The frozen V19 source contains the full user target-wavefield example at `notebook/Scalar/Scalar2D_TargetWavefield_CUDA.ipynb`, with CUDA `.py` export and matching `notebook/Scalar/Scalar2D_TargetWavefield_TorchCompile.ipynb` / `notebook/Scalar/Scalar2D_TargetWavefield_TorchCompile.py` pair. Open it from that source checkout; this public manual does not redistribute the private notebook, report assets or datasets. It optimizes sources against a terminal-field target and keeps callback snapshots diagnostic. User-supplied RTX 4060/A30 results describe the reviewed feature branch; they are not cloud GPU reruns or validation of a released wheel.
 
 (scalar-time-sampling)=
 ### CFL and internal temporal resampling
@@ -197,7 +193,7 @@ Sources are FFT-upsampled before source-location velocity scaling. Records are t
 (scalar-3d-example)=
 ### Runnable 3D call: first-order velocity and source gradients
 
-With the V18 scalar source, its matching rebuilt native library, and visible logical CUDA device 0 available, the following is a standalone small example. The model uses `[x,y,z]`, spacing is `[dx,dy,dz]`, and coordinates are grid indices. The loss only checks gradient wiring. Syntax and interface have been checked; this documentation update did not execute the GPU example, so these assertions are not numerical acceptance results.
+With the V19 scalar source, its matching rebuilt native library, and visible logical CUDA device 0 available, the following is a standalone small example. The model uses `[x,y,z]`, spacing is `[dx,dy,dz]`, and coordinates are grid indices. The loss only checks gradient wiring. Syntax and interface have been checked; this documentation update did not execute the GPU example, so these assertions are not numerical acceptance results.
 
 ```python
 import torch
@@ -247,7 +243,7 @@ assert torch.isfinite(source_amplitudes.grad).all()
 (born)=
 ## Born Function
 
-V17 source API; [Release V17](https://github.com/StarrMoonn/StarWave/releases/tag/V17) is published and PyPI 8.0.0 remains pending. Published 7.1.0 does not contain Born. This constant-density acoustic Born operator is derived from [Deepwave 0.0.27](https://github.com/ar4/deepwave/tree/dc2f8af71e1fb67676c50a91a22bdd059bac8772). `scatter` is velocity perturbation δv, in the units of `v`, not relative squared velocity or squared slowness. Its background operator differs from `starwave.scalar`; use the returned background records for compatible observations. No installed Deepwave package is required.
+V19 includes this main-package API. This constant-density acoustic Born operator is derived from [Deepwave 0.0.27](https://github.com/ar4/deepwave/tree/dc2f8af71e1fb67676c50a91a22bdd059bac8772). `scatter` is velocity perturbation δv, in the units of `v`, not relative squared velocity or squared slowness. Its background operator differs from `starwave.scalar`; use the returned background records for compatible observations. No installed Deepwave package is required.
 
 ```{py:function} starwave.scalar_born(v: torch.Tensor, scatter: torch.Tensor, grid_spacing: Union[float, Sequence[float]], dt: float, source_amplitudes: Optional[torch.Tensor]=None, source_locations: Optional[torch.Tensor]=None, receiver_locations: Optional[torch.Tensor]=None, bg_receiver_locations: Optional[torch.Tensor]=None, accuracy: int=4, pml_width: Union[int, Sequence[int]]=20, pml_freq: Optional[float]=None, max_vel: Optional[float]=None, survey_pad: Optional[Union[int, Sequence[Optional[int]]]]=None, wavefield_0: Optional[torch.Tensor]=None, wavefield_m1: Optional[torch.Tensor]=None, psiz_m1: Optional[torch.Tensor]=None, psiy_m1: Optional[torch.Tensor]=None, psix_m1: Optional[torch.Tensor]=None, zetaz_m1: Optional[torch.Tensor]=None, zetay_m1: Optional[torch.Tensor]=None, zetax_m1: Optional[torch.Tensor]=None, wavefield_sc_0: Optional[torch.Tensor]=None, wavefield_sc_m1: Optional[torch.Tensor]=None, psiz_sc_m1: Optional[torch.Tensor]=None, psiy_sc_m1: Optional[torch.Tensor]=None, psix_sc_m1: Optional[torch.Tensor]=None, zetaz_sc_m1: Optional[torch.Tensor]=None, zetay_sc_m1: Optional[torch.Tensor]=None, zetax_sc_m1: Optional[torch.Tensor]=None, origin: Optional[Sequence[int]]=None, nt: Optional[int]=None, model_gradient_sampling_interval: int=1, freq_taper_frac: float=0.0, time_pad_frac: float=0.0, time_taper: bool=False, forward_callback: Optional[common.Callback]=None, backward_callback: Optional[common.Callback]=None, callback_frequency: int=1, python_backend: Union[Literal['eager', 'jit', 'compile'], bool]=False, storage_mode: Literal['device', 'cpu', 'disk', 'none']='device', storage_path: str='.', storage_compression: bool=False, *, memory: Literal['full', 'boundary', 'checkpoint']='full', backend=None, execution='eager', checkpoint_interval=None, compile_steps=1) -> Tuple[torch.Tensor, ...]
 
@@ -573,20 +569,20 @@ assert all(x.grad is not None and torch.isfinite(x.grad).all()
 ### Native build and import initialization
 
 ```bash
-# Complete authorized V17 source; use the actual GPU SM.
+# Complete authorized V19 source; use the actual GPU SM.
 python compile_born.py --arch 80
 # CPU-only native full, alternatively:
 python compile_born.py --cpu-only
 ```
 
-Born is in the main Python package, with a separately built native library. In frozen V17 (`27c2e14b184b94d8031a5b3a83c25b1ed3d4ac67`), root `compile_all.py` builds core/elastic/GSLS; Born requires the separate command above. Current dev commit `3f2b24daba0fbe6956389baf95dc910405a7ed4a` also includes Born in `python compile_all.py --arch 80`, building core/elastic/GSLS/Born together. This later change does not alter the frozen V17 archive. Standalone `compile_born.py --cpu-only` remains available; VRR is installed and built separately. Pure Torch requires neither Born native compilation nor a GPU for CPU inputs.
+Born is in the main package. V19 `python compile_all.py --arch 80` builds core, elastic, GSLS, Born and VRR together. `python compile_born.py --cpu-only` remains available for native CPU full. Explicit Torch CPU/CUDA needs no Born native build.
 
-After explicit compilation, V17 `import starwave` loads available core/elastic/Born/GSLS libraries and completes shared-dispatch bindings before returning. Optional Born boundary-entry signatures are bound by their calling path before invocation. An installed/importable independent VRR extension is prepared too, without changing its namespace. Ordinary first parallel propagation needs no serial warm-up or mandatory manual prepare call. Import does not compile, initialize CUDA, select devices, allocate wavefields or propagate. Missing builds are skipped for supported pure-Torch use; an existing invalid build is not silently replaced. Configure build paths before import, rebuild after updates and restart Python/Jupyter. Runtime does not monitor source/library changes or re-hash sources for each propagation. Optional prepare helpers remain available for explicit device checks.
+After explicit compilation, V19 `import starwave` loads available core/elastic/Born/GSLS libraries and completes shared-dispatch bindings before returning. Optional Born boundary-entry signatures are bound by their calling path before invocation. Integrated VRR is prepared too. Ordinary first parallel propagation needs no serial warm-up or mandatory manual prepare call. Import does not compile, initialize CUDA, select devices, allocate wavefields or propagate. Missing builds are skipped for supported pure-Torch use; an existing invalid build is not silently replaced. Configure build paths before import, rebuild after updates and restart Python/Jupyter. Runtime does not monitor source/library changes or re-hash sources for each propagation. Optional prepare helpers remain available for explicit device checks.
 
 (born-scope)=
 ### Version and validation scope
 
-This section documents frozen V17 source `27c2e14b184b94d8031a5b3a83c25b1ed3d4ac67` (`0.1.0.dev17`), available as [Release V17](https://github.com/StarrMoonn/StarWave/releases/tag/V17). Source release, native compilation, public-wheel publication, clean installation, CPU numerics and target-device GPU/multi-GPU validation are separate evidence. A documentation build establishes none of the latter by itself. PyPI 8.0.0 remains pending until the release record identifies its verified artifact; the 7.1.0 wheel does not gain Born through this documentation update. Native higher-order AD, MPS, AMP and performance guarantees are outside this contract.
+This section describes frozen V19. Source release, compilation, package publication, clean installation and CPU/GPU/multi-GPU numerical acceptance are distinct evidence. Documentation checks do not certify hardware numerics. Native higher-order AD, MPS, AMP and performance guarantees are outside this contract.
 
 (vrz)=
 ## VRZ Function
@@ -615,7 +611,7 @@ Performs two-dimensional acoustic propagation using velocity and impedance (or d
 :type accuracy: `int`
 :param pml_freq: **Default `25.0`; keyword-only.** Positive, finite frequency used to configure the PML, typically in Hz; also used for spatial-sampling diagnostics. It does not generate a waveform or automatically measure the source frequency. Choose it for the actual experiment.
 :type pml_freq: `float | int`
-:param pml_width: **Default `20`; keyword-only.** Positive integer thickness in cells or four equal positive widths, in `[x-low,x-high,z-low,z-high]` order. V17 also accepts `[A,A,0,A]` for a flat top, where A is one positive integer width on the remaining faces. Other zero faces, all-zero, unequal remaining widths, negative/noninteger/bool values are rejected. The first physical row remains active; see below.
+:param pml_width: **Default `20`; keyword-only.** Positive integer thickness in cells or four equal positive widths, in `[x-low,x-high,z-low,z-high]` order. V19 accepts `[A,A,0,A]` for a flat top, where A is one positive integer width on the remaining faces. Other zero faces, all-zero, unequal remaining widths, negative/noninteger/bool values are rejected. The first physical row remains active; see below.
 :type pml_width: `int | list[int] | tuple[int, ...]`
 :param boundary_buffer: **Default `5`; keyword-only.** Nonnegative buffer in spatial grid cells, not a number of time steps or a checkpoint interval. Boundary mode requires at least `accuracy // 2 + 1`, which is 5 at eighth order; full mode allows 0. All absorbing sides use total padding `pml_width + boundary_buffer + accuracy // 2`; a top-zero face uses only `accuracy // 2` halo cells, without top PML or buffer. Torch VRZ additionally requires at least accuracy//2 in both full/checkpoint.
 :type boundary_buffer: `int`
@@ -688,11 +684,14 @@ For the impedance parameterization, replace `density=rho` with `impedance=Z`; do
 (vrr)=
 ## VRR Function
 
-```{py:function} starwave_vrr.vrr(v: torch.Tensor, grid_spacing: float | int | list[float] | tuple[float, ...], dt: float | int, *, rx: torch.Tensor, rz: torch.Tensor, source_amplitudes: torch.Tensor, source_locations: torch.Tensor, receiver_locations: torch.Tensor, accuracy: int=8, pml_freq: float | int=25.0, pml_width: int | list[int] | tuple[int, ...]=20, boundary_buffer: int=5, memory: str='boundary', max_vel: float | int | None=None, freq_taper_frac: float=0.0, time_pad_frac: float=0.0, time_taper: bool=False, backend: str='cuda', execution: str='eager', checkpoint_interval: int | None=None, compile_steps: int=1) -> tuple[torch.Tensor]
+<span id="starwave_vrr.vrr"></span>
 
-Independent **source extension** integrated in the reviewed dev source, distribution `starwave-vrr` (`0.1.0.dev1`), import `starwave_vrr`. It is not part of the published V16 / StarWave 7.1.0 wheel. There is no `starwave.vrr` alias. Obtain complete authorized source containing `extensions/vrr`; this public manual does not distribute the private implementation. See [installation](installation.md) for the separate main package.
+```{py:function} starwave.vrr(v: torch.Tensor, grid_spacing: float | int | list[float] | tuple[float, ...], dt: float | int, *, rx: torch.Tensor, rz: torch.Tensor, source_amplitudes: torch.Tensor, source_locations: torch.Tensor, receiver_locations: torch.Tensor, accuracy: int=8, pml_freq: float | int=25.0, pml_width: int | list[int] | tuple[int, ...]=20, boundary_buffer: int=5, memory: str='boundary', max_vel: float | int | None=None, freq_taper_frac: float=0.0, time_pad_frac: float=0.0, time_taper: bool=False, backend: str='cuda', execution: str='eager', checkpoint_interval: int | None=None, compile_steps: int=1) -> tuple[torch.Tensor]
 
-:param v: **Required.** Positive finite velocity [nx,nz], m/s.
+
+VRR is integrated in V19 as `starwave.vrr` and `starwave.vrr_reference`. Install the root StarWave package; no separate `starwave-vrr` distribution is required. This public manual contains API contracts, not the scientific implementation.
+
+:param v: **Required.** Positive finite velocity [nx,nz], m/s. Each model axis has at least 2 cells.
 :type v: `torch.Tensor`
 :param grid_spacing: **Required.** Positive uniform spacing: scalar or equal pair, metres.
 :type grid_spacing: `float | int | list[float] | tuple[float, ...]`
@@ -702,11 +701,11 @@ Independent **source extension** integrated in the reviewed dev source, distribu
 :type rx: `torch.Tensor`
 :param rz: **Required.** Keyword-only. Finite signed z reflectivity-vector field, same shape/device/dtype as v; 1/m.
 :type rz: `torch.Tensor`
-:param source_amplitudes: **Required.** Keyword-only. Forcing [B,S,T]; explicitly expand shared wavelets across shots/sources.
+:param source_amplitudes: **Required.** Keyword-only. Forcing [B,S,T]; explicitly expand shared wavelets across shots/sources. All B/S/T are positive; dtype and device must already match v exactly. No implicit transfer/casting.
 :type source_amplitudes: `torch.Tensor`
-:param source_locations: **Required.** Keyword-only. Integer [B,S,2], or [B,2] for one source per shot.
+:param source_locations: **Required.** Keyword-only. Integer [B,S,2], or [B,2] for one source per shot. Use int32/int64 already on the model device.
 :type source_locations: `torch.Tensor`
-:param receiver_locations: **Required.** Keyword-only. Integer [B,R,2]; geometry indexes unpadded physical models.
+:param receiver_locations: **Required.** Keyword-only. Integer [B,R,2]; geometry indexes unpadded physical models. R must be at least 1; int32/int64 on the model device. Empty receiver geometry is rejected.
 :type receiver_locations: `torch.Tensor`
 :param accuracy: **Default `8`.** Keyword-only. Interior spatial finite-difference order: 2, 4, 6 or 8.
 :type accuracy: `int`
@@ -726,7 +725,7 @@ Independent **source extension** integrated in the reviewed dev source, distribu
 :type time_pad_frac: `float`
 :param time_taper: **Default `False`.** Keyword-only. Optional time taper during resampling.
 :type time_taper: `bool`
-:param backend: **Default `"cuda"`.** Keyword-only. cuda or torch; no automatic backend fallback.
+:param backend: **Default `"cuda"`.** Keyword-only. cuda or torch; no automatic backend fallback. None and native_cpu are rejected.
 :type backend: `str`
 :param execution: **Default `"eager"`.** Keyword-only. Torch: eager/compile. Native CUDA accepts eager only.
 :type execution: `str`
@@ -738,24 +737,62 @@ Independent **source extension** integrated in the reviewed dev source, distribu
 :rtype: tuple[torch.Tensor]
 ```
 
+(vrr-reference)=
+### starwave.vrr_reference
+
+```{py:function} starwave.vrr_reference(v: torch.Tensor, grid_spacing: float | int | list[float] | tuple[float, ...], dt: float | int, *, rx: torch.Tensor, rz: torch.Tensor, source_amplitudes: torch.Tensor, source_locations: torch.Tensor, receiver_locations: torch.Tensor, accuracy: int=8, pml_freq: float | int=25.0, pml_width: int | list[int] | tuple[int, ...]=20, boundary_buffer: int=5, memory: str='full', max_vel: float | int | None=None, freq_taper_frac: float=0.0, time_pad_frac: float=0.0, time_taper: bool=False) -> tuple[torch.Tensor]
+
+Explicit tensor reference for CPU/CUDA float32/float64. All four differentiable inputs, geometry, PML, source and return conventions match `vrr`; only full memory is supported. There are no backend, execution, checkpoint or compilation selectors. This function never acts as an automatic fallback.
+
+:param v: **Required.** Positive finite velocity [nx,nz], m/s. Each model axis has at least 2 cells.
+:type v: `torch.Tensor`
+:param grid_spacing: **Required.** Positive uniform spacing: scalar or equal pair, metres.
+:type grid_spacing: `float | int | list[float] | tuple[float, ...]`
+:param dt: **Required.** Positive user sampling interval, seconds.
+:type dt: `float | int`
+:param rx: **Required.** Keyword-only. Finite signed x reflectivity-vector field, same shape/device/dtype as v; 1/m.
+:type rx: `torch.Tensor`
+:param rz: **Required.** Keyword-only. Finite signed z reflectivity-vector field, same shape/device/dtype as v; 1/m.
+:type rz: `torch.Tensor`
+:param source_amplitudes: **Required.** Keyword-only. Forcing [B,S,T]; explicitly expand shared wavelets across shots/sources. All B/S/T are positive; dtype and device must already match v exactly. No implicit transfer/casting.
+:type source_amplitudes: `torch.Tensor`
+:param source_locations: **Required.** Keyword-only. Integer [B,S,2], or [B,2] for one source per shot. Use int32/int64 already on the model device.
+:type source_locations: `torch.Tensor`
+:param receiver_locations: **Required.** Keyword-only. Integer [B,R,2]; geometry indexes unpadded physical models. R must be at least 1; int32/int64 on the model device. Empty receiver geometry is rejected.
+:type receiver_locations: `torch.Tensor`
+:param accuracy: **Default `8`.** Keyword-only. Interior spatial finite-difference order: 2, 4, 6 or 8.
+:type accuracy: `int`
+:param pml_freq: **Default `25.0`.** Keyword-only. Positive CPML reference frequency, Hz.
+:type pml_freq: `float | int`
+:param pml_width: **Default `20`.** Keyword-only. Positive scalar, equal positive four-face widths, or [w,w,0,w] with positive integer w.
+:type pml_width: `int | list[int] | tuple[int, ...]`
+:param boundary_buffer: **Default `5`.** Keyword-only. Spatial cells; at least accuracy//2+1, including full mode.
+:type boundary_buffer: `int`
+:param memory: **Default `'full'`.** Keyword-only. Only full history is accepted.
+:type memory: `str`
+:param max_vel: **Default `None`.** Keyword-only. Detached current velocity maximum when omitted; explicit positive bound must cover v.
+:type max_vel: `float | int | None`
+:param freq_taper_frac: **Default `0.0`.** Keyword-only. FFT resampling frequency-taper fraction.
+:type freq_taper_frac: `float`
+:param time_pad_frac: **Default `0.0`.** Keyword-only. FFT resampling time-padding fraction.
+:type time_pad_frac: `float`
+:param time_taper: **Default `False`.** Keyword-only. Optional time taper during resampling.
+:type time_taper: `bool`
+:returns: Single-element `(record,)` tuple; record shape `[B,R,T]`. Use `result[-1]`; no final states or illumination.
+:rtype: tuple[torch.Tensor]
+```
+
 (vrr-install)=
 ### Install and build
 
-From the complete source root, use the intended Python environment with compatible dependencies already installed:
+From complete V19 source, install the root package and explicitly build for the actual GPU SM:
 
 ```bash
-python -m pip install --no-deps --no-build-isolation -e ./extensions/vrr
-python -c "import starwave_vrr; print(starwave_vrr.__file__)"
-# Native CUDA only; replace 80 with the actual GPU SM.
-python -m starwave_vrr.build --plan --arch 80
-python -m starwave_vrr.build --arch 80
+python -m pip install --no-deps --no-build-isolation -e .
+python compile_all.py --arch 80
 ```
 
-For `backend="torch"`, omit both build commands. Import and propagation do not implicitly build. Root `compile_all.py` builds the main package only. `--plan` prints a plan without proving compilation; `--arch` accepts `80` or `8.0`, SM 60 or newer. Optional `--nvcc` and `--ccbin` select installed compilers.
-
-Standalone nvcc/C++17 compilation does not use Torch C++ headers or libtorch and can be planned/run with CPU-only Torch. Actual GPU execution still requires CUDA-enabled Torch, a supported GPU and compatible toolkit/driver/runtime. This is not a promise that arbitrary version combinations work. Native C ABI 3 is independent of the main package. Rebuild this exact source and restart Python after source/library changes; old ABI 1/2 binaries cannot be reused. The default cache is `~/.cache/starwave-vrr/`; `STARWAVE_VRR_CACHE` can select another extension cache.
-
-Unregister only this extension with `python -m pip uninstall starwave-vrr`; source/cache cleanup is separate. Editable registration does not replace `starwave`.
+The unified builder includes core, elastic, Born, GSLS and VRR. `backend="torch"` requires no native build. Import and propagation never compile implicitly. Rebuild matching source and restart Python/Jupyter after native changes. See [installation](installation.md) for the shared build configuration.
 
 (vrr-backends)=
 ### Backends and gradients
@@ -769,7 +806,7 @@ Selecting Torch alone does not change the boundary default: also pass `memory="f
 
 CUDA full stores the six-state trajectory (two pressure levels and four CPML memories). Boundary stores shell history and final states and reconstructs the interior; history still grows with time and shell size. Torch checkpoint stores complete six-state segment boundaries and recomputes forward segments during backward. It is not native boundary reconstruction.
 
-One first-order backward supports independent `v`, `rx`, `rz` and source amplitudes, including source velocity scaling and the full replicated-padding transpose. Geometry and planning inputs are not trainable. MPS, AMP/autocast, CUDA graphs, native checkpoint, Torch boundary, VRR3D and higher-order AD are unsupported. `starwave_vrr.vrr_reference` is an explicitly selected CPU/CUDA float32/64 full-history reference; it has no backend/execution/checkpoint/compile selectors and is not a fallback.
+One first-order backward supports independent `v`, `rx`, `rz` and source amplitudes, including source velocity scaling and the full replicated-padding transpose. Geometry and planning inputs are not trainable. MPS, AMP/autocast, CUDA graphs, native checkpoint, Torch boundary, VRR3D and higher-order AD are unsupported. `starwave.vrr_reference` is an explicitly selected CPU/CUDA float32/64 full-history reference; it has no backend/execution/checkpoint/compile selectors and is not a fallback.
 
 (vrr-physics)=
 ### Models, source and time conventions
@@ -796,7 +833,7 @@ The top removes PML/buffer but keeps `M=accuracy//2` zero halo cells. Physical `
 
 ```python
 import torch
-from starwave_vrr import vrr
+from starwave import vrr
 
 # A small synthetic CPU example; all models use [x,z].
 v = torch.full((32, 32), 1500.0, dtype=torch.float64, requires_grad=True)
@@ -827,11 +864,11 @@ For native CUDA, move every model, source and geometry tensor to the same CUDA d
 (vrr-status)=
 ### Source and validation scope
 
-The current reviewed V17 source is `27c2e14b184b94d8031a5b3a83c25b1ed3d4ac67` (`0.1.0.dev17`), including import-time native initialization. The earlier reviewed dev baseline `904c9106bdb883325df8586b7c3412f7814a9737` retained the VRR runtime integrated at `6b9ec41d3bef1a8a3593a63f124c6ee4139955b0`. This dev extension is later than frozen V16 source `5a224dbb1e86154ff034bbedaf67c0e4cf7a1b6a`, which underlies public 7.1.0. Its reviewed VRR feature input is `e8ccf9b0fe70edd023fc4c6d0319abae6c203c65`; the dev integration preserves the existing main-package free-surface work and keeps the extension separately packaged. Release V17 now identifies the frozen source above; the separately packaged VRR extension does not thereby become part of the 7.1.0 wheel, and PyPI 8.0.0 remains pending.
+This reference targets frozen V19 source `0.1.0.dev19`, commit `46d32877e3336d531520a696d5f2e074e6f4ef74`, published as [Release V19](https://github.com/StarrMoonn/StarWave/releases/tag/V19). All signatures below are checked against that source, including the 23-parameter Scalar API and integrated `starwave.vrr`. The final PyPI 9.1.0 wheel is published, with verified artifact identity and CPU checks; published 9.0.0 is the historical V18 wheel. Source, wheel and device-validation evidence remain separate. See [Status](status.md) and [installation](installation.md).
 
 The physical parameterization follows [Whitmore et al., EAGE 2020](https://doi.org/10.3997/2214-4609.202010332). The tensor top convention follows [SWEEP dev](https://github.com/DeepWave-KAUST/sweep/tree/32235f796ffa5b272ca81b9016f8cc85e25ecdf1) commit `32235f796ffa5b272ca81b9016f8cc85e25ecdf1`; the native VRR CUDA step/VJP and boundary reconstruction are independent implementations, not an upstream CUDA port.
 
-The reviewed source records user-supplied RTX 4060 Laptop and A30 numerical reports, including native full/boundary and input gradients; CPU/Inductor, host loading, actual GPU, multi-GPU, long FWI and performance are separate evidence categories. This documentation build does not rerun or certify those GPU results, and no result is transferred to the 7.1.0 wheel or arbitrary hardware/physical regimes. A first-order backward is not a Born/LSRTM or Hessian API.
+The reviewed source records user-supplied RTX 4060 Laptop and A30 numerical reports, including native full/boundary and input gradients; CPU/Inductor, host loading, actual GPU, multi-GPU, long FWI and performance are separate evidence categories. This documentation build does not rerun or certify those GPU results, and no result is transferred to untested wheel/device/physical combinations. A first-order backward is not a Born/LSRTM or Hessian API.
 
 (vti)=
 ## VTI Function
@@ -866,7 +903,7 @@ Propagates a Duveneck-type first-order acoustic VTI system, selecting 2D or 3D f
 :type accuracy: `int`
 :param pml_freq: **Default `25.0`; keyword-only.** Positive, finite frequency used to configure the PML, typically in Hz; also used for spatial-sampling diagnostics. It does not generate a waveform or automatically measure the source frequency. Choose it for the actual experiment.
 :type pml_freq: `float | int`
-:param pml_width: **Default `20`; keyword-only.** Positive integer thickness in cells or `2*D` equal positive widths in low/high axis pairs. V17 also accepts `[A,A,0,A]` in 2D `[x,z]` or `[A,A,A,A,0,A]` in 3D `[x,y,z]`, with equal positive remaining widths A. Only the top face may be zero; other zero faces, all-zero, unequal remaining widths, negative/noninteger/bool values are rejected. This selects the projected normal-traction closure below.
+:param pml_width: **Default `20`; keyword-only.** Positive integer thickness in cells or `2*D` equal positive widths in low/high axis pairs. V19 accepts `[A,A,0,A]` in 2D `[x,z]` or `[A,A,A,A,0,A]` in 3D `[x,y,z]`, with equal positive remaining widths A. Only the top face may be zero; other zero faces, all-zero, unequal remaining widths, negative/noninteger/bool values are rejected. This selects the projected normal-traction closure below.
 :type pml_width: `int | list[int] | tuple[int, ...]`
 :param boundary_buffer: **Default `5`; keyword-only.** Nonnegative buffer in spatial grid cells, not a number of time steps or a checkpoint interval. Boundary mode requires at least `accuracy // 2 + 1`, which is 5 at eighth order; full mode allows 0. All absorbing sides use total padding `pml_width + boundary_buffer + accuracy // 2`; a top-zero face uses only `accuracy // 2` halo cells, without top PML or buffer.
 :type boundary_buffer: `int`
@@ -980,7 +1017,7 @@ This example uses 2D inputs. A 3D call needs all four models shaped `[nx,ny,nz]`
 :type receiver_locations_p: `Optional[torch.Tensor]`
 :param accuracy: **Default `4`.** Spatial finite-difference order: `2,4,6,8`, for 2D/3D in both full and boundary modes.
 :type accuracy: `int`
-:param pml_width: **Default `20`.** Positive integer thickness in cells or length-2D positive face widths in low/high axis order; positive faces may differ. V17 accepts top-zero `[0,A,B,C]` for 2D `[y,x]` and `[0,A,B,C,D,E]` for 3D `[z,y,x]`, with every remaining width positive. Other zero faces and all-zero are rejected. This selects improved-vacuum preparation on the first model axis: row 0 is fixed vacuum and row 1 is the first solid stress row. Top-zero rejects survey_pad, origin and supplied initial fields; see below.
+:param pml_width: **Default `20`.** Positive integer thickness in cells or length-2D positive face widths in low/high axis order; positive faces may differ. V19 accepts top-zero `[0,A,B,C]` for 2D `[y,x]` and `[0,A,B,C,D,E]` for 3D `[z,y,x]`, with every remaining width positive. Other zero faces and all-zero are rejected. This selects improved-vacuum preparation on the first model axis: row 0 is fixed vacuum and row 1 is the first solid stress row. Top-zero rejects survey_pad, origin and supplied initial fields; see below.
 :type pml_width: `Union[int, Sequence[int]]`
 :param pml_freq: **Default `None`.** PML frequency, typically Hz. None selects 25 Hz with a warning; specify the dominant source frequency explicitly.
 :type pml_freq: `Optional[float]`
@@ -1175,7 +1212,7 @@ For native CPU, build its matching library, change device to `torch.device("cpu"
 
 - Native propagation provides first-order AD, without a higher-order guarantee. The conversion helpers retain the PyTorch chain but do not add higher-order propagation derivatives. Raw materials are not physically repaired; invalid square roots, ill-conditioned models or insufficient resolution can still produce invalid results.
 - There is no public backward_callback, free_surface, boundary_buffer, source_fields or receiver_fields argument; use the actual component keywords. Elastic nt/storage options cannot be added to scalar, VRZ or VTI calls.
-- V17 import initializes the available elastic library before DataParallel; {py:func}`starwave.prepare_elastic` remains an optional explicit device check. Keep complete materials in a Module and split acquisition along shots only. Successful initialization is not multi-GPU numerical acceptance.
+- V19 import initializes the available elastic library before DataParallel; {py:func}`starwave.prepare_elastic` remains an optional explicit device check. Keep complete materials in a Module and split acquisition along shots only. Successful initialization is not multi-GPU numerical acceptance.
 - This update checked the published wheel's interface and Python 3.10 syntax without running a GPU. Existing user-supplied RTX 4060 source-test reports and published-wheel CPU/host checks have their own scopes; they do not establish A30, multi-GPU, long FWI or target-GPU performance acceptance.
 
 (elastic-conversions)=
@@ -1214,7 +1251,7 @@ Forward algebra is `lamb=(vp**2-2*vs**2)*rho`, `mu=vs**2*rho`, and `buoyancy=rho
 (visco-gsls)=
 ## GSLS Function
 
-This section describes V17 source `0.1.0.dev17`, including the merged top-zero pressure-release boundary and import lifecycle. The two-dimensional `starwave.visco_gsls` is the current viscoacoustic entry point; a single mechanism uses explicit `mode="sls_compat", n_mechanisms=1`. The standalone `visco_sls`, `prepare_visco_sls` and `visco_sls_native_status` APIs are removed. Published [PyPI 7.1.0](https://pypi.org/project/starwave/7.1.0/) includes the earlier V16 GSLS API, without the V17 boundary/initialization changes; historical `7.0.0` has no GSLS. Release V17 is published; PyPI `8.0.0` remains pending. See [documentation status](status.md) and [installation](installation.md).
+This section describes frozen V19 GSLS, including its top-zero pressure-release closure and import lifecycle. `starwave.visco_gsls` is the viscoacoustic entry point; single-mechanism compatibility uses `mode="sls_compat", n_mechanisms=1`. Standalone SLS APIs remain removed. See [Status](status.md) and [installation](installation.md) for publication channels.
 
 Supported: fixed spatially varying density, float32/float64, and first-order Vp/Q/source/provider-parameter gradients. Native CPU/CUDA support full/checkpoint; explicit Torch supports full/checkpoint and eager/compile. All main propagators gain execution options while native defaults remain unchanged; see the [PyTorch backend](pytorch-backend.md).
 
@@ -1281,7 +1318,7 @@ starwave.visco_gsls(vp, q, rho, grid_spacing, dt, *, source_amplitudes,
 ```
 <!-- api-doc:visco_gsls:signature:end -->
 
-The first five parameters are positional-or-keyword; all others are keyword-only. `source_amplitudes`, `source_locations`, `receiver_locations` and `f_ref` are required. The four-entry V17 top-zero form may be a list or tuple, under the restrictions below. The table lists every parameter and signature default.
+The first five parameters are positional-or-keyword; all others are keyword-only. `source_amplitudes`, `source_locations`, `receiver_locations` and `f_ref` are required. The four-entry V19 top-zero form may be a list or tuple, under the restrictions below. The table lists every parameter and signature default.
 
 <!-- api-doc:visco_gsls:parameters:start -->
 | Parameter | Calling kind | Default when omitted | Type, shape and units | Purpose and behavior | Allowed values, rejections and limits |
@@ -1393,7 +1430,7 @@ The complete CPU Torch full example below needs no native library and explicitly
 import torch
 import starwave
 
-# V17 source; explicit CPU Torch reference, no native build required.
+# V19 source; explicit CPU Torch reference, no native build required.
 dtype = torch.float64
 nz, nx, nt = 12, 16, 80
 vp = torch.full((nz, nx), 1800.0, dtype=dtype, requires_grad=True)
@@ -1428,7 +1465,7 @@ for grad in (vp.grad, q.grad, source.grad):
 assert torch.count_nonzero(source.grad[..., -1]) == 0
 ```
 
-Complete native checkpoint call (first build the matching CUDA library and move models/source/geometry to one CUDA device; V17 import initializes the library, or explicitly use native_cpu with CPU tensors):
+Complete native checkpoint call (first build the matching CUDA library and move models/source/geometry to one CUDA device; V19 import initializes the library, or explicitly use native_cpu with CPU tensors):
 
 <!-- api-doc:visco_gsls:full:start -->
 ```python
@@ -1504,7 +1541,7 @@ Return four strided Tensors matching model dtype/device: c_rel2 `[zp,xp]` and st
 
 The native backward returns VJPs for all four material outputs, which Torch chains through provider parameters. Avoid detach, NumPy, item on learned values or rebuilding them with torch.tensor. Original-grid spatial tensors captured in the closure are not automatically padded; explicitly extend them to the exact same domain and preserve gradients. All trainable material outputs with nonzero PML still require fixed explicit max_vel.
 
-The following extension to the CPU example defines learnable per-mechanism weights and times. Once changed, it is experimental material, no longer the fixed published Hao1 spectrum. The optimizer must preserve Q0>S, and the actual spectrum needs new diagnostics. An external provider change alone needs no recompilation; package files tracked by the fingerprint require rebuilding and restarting.
+The following extension to the CPU example defines learnable per-mechanism weights and times. Once changed, it is experimental material, no longer the fixed published Hao1 spectrum. The optimizer must preserve Q0>S, and the actual spectrum needs new diagnostics. An external provider change alone needs no recompilation; native source changes require explicit rebuilding and restarting.
 
 ```python
 from starwave.visco_gsls_coefficients import (
@@ -1537,7 +1574,7 @@ def provider(vp_padded, q_padded, dt, f_ref):
 
 ```{py:function} starwave.prepare_visco_gsls(backend: str='native_cpu', device: str | torch.device | None=None) -> dict
 
-Optionally check an explicitly selected device and obtain the existing GSLS library. V17 import already loads and validates available libraries; subsequent calls reuse the ready handle without re-hashing loaded files. Does not compile or propagate.
+Optionally check an explicitly selected device and obtain the existing GSLS library. V19 import already loads and validates available libraries; subsequent calls reuse the ready handle without re-hashing loaded files. Does not compile or propagate.
 
 :param backend: **Default `'native_cpu'`; positional-or-keyword.** Only 'native_cpu' or 'cuda'; 'torch' is rejected.
 :type backend: `str`
@@ -1568,7 +1605,7 @@ starwave.prepare_visco_gsls(backend="native_cpu", device=None)
 starwave.prepare_visco_gsls(backend="cuda", device="cuda:0")
 ```
 
-Build explicitly from a complete authorized V17 source checkout using an installed Torch-compatible toolchain:
+Build explicitly from a complete authorized V19 source checkout using an installed Torch-compatible toolchain:
 
 ```bash
 # Current dev: core/elastic/GSLS/Born; replace 80 with the actual target SM.
@@ -1580,9 +1617,9 @@ python compile_visco_gsls.py --backend cpu
 ```
 
 
-In current dev commit `3f2b24daba0fbe6956389baf95dc910405a7ed4a`, compile_all builds/verifies four independent libraries: core, elastic, GSLS and Born. Frozen V17 builds the first three and requires separate `compile_born.py --arch 80`; its immutable archive does not include the later orchestration update. combined_build covers core/elastic only. VRR is separately installed and built. Source-tree GSLS output defaults to native/build/gsls; installed builds use the StarWave cache. An optional STARWAVE_BUILD_DIR uses its gsls subdirectory and must agree between build/runtime; standalone STARWAVE_GSLS_BUILD_DIR is not used. Complete-source execution requires neither pip registration nor export and downloads no compiler; optional editable installation is separate from compilation.
+V19 compile_all builds core, elastic, GSLS, Born and VRR. Each uses a matching native library. Configure build paths before import and restart Python after rebuilding. Editable registration and compilation are separate operations.
 
-GSLS and core are separate native libraries. GSLS source/library/metadata fingerprints and ABI are checked when the existing library is first loaded during import, then its ready handle is reused without per-propagation source hashing or file polling. Never borrow another tree's library or bypass identity checks. Rebuild and restart Python/Jupyter after updating loaded inputs. Ordinary first propagation or DataParallel needs no manual GSLS preparation; prepare_native and prepare_elastic remain separate optional helpers. No runtime compilation or backend fallback occurs. Root compile_all does not rebuild an optional retained GSLS CPU library; rebuild that separately when stale.
+GSLS import loads existing native libraries and binds their entry points; subsequent calls reuse the handle. There is no runtime source/library hash or ABI-version gate, implicit compilation, repair or backend fallback. Rebuild after source changes and restart Python. Rebuild any retained GSLS CPU library explicitly as well. Optional preparation helpers check their own libraries/devices.
 
 CUDA numerical correctness, actual multi-GPU execution, long FWI and performance require separate target-device validation. Library presence, compilation or successful preparation do not establish those results. This section supplies no new GPU or benchmark acceptance evidence.
 
@@ -1614,7 +1651,7 @@ Queries current native-library status without compiling or propagating.
 
 ```{py:function} starwave.prepare_native(device_ids: list[int] | tuple[int, ...]) -> dict
 
-Optionally validates explicit logical CUDA devices and returns the existing core native library status. V17 import already initializes available core libraries before returning; this helper is not required before ordinary first propagation or DataParallel. Does not compile.
+Optionally validates explicit logical CUDA devices and returns the existing core native library status. V19 import already initializes available core libraries before returning; this helper is not required before ordinary first propagation or DataParallel. Does not compile.
 
 :param device_ids: Required. Nonempty, duplicate-free collection of nonnegative visible logical CUDA device IDs; Booleans are rejected. Use the device-visibility mapping of the current process.
 :type device_ids: `list[int] | tuple[int, ...]`
@@ -1625,16 +1662,16 @@ Optionally validates explicit logical CUDA devices and returns the existing core
 (native-notes)=
 ## Native runtime notes
 
-After explicit compilation, ordinary V17 `import starwave` initializes available core, elastic, Born and GSLS libraries plus an importable independent VRR extension. Shared dispatch is ready before the first parallel call; no serial warm-up or mandatory `prepare_*` step is needed. Import does not compile, initialize CUDA, select devices, allocate wavefields or propagate. Missing unbuilt libraries are skipped for supported pure-Torch use; an existing invalid build fails instead of silently falling back. Configure build paths before import and restart Python/Jupyter after rebuilding loaded code. Ready handles are reused without per-propagation source hashing or library polling.
+After explicit compilation, ordinary V19 `import starwave` initializes available core, elastic, Born and GSLS libraries and integrated VRR. Shared dispatch is ready before the first parallel call; no serial warm-up or mandatory `prepare_*` step is needed. Import does not compile, initialize CUDA, select devices, allocate wavefields or propagate. Missing unbuilt libraries are skipped for supported pure-Torch use; an existing invalid build fails instead of silently falling back. Configure build paths before import and restart Python/Jupyter after rebuilding loaded code. Ready handles are reused without per-propagation source hashing or library polling.
 
 Use `native_status()` for diagnostics and optional `prepare_native()` to check explicit logical CUDA devices. Neither function compiles or replaces GPU numerical acceptance; device `0` in the example must be visible. Core, elastic, GSLS and VRR retain their initial-load identity checks. Born performs full hashes/symbol auditing only during explicit builds/development audits, then uses ordinary one-time runtime loading.
 
-This scalar development integration retains import-time native binding. The core loader now loads/binds once without runtime source/library hash, fingerprint or version probing; loading/binding errors still fail. A successful import is not a source/build identity audit or numerical check. Rebuild matching source and restart Python/Jupyter after changes; prepare_native remains an optional explicit device check.
+V19 retains import-time native binding. The core loader now loads/binds once without runtime source/library hash, fingerprint or version probing; loading/binding errors still fail. A successful import is not a source/build identity audit or numerical check. Rebuild matching source and restart Python/Jupyter after changes; prepare_native remains an optional explicit device check.
 
 (native-examples)=
 ## Native runtime examples
 
-With the reviewed V17 source, a matching explicit native build and compatible PyTorch, query status after import. The optional preparation call requires an available CUDA device. The pending 8.0.0 wheel must be independently verified; published 7.1.0 retains its older lifecycle.
+With frozen V19, a matching explicit build and compatible PyTorch, query status after import. Optional prepare calls validate available CUDA devices; they do not compile or establish numerical acceptance.
 
 ```python
 import starwave
@@ -1649,7 +1686,7 @@ prepared = starwave.prepare_native([0])  # Optional device validation.
 
 ```{py:function} starwave.prepare_elastic(device_ids: list[int] | tuple[int, ...] | None=None) -> dict
 
-Optionally obtain the separate elastic library and validate explicit logical devices. V17 import already initializes available elastic bindings; this is not a mandatory CUDA/DataParallel preload step. Does not compile or execute propagation tests.
+Optionally obtain the separate elastic library and validate explicit logical devices. V19 import already initializes available elastic bindings; this is not a mandatory CUDA/DataParallel preload step. Does not compile or execute propagation tests.
 
 :param device_ids: **Default `None`.** None loads the elastic library without selecting or preparing a CUDA device list, suitable for CPU use; a nonempty list/tuple selects distinct, nonnegative visible logical CUDA integer IDs (bool is rejected). CUDA requests validate the devices and build capability.
 :type device_ids: `list[int] | tuple[int, ...] | None`
@@ -1661,9 +1698,119 @@ Optionally obtain the separate elastic library and validate explicit logical dev
 
 (other-exports)=
 ## Other exported names and scope
+StarWave V19 has no public `starwave.Scalar` wrapper class; `starwave.ScalarBorn` is the distinct Born module documented above. The tutorials define their own Module wrapper. Do not assume another library’s classes exist in StarWave, or add elastic state, `nt`, or storage options to scalar/VRZ/VTI calls.
 
-`ScalarIllumination`, `IlluminationFields`, and `precondition_gradient` are verified exported names related to scalar illumination. This edition does not yet provide a complete lifecycle tutorial for them; the propagator pages explain the usage boundaries of the `illumination` parameter.
+(elastic-native-status)=
+### starwave.elastic_native_status
 
-StarWave V17 has no public `starwave.Scalar` wrapper class; `starwave.ScalarBorn` is the distinct Born module documented above. The tutorials define their own Module wrapper. Do not assume another library’s classes exist in StarWave, or add elastic state, `nt`, or storage options to scalar/VRZ/VTI calls.
+```{py:function} starwave.elastic_native_status()
+
+Inspect the existing elastic library status without compiling or propagating; a status report is not a numerical validation.
+
+:returns: Inspect the existing elastic library status without compiling or propagating; a status report is not a numerical validation.
+```
+
+
+(scalar-illumination)=
+### starwave.ScalarIllumination
+
+```{py:class} starwave.ScalarIllumination(*, expected_shots)
+
+One-use collector for native CUDA Scalar2D with positive PML widths and trainable velocity. Create on the caller thread for each batch; pass the same collector to replicas, seal after forward, backward once, then reduce. Use a context manager to release pending statistics on failure. Torch, 3D and any zero PML face are rejected.
+
+:param expected_shots: **Required.** Total positive integer shot count before DataParallel scattering; bool rejected.
+:type expected_shots: `int`
+:returns: One-use collector for native CUDA Scalar2D with positive PML widths and trainable velocity. Create on the caller thread for each batch; pass the same collector to replicas, seal after forward, backward once, then reduce. Use a context manager to release pending statistics on failure. Torch, 3D and any zero PML face are rejected.
+```
+
+
+(illumination-seal)=
+### starwave.ScalarIllumination.seal
+
+```{py:method} starwave.ScalarIllumination.seal()
+
+Finish registration after all forward replicas return, before backward. Returns None.
+
+:returns: Finish registration after all forward replicas return, before backward. Returns None.
+```
+
+
+(illumination-reduce)=
+### starwave.ScalarIllumination.reduce
+
+```{py:method} starwave.ScalarIllumination.reduce(*, device)
+
+After backward finishes, consume all registered replicas and return detached float64 global shot SUMs as IlluminationFields on the requested device. Incomplete reduction raises without consuming the collector; invalid native data raises. Successful reduction closes it.
+
+:param device: **Required.** Explicit torch.device or device string for the reduction result.
+:type device: `torch.device | str`
+:returns: After backward finishes, consume all registered replicas and return detached float64 global shot SUMs as IlluminationFields on the requested device. Incomplete reduction raises without consuming the collector; invalid native data raises. Successful reduction closes it.
+```
+
+
+(illumination-close)=
+### starwave.ScalarIllumination.close
+
+```{py:method} starwave.ScalarIllumination.close()
+
+Discard pending statistics and close the collector; safe after a failed forward/backward. Returns None.
+
+:returns: Discard pending statistics and close the collector; safe after a failed forward/backward. Returns None.
+```
+
+
+(precondition-gradient)=
+### starwave.precondition_gradient
+
+```{py:function} starwave.precondition_gradient(gradient, fields, *, mode, damping=0.01)
+
+Returns a detached new tensor g / (H / max(H) + damping); never changes the supplied gradient or optimizer. An all-zero H returns an unchanged clone. Apply after backward/reduction, before masking/clipping/step. pseudo_hessian is a per-shot geometric statistic, not an exact Hessian diagonal.
+
+:param gradient: **Required.** Finite floating tensor, same shape, public axes and device as fields.
+:type gradient: `torch.Tensor`
+:param fields: **Required.** IlluminationFields returned by reduce, containing finite nonnegative statistics.
+:type fields: `IlluminationFields`
+:param mode: **Required.** One of 'source', 'receiver', 'pseudo_hessian'; no default.
+:type mode: `str`
+:param damping: **Default `0.01`.** Positive finite dimensionless water level; 0.01 is a numerical choice, not an optimal or literature default.
+:type damping: `float`
+:returns: Returns a detached new tensor g / (H / max(H) + damping); never changes the supplied gradient or optimizer. An all-zero H returns an unchanged clone. Apply after backward/reduction, before masking/clipping/step. pseudo_hessian is a per-shot geometric statistic, not an exact Hessian diagonal.
+```
+
+
+(ricker)=
+### starwave.wavelets.ricker
+
+```{py:function} starwave.wavelets.ricker(freq: float, length: int, dt: float, peak_time: float, dtype: Optional[torch.dtype]=None) -> torch.Tensor
+
+Return a one-dimensional CPU Ricker wavelet of shape [length]. Explicitly move/expand it for the propagator device, shots and sources; this helper does not choose source units or scale by velocity/dt. dt=0 raises.
+
+:param freq: **Required.** Central frequency in Hz.
+:type freq: `float`
+:param length: **Required.** Number of time samples.
+:type length: `int`
+:param dt: **Required.** Time sample spacing in seconds.
+:type dt: `float`
+:param peak_time: **Required.** Peak time in seconds.
+:type peak_time: `float`
+:param dtype: **Default `None`.** Requested torch dtype; None uses the PyTorch default dtype.
+:type dtype: `Optional[torch.dtype]`
+:returns: Return a one-dimensional CPU Ricker wavelet of shape [length]. Explicitly move/expand it for the propagator device, shots and sources; this helper does not choose source units or scale by velocity/dt. dt=0 raises.
+```
+
+
+(backend-capabilities)=
+### starwave.torch_backend.backend_capabilities
+
+```{py:function} starwave.torch_backend.backend_capabilities(equation=None)
+
+Return a tuple of implemented BackendCapability records, optionally filtered by equation. This describes implementation eligibility, not available devices or hardware acceptance. The six-equation registry excludes the separately implemented integrated VRR path; consult the VRR section above. Unknown equation raises.
+
+:param equation: **Default `None`.** None selects all; otherwise scalar, vrz, vti, elastic, visco_gsls or scalar_born.
+:type equation: `str | None`
+:returns: Return a tuple of implemented BackendCapability records, optionally filtered by equation. This describes implementation eligibility, not available devices or hardware acceptance. The six-equation registry excludes the separately implemented integrated VRR path; consult the VRR section above. Unknown equation raises.
+```
+
+IlluminationFields is a frozen result container with source, receiver and pseudo_hessian detached float64 tensors in physical model axes, and shots (int). They are global shot sums, not averages; time sums include no extra dt. Reduction cannot repair overflow already present in native FP32 statistics.
 
 {ref}`genindex`
