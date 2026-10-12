@@ -22,6 +22,8 @@ GSLS: [visco_gsls](#visco-gsls). 独立源码扩展：[VRR Function](#vrr)，不
 
 本参考面向已审查的 V17 源码 `0.1.0.dev17`，包括 Born、已合并的平顶边界行为与导入时原生初始化。[Release V17](https://github.com/StarrMoonn/StarWave/releases/tag/V17) 已发布，PyPI `8.0.0` 尚待发布；已发布的 `7.1.0` wheel 是 V16 基线，不会因文档更新获得这些变化。详见[文档状态](status.md)。原有位置参数与原生默认行为保留；显式 [PyTorch 后端](pytorch-backend.md) 选项仍遵循各方程的限制。下方逐项列出完整签名、参数、返回与限制。
 
+下方 Scalar 节明确描述后续未发布 dev API，其版本说明优先于本页 V17 基线。
+
 6.0.0 的内部存储和 PML 转置维护见[发布说明](release-notes.md)，二维存储变化见[scalar 说明](modeling/scalar.md)。它们不引入新的公共参数；源码升级需重新构建配套原生库。
 
 页面组织参考 [Deepwave 官方 Usage](https://ausargeo.com/deepwave/usage) 的 Sphinx Python API 风格，正文按 StarWave 的实际契约重新编写。两者的参数集合、源单位、返回结构和可微范围不能互换。
@@ -29,7 +31,7 @@ GSLS: [visco_gsls](#visco-gsls). 独立源码扩展：[VRR Function](#vrr)，不
 (propagators)=
 ## 传播函数速查
 
-- {py:func}`starwave.scalar`：二维/三维标量声学；速度模型 `v`；返回单元素记录元组。
+- {py:func}`starwave.scalar`：二维/三维标量声学；速度模型 `v`；默认返回记录元组，dev 可选最终物理波场。
 
 - {py:func}`starwave.scalar_born`：一维/二维/三维常密度声学 Born；速度扰动 δv，返回背景/散射记录及终态。V17 源码已包含，8.0.0 尚待发布。
 
@@ -48,9 +50,13 @@ GSLS: [visco_gsls](#visco-gsls). 独立源码扩展：[VRR Function](#vrr)，不
 (scalar)=
 ## Scalar Function
 
-```{py:function} starwave.scalar(v: torch.Tensor, grid_spacing: float | int | list[float] | tuple[float, ...], dt: float | int, *, source_amplitudes: torch.Tensor, source_locations: torch.Tensor, receiver_locations: torch.Tensor, accuracy: int=8, pml_freq: float | int=25.0, pml_width: int | list[int] | tuple[int, ...]=20, boundary_buffer: int=5, memory: str='boundary', max_vel: float | int | None=None, freq_taper_frac: float | int=0.0, time_pad_frac: float | int=0.0, time_taper: bool=False, illumination: ScalarIllumination | None=None, backend: str | None=None, execution: str='eager', checkpoint_interval: int | None=None, compile_steps: int=1) -> tuple[torch.Tensor]
+本 Scalar 节描述由 `bc63dd3c3e438256e46fce3a1738b94e6c9a2970` 审阅并合入 dev `e040aa9b8225ab387f7e4853bfe6162f5351f5d5` 的未发布扩展，须使用匹配源码；原生执行还需重编译对应库。冻结 V17（`27c2e14b184b94d8031a5b3a83c25b1ed3d4ac67`）、8.0.0 发布基线与已发布 7.1.0 均保留较早的 20 参数 scalar API：没有终态/回调关键字，二维源固定，不支持任意零面；V17 只支持已说明的顶部零宽排列。下方其它传播器仍遵循各自发布契约。
 
-根据 `v.ndim` 在二维或三维网格上传播标量声学波，支持一批独立炮。两种维数都支持一次一阶速度梯度，三维还支持源波形梯度；坐标和数值设置不参与求导。每次调用使用新的传播状态，不返回最终波场。
+本次计划发布为 V18 源码与 PyPI 9.0.0；发布状态和 wheel 验收仍待确认。已核验产物可用前，请使用审阅过的源码。这些功能不会倒写进 V17 或 8.0.0 基线。
+
+```{py:function} starwave.scalar(v: torch.Tensor, grid_spacing: float | int | list[float] | tuple[float, ...], dt: float | int, *, source_amplitudes: torch.Tensor, source_locations: torch.Tensor, receiver_locations: torch.Tensor, accuracy: int=8, pml_freq: float | int=25.0, pml_width: int | list[int] | tuple[int, ...]=20, boundary_buffer: int=5, memory: str='boundary', max_vel: float | int | None=None, freq_taper_frac: float | int=0.0, time_pad_frac: float | int=0.0, time_taper: bool=False, illumination: ScalarIllumination | None=None, backend: str | None=None, execution: str='eager', checkpoint_interval: int | None=None, compile_steps: int=1, return_wavefield: bool=False, forward_callback: Callable | None=None, callback_frequency: int=1) -> tuple[torch.Tensor, ...]
+
+根据 `v.ndim` 在二维或三维网格上传播标量声学波，支持独立炮。两种维数均支持一阶速度与源波形梯度；坐标和数值设置不参与求导。每次调用从新状态开始，可选返回可微的最终物理波场；它不是完整重启状态。
 
 :param v: **必填；位置或关键字参数。** 二维 `[N0,N1]` 或三维 `[N0,N1,N2]` 模型，每维至少为 2；float32（原生 CUDA；Torch 为 CPU/CUDA），典型单位 m/s。由 `v.ndim` 选择传播维数。坐标 `[i,j]` / `[i,j,k]` 直接索引 `v[i,j]` / `v[i,j,k]`；三维示例采用 `[nx,ny,nz]`，不自动交换物理轴。所有值须有限；允许负值或零值，但不保证物理合理性。模型轴变换保留 autograd 链；`requires_grad=True` 时请求速度梯度。
 :type v: `torch.Tensor`
@@ -58,21 +64,21 @@ GSLS: [visco_gsls](#visco-gsls). 独立源码扩展：[VRR Function](#vrr)，不
 :type grid_spacing: `float | int | list[float] | tuple[float, ...]`
 :param dt: **必填；位置或关键字参数。** 正且有限的用户输入/输出采样间隔，典型单位 s。内部可能按 CFL 采用更小的时间步，返回间隔仍为此值。不能传入 Tensor 或布尔值，不对其求导。
 :type dt: `float | int`
-:param source_amplitudes: **必填；仅关键字参数。** 实数张量 `[B,S,T]`，三个维度均非空；数据须有限、可表示为 float32，会转换到模型设备和 float32。二维须固定（不能设置 `requires_grad=True`）；三维支持一阶源梯度，可单独或同时训练源与速度。它是归一化 forcing `f`，不是每步压力增量；若波场用 Pa、长度用 m，单位为 Pa/m²。不能只传 `[T]` 或 `[B,T]`，共享波形应显式扩展炮/源维。
+:param source_amplitudes: **必填；仅关键字参数。** 实数张量 `[B,S,T]`，三个维度均非空；数据须有限、可表示为 float32，会转换到模型设备和 float32。二维和三维都支持一阶源梯度，可单独或同时训练源与速度。它是归一化 forcing `f`，不是每步压力增量；若波场用 Pa、长度用 m，单位为 Pa/m²。不能只传 `[T]` 或 `[B,T]`，共享波形应显式扩展炮/源维。
 :type source_amplitudes: `torch.Tensor`
 :param source_locations: **必填；仅关键字参数。** 固定整数张量 `[B,S,D]`，`D=v.ndim`；单源时也接受 `[B,D]`。建议 `torch.long`。坐标按输入模型轴序直接索引物理网格；三维 `[i,j,k]` 对应 `v[i,j,k]`。不能包含 PML 偏移或越界值。每个源有对应波形，同一炮内重合源的增量相加。
 :type source_locations: `torch.Tensor`
-:param receiver_locations: **必填；仅关键字参数。** 固定整数张量 `[B,R,D]`，`D=v.ndim`、`R>0`，建议 `torch.long`。炮数与源一致，使用输入模型轴序的物理网格下标。允许重复位置；接收点不可省略，不能用空张量请求无记录传播。
+:param receiver_locations: **必填；仅关键字参数。** 固定整数张量 `[B,R,D]`，`D=v.ndim`、`R>=0`，建议 `torch.long`。炮数与源一致，使用输入模型轴序的物理网格下标。允许重复位置；此关键字仍必填，可传整型空张量 `[B,0,D]`，返回 `[B,0,T]` 记录。仅终态 loss 不需要虚构接收器。
 :type receiver_locations: `torch.Tensor`
 :param accuracy: **默认 `8`；仅关键字参数。** 空间有限差分阶数，可选 `2,4,6,8`，不是误差容差。影响模板范围、计算量和 boundary buffer 最小值；拒绝布尔值及其它阶数。
 :type accuracy: `int`
 :param pml_freq: **默认 `25.0`；仅关键字参数。** 正且有限的 PML 设置频率，典型单位 Hz，也用于空间采样诊断。不是波形生成器，不会自动测量源信号频率；应按实际实验选择。
 :type pml_freq: `float | int`
-:param pml_width: **默认 `20`；仅关键字参数。** 正整数网格厚度，应用到所有面；或二维四个/三维六个相等正整数，按公开模型轴低端/高端成对排列。V17 另支持仅顶面为零：二维 `[x,z]` 使用 `[A,A,0,A]`，三维 `[x,y,z]` 使用 `[A,A,A,A,0,A]`，其余各面均为相等正整数 A。拒绝其它零面、全零、其余面宽不等、负值、非整数或 bool；零 halo 几何见下文。
+:param pml_width: **默认 `20`；仅关键字参数。** 非负整数网格厚度，或二维四个/三维六个非负逐面宽度。任意面组合可为零，包括标量 0/全零；所有正宽度仍须等于同一 A。顺序为 `[x-low,x-high,z-low,z-high]` / `[x-low,x-high,y-low,y-high,z-low,z-high]`。零面仅保留固定零 FD ghost，不含 PML/buffer，物理边缘样点仍活动。拒绝负值、非整数、bool 及不相等的正宽度。该 dev scalar 取值域不扩展 VRZ/VTI。
 :type pml_width: `int | list[int] | tuple[int, ...]`
-:param boundary_buffer: **默认 `5`；仅关键字参数。** 非负空间网格 buffer，不是时间步数或 checkpoint 间隔。boundary 模式要求至少 `accuracy // 2 + 1`，8 阶时为 5；full 模式允许 0。各吸收侧总填充为 `pml_width + boundary_buffer + accuracy // 2`；顶面为零时只保留 `accuracy // 2` 个 halo 单元，不含顶部 PML 或 buffer。
+:param boundary_buffer: **默认 `5`；仅关键字参数。** 非负空间网格 buffer，不是时间步数或 checkpoint 间隔。boundary 模式要求至少 `accuracy // 2 + 1`，8 阶时为 5；full 模式允许 0。各吸收侧总填充为 `pml_width + boundary_buffer + accuracy // 2`；各零宽面只保留 `accuracy // 2` 个 halo 单元，不含该面的 PML 或 buffer。
 :type boundary_buffer: `int`
-:param memory: **默认 `'boundary'`；仅关键字参数。** 反传历史策略。`"boundary"` 保存压力边界条带与两个终态压力场并重构；三维六个面的保存宽度为 `M=accuracy//2`（Radius-M）。三维 `"full"` 保存逐内部时间步、完整填充体积的未缩放 `Lap(u)` 历史，适合小规模对照。三维只训练源也会保存所选历史；只有不需要速度或源梯度的正演才不保存。full 可能耗尽显存；原生没有自动降级、CPU/磁盘卸载或 checkpoint；Torch 另支持 full/checkpoint（不支持 boundary），保存 autograd 图或完整状态检查点，不使用这里的原生 Lap(u) 历史存储。
+:param memory: **默认 `'boundary'`；仅关键字参数。** 反传历史策略。`"boundary"` 保存压力边界条带与两个终态压力场并重构；三维六个面的保存宽度为 `M=accuracy//2`（Radius-M）。三维 `"full"` 保存逐内部时间步、完整填充体积的未缩放 `Lap(u)` 历史，适合小规模对照。两种维度只训练源也会保存所选历史；只有不需要速度或源梯度的正演才不保存。full 可能耗尽显存；原生没有自动降级、CPU/磁盘卸载或 checkpoint；Torch 另支持 full/checkpoint（不支持 boundary），保存 autograd 图或完整状态检查点，不使用这里的原生 Lap(u) 历史存储。
 :type memory: `str`
 :param max_vel: **默认 `None`；仅关键字参数。** CFL/PML 速度包络，典型单位 m/s。`None` 时每次调用从当前模型 `max(abs(v))` 重新规划。显式值必须正且有限并覆盖该最大值；不是裁剪上限。全零模型需要显式正值。极值、时间子步与 PML 设置不参与求导。
 :type max_vel: `float | int | None`
@@ -82,7 +88,7 @@ GSLS: [visco_gsls](#visco-gsls). 独立源码扩展：[VRR Function](#vrr)，不
 :type time_pad_frac: `float | int`
 :param time_taper: **默认 `False`；仅关键字参数。** 是否在时间重采样中应用非周期 Hann 窗：上采样后、下采样前应用。改变信号及其反传转置；仅接受布尔值，不接受整数 0/1。内部重采样比为 1 时不改变信号。
 :type time_taper: `bool`
-:param illumination: **默认 `None`；仅关键字参数。** 二维可选的新 `ScalarIllumination` 收集器；需启用梯度且存在可训练模型。收集 detached 的源、接收与几何乘积统计；forward 后 seal，一次 backward 后 reduce。三维只接受 `None`，其它值会抛出 `NotImplementedError`。`None` 不分配照明 buffer；统计量不是精确 Hessian，也不自动预条件梯度。 Torch 或 scalar 顶面为零的自由表面必须为 None。
+:param illumination: **默认 `None`；仅关键字参数。** 二维可选的新 `ScalarIllumination` 收集器；需启用梯度且存在可训练模型。收集 detached 的源、接收与几何乘积统计；forward 后 seal，一次 backward 后 reduce。三维只接受 `None`，其它值会抛出 `NotImplementedError`。`None` 不分配照明 buffer；统计量不是精确 Hessian，也不自动预条件梯度。 Torch 或 scalar 任意面零宽时必须为 None。
 :type illumination: `ScalarIllumination | None`
 :param backend: **默认 `None`；仅关键字参数。** None 保留原生行为，不自动选择 Torch；`'cuda'` 显式要求 CUDA 模型；`'torch'` 使用 CPU/CUDA 张量正演和 autograd。设备取自输入，不自动移动模型；不接受 `'cpu'` 后端。MPS 支持 Scalar2D accuracy=4 float32；Scalar3D 不支持 MPS。scalar/VRZ/VTI 的 Torch 路径须显式选择 full/checkpoint。
 :type backend: `str | None`
@@ -92,8 +98,14 @@ GSLS: [visco_gsls](#visco-gsls). 独立源码扩展：[VRR Function](#vrr)，不
 :type checkpoint_interval: `int | None`
 :param compile_steps: **默认 `1`；仅关键字参数。** 正整数，拒绝 bool；Torch 每个执行段包含的连续内部时间步数。compile 可尝试 4，完整处理尾段；不改变 dt、nt、炮数或损失。原生只接受 1。
 :type compile_steps: `int`
-:returns: **`(receiver_amplitudes,)`**，恰好一个元素的元组。记录为连续 float32（原生 CUDA；Torch 为 CPU/CUDA） 张量 `[B,R,T]`，与模型在同一设备，名义时间 `0, dt, ..., (T-1)*dt`。为 pressure-like 记录，尺度取决于源和单位体系。用 `[0]` 或 `[-1]` 取出；不包含最终波场或 PML 状态。
-:rtype: `tuple[torch.Tensor]`
+:param return_wavefield: **默认 `False`；仅关键字参数。** 布尔值。False 保留 `(records,)`；True 返回 `(terminal_physical_wavefield, records)`，`[-1]` 仍为记录。可微终态形状 `[B,*v.shape]`，按公开模型轴序，不含 PML/buffer/FD ghost；对应最后一个内部更新及源注入完成后的 `T*dt`。不返回前一时间层或 CPML 记忆。
+:type return_wavefield: `bool`
+:param forward_callback: **默认 `None`；仅关键字参数。** 接受 ScalarCallbackState 的 callable，在完整前向区间及最后一步更新后执行。物理波场为独立、detached、只读快照；回调中修改会报错。初始时刻和 Torch checkpoint 反传重算不触发回调。可微 loss 使用返回终态，不使用回调快照；时钟见下文。
+:type forward_callback: `Callable | None`
+:param callback_frequency: **默认 `1`；仅关键字参数。** 正整数，拒绝 bool，按用户采样步计数。内部间隔为 `CFL_ratio * callback_frequency`；即使末段不足一个间隔，也总在最终更新后回调。forward_callback 为 None 时仍验证该值。
+:type callback_frequency: `int`
+:returns: **默认 `(receiver_amplitudes,)`；`return_wavefield=True` 时为 `(terminal_physical_wavefield, receiver_amplitudes)`。** 记录为模型设备上的连续 float32 `[B,R,T]`，名义时间为 `0, dt, ..., (T-1)*dt`，`[-1]` 始终取记录。可选可微终态形状为 `[B,*v.shape]`，对应最后一次源更新之后的 `internal_nt*internal_dt = T*dt`，与最后一个记录样点时间不同。不含 PML/buffer/ghost，也不能单独重启传播。
+:rtype: `tuple[torch.Tensor, ...]`
 ```
 
 **Torch 路径：** 同一主入口设置 `backend="torch"` 并显式 `memory="full"` 或 `"checkpoint"`，可使用 CPU/CUDA，无需原生构建；导入仍会初始化已有可用的原生库。下方历史存储/原生 stream 限制只描述原生路径。完整选项和内存表见 [PyTorch 后端](pytorch-backend.md)。
@@ -101,13 +113,15 @@ GSLS: [visco_gsls](#visco-gsls). 独立源码扩展：[VRR Function](#vrr)，不
 (scalar-details)=
 ### 震源与自动微分
 
-公开方程约定为 `u_tt = v² (Lap(u) - f)`。二维用户提供固定 `f`，三维还可训练 `f`；内部源增量为 `-v_source² * internal_dt² * U(f)`，其中 `U` 是内部上采样。不要在外部再次乘 `-v² dt²`。源位置的速度缩放链保留在模型梯度中。
+公开方程约定为 `u_tt = v² (Lap(u) - f)`。二维和三维用户均可训练 `f`；内部源增量为 `-v_source² * internal_dt² * U(f)`，其中 `U` 是内部上采样。不要在外部再次乘 `-v² dt²`。源位置的速度缩放链保留在模型梯度中。
 
 步后记录在下采样前通过前置零、丢弃最后一步对齐用户时钟。时间重采样和移位的转置保留在 autograd 中；FFT 的非因果滤波可能使初始用户样本出现振铃。
 
 模型梯度采用固定扩展模型、CFL 与 PML 的条件。重新生成物理边缘的 replicate padding 时，当前返回梯度不包含完整扩展链的转置累积，不能当作整个重建边界过程的全导数；切换 full 不改变这一限制。
 
-顶面 `pml_width` 为零时，物理网格上方的 `M=accuracy//2` 个单元固定为零，用户 `z=0` 仍参与传播。坐标保持原模型下标，不要增加 halo 偏移；顶部没有 PML/buffer。这是截断模板的零 halo 闭合，不是奇反射：二阶时有效压力释放平面位于第一物理样点上方一格，高阶并不继承该镜像构造或相应表面收敛阶。原生 CUDA full/boundary 与 Torch full/checkpoint 保留相同的源/时间约定和固定扩展模型梯度限制。Scalar2D 原生自由表面 full 使用完整网格历史，不使用通常的紧凑历史；boundary 保留所需顶部条带，不回退 full。顶面为零时拒绝照明。Scalar2D MPS 仍仅限 float32、accuracy=4；MPS 自由表面实际验收须单独进行。
+各零宽面外部保留 `M=accuracy//2` 个固定零 ghost，不含该面的 PML/buffer。物理边缘样点仍活动，坐标不偏移。这是截断中心差分，不是奇反射：二阶的等效零平面在物理边缘之外一个网格间距；更高内部阶数不意味着奇镜像闭合或表面收敛阶。含零面时原生 full 使用完整网格历史；boundary 仍保存/重构所需面条带，不回退 full。任意零面均拒绝 illumination。原生 CUDA full/boundary 与 Torch CPU/CUDA full/checkpoint eager/compile 支持观测选项。MPS 资格仍限 Scalar2D float32、accuracy=4；未新增 MPS 设备验收。
+
+回调状态提供 `wavefield`、`step`（整数已完成用户步）、`user_step`、`internal_step`、`internal_dt`、`step_ratio`、`dt`（internal_dt 的别名）及 `time=internal_step*internal_dt`。秒时间使用 `state.time`；CFL 比率大于 1 时 `state.step*state.dt` 不正确。比率为 2、频率为 3 时，在用户步 3,6,... / 内部步 6,12,... 后回调，并总包含最后一次更新。快照独立克隆，不传递 loss 梯度；DataParallel 中的回调闭包须自行处理并发观测记录。
 
 (scalar-examples)=
 ### 示例
@@ -128,6 +142,46 @@ receiver_amplitudes, = starwave.scalar(
 完整、无数据文件依赖的输入构造与一次 FWI 更新见[快速入门](quickstart.md)和[FWI](inversion/fwi.md)。默认 `pml_freq=25.0` 不会随源频率自动调整。
 
 
+未发布 dev 的 CPU 示例：仅终态 loss、可训练二维源、全零面、空接收器与 checkpoint 安全观测。它只检查小规模梯度接线，不代表目标波场收敛或 GPU 验收。
+
+<!-- scalar-dev:example:start -->
+```python
+import torch
+import starwave
+
+v = torch.full((12, 10), 1500.0, dtype=torch.float32, requires_grad=True)
+source = torch.zeros((1, 1, 7), dtype=v.dtype)
+source[0, 0, 1] = 1.0
+source.requires_grad_()
+src = torch.tensor([[[6, 5]]], dtype=torch.long)
+rec = torch.empty((1, 0, 2), dtype=torch.long)
+steps = []
+
+def observe(state):
+    assert state.wavefield.shape == (1, 12, 10)
+    assert not state.wavefield.requires_grad
+    steps.append((state.step, state.internal_step, state.time))
+
+terminal, records = starwave.scalar(
+    v, 10.0, 0.004,
+    source_amplitudes=source, source_locations=src,
+    receiver_locations=rec, accuracy=4, pml_width=0,
+    pml_freq=15.0, max_vel=1600.0, backend="torch",
+    memory="checkpoint", checkpoint_interval=4,
+    return_wavefield=True, forward_callback=observe, callback_frequency=3,
+)
+assert terminal.shape == (1, 12, 10) and records.shape == (1, 0, 7)
+assert [step for step, _, _ in steps] == [3, 6, 7]
+assert torch.isfinite(terminal).all()
+terminal.square().mean().backward()
+assert len(steps) == 3  # No callbacks during checkpoint backward replay.
+for gradient in (v.grad, source.grad):
+    assert gradient is not None and torch.isfinite(gradient).all()
+```
+<!-- scalar-dev:example:end -->
+
+授权的当前 dev 源码中，完整用户目标波场示例位于 `notebook/Scalar2D_Target_Wavefield.ipynb`，配套脚本为 `notebook/Scalar2D_Target_Wavefield.py`。请从该源码检出中打开；本公开手册不重新分发私有 notebook、报告素材或数据集。示例以终态波场目标优化源，回调快照仅作诊断。用户提供的 RTX 4060/A30 结果描述经审阅的功能分支，不是云端 GPU 重跑，也不是发布 wheel 验收。
+
 (scalar-time-sampling)=
 ### CFL 与内部时间重采样
 
@@ -143,7 +197,7 @@ scalar 使用保守系数 0.6，按全部模型轴间距与 `max(abs(v))`（或�
 (scalar-3d-example)=
 ### 三维可运行调用：速度与源的一阶梯度
 
-取得 V17 源码、构建匹配原生库并确保可见逻辑 CUDA 设备 0 可用后，可运行下面的独立小例子。模型采用 `[x,y,z]`，间距为 `[dx,dy,dz]`，坐标是网格下标。loss 仅检查求导接线。此代码已检查语法与接口；本次文档维护未运行 GPU，不把断言视为已通过的数值验收。
+取得未发布 dev scalar 源码、构建匹配原生库并确保可见逻辑 CUDA 设备 0 可用后，可运行下面的独立小例子。模型采用 `[x,y,z]`，间距为 `[dx,dy,dz]`，坐标是网格下标。loss 仅检查求导接线。此代码已检查语法与接口；本次文档维护未运行 GPU，不把断言视为已通过的数值验收。
 
 ```python
 import torch
@@ -171,6 +225,7 @@ receiver_amplitudes, = starwave.scalar(
     freq_taper_frac=0.0, time_pad_frac=0.0, time_taper=False,
     illumination=None, backend=None, execution="eager",
     checkpoint_interval=None, compile_steps=1,
+    return_wavefield=False, forward_callback=None, callback_frequency=1,
 )
 assert receiver_amplitudes.shape == (1, 16, 96)
 loss = receiver_amplitudes.square().mean()
@@ -184,10 +239,10 @@ assert torch.isfinite(source_amplitudes.grad).all()
 (scalar-notes)=
 ### 注意事项
 
-- 原生路径仅 CUDA FP32 默认 stream；每次 forward 只支持一次一阶 backward。二维不支持源梯度；三维支持一次一阶源梯度。高阶导数、AMP、CUDA graphs、自定义 stream、CPU 传播、公开初始/最终状态不在支持范围。
+- 原生路径仅 CUDA FP32 默认 stream；每次 forward 只支持一次一阶 backward。二维和三维均支持一次一阶源梯度。高阶导数、AMP、CUDA graphs、自定义 stream、CPU 传播、公开初始/重启状态不在支持范围；可选终态物理波场不是完整状态。
 - 时间 CFL 子步不能弥补空间采样不足；空间分辨率警告是诊断，不是精度或稳定性证书。
 - DataParallel 应把完整模型放入 Module，只拆分炮维采集；参见[多卡入门](inversion/dataparallel.md)。
-- 本页已核对接口契约，未完成目标 GPU 数值、性能或 FWI 验收。
+- 源码/API 与有限 CPU 检查同用户提供的功能分支 GPU 报告分开记录。本次文档更新未重跑目标 GPU 传播，不建立合并 dev/wheel 的性能或 FWI 验收。
 
 (born)=
 ## Born Function
@@ -1573,6 +1628,8 @@ CUDA 数值、实际多卡、长 FWI 和性能均须在目标设备单独验证�
 显式构建后，普通 V17 `import starwave` 初始化可用 core、elastic、Born、GSLS 库，以及可导入的独立 VRR 扩展。共享分派在首次并行调用前已就绪，无需串行预热或强制 `prepare_*` 步骤。导入不编译、不初始化 CUDA、不选择设备、不分配波场，也不传播。尚未构建的库会跳过，以支持符合条件的纯 Torch 路径；已有但失效的构建会报错，不静默回退。构建路径应在导入前配置，重建已载入代码后重启 Python/Jupyter。就绪句柄会复用，不逐次传播重算源码哈希或轮询库文件。
 
 `native_status()` 用于诊断，可选的 `prepare_native()` 用于检查显式逻辑 CUDA 设备；二者不编译，也不能替代 GPU 数值验收。示例中的设备 `0` 必须可见。core、elastic、GSLS 和 VRR 保留首次加载身份核验；Born 的完整哈希/符号审计仅在显式构建或开发审计时执行，运行时采用常规一次性加载。
+
+本 scalar 开发整合保留导入时原生绑定；core 现在仅一次加载/绑定，不执行运行时源码/库哈希、指纹或版本探测，加载/绑定错误仍会报错。导入成功不等于源码/构建身份核验或数值检查。更新后按匹配源码重编译并重启 Python/Jupyter，prepare_native 仍是可选显式设备检查。
 
 (native-examples)=
 ## 原生库示例

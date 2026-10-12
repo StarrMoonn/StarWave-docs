@@ -5,6 +5,10 @@
 
 另行安装的 {ref}`VRR 源码扩展 <vrr>` 使用 `starwave_vrr.vrr`，与主包传播入口分开，也不在 7.1.0 中。其显式 Torch 模式支持 CPU/CUDA float32/64、full/checkpoint 与 eager/compile；原生 CUDA float32 full/boundary 须独立构建。扩展安装和限制见该页。
 
+未发布 dev `e040aa9b8225ab387f7e4853bfe6162f5351f5d5` 的 scalar 新增任意零面组合（正宽度仍须相等）、二维/三维可训练源、可选可微最终物理波场与诊断前向回调。这些是源码开发功能，不在冻结 V17/其 8.0.0 发布基线或 7.1.0 中。23 参数契约见 [Scalar Function](usage.md#scalar-function)，较早的 20 参数发布快照仍单独固定。
+
+本次计划发布为 V18 源码与 PyPI 9.0.0；发布状态和 wheel 验收仍待确认。已核验产物可用前，请使用审阅过的源码。这些功能不会倒写进 V17 或 8.0.0 基线。
+
 (torch-selection)=
 ## 显式选择后端与设备
 
@@ -40,7 +44,7 @@ compile_steps 只改变执行块大小，不改变 dt、nt、精度、炮数、l
 
 | Torch 入口 | 维度 | dtype | 一阶梯度 |
 |---|---|---|---|
-| scalar | 2D/3D | float32 | v；source 仅 3D |
+| scalar（未发布 dev） | 2D/3D | float32 | 二维/三维均支持 v 与源；可选终态 loss |
 | scalar_born | 1D/2D/3D | float32/64 | v、scatter（δv）、源、背景/散射/PML 初始状态 |
 | VRZ | 2D | float32 | v 与 impedance 或 density；源固定 |
 | VTI | 2D/3D | float32 | vp、epsilon、delta、rho；源固定 |
@@ -60,6 +64,8 @@ Torch scalar/VRZ/VTI 与 GSLS 会检查传入记录的反传余切量；NaN/Inf 
 V17 Torch Born 要求 `python_backend=False`、`model_gradient_sampling_interval=1`、device 历史且不压缩；选择 `memory="full"` 或 `"checkpoint"` 与 eager/compile。完整状态 checkpoint 保留背景/散射初始状态、源、`v`、`scatter` 的梯度。Born 支持观察用途的 forward callback，拒绝 backward callback。首次 compile 可能较慢，失败不回退 eager。Born 的背景算子不同于 `starwave.scalar`，观测应与其返回的背景记录配对。完整签名、返回、轴序及原生梯度抽样语义见 [Born Function](usage.md#born-function)。
 
 V17 的 Torch 平顶限制仍按方程区分：scalar/VRZ 使用固定零外部 halo，VTI 为零法向牵引，elastic 为改进真空表面，GSLS 为奇压力/偶竖直面闭合。Born 的零面 ghost 约定独立。设备允许范围不变；MPS 仍只限 Scalar2D accuracy=4 float32，目标设备的自由表面验收另行记录，见[模型约定](modeling/conventions.md)。
+
+当前 dev scalar 在 CPU/CUDA full/checkpoint eager/compile 支持 return_wavefield 与 forward_callback。回调在用户时钟间隔及末步更新后执行，不在 checkpoint 重算中重复。返回终态可微，回调快照为 detached 诊断；源缩放与冻结扩边/裁切模型梯度约定不变。未新增 MPS 验收。
 
 (torch-example)=
 ## CPU 最小独立示例
@@ -100,6 +106,8 @@ assert v.grad is not None and torch.isfinite(v.grad).all()
 
 下列为已准备有效输入后的接线片段，不是完整实验。四个入口显式列出全部可选参数；GSLS 的完整参数调用见 {ref}`GSLS 示例 <visco-gsls-example>`。None 初态表示从零状态开始，不省略 API 覆盖。不能把不同方程的 source / geometry / 模型变量直接共用。
 
+这份 scalar 完整选项列表要求未发布 dev 源码；上方简单 CPU 示例未使用新参数，仍兼容发布基线。
+
 <!-- torch-api:scalar:full:start -->
 ```python
 outputs = starwave.scalar(v, grid_spacing, dt,
@@ -120,6 +128,7 @@ outputs = starwave.scalar(v, grid_spacing, dt,
     execution="eager",
     checkpoint_interval=32,
     compile_steps=1,
+    return_wavefield=False, forward_callback=None, callback_frequency=1,
 )
 ```
 <!-- torch-api:scalar:full:end -->

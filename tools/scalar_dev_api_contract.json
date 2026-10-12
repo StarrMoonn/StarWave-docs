@@ -1,0 +1,87 @@
+{
+  "feature_commit": "bc63dd3c3e438256e46fce3a1738b94e6c9a2970",
+  "integration_baseline": "3f2b24daba0fbe6956389baf95dc910405a7ed4a",
+  "release_source_commit": "27c2e14b184b94d8031a5b3a83c25b1ed3d4ac67",
+  "source_file": "starwave/scalar.py",
+  "source_sha256": "453a87b5c0ba881a40228ccada8a5afda63b54a0ad96be51d2717d6c7cd7c5b8",
+  "apis": {
+    "scalar": {
+      "signature": "(v: torch.Tensor, grid_spacing: float | int | list[float] | tuple[float, ...], dt: float | int, *, source_amplitudes: torch.Tensor, source_locations: torch.Tensor, receiver_locations: torch.Tensor, accuracy: int=8, pml_freq: float | int=25.0, pml_width: int | list[int] | tuple[int, ...]=20, boundary_buffer: int=5, memory: str='boundary', max_vel: float | int | None=None, freq_taper_frac: float | int=0.0, time_pad_frac: float | int=0.0, time_taper: bool=False, illumination: ScalarIllumination | None=None, backend: str | None=None, execution: str='eager', checkpoint_interval: int | None=None, compile_steps: int=1, return_wavefield: bool=False, forward_callback: Callable | None=None, callback_frequency: int=1) -> tuple[torch.Tensor, ...]",
+      "types": {
+        "v": "torch.Tensor",
+        "grid_spacing": "float | int | list[float] | tuple[float, ...]",
+        "dt": "float | int",
+        "source_amplitudes": "torch.Tensor",
+        "source_locations": "torch.Tensor",
+        "receiver_locations": "torch.Tensor",
+        "accuracy": "int",
+        "pml_freq": "float | int",
+        "pml_width": "int | list[int] | tuple[int, ...]",
+        "boundary_buffer": "int",
+        "memory": "str",
+        "max_vel": "float | int | None",
+        "freq_taper_frac": "float | int",
+        "time_pad_frac": "float | int",
+        "time_taper": "bool",
+        "illumination": "ScalarIllumination | None",
+        "backend": "str | None",
+        "execution": "str",
+        "checkpoint_interval": "int | None",
+        "compile_steps": "int",
+        "return_wavefield": "bool",
+        "forward_callback": "Callable | None",
+        "callback_frequency": "int"
+      },
+      "return": "tuple[torch.Tensor, ...]",
+      "semantics": {
+        "reviewed_channel": "unreleased-dev",
+        "source_gradient_by_dimension": {
+          "2": true,
+          "3": true
+        },
+        "pml_faces_by_dimension": {
+          "2": 4,
+          "3": 6
+        },
+        "all_zero_faces": true,
+        "positive_widths_equal": true,
+        "return_wavefield_default": false,
+        "return_order": [
+          "terminal_physical_wavefield",
+          "receiver_amplitudes"
+        ],
+        "callback_clock": "completed user steps",
+        "callback_snapshot": "independent detached diagnostic clone",
+        "callback_checkpoint_replay": false,
+        "model_padding_vjp": "frozen extension; crop backward"
+      },
+      "torch_backend": {
+        "devices": [
+          "cpu",
+          "cuda"
+        ],
+        "memory": [
+          "full",
+          "checkpoint"
+        ],
+        "execution": [
+          "eager",
+          "compile"
+        ],
+        "checkpoint_interval_default_internal_steps": 32,
+        "mps": false,
+        "amp": false,
+        "gradient_order": 1,
+        "native_default_preserved": true
+      }
+    }
+  },
+  "released_contract_sha256": "3ab09ba9b61863f3358b00a052b18a555f4ad0b87336df079bb8f23e812d4c9b",
+  "source_commit": "e040aa9b8225ab387f7e4853bfe6162f5351f5d5",
+  "source_manifest_sha256": "73b45086bcbbe57d4e89bac2e7d0a115066d743d91459011bb4f15f60a9f1520",
+  "planned_release_targets": {
+    "source_release": "V18",
+    "pypi": "9.0.0",
+    "publication": "pending verification"
+  }
+}

@@ -2,7 +2,9 @@
 
 The CUDA device, full/boundary history layout and native-build descriptions on this page apply to native defaults. V16 adds explicit Torch CPU/CUDA full/checkpoint; see the [PyTorch backend](../pytorch-backend.md).
 
-In the current V17 source contract, `starwave.scalar` accepts a 2D or 3D velocity model `v`, selected by `v.ndim`, and returns a single-element tuple `(receiver_amplitudes,)`. Use `[0]` to obtain pressure-like records of shape `[B,R,T]`.
+Unreleased dev `e040aa9b8225ab387f7e4853bfe6162f5351f5d5` scalar adds arbitrary zero-face subsets (positive widths still equal), trainable 2D/3D sources, optional differentiable terminal physical fields and diagnostic forward callbacks. These are source-only development features, absent from frozen V17/its 8.0.0 release baseline and from 7.1.0. See [Scalar Function](../usage.md#scalar-function) for the 23-parameter contract; the older 20-parameter release snapshot remains separately pinned. Default output remains `(records,)`; `return_wavefield=True` adds the terminal physical field before records, so use `[-1]` when code must handle either form.
+
+The planned release targets are V18 source and PyPI 9.0.0; publication and wheel validation are still pending. Until verified artifacts are available, use the reviewed source. These features are not retroactively part of V17 or the 8.0.0 baseline.
 
 ## Models, coordinates, and sampling
 
@@ -10,11 +12,11 @@ Models are CUDA float32 with at least 2 cells in every dimension. Coordinates `[
 
 Finite positive, zero, and signed model values are accepted without establishing physical validity; conventional velocity models usually use positive values. CFL planning uses `max(abs(v))` and every axis spacing. An all-zero model requires an explicit positive `max_vel`. Output retains T user samples at interval `dt`.
 
-Supported orders are `accuracy=2,4,6,8`. Positive scalar `pml_width` or equal positive widths on all four/six faces retain the absorbing case. V17 also accepts `[A,A,0,A]` for `[x,z]` or `[A,A,A,A,0,A]` for `[x,y,z]`, with one positive A on every other face. Other zero faces, all-zero and unequal remaining widths are rejected. The top uses only `M=accuracy//2` fixed-zero halo cells, without top PML/buffer; physical `z=0` stays active. This truncated-stencil closure is not odd reflection: the second-order effective surface lies one cell above that sample, and no high-order surface accuracy is implied. Coordinates retain their physical indices. `boundary_buffer=5` by default and must be at least `accuracy//2+1` in boundary mode. Published 7.1.0 does not include this V17 top-zero behavior.
+Supported orders are `accuracy=2,4,6,8`. Current-dev scalar permits any zero-face subset or `pml_width=0`, with all positive face widths equal. Public face order follows model axes low/high. A zero face has only `M=accuracy//2` fixed-zero ghosts, no PML/buffer, and active physical edge samples. At order two the effective zero plane is one cell outside the edge; higher-order stencils are truncated, not odd-mirrored. The boundary-mode buffer minimum `accuracy//2+1` still applies, even with all-zero faces. Frozen V17 only supports the last-axis top-zero pattern; 7.1.0 has neither dev expansion nor the V17 top-zero feature.
 
 ## Source and call
 
-The public source input is normalized forcing satisfying `u_tt = v² (Lap(u) - f)`. Supply fixed `f` in 2D; 3D also supports first-order source gradients. Do not additionally multiply by `-v² dt²`. If `u` is in Pa and length in m, `f` is in Pa/m².
+The public source input is normalized forcing satisfying `u_tt = v² (Lap(u) - f)`. Current-dev scalar supports first-order source gradients in both 2D and 3D; released 2D scalar requires fixed sources. Do not additionally multiply by `-v² dt²`. If `u` is in Pa and length in m, `f` is in Pa/m².
 
 ```python
 records = starwave.scalar(
@@ -27,13 +29,15 @@ records = starwave.scalar(
 
 This fragment requires prepared inputs. See [Quickstart](../quickstart.md) for a standalone 2D program, the {ref}`3D call example <scalar-3d-example>` for joint velocity/source differentiation, and the {ref}`scalar API reference <scalar>` for all parameters. This documentation update did not execute these GPU examples.
 
+The optional terminal physical field is differentiable but omits previous-time and CPML state, so it cannot restart propagation alone. Required receiver_locations may be empty `[B,0,D]`. Forward callbacks receive independent detached snapshots after user-step intervals and the last update; use state.time for seconds, never assume step*dt is correct under CFL subdivision. Callback mutation during invocation raises, and checkpoint backward never repeats callbacks. See Usage for the runnable CPU example and `notebook/Scalar2D_Target_Wavefield.ipynb` in the authorized current-dev source.
+
 ## Gradients and illumination
 
-Set `v.requires_grad=True`, build a scalar loss from the records, and call `backward()` once. The source-location velocity factor remains part of the model-gradient chain. 2D sources remain fixed; 3D supports velocity or source gradients separately or together. `ScalarIllumination` is supported only for 2D scalar; 3D requires `None`. Illumination is rejected for top-zero scalar and for Torch; its statistics are not an exact Hessian.
+Set `v.requires_grad=True`, build a scalar loss from the records, and call `backward()` once. The source-location velocity factor remains part of the model-gradient chain. Current-dev 2D/3D supports velocity or source gradients separately or together, from records, the terminal field or a joint loss. `ScalarIllumination` is supported only for 2D scalar; 3D requires `None`. Illumination is rejected for any zero face and for Torch; its statistics are not an exact Hessian.
 
 The all-positive-PML 2D layout introduced in 6.0.0 uses directional compact PML states. Boundary mode stores pressure strips of width `M=accuracy//2` and two terminal pressure fields. For ordinary objective backpropagation (`illumination=None`), full history excludes PML/finite-difference halos but retains `boundary_buffer`: each axis is the original model size plus `2*boundary_buffer`. Enabling the optional illumination collector retains the full layout. Removing padded-region history does not remove propagation, adjoint, or reconstruction workspaces. Actual peak memory still depends on the model, PML, shot count, internal timesteps, and computational graph. Public full/boundary choices and defaults are unchanged. The PML-transpose correction does not change the model-extension gradient limits below.
 
-V17 top-zero Scalar2D native full instead retains full-grid history; native boundary retains the required top strips without a full-history fallback. Both preserve the frozen-extension model-gradient limits.
+For current-dev Scalar2D with any zero face, native full retains full-grid history; native boundary retains the required face strips without a full-history fallback. Both preserve the frozen-extension model-gradient limits.
 
 The default is `memory="boundary"`. 3D stores six pressure faces of width `M=accuracy//2` and two terminal pressure fields for reverse reconstruction. `"full"` stores `Lap(u)` history over the padded volume at each internal step. Source-only gradients also retain history. Directional CPML slabs do not eliminate propagation, adjoint, or other workspaces. There is no automatic fallback or CPU/disk offload. See {ref}`Scalar3D reconstruction <reconstruction-scalar3d>` for memory estimates.
 

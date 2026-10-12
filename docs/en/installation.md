@@ -6,6 +6,13 @@ The separately installed {ref}`VRR source extension <vrr>` uses `starwave_vrr.vr
 
 Use the prebuilt 7.1.0 wheel on supported Linux x86_64 hosts. The source repository is private; source users need complete authorized V17 source. There is no macOS wheel or PyPI sdist: Mac MPS requires the source installation below and only the documented Scalar2D configuration is eligible.
 
+
+Unreleased dev `e040aa9b8225ab387f7e4853bfe6162f5351f5d5` scalar adds arbitrary zero-face subsets (positive widths still equal), trainable 2D/3D sources, optional differentiable terminal physical fields and diagnostic forward callbacks. These are source-only development features, absent from frozen V17/its 8.0.0 release baseline and from 7.1.0. See [Scalar Function](usage.md#scalar-function) for the 23-parameter contract; the older 20-parameter release snapshot remains separately pinned.
+
+The planned release targets are V18 source and PyPI 9.0.0; publication and wheel validation are still pending. Until verified artifacts are available, use the reviewed source. These features are not retroactively part of V17 or the 8.0.0 baseline.
+
+This scalar development integration retains import-time native binding. The core loader now loads/binds once without runtime source/library hash, fingerprint or version probing; loading/binding errors still fail. A successful import is not a source/build identity audit or numerical check. Rebuild matching source and restart Python/Jupyter after changes; prepare_native remains an optional explicit device check.
+
 ## Source and wheel Torch installation and execution
 
 Linux wheel users can select the Torch backend directly after installing 7.1.0 below. For source use, including Mac MPS, run from the complete V17 source root, or optionally register it:

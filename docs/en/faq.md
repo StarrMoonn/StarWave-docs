@@ -24,6 +24,10 @@ Born is part of V17 source (`starwave.scalar_born` / `starwave.ScalarBorn`), wit
 
 No. V17 accepts different face layouts and physical closures per equation. Scalar/VRZ allow only the last-axis top face zero, with equal positive widths elsewhere; their exterior halo is fixed zero, not an odd-reflection surface, and scalar illumination is rejected. VTI uses a zero-normal-traction top, elastic a first-axis improved-vacuum surface, and GSLS a 2D pressure-release closure. Born independently accepts nonnegative per-face widths with fixed-zero ghost cells. Follow [model conventions](modeling/conventions.md) and the individual [Usage](usage.md) contracts; do not transfer Born's broader width domain to scalar.
 
+Unreleased dev `e040aa9b8225ab387f7e4853bfe6162f5351f5d5` scalar adds arbitrary zero-face subsets (positive widths still equal), trainable 2D/3D sources, optional differentiable terminal physical fields and diagnostic forward callbacks. These are source-only development features, absent from frozen V17/its 8.0.0 release baseline and from 7.1.0. See [Scalar Function](usage.md#scalar-function) for the 23-parameter contract; the older 20-parameter release snapshot remains separately pinned. VRZ and VTI still reject arbitrary zero faces. Use the dev scalar terminal return for a differentiable full-field loss; its callback snapshots are for observation only.
+
+The planned release targets are V18 source and PyPI 9.0.0; publication and wheel validation are still pending. Until verified artifacts are available, use the reviewed source. These features are not retroactively part of V17 or the 8.0.0 baseline.
+
 ## Can I run it on an A30 or RTX 4060 Laptop?
 
 The corresponding sm_80 / sm_89 architectures are covered by compilation. This alone does not establish numerical correctness, stability, or acceptable performance on actual devices. On your actual system, work through loading, small-model recordings, gradients, long time series, and multi-GPU tests in sequence.

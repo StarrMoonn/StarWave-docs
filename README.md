@@ -4,6 +4,13 @@ StarWave V17 源码契约双语使用手册，基于 Sphinx、Read the Docs 主�
 
 Bilingual user documentation for StarWave V17 source, with the published V16 / 7.1.0 wheel documented separately, built with Sphinx, the Read the Docs theme, and MyST Markdown. Each language contains the complete manual and a separate search index. The API presentation takes organizational cues from Deepwave while preserving StarWave’s own public contracts.
 
+
+The Scalar reference now separately documents an unreleased development extension at dev `e040aa9b8225ab387f7e4853bfe6162f5351f5d5`: 23 parameters, arbitrary zero-face subsets with equal positive widths, trainable 2D/3D sources, differentiable terminal-wavefield loss and read-only diagnostic callbacks. Callback snapshots are detached observations and do not carry loss gradients. Frozen V17/8.0.0 and the 7.1.0 wheel retain the old scalar API; other propagator contracts are unchanged. The target-wavefield notebook stays in the authorized source at `notebook/Scalar2D_Target_Wavefield.ipynb`.
+
+本次计划发布为 V18 源码与 PyPI 9.0.0；发布状态和 wheel 验收仍待确认。已核验产物可用前，请使用审阅过的源码。这些功能不会倒写进 V17 或 8.0.0 基线。
+
+The planned release targets are V18 source and PyPI 9.0.0; publication and wheel validation are still pending. Until verified artifacts are available, use the reviewed source. These features are not retroactively part of V17 or the 8.0.0 baseline.
+
 ## V17 source, Born and flat-top boundaries
 
 [Release V17](https://github.com/StarrMoonn/StarWave/releases/tag/V17) is published from frozen source `0.1.0.dev17`, commit `27c2e14b184b94d8031a5b3a83c25b1ed3d4ac67`. PyPI **8.0.0 has not been published**. The available **7.1.0 wheel remains the V16 binary** recorded below; it does not contain Born or the V17 flat-top/import changes.
@@ -55,6 +62,7 @@ python -m pip install -r docs/requirements.txt
 python tools/build_docs.py
 python tools/check_site.py _build/html
 python tools/check_api_docs.py
+python tools/check_scalar_dev_docs.py
 python tools/check_born_docs.py
 python tools/check_vrr_docs.py
 python tools/check_tutorial_assets.py
@@ -73,9 +81,10 @@ Each page has an accessible language switch. Section and Python-object anchors s
 
 - `check_site.py`: local links, anchors, resources, complete locale coverage, independent search assets, English translation coverage, Python syntax and restricted-content guardrails.
 - `check_presentation_asset.py` (also run by `check_site.py`): the reviewed PDF's SHA-256, exactly 30 slides, an image hash for each reviewed watermark-bearing page, absence of active PDF actions or embedded files, and a strict publication allowlist. These checks preserve the independently reviewed pixels; they do not claim to recognize a watermark automatically.
+- `check_scalar_dev_docs.py`: isolated current-dev scalar contract, exactly three additive options, preserved 20-parameter release snapshot, source AST and bilingual terminal-only checkpoint example.
 - `check_born_docs.py`: separately pinned V17 source AST contract for scalar_born / ScalarBorn / forward (47/13/41 parameters), exact defaults/types/returns, bilingual checkpoint example and source-only scope; optional `--source-root` checks the reviewed source file SHA-256 and AST without importing it. The 12 original API snapshots remain unchanged.
 - `check_vrr_docs.py`: independent extension signature/defaults, parameter coverage, bilingual examples and source-only scope; optional `--source-root` compares the authorized local source through AST without importing it.
-- `check_api_docs.py`: typed function signatures, types/defaults/descriptions, scalar 20 / VRZ 22 / VTI 24 / elastic 66 parameter coverage, material conversions, native helpers, GSLS contracts, return contracts and Python snippets. The checked-in public contract snapshot prevents cross-language agreement from hiding interface drift.
+- `check_api_docs.py`: typed function signatures, types/defaults/descriptions, released scalar 20 / dev scalar 23 / VRZ 22 / VTI 24 / elastic 66 parameter coverage, material conversions, native helpers, GSLS contracts, return contracts and Python snippets. The checked-in public contract snapshot prevents cross-language agreement from hiding interface drift.
 - `check_tutorial_assets.py`: clean notebook/script parity, numerical-source provenance, safe metadata, configuration and measured-result invariants.
 - Optional `--wheel PATH`: verifies the pinned 7.1.0 binary wheel SHA-256, package/platform metadata, native-library receipt hashes, and signatures through AST parsing, without importing or running StarWave. Wheels are never part of the source or published site.
 

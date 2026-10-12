@@ -5,6 +5,10 @@ The unified PyTorch backend is selected through `starwave.scalar / scalar_born /
 
 The separately installed {ref}`VRR source extension <vrr>` uses `starwave_vrr.vrr`, separate from the main-package entry points. It is absent from 7.1.0. Its explicit Torch mode supports CPU/CUDA float32/64 full/checkpoint and eager/compile; native CUDA float32 full/boundary requires its own build. Follow that page for extension installation and limits.
 
+Unreleased dev `e040aa9b8225ab387f7e4853bfe6162f5351f5d5` scalar adds arbitrary zero-face subsets (positive widths still equal), trainable 2D/3D sources, optional differentiable terminal physical fields and diagnostic forward callbacks. These are source-only development features, absent from frozen V17/its 8.0.0 release baseline and from 7.1.0. See [Scalar Function](usage.md#scalar-function) for the 23-parameter contract; the older 20-parameter release snapshot remains separately pinned.
+
+The planned release targets are V18 source and PyPI 9.0.0; publication and wheel validation are still pending. Until verified artifacts are available, use the reviewed source. These features are not retroactively part of V17 or the 8.0.0 baseline.
+
 (torch-selection)=
 ## Explicit backend and device selection
 
@@ -40,7 +44,7 @@ compile_steps changes execution block size, not dt, nt, accuracy, shots, loss or
 
 | Torch entry | Dimensions | dtype | First-order gradients |
 |---|---|---|---|
-| scalar | 2D/3D | float32 | v; source in 3D only |
+| scalar (unreleased dev) | 2D/3D | float32 | v and source in both dimensions; optional terminal-field loss |
 | scalar_born | 1D/2D/3D | float32/64 | v, scatter (δv), source, initial background/scattered/PML states |
 | VRZ | 2D | float32 | v and impedance or density; fixed source |
 | VTI | 2D/3D | float32 | vp, epsilon, delta, rho; fixed source |
@@ -60,6 +64,8 @@ Torch scalar/VRZ/VTI and GSLS validate incoming recording cotangents and reject 
 V17 Torch Born accepts `python_backend=False`, `model_gradient_sampling_interval=1`, device history and no compression; use `memory="full"` or `"checkpoint"` with eager/compile. Complete-state checkpoints preserve gradients to background/scattered initial states, sources, `v` and `scatter`. Born forward callbacks are supported as observers; backward callbacks are rejected. The first compile can be expensive, and errors do not fall back to eager. Its background operator is not `starwave.scalar`; compare observations against Born's returned background records. See [Born Function](usage.md#born-function) for full signatures, returns, axes and sampled native-gradient semantics.
 
 V17 flat-top restrictions remain equation-specific on Torch: scalar/VRZ use fixed-zero exterior halos, VTI zero normal traction, elastic an improved-vacuum surface, and GSLS odd-pressure/even-vertical-face closure. Born's zero-face ghost convention is separate. Device eligibility is unchanged; MPS remains limited to Scalar2D accuracy=4 float32, with target-device free-surface acceptance separately scoped. See [model conventions](modeling/conventions.md).
+
+Current-dev scalar supports return_wavefield and forward_callback on CPU/CUDA full/checkpoint eager/compile. Callbacks run after user-clock intervals and the final step, outside checkpoint replay. The returned terminal field is differentiable; callback snapshots are detached diagnostics. Existing source scaling and frozen-extension/cropped model gradients remain unchanged. No new MPS acceptance is claimed.
 
 (torch-example)=
 ## Standalone CPU example
@@ -100,6 +106,8 @@ A separate CPU smoke passed on V16 source with Python 3.12.14 and PyTorch 2.14.1
 
 These are wiring fragments assuming valid prepared inputs, not complete experiments. Every optional parameter is explicit for four entries; the complete GSLS call is in the {ref}`GSLS examples <visco-gsls-example>`. None initial states mean zero initialization, not omitted API coverage. Do not reuse source/geometry/model variables between different equations without applying their contracts.
 
+This complete scalar option list requires the unreleased dev source. The simple CPU example above omits new arguments and remains release-compatible.
+
 <!-- torch-api:scalar:full:start -->
 ```python
 outputs = starwave.scalar(v, grid_spacing, dt,
@@ -120,6 +128,7 @@ outputs = starwave.scalar(v, grid_spacing, dt,
     execution="eager",
     checkpoint_interval=32,
     compile_steps=1,
+    return_wavefield=False, forward_callback=None, callback_frequency=1,
 )
 ```
 <!-- torch-api:scalar:full:end -->

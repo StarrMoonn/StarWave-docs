@@ -11,7 +11,7 @@ Unless stated otherwise, the tensor table and scalar/VRZ/VTI restrictions below 
 | scalar model | `[N0,N1]` or `[N0,N1,N2]` | CUDA float32; `v.ndim` selects the dimension |
 | VRZ model | `[N0,N1]` | CUDA float32 |
 | VTI model | `[nx,nz]` or `[nx,ny,nz]` | The vertical axis is always last |
-| `source_amplitudes` | `[B,S,T]` | 3D scalar supports first-order source gradients; 2D scalar, VRZ, and VTI sources remain fixed |
+| `source_amplitudes` | `[B,S,T]` | Current-dev scalar2D/3D supports source gradients; released scalar2D and VRZ/VTI sources remain fixed |
 | `source_locations` | `[B,S,D]` | Integer grid indices; torch.long is recommended |
 | `receiver_locations` | `[B,R,D]` | Integer grid indices |
 | Each recorded tensor | `[B,R,T]` | CUDA float32 |
@@ -24,7 +24,8 @@ Coordinates directly index the supplied physical model. They are **not coordinat
 
 `pml_freq` configures PML and spatial-sampling diagnostics; it does not generate the source. V17 `pml_width` and surface geometry are equation-specific:
 
-- Scalar2D/3D and VRZ2D: positive scalar or equal positive face widths; only the low face of the last model axis may be zero, with every other width the same positive integer A. Use `[A,A,0,A]` for `[x,z]` or `[A,A,A,A,0,A]` for `[x,y,z]`. The exterior `accuracy//2` halo cells are fixed zero, the first physical row remains active, and top PML/buffer is removed. This is a truncated stencil, not odd reflection; the second-order effective pressure-release plane lies one cell above the first sample, with no high-order surface-accuracy claim. Scalar illumination is rejected with top-zero.
+- Current-dev scalar only: any subset of the four/six faces may be zero, including all-zero; all positive widths remain equal. Each zero face keeps fixed-zero exterior ghosts and active physical samples, without PML/buffer or a high-order odd-reflection claim. Both dimensions support source gradients; optional terminal field `[B,*v.shape]` is at `T*dt`, while records end at `(T-1)*dt`. Empty receiver geometry `[B,0,D]` is supported. This does not broaden the released V17 or VRZ/VTI contracts below.
+- Frozen V17 Scalar2D/3D and VRZ2D: positive scalar or equal positive face widths; only the low face of the last model axis may be zero, with every other width the same positive integer A. Use `[A,A,0,A]` for `[x,z]` or `[A,A,A,A,0,A]` for `[x,y,z]`. The exterior `accuracy//2` halo cells are fixed zero, the first physical row remains active, and top PML/buffer is removed. This is a truncated stencil, not odd reflection; the second-order effective pressure-release plane lies one cell above the first sample, with no high-order surface-accuracy claim. Scalar illumination is rejected with top-zero.
 - Independent VRR2D: `[x,z]`, with positive scalar/equal face widths or `[A,A,0,A]`; see [VRR Function](../usage.md#vrr-function) for its separate extension contract.
 - VTI2D/3D: the same last-axis top-zero layouts and equal positive remaining widths as scalar, but a projected zero-normal-traction closure. Sources including `sV` at `z=0` are rejected, including the default source; `sV` receivers there return zero. This is an acoustic closure, not elastic VTI.
 - Elastic2D/3D: the first model axis is vertical (`[y,x]` / `[z,y,x]`). `[0,A,B,C]` / `[0,A,B,C,D,E]` selects improved-vacuum preparation, with positive remaining widths allowed to differ. Row 0 is fixed vacuum and row 1 is the first solid stress row. Supplied initial states, `origin` and `survey_pad` are rejected with top-zero. No coordinate shift is added.

@@ -84,9 +84,9 @@ def arguments_without_annotations(args):
     return ast.dump(args)
 
 
-def check_scalar3d_examples(project, contract):
+def check_scalar3d_examples(project, contract, released_contract):
     """Check runnable wiring against the reviewed semantic ledger, not numerics."""
-    semantics = contract['semantics']
+    semantics = released_contract['semantics']
     assert semantics['reviewed_public_version'] == '5.0.0'
     assert semantics['model_dimensions'] == [2, 3]
     assert semantics['source_gradient_by_dimension'] == {'2': False, '3': True}
@@ -184,6 +184,10 @@ def check_torch_backend_docs(project, contracts):
         if name != 'visco_gsls':
             original = parse_signature(legacy[name]['signature']).args
             removed = copy.deepcopy(args)
+            if name == 'scalar':
+                assert [p.arg for p in removed.kwonlyargs[-3:]] == ['return_wavefield', 'forward_callback', 'callback_frequency']
+                removed.kwonlyargs = removed.kwonlyargs[:-3]
+                removed.kw_defaults = removed.kw_defaults[:-3]
             assert tuple(param.arg for param in removed.kwonlyargs[-4:]) == added
             removed.kwonlyargs = removed.kwonlyargs[:-4]
             removed.kw_defaults = removed.kw_defaults[:-4]
@@ -224,9 +228,13 @@ def check(wheel_path=None, source_root=None):
     project = Path(__file__).resolve().parents[1]
     from check_born_docs import check as check_born
     check_born(source_root)
-    contracts = json.loads((project / 'tools' / 'api_contract.json').read_text())
+    released_contracts = json.loads((project / 'tools' / 'api_contract.json').read_text())
+    from check_scalar_dev_docs import check as check_scalar_dev
+    scalar_dev = check_scalar_dev(source_root)
+    contracts = copy.deepcopy(released_contracts)
+    contracts['scalar'] = scalar_dev
     assert set(contracts) == set(MODULES), 'Public contract inventory changed'
-    check_scalar3d_examples(project, contracts['scalar'])
+    check_scalar3d_examples(project, contracts['scalar'], released_contracts['scalar'])
     check_gsls_contract(project, contracts)
     check_torch_backend_docs(project, contracts)
     legacy_common = json.loads((project / 'tools' / 'api_legacy_v14_common_contract.json').read_text())
@@ -326,7 +334,7 @@ def check(wheel_path=None, source_root=None):
                 assert hashlib.sha256(library).hexdigest() == receipt['libraries'][kind]['sha256'], f'Binary receipt mismatch: {filename}'
             for name, module in MODULES.items():
                 actual = wheel_function(wheel, module, name.rsplit('.', 1)[-1])
-                assert arguments_without_annotations(parse_signature(contracts[name]['signature']).args) == arguments_without_annotations(actual.args), f'{name}: differs from public wheel'
+                assert arguments_without_annotations(parse_signature(released_contracts[name]['signature']).args) == arguments_without_annotations(actual.args), f'{name}: differs from public wheel'
                 if name in WHEEL_TYPED_APIS:
                     # V16's four additive elastic options have no runtime annotations.
                     # Still check their positions/defaults above and require the exact
@@ -344,7 +352,7 @@ def check(wheel_path=None, source_root=None):
             assert not {'visco_sls', 'prepare_visco_sls', 'visco_sls_native_status'} & set(public), 'Removed standalone SLS APIs are exported'
     counts = {name: len(parameter_defaults(languages['zh'][name])) for name in MODULES}
     print(f'PASS: both languages: typed signatures, descriptions/defaults {counts}, {len(MODULES)} return contracts; {blocks} Python blocks parsed as Python 3.10.')
-    print(f'PASS: all {len(MODULES)} V16 signatures match verified {WHEEL_VERSION} binary wheel; metadata, source identity and four native-library receipt hashes match. No propagation libraries were imported or executed.' if wheel_path else f'PASS: bilingual signatures match the API contract; V16 source signatures are checked only with --source-root; public {WHEEL_VERSION} binary identity only with --wheel.')
+    print(f'PASS: all {len(MODULES)} V16 signatures match verified {WHEEL_VERSION} binary wheel; metadata, source identity and four native-library receipt hashes match. No propagation libraries were imported or executed.' if wheel_path else f'PASS: bilingual docs match released APIs plus the isolated unreleased scalar contract; current-dev AST only with --source-root; immutable {WHEEL_VERSION} wheel contract only with --wheel.')
 
 
 if __name__ == '__main__':

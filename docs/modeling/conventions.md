@@ -11,7 +11,7 @@
 | scalar 模型 | `[N0,N1]` 或 `[N0,N1,N2]` | CUDA float32；由 `v.ndim` 选择维数 |
 | VRZ 模型 | `[N0,N1]` | CUDA float32 |
 | VTI 模型 | `[nx,nz]` 或 `[nx,ny,nz]` | 竖直轴固定为最后一轴 |
-| `source_amplitudes` | `[B,S,T]` | 三维 scalar 支持一阶源梯度；二维 scalar、VRZ、VTI 源固定 |
+| `source_amplitudes` | `[B,S,T]` | 当前 dev scalar 二维/三维均支持源梯度；发布版二维 scalar 与 VRZ/VTI 源固定 |
 | `source_locations` | `[B,S,D]` | 整数网格下标，建议 torch.long |
 | `receiver_locations` | `[B,R,D]` | 整数网格下标 |
 | 每个记录张量 | `[B,R,T]` | CUDA float32 |
@@ -24,7 +24,8 @@
 
 `pml_freq` 用于 PML 设置与空间采样诊断，不生成震源。V17 的 `pml_width` 与表面几何依方程区分：
 
-- Scalar2D/3D 与 VRZ2D：正整数或逐面相等的正宽度；只允许最后一模型轴的低侧面为零，其余宽度必须是同一正整数 A。`[x,z]` 使用 `[A,A,0,A]`，`[x,y,z]` 使用 `[A,A,A,A,0,A]`。外部 `accuracy//2` 格 halo 固定为零，首个物理行仍活动，顶部不加 PML/buffer。它是截断模板，不是奇反射；二阶的等效压力释放面在首个采样上方一格，不据此宣称高阶表面精度。scalar 顶部零宽时拒绝 illumination。
+- 仅当前 dev scalar：二维四面/三维六面的任意组合可为零，包括全零；所有正宽度仍须相等。每个零面仅保留固定零外部 ghost，物理样点活动，不含 PML/buffer，也不宣称高阶奇反射。两种维度均支持源梯度；可选终态 `[B,*v.shape]` 对应 `T*dt`，记录末样点为 `(T-1)*dt`；支持空接收几何 `[B,0,D]`。它不扩展下方发布 V17 或 VRZ/VTI 契约。
+- 冻结 V17 Scalar2D/3D 与 VRZ2D：正整数或逐面相等的正宽度；只允许最后一模型轴的低侧面为零，其余宽度必须是同一正整数 A。`[x,z]` 使用 `[A,A,0,A]`，`[x,y,z]` 使用 `[A,A,A,A,0,A]`。外部 `accuracy//2` 格 halo 固定为零，首个物理行仍活动，顶部不加 PML/buffer。它是截断模板，不是奇反射；二阶的等效压力释放面在首个采样上方一格，不据此宣称高阶表面精度。scalar 顶部零宽时拒绝 illumination。
 - 独立 VRR2D：轴序 `[x,z]`，接受正标量/等正逐面宽度或 `[A,A,0,A]`；独立扩展契约见 [VRR Function](../usage.md#vrr-function)。
 - VTI2D/3D：与 scalar 相同的最后一轴顶部零宽排列，其余宽度等正，但采用投影的零法向牵引闭合。`z=0` 含 `sV` 的源被拒绝，包括默认源；该处 `sV` 接收为零。它是声学闭合，不是弹性 VTI。
 - Elastic2D/3D：第一模型轴竖直（`[y,x]` / `[z,y,x]`）。`[0,A,B,C]` / `[0,A,B,C,D,E]` 选择改进真空准备，其余宽度为正且可不同。第 0 行固定真空，第 1 行为首个固体应力行。顶部零宽时拒绝传入初始状态、`origin` 与 `survey_pad`，不新增坐标偏移。
