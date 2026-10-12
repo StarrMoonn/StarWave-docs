@@ -52,7 +52,7 @@ GSLS: [visco_gsls](#visco-gsls). 独立源码扩展：[VRR Function](#vrr)，不
 
 本 Scalar 节描述由 `bc63dd3c3e438256e46fce3a1738b94e6c9a2970` 审阅并合入 dev `e040aa9b8225ab387f7e4853bfe6162f5351f5d5` 的 V18 扩展，须使用匹配源码；原生执行还需重编译对应库。冻结 V17（`27c2e14b184b94d8031a5b3a83c25b1ed3d4ac67`）、8.0.0 发布基线与已发布 7.1.0 均保留较早的 20 参数 scalar API：没有终态/回调关键字，二维源固定，不支持任意零面；V17 只支持已说明的顶部零宽排列。下方其它传播器仍遵循各自发布契约。
 
-[Release V18](https://github.com/StarrMoonn/StarWave/releases/tag/V18) 已发布，冻结提交为 `fba1f496b890f2dbaf3fbb3011d39f6d723cfea1`，保留已审 dev `e040aa9` 的 scalar API。PyPI **9.0.0 仍待发布**；7.1.0 仍是已核验的最新公开 wheel。这些功能请使用匹配的 V18 源码。V17 与 8.0.0 基线保持不变。
+[Release V18](https://github.com/StarrMoonn/StarWave/releases/tag/V18) 已发布，冻结提交为 `fba1f496b890f2dbaf3fbb3011d39f6d723cfea1`，保留已审 dev `e040aa9` 的 scalar API。[PyPI 9.0.0](https://pypi.org/project/starwave/9.0.0/) 已发布，受支持的 Linux x86_64 主机可安装包含这些功能的 wheel，条件和命令见[安装](installation.md)。V17 与未发布的 8.0.0 基线保持不变；7.1.0 为历史 V16 wheel。
 
 ```{py:function} starwave.scalar(v: torch.Tensor, grid_spacing: float | int | list[float] | tuple[float, ...], dt: float | int, *, source_amplitudes: torch.Tensor, source_locations: torch.Tensor, receiver_locations: torch.Tensor, accuracy: int=8, pml_freq: float | int=25.0, pml_width: int | list[int] | tuple[int, ...]=20, boundary_buffer: int=5, memory: str='boundary', max_vel: float | int | None=None, freq_taper_frac: float | int=0.0, time_pad_frac: float | int=0.0, time_taper: bool=False, illumination: ScalarIllumination | None=None, backend: str | None=None, execution: str='eager', checkpoint_interval: int | None=None, compile_steps: int=1, return_wavefield: bool=False, forward_callback: Callable | None=None, callback_frequency: int=1) -> tuple[torch.Tensor, ...]
 

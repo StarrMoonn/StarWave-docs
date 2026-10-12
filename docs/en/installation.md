@@ -1,21 +1,21 @@
 # Installation
 
-This manual targets [V17 source](https://github.com/StarrMoonn/StarWave/releases/tag/V17), `0.1.0.dev17` at `27c2e14b184b94d8031a5b3a83c25b1ed3d4ac67`, including Born and the merged flat-top/import behavior. PyPI **8.0.0 is not published**. The available [7.1.0 wheel](https://pypi.org/project/starwave/7.1.0/) is the V16 baseline with GSLS and the [PyTorch backend](pytorch-backend.md), without the V17 additions. See [Status](status.md) for the exact artifacts and evidence.
+The current public package is [StarWave 9.0.0](https://pypi.org/project/starwave/9.0.0/), based on published [V18 source](https://github.com/StarrMoonn/StarWave/releases/tag/V18) at `fba1f496b890f2dbaf3fbb3011d39f6d723cfea1`. It includes Born and the documented 23-parameter scalar API. Historical V17/8.0.0 and V16/7.1.0 contracts remain separately identified; 8.0.0 was not published. See [Status](status.md) for artifact identity and verification scope.
 
 The separately installed {ref}`VRR source extension <vrr>` uses `starwave_vrr.vrr`, separate from the main-package entry points. It is absent from 7.1.0. Its explicit Torch mode supports CPU/CUDA float32/64 full/checkpoint and eager/compile; native CUDA float32 full/boundary requires its own build. Follow that page for extension installation and limits.
 
-Use the prebuilt 7.1.0 wheel on supported Linux x86_64 hosts. The source repository is private; source users need complete authorized V17 source. There is no macOS wheel or PyPI sdist: Mac MPS requires the source installation below and only the documented Scalar2D configuration is eligible.
+Use the prebuilt 9.0.0 wheel on supported Linux x86_64 hosts. The source repository is private; source users need complete authorized V18 source. There is no macOS wheel or PyPI sdist: Mac MPS requires the source installation below and only the documented Scalar2D configuration is eligible.
 
 
 V18 scalar (reviewed at dev `e040aa9b8225ab387f7e4853bfe6162f5351f5d5`) adds arbitrary zero-face subsets (positive widths still equal), trainable 2D/3D sources, optional differentiable terminal physical fields and diagnostic forward callbacks. These source features are absent from frozen V17/its 8.0.0 release baseline and from 7.1.0. See [Scalar Function](usage.md#scalar-function) for the 23-parameter contract; the older 20-parameter release snapshot remains separately pinned.
 
-[Release V18](https://github.com/StarrMoonn/StarWave/releases/tag/V18) is published at `fba1f496b890f2dbaf3fbb3011d39f6d723cfea1`, preserving the reviewed scalar API from dev `e040aa9`. PyPI **9.0.0 is still pending**; 7.1.0 remains the latest verified published wheel. Use matching V18 source for these features. V17 and the 8.0.0 baseline remain unchanged.
+[Release V18](https://github.com/StarrMoonn/StarWave/releases/tag/V18) is published at `fba1f496b890f2dbaf3fbb3011d39f6d723cfea1`, preserving the reviewed scalar API from dev `e040aa9`. [PyPI 9.0.0](https://pypi.org/project/starwave/9.0.0/) is now published with these features for supported Linux x86_64 hosts; see [installation](installation.md) for requirements and commands. V17 and the unpublished 8.0.0 baseline remain unchanged; 7.1.0 is the historical V16 wheel.
 
 This scalar development integration retains import-time native binding. The core loader now loads/binds once without runtime source/library hash, fingerprint or version probing; loading/binding errors still fail. A successful import is not a source/build identity audit or numerical check. Rebuild matching source and restart Python/Jupyter after changes; prepare_native remains an optional explicit device check.
 
 ## Source and wheel Torch installation and execution
 
-Linux wheel users can select the Torch backend directly after installing 7.1.0 below. For source use, including Mac MPS, run from the complete V17 source root, or optionally register it:
+Linux wheel users can select the Torch backend directly after installing 9.0.0 below. For source use, including Mac MPS, run from the complete V18 source root, or optionally register it:
 
 ```bash
 python -m pip install --no-deps --no-build-isolation -e .
@@ -60,7 +60,20 @@ A complete source checkout runs without pip registration. Optional registration 
 python -m pip install --no-deps -e .
 ```
 
-The following requirements and commands install the verified public 7.1.0 wheel.
+**Install the current 9.0.0 wheel**
+
+Use Linux x86_64 / glibc ≥ 2.35, Python ≥ 3.10 and < 3.13, PyTorch ≥ 2.5 and < 2.6, and NumPy ≥ 1.23. There is no macOS wheel or sdist. A prebuilt installation needs no nvcc or local CUDA Toolkit; native CUDA execution still requires a supported NVIDIA driver/device. The following uses the publication-tested PyTorch 2.5.1 CUDA 11.8 configuration; CPU-only use can select a matching PyTorch 2.5.x CPU build. This does not expand backend/device eligibility.
+
+```bash
+python3.12 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install torch==2.5.1 --index-url https://download.pytorch.org/whl/cu118
+python -m pip install --only-binary=starwave starwave==9.0.0
+python -m pip check
+```
+
+Restart Python/Jupyter after upgrading. The public wheel's Python 3.10–3.12 install/smoke checks passed; target-GPU numerical acceptance remains separate. The following 7.1.0 sections are retained as historical installation instructions, not the current version recommendation.
 
 (historical-7-0-0-wheel-requirements)=
 (runtime-requirements)=

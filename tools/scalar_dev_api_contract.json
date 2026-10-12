@@ -84,7 +84,11 @@
     "source_release": "V18",
     "source_published_at": "2026-10-12T01:59:54Z",
     "pypi_target": "9.0.0",
-    "pypi_status": "pending",
-    "latest_verified_pypi": "7.1.0"
+    "pypi_status": "published",
+    "latest_verified_pypi": "9.0.0",
+    "pypi_sha256": "d290ea0a7fdc2a74229d989525aa2bff1cdc9d675fb715bd6f43a6e17b1ddd0b",
+    "pypi_bytes": 27975674,
+    "pypi_uploaded_at": "2026-10-12T03:27:26.409068Z",
+    "publication_workflow": "https://github.com/StarrMoonn/StarWave/actions/runs/38199707015"
   }
 }

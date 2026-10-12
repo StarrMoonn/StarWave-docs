@@ -1,21 +1,21 @@
 # 安装
 
-本手册面向 [V17 源码](https://github.com/StarrMoonn/StarWave/releases/tag/V17)，版本 `0.1.0.dev17`、提交 `27c2e14b184b94d8031a5b3a83c25b1ed3d4ac67`，包含 Born 与已合并的平顶边界、导入行为。PyPI **8.0.0 尚未发布**。目前可安装的 [7.1.0 wheel](https://pypi.org/project/starwave/7.1.0/) 是包含 GSLS 和 [PyTorch 后端](pytorch-backend.md)的 V16 基线，不含 V17 新增内容。发行文件及证据范围见[文档状态](status.md)。
+当前公开包为 [StarWave 9.0.0](https://pypi.org/project/starwave/9.0.0/)，基于已发布 [V18 源码](https://github.com/StarrMoonn/StarWave/releases/tag/V18)，冻结提交 `fba1f496b890f2dbaf3fbb3011d39f6d723cfea1`，包含 Born 和文档中的 23 参数 scalar API。历史 V17/8.0.0、V16/7.1.0 契约继续分别标明；8.0.0 未发布。发行文件与核验范围见[文档状态](status.md)。
 
 另行安装的 {ref}`VRR 源码扩展 <vrr>` 使用 `starwave_vrr.vrr`，与主包传播入口分开，也不在 7.1.0 中。其显式 Torch 模式支持 CPU/CUDA float32/64、full/checkpoint 与 eager/compile；原生 CUDA float32 full/boundary 须独立构建。扩展安装和限制见该页。
 
-受支持的 Linux x86_64 主机可安装预编译 7.1.0 wheel。源码仓库为私有仓库；源码用户需使用已获授权的完整 V17 源码。本次没有 macOS wheel 或 PyPI sdist；Mac MPS 必须按下文从源码安装，且仅支持文档限定的 Scalar2D 配置。
+受支持的 Linux x86_64 主机可安装预编译 9.0.0 wheel。源码仓库为私有仓库；源码用户需使用已获授权的完整 V18 源码。本次没有 macOS wheel 或 PyPI sdist；Mac MPS 必须按下文从源码安装，且仅支持文档限定的 Scalar2D 配置。
 
 
 V18 scalar（审阅基于 dev `e040aa9b8225ab387f7e4853bfe6162f5351f5d5`） 新增任意零面组合（正宽度仍须相等）、二维/三维可训练源、可选可微最终物理波场与诊断前向回调。这些源码功能，不在冻结 V17/其 8.0.0 发布基线或 7.1.0 中。23 参数契约见 [Scalar Function](usage.md#scalar-function)，较早的 20 参数发布快照仍单独固定。
 
-[Release V18](https://github.com/StarrMoonn/StarWave/releases/tag/V18) 已发布，冻结提交为 `fba1f496b890f2dbaf3fbb3011d39f6d723cfea1`，保留已审 dev `e040aa9` 的 scalar API。PyPI **9.0.0 仍待发布**；7.1.0 仍是已核验的最新公开 wheel。这些功能请使用匹配的 V18 源码。V17 与 8.0.0 基线保持不变。
+[Release V18](https://github.com/StarrMoonn/StarWave/releases/tag/V18) 已发布，冻结提交为 `fba1f496b890f2dbaf3fbb3011d39f6d723cfea1`，保留已审 dev `e040aa9` 的 scalar API。[PyPI 9.0.0](https://pypi.org/project/starwave/9.0.0/) 已发布，受支持的 Linux x86_64 主机可安装包含这些功能的 wheel，条件和命令见[安装](installation.md)。V17 与未发布的 8.0.0 基线保持不变；7.1.0 为历史 V16 wheel。
 
 本 scalar 开发整合保留导入时原生绑定；core 现在仅一次加载/绑定，不执行运行时源码/库哈希、指纹或版本探测，加载/绑定错误仍会报错。导入成功不等于源码/构建身份核验或数值检查。更新后按匹配源码重编译并重启 Python/Jupyter，prepare_native 仍是可选显式设备检查。
 
 ## 源码与 wheel 的 Torch 安装和运行
 
-Linux wheel 用户完成下文 7.1.0 安装后，可直接选择 Torch 后端。源码使用（包括 Mac MPS）可从完整 V17 源码根目录直接运行，或选择可选注册：
+Linux wheel 用户完成下文 9.0.0 安装后，可直接选择 Torch 后端。源码使用（包括 Mac MPS）可从完整 V18 源码根目录直接运行，或选择可选注册：
 
 ```bash
 python -m pip install --no-deps --no-build-isolation -e .
@@ -60,7 +60,20 @@ GSLS 源码构建输出为 `native/build/gsls/`；通用 `STARWAVE_BUILD_DIR` �
 python -m pip install --no-deps -e .
 ```
 
-以下条件与命令用于安装已核验的公开 7.1.0 wheel。
+**安装当前 9.0.0 wheel**
+
+要求 Linux x86_64 / glibc ≥ 2.35、Python ≥ 3.10 且 < 3.13、PyTorch ≥ 2.5 且 < 2.6、NumPy ≥ 1.23。没有 macOS wheel 或 sdist。预编译安装不需要 nvcc 或本地 CUDA Toolkit；原生 CUDA 运行仍需支持的 NVIDIA 驱动与设备。下面使用发布核验采用的 PyTorch 2.5.1 / CUDA 11.8 配置；仅用 CPU 时可选择配套的 PyTorch 2.5.x CPU 构建。这不扩大后端或设备的支持范围。
+
+```bash
+python3.12 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install torch==2.5.1 --index-url https://download.pytorch.org/whl/cu118
+python -m pip install --only-binary=starwave starwave==9.0.0
+python -m pip check
+```
+
+升级后重启 Python/Jupyter。公开 wheel 已通过 Python 3.10–3.12 安装与 smoke 检查；目标 GPU 数值验收另行记录。下方 7.1.0 小节保留历史安装说明，不是当前版本推荐。
 
 (runtime-requirements)=
 ## 7.1.0 wheel 运行条件

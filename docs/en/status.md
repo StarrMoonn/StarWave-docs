@@ -1,17 +1,19 @@
 # Documentation Status and References
 
 
-**Published V18 scalar extension; PyPI 9.0.0 pending**
+**Published V18 / PyPI 9.0.0**
 
 V18 scalar (reviewed at dev `e040aa9b8225ab387f7e4853bfe6162f5351f5d5`) adds arbitrary zero-face subsets (positive widths still equal), trainable 2D/3D sources, optional differentiable terminal physical fields and diagnostic forward callbacks. These source features are absent from frozen V17/its 8.0.0 release baseline and from 7.1.0. See [Scalar Function](usage.md#scalar-function) for the 23-parameter contract; the older 20-parameter release snapshot remains separately pinned.
 
-[Release V18](https://github.com/StarrMoonn/StarWave/releases/tag/V18) is published at `fba1f496b890f2dbaf3fbb3011d39f6d723cfea1`, preserving the reviewed scalar API from dev `e040aa9`. PyPI **9.0.0 is still pending**; 7.1.0 remains the latest verified published wheel. Use matching V18 source for these features. V17 and the 8.0.0 baseline remain unchanged.
+[Release V18](https://github.com/StarrMoonn/StarWave/releases/tag/V18) is published at `fba1f496b890f2dbaf3fbb3011d39f6d723cfea1`, preserving the reviewed scalar API from dev `e040aa9`. [PyPI 9.0.0](https://pypi.org/project/starwave/9.0.0/) is now published with these features for supported Linux x86_64 hosts; see [installation](installation.md) for requirements and commands. V17 and the unpublished 8.0.0 baseline remain unchanged; 7.1.0 is the historical V16 wheel.
+
+The published file is `starwave-9.0.0-py3-none-manylinux_2_35_x86_64.whl` (27,975,674 bytes), uploaded on 2026-10-12; SHA-256 `d290ea0a7fdc2a74229d989525aa2bff1cdc9d675fb715bd6f43a6e17b1ddd0b`. There is no sdist or macOS wheel. Requirements: Linux x86_64 / glibc ≥ 2.35, Python ≥ 3.10 and < 3.13, PyTorch ≥ 2.5 and < 2.6, NumPy ≥ 1.23. The public download matches this hash. The [publication workflow](https://github.com/StarrMoonn/StarWave/actions/runs/38199707015) passed all eight jobs, including clean public-PyPI download/install/smoke checks on Python 3.10, 3.11 and 3.12. These are packaging and host/CPU checks, not public-wheel GPU, multi-GPU, long-FWI or performance acceptance. Mac MPS remains source-only within its documented Scalar2D limits.
 
 The documentation CPU checkpoint example passed on Torch 2.5.1+cpu: terminal shape (1,12,10), empty records (1,0,7), callbacks at user steps 3/6/7 and internal steps 6/12/14, finite model/source gradients, no callbacks during backward replay. This is a small CPU wiring check. The user supplied an RTX 4060/A30 feature-branch report; this documentation update did not rerun GPU propagation and does not transfer its results to a merged build or released wheel.
 
 ## V17 source, Born and flat-top boundaries
 
-[Release V17](https://github.com/StarrMoonn/StarWave/releases/tag/V17) is published from frozen source `0.1.0.dev17`, commit `27c2e14b184b94d8031a5b3a83c25b1ed3d4ac67`. PyPI **8.0.0 has not been published**. The available **7.1.0 wheel remains the V16 binary** recorded below; it does not contain Born or the V17 flat-top/import changes.
+[Release V17](https://github.com/StarrMoonn/StarWave/releases/tag/V17) is published from frozen source `0.1.0.dev17`, commit `27c2e14b184b94d8031a5b3a83c25b1ed3d4ac67`. PyPI **8.0.0 has not been published**. The historical **7.1.0 wheel remains the V16 binary** recorded below; it does not contain Born or the V17 flat-top/import changes.
 
 - The main package adds `starwave.scalar_born` and `starwave.ScalarBorn`: 1D/2D/3D constant-density acoustic Born, velocity perturbation δv, background/scattered records and final states. Native CPU full, native CUDA full/boundary, and explicit Torch CPU/CUDA full/checkpoint have distinct contracts. See [Born Function](usage.md#born-function).
 - Flat-top behavior is equation-specific: scalar/VRZ use a last-axis top-zero fixed halo; VTI enforces zero normal traction; elastic uses a first-axis improved-vacuum surface; GSLS uses its 2D pressure-release closure. Born retains its own nonnegative per-face zero-ghost convention. These are not interchangeable free-surface implementations; see [model conventions](modeling/conventions.md).

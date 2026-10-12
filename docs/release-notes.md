@@ -1,15 +1,17 @@
 # 发布说明
 
 
-**V18 scalar 扩展已发布；PyPI 9.0.0 待发布**
+**V18 / PyPI 9.0.0 已发布**
 
 V18 scalar（审阅基于 dev `e040aa9b8225ab387f7e4853bfe6162f5351f5d5`） 新增任意零面组合（正宽度仍须相等）、二维/三维可训练源、可选可微最终物理波场与诊断前向回调。这些源码功能，不在冻结 V17/其 8.0.0 发布基线或 7.1.0 中。23 参数契约见 [Scalar Function](usage.md#scalar-function)，较早的 20 参数发布快照仍单独固定。
 
-[Release V18](https://github.com/StarrMoonn/StarWave/releases/tag/V18) 已发布，冻结提交为 `fba1f496b890f2dbaf3fbb3011d39f6d723cfea1`，保留已审 dev `e040aa9` 的 scalar API。PyPI **9.0.0 仍待发布**；7.1.0 仍是已核验的最新公开 wheel。这些功能请使用匹配的 V18 源码。V17 与 8.0.0 基线保持不变。
+[Release V18](https://github.com/StarrMoonn/StarWave/releases/tag/V18) 已发布，冻结提交为 `fba1f496b890f2dbaf3fbb3011d39f6d723cfea1`，保留已审 dev `e040aa9` 的 scalar API。[PyPI 9.0.0](https://pypi.org/project/starwave/9.0.0/) 已发布，受支持的 Linux x86_64 主机可安装包含这些功能的 wheel，条件和命令见[安装](installation.md)。V17 与未发布的 8.0.0 基线保持不变；7.1.0 为历史 V16 wheel。
+
+公开文件为 `starwave-9.0.0-py3-none-manylinux_2_35_x86_64.whl`（27,975,674 字节），2026-10-12 上传，SHA-256 为 `d290ea0a7fdc2a74229d989525aa2bff1cdc9d675fb715bd6f43a6e17b1ddd0b`。没有 sdist 或 macOS wheel。要求 Linux x86_64 / glibc ≥ 2.35、Python ≥ 3.10 且 < 3.13、PyTorch ≥ 2.5 且 < 2.6、NumPy ≥ 1.23。公开下载文件已逐字节核对哈希。[发布工作流](https://github.com/StarrMoonn/StarWave/actions/runs/38199707015) 八项作业全部通过，包括 Python 3.10、3.11、3.12 的公开 PyPI 干净下载、安装与 smoke 检查。这些是打包和主机/CPU 检查，不代表公开 wheel 的 GPU、多卡、长程 FWI 或性能验收。Mac MPS 仍需源码，且只限已说明的 Scalar2D 配置。
 
 ## V17 源码、Born 与平顶边界
 
-[Release V17](https://github.com/StarrMoonn/StarWave/releases/tag/V17) 已发布，冻结源码版本为 `0.1.0.dev17`，提交 `27c2e14b184b94d8031a5b3a83c25b1ed3d4ac67`。PyPI **8.0.0 尚未发布**。目前可安装的 **7.1.0 wheel 仍是下文记录的 V16 二进制**，不包含 Born 或 V17 的平顶边界、导入初始化变更。
+[Release V17](https://github.com/StarrMoonn/StarWave/releases/tag/V17) 已发布，冻结源码版本为 `0.1.0.dev17`，提交 `27c2e14b184b94d8031a5b3a83c25b1ed3d4ac67`。PyPI **8.0.0 尚未发布**。历史 **7.1.0 wheel 仍是下文记录的 V16 二进制**，不包含 Born 或 V17 的平顶边界、导入初始化变更。
 
 - 主包新增 `starwave.scalar_born` 与 `starwave.ScalarBorn`：一维/二维/三维常密度声学 Born，散射参数为速度扰动 δv，返回背景/散射记录及终态。原生 CPU full、原生 CUDA full/boundary 与显式 Torch CPU/CUDA full/checkpoint 各有独立契约，见 [Born Function](usage.md#born-function)。
 - 平顶行为依方程区分：scalar/VRZ 为最后一轴顶部零宽 PML 的固定零 halo；VTI 约束法向牵引为零；elastic 采用第一轴的改进真空自由表面；GSLS 采用二维压力释放闭合。Born 保留独立的逐面非负宽度与零 ghost 约定，不能相互套用，见[模型约定](modeling/conventions.md)。
