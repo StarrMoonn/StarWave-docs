@@ -987,7 +987,21 @@ def check_landing_page(page, base, output):
     page.locator('.gif-toggle[data-image="waveGif"]').click()
     assert page.locator('#waveGif').get_attribute('src').endswith('.png')
     page.emulate_media(reduced_motion='reduce')
-    assert page.locator('#inversionGif').get_attribute('src').endswith('.png')
+    # matchMedia change is dispatched asynchronously after media emulation.
+    # Wait for the complete accessible paused state, not merely the preference.
+    page.wait_for_function("""() => ['waveGif', 'inversionGif'].every(id => {
+        const img = document.getElementById(id);
+        const button = document.querySelector(`.gif-toggle[data-image="${id}"]`);
+        return img.getAttribute('src').endsWith('.png') &&
+            button.textContent === '播放 GIF' &&
+            button.getAttribute('aria-pressed') === 'false' &&
+            button.getAttribute('aria-label').startsWith('播放 GIF：');
+    })""", timeout=5000)
+    for image_id in ('waveGif', 'inversionGif'):
+        assert page.locator('#' + image_id).get_attribute('src').endswith('.png')
+        toggle = page.locator(f'.gif-toggle[data-image="{image_id}"]')
+        assert toggle.text_content() == '播放 GIF'
+        assert toggle.get_attribute('aria-pressed') == 'false'
     for width in (1440, 1180, 390, 320):
         page.set_viewport_size({'width': width, 'height': 900})
         assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), f'Landing overflow: {width}'
