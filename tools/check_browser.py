@@ -944,6 +944,41 @@ def check_sls_retirement(page, base):
         assert page.locator('a[href*="examples/visco-sls"], a[href*="_static/sls/"]').count() == 0
 
 
+def check_landing_page(page, base, output):
+    """Public root introduction must not replace or break the bilingual manuals."""
+    page.goto(base, wait_until='networkidle')
+    assert page.locator('#storyVideo').count() == 1
+    assert page.locator('#filmVideo').count() == 1
+    assert page.locator('video[autoplay]').count() == 0
+    assert page.locator('a[href="zh/"]').count() > 0
+    assert page.locator('a[href="en/"]').count() > 0
+    page.wait_for_function("Array.from(document.querySelectorAll('video')).every(v => v.readyState >= 1)")
+    assert page.locator('#filmVideo').evaluate('v => v.duration') == 60
+    assert page.locator('#storyVideo').evaluate('v => v.duration') == 64
+    page.locator('[data-time="28"]').click()
+    page.wait_for_function("document.getElementById('filmVideo').currentTime >= 28")
+    page.locator('#filmVideo').evaluate('v => v.pause()')
+    page.locator('.gif-toggle[data-image="waveGif"]').click()
+    assert page.locator('#waveGif').get_attribute('src').endswith('.png')
+    page.emulate_media(reduced_motion='reduce')
+    assert page.locator('#inversionGif').get_attribute('src').endswith('.png')
+    for width in (1440, 1180, 390, 320):
+        page.set_viewport_size({'width': width, 'height': 900})
+        assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), f'Landing overflow: {width}'
+        page.screenshot(path=str(output / f'landing-{width}.png'), full_page=True)
+    page.emulate_media(reduced_motion='no-preference')
+    page.set_viewport_size({'width': 1440, 'height': 1000})
+    page.goto(base + '?from=landing-legacy#home-workflow')
+    page.wait_for_url('**/zh/index.html?from=landing-legacy#*')
+    context = page.context.browser.new_context(java_script_enabled=False)
+    plain = context.new_page()
+    plain.goto(base)
+    assert plain.locator('#waveGif').get_attribute('src').endswith('.png')
+    assert plain.locator('#inversionGif').get_attribute('src').endswith('.png')
+    assert plain.locator('video[controls]').count() == 2
+    context.close()
+
+
 def check(root, browser_path=None):
     handler = partial(SimpleHTTPRequestHandler, directory=str(root))
     server = ThreadingHTTPServer(('127.0.0.1', 0), handler)
@@ -960,6 +995,7 @@ def check(root, browser_path=None):
             browser = playwright.chromium.launch(**options)
             page = browser.new_page(viewport={'width': 1440, 'height': 1000})
             page.on('pageerror', lambda error: errors.append(str(error)))
+            check_landing_page(page, base, output)
             check_scalar3d_examples(page, base, output)
             check_sls_retirement(page, base)
             for size in ({'width': 1440, 'height': 1000}, {'width': 1180, 'height': 760}, {'width': 390, 'height': 844}):

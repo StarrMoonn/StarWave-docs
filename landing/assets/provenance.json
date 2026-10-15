@@ -1,0 +1,86 @@
+{
+  "engine": "StarWave scalar",
+  "backend": "native_cpu",
+  "baseline_commit": "3ebf3fc1f9954e0e2dfbe98af5f8322aeeb2f7ea",
+  "torch": "2.7.1+cpu",
+  "threads": 2,
+  "grid_shape_x_z": [
+    81,
+    51
+  ],
+  "spacing_m": 10,
+  "dt_s": 0.001,
+  "nt": 600,
+  "shots": 3,
+  "receivers_per_shot": 36,
+  "frequency_hz": 12,
+  "accuracy": 4,
+  "pml_width": 12,
+  "memory": "full",
+  "optimizer": "Adam lr=8 m/s; 5x5 box-smoothed native adjoint gradient; top 5 cells frozen; velocity clamped 1500..2350 m/s",
+  "updates": 30,
+  "initial_loss": 0.00016993134340737015,
+  "final_loss": 2.4043059966061264e-05,
+  "loss_reduction_percent": 85.85130942652309,
+  "initial_model_rmse": 50.75968933105469,
+  "final_model_rmse": 45.59281539916992,
+  "wavefield_shot_index": 1,
+  "units": {
+    "velocity": "m/s",
+    "position": "m",
+    "time": "s",
+    "source_records_wavefield": "arbitrary amplitude"
+  },
+  "caveats": [
+    "Small synthetic pedagogical FWI demonstration, not a field-data result or general convergence benchmark.",
+    "Observed data and optimization use the same acoustic discretization and known source (inverse crime).",
+    "Sparse surface acquisition gives limited depth illumination; final velocity is not exact recovery.",
+    "Every model frame is an actual optimizer iterate; wavefield snapshots are actual native callback outputs.",
+    "Wavefield contains center shot only; observed and predicted arrays contain all 3 shots."
+  ],
+  "schema": {
+    "truth_initial": "[x,z]",
+    "models": "[iteration,x,z]",
+    "wavefields": "[frame,x,z] center shot",
+    "observed": "[shot,receiver,time]",
+    "predicted": "[iteration,shot,receiver,time]",
+    "source": "[shot,source,time]",
+    "source_locations_receiver_locations": "[shot,point,(x,z)] integer grid indices"
+  },
+  "verification": {
+    "all_arrays_finite": true,
+    "model_0_equals_initial": true,
+    "losses_match_saved_gathers": true,
+    "source_matches_existing_verified_manifest": true,
+    "source_mismatches": [],
+    "velocity_range_m_s": [
+      1700.0,
+      2127.373779296875
+    ],
+    "wavefield_absolute_max": 42.9128532409668,
+    "wavefield_absolute_percentile_99": 5.7180495262146,
+    "gather_absolute_max": 43.42691421508789,
+    "model_rmse_reduction_percent": 10.17908895814238,
+    "artifacts": {
+      "fwi_arrays.npz": "73f9b86e7449e4f46d9c17321ac5c07ebf3caf0e7dcc7550180c1bb716f58243",
+      "run_demo.py": "2f4e62d31ccf0be59fdbc138f3b5741bf7bbfd17c297f1457f0009d6f6397db7",
+      "metadata.json": "7c4738eb3cd4a584b5f2fc71ad0eda06df008d1acaca9e84faf2c05a13471fc9"
+    }
+  },
+  "display": {
+    "model_color_range_m_s": [
+      1700,
+      2150
+    ],
+    "wavefield": "middle shot, normalized by global max absolute wavefield",
+    "gather": "middle shot, normalized by its global max absolute gather",
+    "normalized_amplitude_color_range": [
+      -0.15,
+      0.15
+    ],
+    "out_of_range_amplitudes": "color saturation only",
+    "loss": "divided by initial loss",
+    "video": "60 seconds; time stretched; not real-time benchmark",
+    "model_frames": "actual saved states; no interpolation"
+  }
+}

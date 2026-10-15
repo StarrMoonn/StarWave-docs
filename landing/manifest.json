@@ -1,0 +1,17 @@
+{
+  "sha256": {
+    "assets/StarWave_PhD_Story.mp4": "3a9c0ece5aeeaab9902ff560b821c20f54fba123fbe069700c53bce5ed21e1e7",
+    "assets/StarWave_PhD_Story_Poster.jpg": "29c8d6a3ac3760f37e17ab5a524d79a04974a7cdd9d13017c56740391db5e9bb",
+    "assets/StarWave_Real_FWI_60s.mp4": "f89012bf6dba9f151f1f15c518fd7a15e03369ed64bfe7e7402a5dc04361bf19",
+    "assets/StarWave_inversion.gif": "0209c9993b95f767bd9f3332704b72bab8f4cfbd5078f377a513cd74e6f1377e",
+    "assets/StarWave_wavefield.gif": "d0a58de629ef0b0ac134e1206ce0b77e8c131d1d8f9ca37efb2db83db0f45f08",
+    "assets/film-frame-05.png": "9bbaf29bf5acc2a13c5f738c5cf3806d2fe13092f437b52ca9606d12af4bbb06",
+    "assets/film-frame-20.png": "3557d1f11d19ca7c5aa72804d9eb61329dd038074a349561d2fed6c8c040ef79",
+    "assets/film-frame-37.png": "896d064171a9eca813515e6e899f689b8451042fd2745e179008f989adadfa73",
+    "assets/film-frame-55.png": "76443411a915573fb63c164045e576db6d2d6c113252e9c7beb4813f3a41be10",
+    "assets/provenance.json": "010cc7899c3415e512cc1dcd95f1254bfccbe1aacebb95916481715e669bda5f",
+    "index.html": "3c6201f159364b986eefc118e26b37bb1e476fdf0624370fe8a4f094e0f7b98c",
+    "script.js": "73c8d2ffee65c5acad465165081b634d58d6aa5da28ccd3ac0632b1f067f758f",
+    "style.css": "250737ea88720fcbb4227db2f4532623c0e7c73f8deb8510a610735fe7b59c7f"
+  }
+}

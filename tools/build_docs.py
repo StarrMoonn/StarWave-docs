@@ -12,6 +12,7 @@ import re
 import shutil
 import subprocess
 import sys
+from landing import publish as publish_landing
 
 PROJECT = Path(__file__).resolve().parents[1]
 SECTION = re.compile(r'<section id="([^"]+)">\s*((?:<span id="[^"]+"></span>\s*)*)(<h[1-6]\b.*?</h[1-6]>)', re.S)
@@ -222,6 +223,7 @@ def build(destination):
     assert source_paths['zh'] == source_paths['en'], 'Translated page coverage differs'
     legacy = json.loads((PROJECT / 'tools' / 'legacy_anchors.json').read_text())
     pages = {path.with_suffix('.html').as_posix() for path in source_paths['zh']} | {'genindex.html', 'search.html'}
+    home_fragments = {}
     for relative in sorted(pages):
         path = destination / 'zh' / relative
         other = destination / 'en' / relative
@@ -249,6 +251,12 @@ def build(destination):
                 raise ValueError(f"Legacy heading missing/ambiguous: {relative} {entry['title']}")
             number = FWI_NUMBERS[matches[0]] if relative == 'inversion/fwi.html' else matches[0]
             mapping[entry['id']] = f'sw-section-{number}'
+        if relative == 'index.html':
+            home_fragments = dict(mapping)
+            home_fragments.update({sid: sid for sid, _ in pairs[0]})
+            home_fragments.update({alias: sid for sid, spans, _ in SECTION.findall(texts[0])
+                                   for alias in re.findall(r'<span id="([^"]+)"', spans)})
+            home_fragments.update({f'sw-section-{i}': f'sw-section-{i}' for i in range(len(pairs[0]))})
         texts[0] = texts[0].replace('aria-label="Main"', 'aria-label="主导航"')
         if relative not in {'usage.html', 'index.html'}:
             texts = [add_page_toc(text, locale) for text, locale in zip(texts, ('zh', 'en'))]
@@ -295,6 +303,7 @@ def build(destination):
                                          target_relative='modeling/wave-propagation.html',
                                          locale='zh' if source == 'root' else source,
                                          default_fragment=route['default']), encoding='utf-8')
+    publish_landing(destination, home_fragments)
     (destination / '.nojekyll').touch()
     print(f'Built {len(source_paths["zh"])} pages per language with independent search indexes and legacy routes.')
 
