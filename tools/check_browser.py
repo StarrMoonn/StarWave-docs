@@ -944,6 +944,19 @@ def check_sls_retirement(page, base):
         assert page.locator('a[href*="examples/visco-sls"], a[href*="_static/sls/"]').count() == 0
 
 
+def landing_media_diagnostics(page):
+    return page.evaluate("""() => ({userAgent: navigator.userAgent,
+      videos: Array.from(document.querySelectorAll('video')).map(v => ({
+        id: v.id, src: v.currentSrc, readyState: v.readyState, networkState: v.networkState,
+        duration: Number.isFinite(v.duration) ? v.duration : null,
+        time: v.currentTime, paused: v.paused, width: v.videoWidth, height: v.videoHeight,
+        error: v.error ? {code: v.error.code, message: v.error.message} : null,
+        h264: v.canPlayType('video/mp4; codecs="avc1.64001f"'),
+        aac: v.canPlayType('audio/mp4; codecs="mp4a.40.2"'),
+        decodedFrames: v.getVideoPlaybackQuality ? v.getVideoPlaybackQuality().totalVideoFrames : null
+      }))})""")
+
+
 def check_landing_page(page, base, output):
     """Public root introduction must not replace or break the bilingual manuals."""
     page.goto(base, wait_until='networkidle')
@@ -952,7 +965,20 @@ def check_landing_page(page, base, output):
     assert page.locator('video[autoplay]').count() == 0
     assert page.locator('a[href="zh/"]').count() > 0
     assert page.locator('a[href="en/"]').count() > 0
-    page.wait_for_function("Array.from(document.querySelectorAll('video')).every(v => v.readyState >= 1)")
+    try:
+        page.wait_for_function("Array.from(document.querySelectorAll('video')).every(v => v.readyState >= 1) || Array.from(document.querySelectorAll('video')).some(v => v.error)")
+    finally:
+        diagnostics = landing_media_diagnostics(page)
+        diagnostics['browserVersion'] = page.context.browser.version
+        (output / 'landing-media-diagnostics.json').write_text(json.dumps(diagnostics, indent=2))
+        print('Landing media diagnostics: ' + json.dumps(diagnostics), flush=True)
+    assert all(v['error'] is None and v['readyState'] >= 1 for v in diagnostics['videos']), diagnostics
+    # Decode/play both actual MP4s, rather than treating a 200 response as media success.
+    for selector in ('#storyVideo', '#filmVideo'):
+        player = page.locator(selector)
+        player.evaluate('async v => {v.muted = true; await v.play();}')
+        page.wait_for_function("selector => {const v=document.querySelector(selector); return !v.paused && v.currentTime > 0.2 && v.getVideoPlaybackQuality().totalVideoFrames > 0;}", arg=selector)
+        player.evaluate('v => {v.pause(); v.currentTime = 0;}')
     assert page.locator('#filmVideo').evaluate('v => v.duration') == 60
     assert page.locator('#storyVideo').evaluate('v => v.duration') == 64
     page.locator('[data-time="28"]').click()
@@ -979,7 +1005,7 @@ def check_landing_page(page, base, output):
     context.close()
 
 
-def check(root, browser_path=None):
+def check(root, browser_path=None, browser_channel="chromium"):
     handler = partial(SimpleHTTPRequestHandler, directory=str(root))
     server = ThreadingHTTPServer(('127.0.0.1', 0), handler)
     threading.Thread(target=server.serve_forever, daemon=True).start()
@@ -991,7 +1017,7 @@ def check(root, browser_path=None):
         with sync_playwright() as playwright:
             # Full Chromium's new headless mode includes the native PDF viewer;
             # Playwright's default headless shell does not mirror that UI.
-            options = {'executable_path': browser_path} if browser_path else {'channel': 'chromium'}
+            options = {'executable_path': browser_path} if browser_path else {'channel': browser_channel}
             browser = playwright.chromium.launch(**options)
             page = browser.new_page(viewport={'width': 1440, 'height': 1000})
             page.on('pageerror', lambda error: errors.append(str(error)))
@@ -1153,5 +1179,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--root', type=Path, default=PROJECT / '_build' / 'html')
     parser.add_argument('--browser-path')
+    parser.add_argument('--browser-channel', choices=('chromium', 'chrome'), default='chromium')
     args = parser.parse_args()
-    check(args.root.resolve(), args.browser_path)
+    check(args.root.resolve(), args.browser_path, args.browser_channel)
