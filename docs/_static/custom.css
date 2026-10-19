@@ -249,3 +249,9 @@ html[lang="en"] .rst-content [role="main"] .sw-example-page > h1 { font-family: 
 
 /* Long source notebook paths and environment names remain readable on phones. */
 .rst-content #scalar2d-mps-notebook p { overflow-wrap: anywhere; }
+
+/* Byte-preserved 2D snapshots: keep labels legible and permit keyboard scrolling. */
+.sw-wavefield-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); min-width: 1080px; }
+.sw-wavefield-row a { display: block; min-width: 0; }
+.sw-wavefield-row img { width: 100%; min-width: 0; height: auto; }
+.sw-wavefield-row a:focus { outline: 3px solid #487eae; outline-offset: -3px; }

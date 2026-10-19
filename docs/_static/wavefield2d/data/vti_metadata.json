@@ -1,0 +1,47 @@
+{
+  "family": "vti",
+  "commit": "391f4a45efdee2f88a9d1432997fdca20ecd2d6f",
+  "backend": "native_cpu",
+  "dtype": "float32",
+  "field": "sV",
+  "unit": "Pa",
+  "source_convention": "unit Ricker stress rate in both sH and sV, Pa/s; +dt injection",
+  "shape": [
+    3,
+    321,
+    401
+  ],
+  "times_s": [
+    0.2,
+    0.35,
+    0.5
+  ],
+  "sample_indices": [
+    400,
+    700,
+    1000
+  ],
+  "finite": true,
+  "time_collocation": "exact integer-time public records",
+  "min": [
+    -0.0002578366838861257,
+    -0.00026789968251250684,
+    -0.0003191788273397833
+  ],
+  "max": [
+    0.0004896926693618298,
+    0.00039632836706005037,
+    0.0004463741206564009
+  ],
+  "l2": [
+    0.002383133163675666,
+    0.002494874643161893,
+    0.002736486727371812
+  ],
+  "seconds": 10.570913560997724,
+  "peak_rss_MiB": 1215.70703125,
+  "torch": "2.7.1+cpu",
+  "f_peak_hz": 12.0,
+  "source_peak_time_s": 0.1,
+  "record_end_time_s": 0.5005
+}

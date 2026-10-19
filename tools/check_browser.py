@@ -51,7 +51,7 @@ CHAPTERS = {
     'modeling/reconstruction', 'inversion/fwi',
     'inversion/dataparallel', 'inversion/inr', 'usage', 'pytorch-backend', 'faq',
     'release-notes', 'status', 'examples/index', 'examples/enclosed',
-    'examples/surface', 'examples/layered', 'examples/reproduce',
+    'examples/surface', 'examples/layered', 'examples/reproduce', 'examples/wavefield-snapshots',
 }
 
 
@@ -860,6 +860,50 @@ def check_search(page, base):
 
 
 
+
+def check_wavefield_examples(page, base, output):
+    """Six equation rows, real formulas, byte-preserved downloads and mobile scrolling."""
+    for width in (1440, 390, 320):
+        page.set_viewport_size({'width': width, 'height': 900})
+        for locale in ('zh', 'en'):
+            page.goto(base + locale + '/examples/wavefield-snapshots.html', wait_until='networkidle')
+            check_navigation(page, locale, 'examples/wavefield-snapshots.html')
+            assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
+            page.wait_for_function("document.querySelectorAll('mjx-container').length >= 8", timeout=60000)
+            assert page.locator('mjx-merror').count() == 0
+            assert page.locator('figure.sw-wavefield-family').count() == 6
+            page.screenshot(path=str(output / f'{locale}-wavefield-top-{width}.png'))
+            for family in ('acoustic', 'elastic', 'vti', 'vrz', 'vrr', 'gsls'):
+                figure = page.locator(f'figure[data-family="{family}"]')
+                figure.scroll_into_view_if_needed()
+                assert figure.locator('img').count() == 3
+                for img in figure.locator('img').all():
+                    wait_for_native_condition(img, 'e => e.complete && e.naturalWidth > 0', 'Wavefield2D panel')
+                viewport = figure.locator('.sw-example-viewport')
+                assert viewport.get_attribute('tabindex') == '0'
+                assert viewport.evaluate('e => e.getBoundingClientRect().right <= innerWidth + 1')
+                if width <= 390:
+                    assert viewport.evaluate('e => e.scrollWidth > e.clientWidth')
+                    viewport.focus()
+                    viewport.evaluate('e => e.scrollLeft = e.scrollWidth')
+                    assert viewport.evaluate('e => e.scrollLeft >= e.scrollWidth - e.clientWidth - 1')
+                    viewport.evaluate('e => e.scrollLeft = 0')
+                figure.screenshot(path=str(output / f'{locale}-wavefield-{family}-{width}.png'))
+                response = page.request.get(base + locale + '/_static/wavefield2d/data/' + family + '_snapshots.npz')
+                assert response.status == 200
+                expected = (PROJECT / 'docs/_static/wavefield2d/data' / (family + '_snapshots.npz')).read_bytes()
+                assert hashlib.sha256(response.body()).digest() == hashlib.sha256(expected).digest()
+            for name in ('model_context', 'vti_isotropic_control', 'gsls_lossless_comparison'):
+                img = page.locator(f'img[src$="/{name}.png"]')
+                img.scroll_into_view_if_needed()
+                wait_for_native_condition(img, 'e => e.complete && e.naturalWidth > 0', 'Wavefield2D control')
+            assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
+            other = 'en' if locale == 'zh' else 'zh'
+            open_mobile_menu(page)
+            page.locator(f'[data-sw-language="{other}"]').click()
+            assert urlsplit(page.url).path == f'/{other}/examples/wavefield-snapshots.html'
+
+
 def check_scalar3d_examples(page, base, output):
     """Verify native typography, all figures, mobile scrolling and the complete ZIP."""
     asset_root = PROJECT / 'docs' / '_static' / 'scalar3d'
@@ -1037,6 +1081,7 @@ def check(root, browser_path=None, browser_channel="chromium"):
             page.on('pageerror', lambda error: errors.append(str(error)))
             check_landing_page(page, base, output)
             check_scalar3d_examples(page, base, output)
+            check_wavefield_examples(page, base, output)
             check_sls_retirement(page, base)
             for size in ({'width': 1440, 'height': 1000}, {'width': 1180, 'height': 760}, {'width': 390, 'height': 844}):
                 page.set_viewport_size(size)

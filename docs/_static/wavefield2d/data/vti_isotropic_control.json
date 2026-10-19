@@ -1,0 +1,12 @@
+{
+  "control": "epsilon=delta=0 only; all other inputs fixed",
+  "seconds": 15.870607758002734,
+  "finite": true,
+  "max_abs": [
+    4.495906614465639e-05,
+    4.057703699800186e-05,
+    4.0273873310070485e-05
+  ],
+  "modal_projection_performed": false,
+  "conclusion": "Control is evidence of association with anisotropic pseudo-acoustic branch, not a full mode decomposition."
+}

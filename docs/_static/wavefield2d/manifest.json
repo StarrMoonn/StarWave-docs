@@ -1,0 +1,493 @@
+{
+  "source_commit": "391f4a45efdee2f88a9d1432997fdca20ecd2d6f",
+  "source_bundle_sha256": "4ace59f8ae8f8b8d138a52d228ef06926bd064a1afbc47fa081b28756828303b",
+  "source_bundle": "StarWave_2D_All_In_One_20261018.zip",
+  "simulation_date": "2026-10-18",
+  "publication_date": "2026-10-19",
+  "runtime": "Python 3.12; PyTorch 2.7.1+cpu; float32; single shot",
+  "backends": {
+    "acoustic": "native_cpu",
+    "elastic": "torch CPU eager",
+    "vti": "native_cpu",
+    "vrz": "native_cpu",
+    "vrr": "native_cpu",
+    "gsls": "native_cpu"
+  },
+  "cuda_executed": false,
+  "notes": [
+    "All selected figures and arrays are byte-identical to the delivered CPU result bundle.",
+    "No PDE was rerun for this publication.",
+    "Published CUDA source pair is a reproduction entry point, not the provenance of these CPU figures.",
+    "SVG and PDF retain vector labels and axes; numerical wavefields are embedded raster images."
+  ],
+  "assets": [
+    {
+      "path": "panels/acoustic_t0200ms.png",
+      "source_path": "03_panels/linear/acoustic_t0200ms.png",
+      "bytes": 129053,
+      "sha256": "edbfa0c70e3db769ae7e24c8a38763e41202405cd11d665e10b9aa9eb3beb1ab",
+      "pixels": [
+        1920,
+        1680
+      ]
+    },
+    {
+      "path": "panels/acoustic_t0350ms.png",
+      "source_path": "03_panels/linear/acoustic_t0350ms.png",
+      "bytes": 166834,
+      "sha256": "1b356f689e216702bda1382c80ca4bce592dd0a260bff780964cc7a3582858ad",
+      "pixels": [
+        1920,
+        1680
+      ]
+    },
+    {
+      "path": "panels/acoustic_t0500ms.png",
+      "source_path": "03_panels/linear/acoustic_t0500ms.png",
+      "bytes": 194251,
+      "sha256": "60bf1cedfaa6f97c485e2a5b11fb315ba066f1a186bff62aff816c804dcd4ba4",
+      "pixels": [
+        1920,
+        1680
+      ]
+    },
+    {
+      "path": "panels/elastic_t0200ms.png",
+      "source_path": "03_panels/linear/elastic_t0200ms.png",
+      "bytes": 118893,
+      "sha256": "e871751014678cdbdf3ab694d205d448d0f008b4237df14677fa44e31e3f5eff",
+      "pixels": [
+        1920,
+        1680
+      ]
+    },
+    {
+      "path": "panels/elastic_t0350ms.png",
+      "source_path": "03_panels/linear/elastic_t0350ms.png",
+      "bytes": 144923,
+      "sha256": "55417fdcc0ea6ceaa86e770f9c791b95b2ac6647a915427d977a65b2488578cd",
+      "pixels": [
+        1920,
+        1680
+      ]
+    },
+    {
+      "path": "panels/elastic_t0500ms.png",
+      "source_path": "03_panels/linear/elastic_t0500ms.png",
+      "bytes": 159058,
+      "sha256": "5433dd1ffa3200979d4de033503f51e5bdce00bd30ad6c0091017b4f0f92f51e",
+      "pixels": [
+        1920,
+        1680
+      ]
+    },
+    {
+      "path": "panels/vti_t0200ms.png",
+      "source_path": "03_panels/linear/vti_t0200ms.png",
+      "bytes": 107872,
+      "sha256": "dcb69dedecb5b2497988c5be877189903bf8c9004fb8acceb305b3e5ed17c9c3",
+      "pixels": [
+        1920,
+        1680
+      ]
+    },
+    {
+      "path": "panels/vti_t0350ms.png",
+      "source_path": "03_panels/linear/vti_t0350ms.png",
+      "bytes": 119960,
+      "sha256": "dc9e7b7e69b77ea84be7fa4b5af4143b074d3d094accb4167cf3e72c3b7a1e99",
+      "pixels": [
+        1920,
+        1680
+      ]
+    },
+    {
+      "path": "panels/vti_t0500ms.png",
+      "source_path": "03_panels/linear/vti_t0500ms.png",
+      "bytes": 129859,
+      "sha256": "40b4e944d56072c10b9ba0d5083aea73211b0cd992fdc5fa2f822d12906e0180",
+      "pixels": [
+        1920,
+        1680
+      ]
+    },
+    {
+      "path": "panels/vrz_t0200ms.png",
+      "source_path": "03_panels/linear/vrz_t0200ms.png",
+      "bytes": 125632,
+      "sha256": "56c8010307191ca92e2014c4c4b7655d5ec892cbe4acce5045486c6ca735c2f5",
+      "pixels": [
+        1920,
+        1680
+      ]
+    },
+    {
+      "path": "panels/vrz_t0350ms.png",
+      "source_path": "03_panels/linear/vrz_t0350ms.png",
+      "bytes": 165817,
+      "sha256": "5fec5dcbecc2dfbbece624cc36ca303a59543e2d54b12bfd76dbf631c053a685",
+      "pixels": [
+        1920,
+        1680
+      ]
+    },
+    {
+      "path": "panels/vrz_t0500ms.png",
+      "source_path": "03_panels/linear/vrz_t0500ms.png",
+      "bytes": 194900,
+      "sha256": "6c7440e2fb863365d24da678819498a2d196eb91b4ba8f1972016e9019323a60",
+      "pixels": [
+        1920,
+        1680
+      ]
+    },
+    {
+      "path": "panels/vrr_t0200ms.png",
+      "source_path": "03_panels/linear/vrr_t0200ms.png",
+      "bytes": 125813,
+      "sha256": "a3b28e79480c95b4e2099514041f827fa082f429311eadb2328e7cc4a507ad8f",
+      "pixels": [
+        1920,
+        1680
+      ]
+    },
+    {
+      "path": "panels/vrr_t0350ms.png",
+      "source_path": "03_panels/linear/vrr_t0350ms.png",
+      "bytes": 166004,
+      "sha256": "6487391d7cd00306a5c04d28b9564698e0eefef7d4a18d2f7d1f1908a11127ff",
+      "pixels": [
+        1920,
+        1680
+      ]
+    },
+    {
+      "path": "panels/vrr_t0500ms.png",
+      "source_path": "03_panels/linear/vrr_t0500ms.png",
+      "bytes": 195081,
+      "sha256": "04f8c1eb205ee87466bd2e0a1bf7f23a6ff14535bb92d65df1bab46617d980af",
+      "pixels": [
+        1920,
+        1680
+      ]
+    },
+    {
+      "path": "panels/gsls_t0200ms.png",
+      "source_path": "03_panels/linear/gsls_t0200ms.png",
+      "bytes": 126042,
+      "sha256": "fa1381b14b671f9dc1891041124ba8e7f7b4189d73b5d0e0274422f33ba0ceae",
+      "pixels": [
+        1920,
+        1680
+      ]
+    },
+    {
+      "path": "panels/gsls_t0350ms.png",
+      "source_path": "03_panels/linear/gsls_t0350ms.png",
+      "bytes": 160610,
+      "sha256": "5d64a28c3abc2365b405d252eb2da3760c9543daeca08f0967ad96cc3fc30536",
+      "pixels": [
+        1920,
+        1680
+      ]
+    },
+    {
+      "path": "panels/gsls_t0500ms.png",
+      "source_path": "03_panels/linear/gsls_t0500ms.png",
+      "bytes": 180177,
+      "sha256": "fdb9bff9ba858b0bbb4b950e6941de861124026fe4dd905299f001904ae9b177",
+      "pixels": [
+        1920,
+        1680
+      ]
+    },
+    {
+      "path": "six_equation_snapshots.png",
+      "source_path": "01_overview/six_equation_snapshots.png",
+      "bytes": 1567949,
+      "sha256": "6181db754df819dd238a2cc897d70c11ce40c5cf2c5ea003ecd324e6818f7692",
+      "pixels": [
+        4500,
+        6930
+      ]
+    },
+    {
+      "path": "six_equation_snapshots.pdf",
+      "source_path": "01_overview/six_equation_snapshots.pdf",
+      "bytes": 637694,
+      "sha256": "6cf7e92588e5b0dc396ef4796ab38fe06fc62df8dcb74a78b3aa115c6f4ce31b"
+    },
+    {
+      "path": "six_equation_snapshots.svg",
+      "source_path": "01_overview/six_equation_snapshots.svg",
+      "bytes": 1375350,
+      "sha256": "5277d195added797137e43e9a559f69bb814c00a3e4be7647c43d8af30ba8994"
+    },
+    {
+      "path": "model_context.png",
+      "source_path": "04_models/model_context.png",
+      "bytes": 335731,
+      "sha256": "cefd0a9d7e60746147812ea73101f31beaf92a86cd74ee42f782ee4ade86f2ea",
+      "pixels": [
+        4500,
+        2580
+      ]
+    },
+    {
+      "path": "model_context.pdf",
+      "source_path": "04_models/model_context.pdf",
+      "bytes": 41201,
+      "sha256": "dd059bbb3471af65f52d8f3ef346ba79a5061cd9903414f1d8c8ee2f5f5feda0"
+    },
+    {
+      "path": "model_context.svg",
+      "source_path": "04_models/model_context.svg",
+      "bytes": 62296,
+      "sha256": "6046563086431addd9e9c94450bf92bbc236f76165b958a73bc3cda56ba95528"
+    },
+    {
+      "path": "gsls_lossless_comparison.png",
+      "source_path": "05_gsls/gsls_lossless_comparison.png",
+      "bytes": 733709,
+      "sha256": "492252c0a1b2deb948b057e35db44f171c6876157db2a510411459b3c9614690",
+      "pixels": [
+        4500,
+        3000
+      ]
+    },
+    {
+      "path": "gsls_lossless_comparison.pdf",
+      "source_path": "05_gsls/gsls_lossless_comparison.pdf",
+      "bytes": 250293,
+      "sha256": "a0121f8b892f003ea23c2d43c5c1e199867aee600be612fd07b39fa95668674f"
+    },
+    {
+      "path": "gsls_lossless_comparison.svg",
+      "source_path": "05_gsls/gsls_lossless_comparison.svg",
+      "bytes": 512511,
+      "sha256": "6ef3c4bffdd2be711f065819d195a153e01704ed58db86680bee14f08b0ecded"
+    },
+    {
+      "path": "vti_isotropic_control.png",
+      "source_path": "06_vti_control/vti_isotropic_control.png",
+      "bytes": 638615,
+      "sha256": "d6c4b5d4988f4fbb95c4c62c089e3166e18102640b390fd92bda6fde0b234a6b",
+      "pixels": [
+        3600,
+        2304
+      ]
+    },
+    {
+      "path": "vti_isotropic_control.pdf",
+      "source_path": "06_vti_control/vti_isotropic_control.pdf",
+      "bytes": 198981,
+      "sha256": "b4f3d3be0cfb926a050014095dbdf36ebb075bb166f4dab3d72d0eda1ee05ea7"
+    },
+    {
+      "path": "vti_isotropic_control.svg",
+      "source_path": "06_vti_control/vti_isotropic_control.svg",
+      "bytes": 467779,
+      "sha256": "e31c094ca5011e082e22af4042b7ad1e84667404ef6603979f54f5834b25ce3d"
+    },
+    {
+      "path": "data/acoustic_metadata.json",
+      "source_path": "08_reproduce_data/acoustic_metadata.json",
+      "bytes": 913,
+      "sha256": "26bce5f51aed0dbc1d87a8f6ff88bb61d717ec5e51c7ec81bd2e7c406ccfb82f"
+    },
+    {
+      "path": "data/acoustic_snapshots.npz",
+      "source_path": "08_reproduce_data/acoustic_snapshots.npz",
+      "bytes": 812085,
+      "sha256": "8d147f131397d84f0345cf0d6617a1d84c4b7cc325228cf009f727e6b597a3f1",
+      "snapshots": {
+        "shape": [
+          3,
+          321,
+          401
+        ],
+        "dtype": "float32",
+        "max_abs": 1.8465367555618286,
+        "finite": true
+      }
+    },
+    {
+      "path": "data/elastic_metadata.json",
+      "source_path": "08_reproduce_data/elastic_metadata.json",
+      "bytes": 1053,
+      "sha256": "03955f9a1bb0e60e3372fbb74b93af882693ad4811d9715ac109a4f42d06008c"
+    },
+    {
+      "path": "data/elastic_snapshots.npz",
+      "source_path": "08_reproduce_data/elastic_snapshots.npz",
+      "bytes": 773489,
+      "sha256": "aeb346cf2f6c7440489d31fcbef62b8910c94afd4ac1085e72202701a8e93f2f",
+      "snapshots": {
+        "shape": [
+          3,
+          320,
+          401
+        ],
+        "dtype": "float32",
+        "max_abs": 7.164045712215739e-08,
+        "finite": true
+      }
+    },
+    {
+      "path": "data/vti_metadata.json",
+      "source_path": "08_reproduce_data/vti_metadata.json",
+      "bytes": 928,
+      "sha256": "bcb07a9fedffaac4a1635ecb68a9c1a7419438a6395c1a2d16bfbec7adbde219"
+    },
+    {
+      "path": "data/vti_snapshots.npz",
+      "source_path": "08_reproduce_data/vti_snapshots.npz",
+      "bytes": 811996,
+      "sha256": "b6753deb1cf6d9b8f17d0c05f30401ed3b9f2891f1b79a9e2111b6d98cd6a1e0",
+      "snapshots": {
+        "shape": [
+          3,
+          321,
+          401
+        ],
+        "dtype": "float32",
+        "max_abs": 0.0004896926693618298,
+        "finite": true
+      }
+    },
+    {
+      "path": "data/vrz_metadata.json",
+      "source_path": "08_reproduce_data/vrz_metadata.json",
+      "bytes": 911,
+      "sha256": "7be9005c4a9dee7c2fd70a1ade9aea3c2db7e5f81b8f0353b3a7197d37897ceb"
+    },
+    {
+      "path": "data/vrz_snapshots.npz",
+      "source_path": "08_reproduce_data/vrz_snapshots.npz",
+      "bytes": 796732,
+      "sha256": "09922edde7e9af467c7267ce1a92fc100c0589ba357a690af7be6dc0896574b8",
+      "snapshots": {
+        "shape": [
+          3,
+          321,
+          401
+        ],
+        "dtype": "float32",
+        "max_abs": 1.846535086631775,
+        "finite": true
+      }
+    },
+    {
+      "path": "data/vrr_metadata.json",
+      "source_path": "08_reproduce_data/vrr_metadata.json",
+      "bytes": 908,
+      "sha256": "49ae846b656e879dce20d00e2fd5887e972972c7e1ba5f068c7eead10e7f69da"
+    },
+    {
+      "path": "data/vrr_snapshots.npz",
+      "source_path": "08_reproduce_data/vrr_snapshots.npz",
+      "bytes": 819235,
+      "sha256": "bfef700f9eba856bb634c50dd90bc18be48b0a0912af0e16656cf8b2a1ee1633",
+      "snapshots": {
+        "shape": [
+          3,
+          321,
+          401
+        ],
+        "dtype": "float32",
+        "max_abs": 1.8465465307235718,
+        "finite": true
+      }
+    },
+    {
+      "path": "data/gsls_metadata.json",
+      "source_path": "08_reproduce_data/gsls_metadata.json",
+      "bytes": 911,
+      "sha256": "56ac2c8000337e06d7c284ccb9fdcdfcdfbc990bf8ecb57dcb5063b69b6abf02"
+    },
+    {
+      "path": "data/gsls_snapshots.npz",
+      "source_path": "08_reproduce_data/gsls_snapshots.npz",
+      "bytes": 806116,
+      "sha256": "1ca74e3ca449f66fa4979b5da90c917b57be025e77e2a785189f10a3882cb07d",
+      "snapshots": {
+        "shape": [
+          3,
+          321,
+          401
+        ],
+        "dtype": "float32",
+        "max_abs": 1.507682204246521,
+        "finite": true
+      }
+    },
+    {
+      "path": "data/gsls_lossless_metadata.json",
+      "source_path": "08_reproduce_data/gsls_lossless_metadata.json",
+      "bytes": 917,
+      "sha256": "a1a19f2a6c326417cd08de85284856e918bc9aab7f576b5c135917554515c8f5"
+    },
+    {
+      "path": "data/gsls_lossless_snapshots.npz",
+      "source_path": "08_reproduce_data/gsls_lossless_snapshots.npz",
+      "bytes": 794385,
+      "sha256": "7ff848a8361e034c61390f28a4ff695e174a1cc5440bebb3ab11a2ad16fa2236",
+      "snapshots": {
+        "shape": [
+          3,
+          321,
+          401
+        ],
+        "dtype": "float32",
+        "max_abs": 1.84648859500885,
+        "finite": true
+      }
+    },
+    {
+      "path": "data/vti_isotropic_control.npz",
+      "source_path": "08_reproduce_data/vti_isotropic_control.npz",
+      "bytes": 745826,
+      "sha256": "9f817c4a87b1d923bd4dd54265553a599d999de1015f5fc1600618081a8a35bd",
+      "snapshots": {
+        "shape": [
+          3,
+          321,
+          401
+        ],
+        "dtype": "float32",
+        "max_abs": 4.495906614465639e-05,
+        "finite": true
+      }
+    },
+    {
+      "path": "data/vti_isotropic_control.json",
+      "source_path": "08_reproduce_data/vti_isotropic_control.json",
+      "bytes": 380,
+      "sha256": "634ac8d28eb696b13ade8337c4849cddff8269bbb9c7f37f7c2993c7cdbec98e"
+    },
+    {
+      "path": "data/config.json",
+      "source_path": "08_reproduce_data/config.json",
+      "bytes": 825,
+      "sha256": "05c5da52c217324307dffd130684dba2d9734b5ca4ffa5b69f7d0d75235326c8"
+    },
+    {
+      "path": "data/validation_summary.json",
+      "source_path": "08_reproduce_data/validation_summary.json",
+      "bytes": 1254,
+      "sha256": "f53f54605a0eaa2d39f4fd107951e9feb9b121de0ba1afb2979a9574387ea79b"
+    },
+    {
+      "path": "data/gsls_comparison_metrics.json",
+      "source_path": "05_gsls/gsls_comparison_metrics.json",
+      "bytes": 1112,
+      "sha256": "d084fff771fea7738228192ff371ce18ff4ffd3eca53526af5821ee8772f520f"
+    }
+  ],
+  "metadata_errata": {
+    "gsls_source_scaling": "Historical GSLS metadata uses a generic -v^2 dt^2 label. The actual GSLS source factor is -c_rel^2 dt^2, with the first-step half-source convention. The original metadata bytes are preserved."
+  },
+  "equation_review_commit": "61152f2569815c60a999fa6babfd0abc461fccae",
+  "cuda_example_commit": "7c1743fe7791c7a52de6900a1ae67c9afe4d9548",
+  "equation_review": "19 targeted equation/frontend/kernel files are byte-identical between the original CPU bundle and reviewed dev."
+}

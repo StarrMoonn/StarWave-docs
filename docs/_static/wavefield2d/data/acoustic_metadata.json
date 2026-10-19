@@ -1,0 +1,47 @@
+{
+  "family": "acoustic",
+  "commit": "391f4a45efdee2f88a9d1432997fdca20ecd2d6f",
+  "backend": "native_cpu",
+  "dtype": "float32",
+  "field": "p",
+  "unit": "Pa",
+  "source_convention": "unit Ricker second-order forcing, Pa/m^2; negative -v_source^2 dt^2 injection",
+  "shape": [
+    3,
+    321,
+    401
+  ],
+  "times_s": [
+    0.2,
+    0.35,
+    0.5
+  ],
+  "sample_indices": [
+    400,
+    700,
+    1000
+  ],
+  "finite": true,
+  "time_collocation": "exact integer-time public records",
+  "min": [
+    -1.8465367555618286,
+    -1.6795973777770996,
+    -1.7523819208145142
+  ],
+  "max": [
+    1.0729881525039673,
+    0.9422403573989868,
+    0.892989993095398
+  ],
+  "l2": [
+    85.2290267944336,
+    90.88973999023438,
+    86.310302734375
+  ],
+  "seconds": 13.267660946999968,
+  "peak_rss_MiB": 1700.6171875,
+  "torch": "2.7.1+cpu",
+  "f_peak_hz": 12.0,
+  "source_peak_time_s": 0.1,
+  "record_end_time_s": 0.5005
+}

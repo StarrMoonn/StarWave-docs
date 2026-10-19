@@ -2,7 +2,7 @@
 
 The exact approved bytes are allowlisted; editable slides, source material,
 attachments and active PDF actions are never published. Scalar3D and SLS report
-PDFs are independently allowlisted and validated by their example checkers.
+and Wavefield2D figure PDFs are independently allowlisted and validated by their example checkers.
 These checks complement independent content and visual review.
 """
 import hashlib
@@ -112,7 +112,8 @@ def check(root=None):
 
     # Preserve the presentation allowlist; separately validate the requested report.
     from check_scalar3d_examples import approved_assets
-    report_pdfs = {p for p in approved_assets() if p.suffix == '.pdf'}
+    from check_wavefield_examples import approved_assets as approved_wavefield_assets
+    report_pdfs = {p for p in approved_assets() | approved_wavefield_assets() if p.suffix == '.pdf'}
     for path in PROJECT.rglob('*'):
         relative = path.relative_to(PROJECT)
         if any(part in {'.git', '.venv', '_build', '_readthedocs', '__pycache__'} for part in relative.parts):

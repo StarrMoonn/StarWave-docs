@@ -130,6 +130,7 @@ INR <inversion/inr>
 :hidden:
 :caption: Example
 
+二维波场：六类方程 <examples/wavefield-snapshots>
 Scalar3D <examples/index>
 六面包围异常体 <examples/enclosed>
 地表采集异常体 <examples/surface>

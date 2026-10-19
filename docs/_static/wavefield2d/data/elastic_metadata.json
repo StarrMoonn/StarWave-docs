@@ -1,0 +1,47 @@
+{
+  "family": "elastic",
+  "commit": "391f4a45efdee2f88a9d1432997fdca20ecd2d6f",
+  "backend": "torch",
+  "dtype": "float32",
+  "field": "v_z (API v_y)",
+  "unit": "m/s",
+  "source_convention": "unit Ricker vertical force density N/m^3 sampled at half times; split over adjacent z faces to place centroid at source location; API multiplies by dt and buoyancy",
+  "shape": [
+    3,
+    320,
+    401
+  ],
+  "times_s": [
+    0.2,
+    0.35,
+    0.5
+  ],
+  "sample_indices": [
+    400,
+    700,
+    1000
+  ],
+  "finite": true,
+  "time_collocation": "mean of adjacent velocity half-step records",
+  "min": [
+    -5.137099989838134e-08,
+    -3.357570932394083e-08,
+    -2.9342022145328883e-08
+  ],
+  "max": [
+    7.164045712215739e-08,
+    4.4312507441190974e-08,
+    3.550522365003417e-08
+  ],
+  "l2": [
+    1.292412434850121e-06,
+    1.2594022109624348e-06,
+    1.220487888531352e-06
+  ],
+  "seconds": 23.453311151999515,
+  "peak_rss_MiB": 1903.1015625,
+  "torch": "2.7.1+cpu",
+  "f_peak_hz": 12.0,
+  "source_peak_time_s": 0.1,
+  "record_end_time_s": 0.5005
+}

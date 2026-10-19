@@ -1,0 +1,34 @@
+{
+  "normalization_max_abs": 1.84648859500885,
+  "unit": "Pa",
+  "metrics": [
+    {
+      "time_s": 0.2,
+      "lossless_max_abs": 1.84648859500885,
+      "attenuating_max_abs": 1.507682204246521,
+      "max_abs_ratio": 0.8165131419288808,
+      "lossless_grid_l2": 85.45116688319958,
+      "attenuating_grid_l2": 70.81180372687948,
+      "grid_l2_ratio": 0.8286815301617804
+    },
+    {
+      "time_s": 0.35,
+      "lossless_max_abs": 1.7271153926849365,
+      "attenuating_max_abs": 1.1481544971466064,
+      "max_abs_ratio": 0.664781578584457,
+      "lossless_grid_l2": 93.32167129087567,
+      "attenuating_grid_l2": 65.22654358634409,
+      "grid_l2_ratio": 0.6989431574048705
+    },
+    {
+      "time_s": 0.5,
+      "lossless_max_abs": 1.7615373134613037,
+      "attenuating_max_abs": 0.956486701965332,
+      "max_abs_ratio": 0.5429840711610583,
+      "lossless_grid_l2": 91.442291410319,
+      "attenuating_grid_l2": 54.56834233286493,
+      "grid_l2_ratio": 0.5967516943337123
+    }
+  ],
+  "notes": "Full-grid amplitude norms, not energy. One scale shared across both simulations and all three times."
+}

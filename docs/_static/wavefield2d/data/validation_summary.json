@@ -1,0 +1,50 @@
+{
+  "numerical_checks": {
+    "minimum_cells_per_wavelength_at_30Hz": 6.666666666666667,
+    "ricker_amplitude_at_2p5_f0": 0.03279698999488365,
+    "ricker_energy_fraction_above_2p5_f0": 0.0001393337998581566,
+    "CFL_vmax_dt_sqrt2_over_dx": 0.4949747468305833,
+    "scalar_vrz_vrr_max_dt": 0.0006060915267313264,
+    "gsls_unrelaxed_max_velocity_m_s": 2948.448974609375,
+    "gsls_max_dt": 0.0007316035917028785,
+    "vti_time_plan": {
+      "user_dt": 0.0005,
+      "user_nt": 1002,
+      "internal_dt": 0.0005,
+      "internal_nt": 1002,
+      "step_ratio": 1,
+      "max_vel": 3500.0,
+      "max_dt": 0.0006933521420146607
+    },
+    "elastic_time_plan": [
+      0.0005,
+      1
+    ]
+  },
+  "gsls_effective_Q": {
+    "frequency_hz": [
+      1.0,
+      3.0,
+      6.0,
+      12.0,
+      24.0,
+      30.0,
+      200.0
+    ],
+    "values": [
+      32.977317810058594,
+      30.41242790222168,
+      29.78973960876465,
+      30.267162322998047,
+      30.44835090637207,
+      30.57607078552246,
+      31.650888442993164
+    ],
+    "convention": "Hao1 nominal Q0=30, not exact constant Q; default warning retained"
+  },
+  "vrz_vrr_relative_L2_difference_per_time": [
+    1.5677181332632912e-05,
+    3.799967027019867e-05,
+    7.485774000457536e-05
+  ]
+}

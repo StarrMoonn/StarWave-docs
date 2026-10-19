@@ -1,0 +1,47 @@
+{
+  "family": "vrr",
+  "commit": "391f4a45efdee2f88a9d1432997fdca20ecd2d6f",
+  "backend": "native_cpu",
+  "dtype": "float32",
+  "field": "p",
+  "unit": "Pa",
+  "source_convention": "unit Ricker second-order forcing, Pa/m^2; negative -v_source^2 dt^2 injection",
+  "shape": [
+    3,
+    321,
+    401
+  ],
+  "times_s": [
+    0.2,
+    0.35,
+    0.5
+  ],
+  "sample_indices": [
+    400,
+    700,
+    1000
+  ],
+  "finite": true,
+  "time_collocation": "exact integer-time public records",
+  "min": [
+    -1.8465465307235718,
+    -1.7272117137908936,
+    -1.7616132497787476
+  ],
+  "max": [
+    1.127243161201477,
+    0.972051203250885,
+    0.9055026173591614
+  ],
+  "l2": [
+    85.4507827758789,
+    93.32176971435547,
+    91.44148254394531
+  ],
+  "seconds": 25.42203159500059,
+  "peak_rss_MiB": 1582.9296875,
+  "torch": "2.7.1+cpu",
+  "f_peak_hz": 12.0,
+  "source_peak_time_s": 0.1,
+  "record_end_time_s": 0.5005
+}

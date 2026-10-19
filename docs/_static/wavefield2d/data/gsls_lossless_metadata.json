@@ -1,0 +1,47 @@
+{
+  "family": "gsls_lossless",
+  "commit": "391f4a45efdee2f88a9d1432997fdca20ecd2d6f",
+  "backend": "native_cpu",
+  "dtype": "float32",
+  "field": "p",
+  "unit": "Pa",
+  "source_convention": "unit Ricker second-order forcing, Pa/m^2; negative -v_source^2 dt^2 injection",
+  "shape": [
+    3,
+    321,
+    401
+  ],
+  "times_s": [
+    0.2,
+    0.35,
+    0.5
+  ],
+  "sample_indices": [
+    400,
+    700,
+    1000
+  ],
+  "finite": true,
+  "time_collocation": "exact integer-time public records",
+  "min": [
+    -1.84648859500885,
+    -1.7271153926849365,
+    -1.7615373134613037
+  ],
+  "max": [
+    1.1272152662277222,
+    0.9721413850784302,
+    0.905685544013977
+  ],
+  "l2": [
+    85.45116424560547,
+    93.32166290283203,
+    91.44227600097656
+  ],
+  "seconds": 49.5956707180012,
+  "peak_rss_MiB": 739.46484375,
+  "torch": "2.7.1+cpu",
+  "f_peak_hz": 12.0,
+  "source_peak_time_s": 0.1,
+  "record_end_time_s": 0.5005
+}

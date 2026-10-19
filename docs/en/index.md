@@ -130,6 +130,7 @@ INR <inversion/inr>
 :hidden:
 :caption: Example
 
+2D wavefields: six equations <examples/wavefield-snapshots>
 Scalar3D <examples/index>
 Enclosed anomaly <examples/enclosed>
 Surface-only anomaly <examples/surface>

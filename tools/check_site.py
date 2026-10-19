@@ -14,6 +14,7 @@ from build_docs import USAGE_SECTIONS, USAGE_NUMBERS
 from check_presentation_asset import ASSET_PATH, check as check_presentation
 from check_scalar3d_examples import approved_assets, check as check_scalar3d
 from check_sls_examples import check as check_sls
+from check_wavefield_examples import approved_assets as approved_wavefield_assets, check as check_wavefield
 from landing import approved_assets as approved_landing_assets, check as check_landing
 
 
@@ -291,6 +292,7 @@ def check(root):
     errors.extend(check_reconstruction(project, root))
     errors.extend(check_scalar3d(root))
     errors.extend(check_sls(root))
+    errors.extend(check_wavefield(root))
     errors.extend(check_landing(root))
     pages = {p: Page(p.read_text(encoding="utf-8")) for p in root.rglob("*.html")}
     if not pages or not (root / "index.html").is_file():
@@ -546,6 +548,7 @@ def check(root):
     ]
     allowed = {".md", ".py", ".txt", ".css", ".yml", ".yaml", ".html", ".js", ".json"}
     scalar3d_assets = approved_assets()
+    wavefield_assets = approved_wavefield_assets()
     landing_assets = approved_landing_assets()
     sources = []
     for p in project.rglob("*"):
@@ -563,16 +566,17 @@ def check(root):
         is_tutorial_notebook = p.suffix == ".ipynb" and relative.parts[:2] == ("examples", "tutorials")
         is_presentation = p == ASSET_PATH
         is_scalar3d_asset = p in scalar3d_assets
+        is_wavefield_asset = p in wavefield_assets
         is_landing_asset = p in landing_assets
         is_landing_binary = is_landing_asset and p.suffix in {".mp4", ".gif", ".jpg", ".png"}
-        if p.name not in {".gitignore", ".gitattributes"} and p.suffix not in allowed and not is_tutorial_png and not is_tutorial_notebook and not is_brand_file and not is_font_file and not is_diagram_file and not is_reconstruction_file and not is_presentation and not is_scalar3d_asset and not is_landing_asset:
+        if p.name not in {".gitignore", ".gitattributes"} and p.suffix not in allowed and not is_tutorial_png and not is_tutorial_notebook and not is_brand_file and not is_font_file and not is_diagram_file and not is_reconstruction_file and not is_presentation and not is_scalar3d_asset and not is_wavefield_asset and not is_landing_asset:
             errors.append(f"Unexpected source file: {relative}")
         if p.suffix == ".py":
             try:
                 ast.parse(p.read_text(encoding="utf-8"))
             except SyntaxError as exc:
                 errors.append(f"Python syntax: {relative}: {exc.msg}")
-        if p not in {Path(__file__).resolve(), project / 'tools' / 'check_presentation_asset.py', project / 'tools' / 'check_sls_examples.py'} and not is_tutorial_png and not (is_brand_file and p.suffix == ".png") and not is_font_file and not is_presentation and not is_scalar3d_asset and not is_landing_binary:
+        if p not in {Path(__file__).resolve(), project / 'tools' / 'check_presentation_asset.py', project / 'tools' / 'check_sls_examples.py'} and not is_tutorial_png and not (is_brand_file and p.suffix == ".png") and not is_font_file and not is_presentation and not is_scalar3d_asset and not is_wavefield_asset and not is_landing_binary:
             text = p.read_text(encoding="utf-8")
             if any(pattern.search(text) for pattern in forbidden):
                 errors.append(f"Review restricted content: {relative}")
