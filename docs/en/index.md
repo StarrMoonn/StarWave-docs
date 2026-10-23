@@ -131,6 +131,7 @@ INR <inversion/inr>
 :caption: Example
 
 2D wavefields: six equations <examples/wavefield-snapshots>
+Elastic VRR (V21) <examples/elastic-vrr>
 Scalar3D <examples/index>
 Enclosed anomaly <examples/enclosed>
 Surface-only anomaly <examples/surface>

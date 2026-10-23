@@ -1,5 +1,7 @@
 # StarWave-docs · 中文 / English
 
+新增 V21 弹性 VRR：[中文](docs/examples/elastic-vrr.md) / [English](docs/en/examples/elastic-vrr.md)。本次为独立接口与示例增补，要求匹配的授权 V21 源码；下文保留 V19 历史基线，不代表当前 PyPI 包可用性。
+
 StarWave V19 源码契约双语使用手册，使用 Sphinx、Read the Docs 主题与 MyST Markdown；每种语言独立构建、导航和搜索。
 
 Bilingual documentation for the StarWave V19 source contract. The complete Chinese and English manuals have independent builds, navigation and search.

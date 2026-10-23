@@ -1,5 +1,7 @@
 # Documentation Status and References
 
+New: [V21 elastic VRR API and runnable CPU example](examples/elastic-vrr.md). This addition requires matching authorized V21 source; older version/package statements below remain historical baseline information and do not establish current PyPI availability or include elastic VRR.
+
 ## V19 / 0.1.0.dev19 · 2026-10-12
 
 [V19 Release](https://github.com/StarrMoonn/StarWave/releases/tag/V19) is published. This manual follows frozen source `0.1.0.dev19`, commit `46d32877e3336d531520a696d5f2e074e6f4ef74`. [PyPI **9.1.0**](https://pypi.org/project/starwave/9.1.0/) is published with the V19 source contract and integrated VRR. The existing [9.0.0 wheel](https://pypi.org/project/starwave/9.0.0/) remains V18 and excludes integrated VRR.
@@ -15,7 +17,7 @@ V19 freezes the reviewed integrated baseline without changing scientific kernels
 
 ## Published binary and historical evidence
 
-The current published binary is V19 / 9.1.0 with integrated VRR. Its Linux/Python/Torch requirements and installation commands are in [Installation](installation.md#published-v19-binary-channel). Version-specific publication receipts, hashes, old platform requirements and verification records are archived in [Release Notes](release-notes.md). The V19 source release does not replace or relabel those historical measurements.
+The current published binary is V19 / 9.1.0 with integrated VRR. Its Linux/Python/Torch requirements and installation commands are in [Installation](installation.md#historical-v19-binary-channel). Version-specific publication receipts, hashes, old platform requirements and verification records are archived in [Release Notes](release-notes.md). The V19 source release does not replace or relabel those historical measurements.
 
 ## Completed and pending work
 

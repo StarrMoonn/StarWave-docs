@@ -1,6 +1,8 @@
 # 安装
 
-[V19 Release](https://github.com/StarrMoonn/StarWave/releases/tag/V19) 已发布；本手册对应冻结源码 `0.1.0.dev19`、提交 `46d32877e3336d531520a696d5f2e074e6f4ef74`。[PyPI **9.1.0**](https://pypi.org/project/starwave/9.1.0/) 已发布，对应 V19 源码契约并包含集成 VRR。现有 [9.0.0 wheel](https://pypi.org/project/starwave/9.0.0/) 仍对应 V18，不含集成 VRR。
+新增：[V21 弹性 VRR 接口与可运行 CPU 示例](examples/elastic-vrr.md)。此功能需要匹配的授权 V21 源码；下文旧版本与包说明保留为历史基线，不代表当前 PyPI 可用性，也不包含弹性 VRR。
+
+下方旧 V19 源码安装说明属于历史基线。新增弹性 VRR 请使用 [V21 源码安装](examples/elastic-vrr.md)。本次未发布 V21 PyPI 包。
 
 V19 将 {ref}`VRR <vrr>` 纳入主包，入口为 `starwave.vrr`，根目录安装与 `compile_all.py` 已覆盖 VRR，无需独立安装 `starwave_vrr`。VRR 显式 Torch 支持 CPU/CUDA float32/64、full/checkpoint 与 eager/compile；原生 CUDA 支持 float32 full/boundary。各方程的设备、梯度和边界限制仍独立。
 
@@ -45,24 +47,9 @@ VRR 无需另装包。其原生构建使用 nvcc/C++17，不依赖 Torch C++ 头
 GSLS 输出为 `native/build/gsls/`，或 `STARWAVE_BUILD_DIR` 的 `gsls/` 子目录。导入前设置构建路径，构建和运行使用同一路径。既有教程、图件与实测结果保留历史版本。
 
 (runtime-requirements)=
-## 已发布 V19 二进制渠道
+## 历史 V19 二进制渠道
 
-以下安装已发布的 V19 / 9.1.0，包含集成 VRR、Born 和 23 参数 scalar。Mac MPS 必须使用上方完整源码安装；此 Linux wheel 不能在 macOS 安装。源码接受 compile 模式，不保证每个 PyTorch 版本或设备均有可用的编译器。
-
-**安装已发布 V19 / 9.1.0 wheel**
-
-要求 Linux x86_64 / glibc ≥ 2.35、Python ≥ 3.10 且 < 3.13、PyTorch ≥ 2.5 且 < 2.6、NumPy ≥ 1.23。没有 macOS wheel 或 sdist。预编译安装不需要 nvcc 或本地 CUDA Toolkit；原生 CUDA 运行仍需支持的 NVIDIA 驱动与设备。下面使用发布核验采用的 PyTorch 2.5.1 / CUDA 11.8 配置；仅用 CPU 时可选择配套的 PyTorch 2.5.x CPU 构建。这不扩大后端或设备的支持范围。
-
-```bash
-python3.12 -m venv .venv
-source .venv/bin/activate
-python -m pip install --upgrade pip
-python -m pip install torch==2.5.1 --index-url https://download.pytorch.org/whl/cu118
-python -m pip install --only-binary=starwave starwave==9.1.0
-python -m pip check
-```
-
-升级后重启 Python/Jupyter。公开 wheel 已通过 Python 3.10–3.12 安装与 smoke 检查；目标 GPU 数值验收另行记录。旧 wheel 条件与迁移命令已归档至[发布说明](release-notes.md)。
+原 V19 / 9.1.0 wheel 说明不作为当前安装途径。历史证据及环境要求见[发布说明](release-notes.md)。不要通过无版本限定的 PyPI 安装获取弹性 VRR，应使用上方已获授权的 V21 源码。
 
 ## 核心库检查（已安装 wheel 或已注册源码）
 

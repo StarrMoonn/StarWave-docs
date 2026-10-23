@@ -1,6 +1,8 @@
 # Installation
 
-[V19 Release](https://github.com/StarrMoonn/StarWave/releases/tag/V19) is published. This manual follows frozen source `0.1.0.dev19`, commit `46d32877e3336d531520a696d5f2e074e6f4ef74`. [PyPI **9.1.0**](https://pypi.org/project/starwave/9.1.0/) is published with the V19 source contract and integrated VRR. The existing [9.0.0 wheel](https://pypi.org/project/starwave/9.0.0/) remains V18 and excludes integrated VRR.
+New: [V21 elastic VRR API and runnable CPU example](examples/elastic-vrr.md). This addition requires matching authorized V21 source; older version/package statements below remain historical baseline information and do not establish current PyPI availability or include elastic VRR.
+
+The previous V19 source and binary installation notes below are historical. For the new elastic VRR interface, use the [V21 source installation](examples/elastic-vrr.md#install-matching-source). No V21 PyPI publication is claimed.
 
 V19 integrates {ref}`VRR <vrr>` as `starwave.vrr`. Root installation and `compile_all.py` include VRR; no separate `starwave_vrr` installation is needed. VRR supports explicit Torch CPU/CUDA float32/64 full/checkpoint with eager/compile, and native CUDA float32 full/boundary. Device, gradient and boundary restrictions remain equation-specific.
 
@@ -46,24 +48,10 @@ GSLS outputs to `native/build/gsls/`, or the `gsls/` subdirectory of `STARWAVE_B
 
 (published-v18-binary-channel)=
 (runtime-requirements)=
-## Published V19 binary channel
+(published-v19-binary-channel)=
+## Historical V19 binary channel
 
-The following installs published V19 / 9.1.0, including integrated VRR, Born and the 23-parameter scalar API. Mac MPS requires the complete source installation above; this Linux wheel cannot be installed on macOS. Source acceptance of compile mode does not guarantee compiler availability on every PyTorch version or device.
-
-**Install the published V19 / 9.1.0 wheel**
-
-Use Linux x86_64 / glibc ≥ 2.35, Python ≥ 3.10 and < 3.13, PyTorch ≥ 2.5 and < 2.6, and NumPy ≥ 1.23. There is no macOS wheel or sdist. A prebuilt installation needs no nvcc or local CUDA Toolkit; native CUDA execution still requires a supported NVIDIA driver/device. The following uses the publication-tested PyTorch 2.5.1 CUDA 11.8 configuration; CPU-only use can select a matching PyTorch 2.5.x CPU build. This does not expand backend/device eligibility.
-
-```bash
-python3.12 -m venv .venv
-source .venv/bin/activate
-python -m pip install --upgrade pip
-python -m pip install torch==2.5.1 --index-url https://download.pytorch.org/whl/cu118
-python -m pip install --only-binary=starwave starwave==9.1.0
-python -m pip check
-```
-
-Restart Python/Jupyter after upgrading. The public wheel's Python 3.10–3.12 install/smoke checks passed; target-GPU numerical acceptance remains separate. Older wheel requirements and migration commands are archived in [Release Notes](release-notes.md#historical-v16-installation-and-migration).
+The former V19 / 9.1.0 wheel instructions are not a current installation route. See [Release Notes](release-notes.md) for historical evidence and requirements. Do not use an unpinned PyPI installation to obtain elastic VRR; use the authorized V21 source above.
 
 ## Check the core library (installed wheel or registered source)
 

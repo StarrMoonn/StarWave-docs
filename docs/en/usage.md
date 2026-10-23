@@ -1,5 +1,7 @@
 # Usage
 
+New: [V21 elastic VRR API and runnable CPU example](examples/elastic-vrr.md). This addition requires matching authorized V21 source; older version/package statements below remain historical baseline information and do not establish current PyPI availability or include elastic VRR.
+
 GSLS: [visco_gsls](#visco-gsls). VRR: [starwave.vrr](#vrr). Both are included in the V19 root package.
 
 ```{container} sw-page-toc

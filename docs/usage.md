@@ -1,5 +1,7 @@
 # Usage
 
+新增：[V21 弹性 VRR 接口与可运行 CPU 示例](examples/elastic-vrr.md)。此功能需要匹配的授权 V21 源码；下文旧版本与包说明保留为历史基线，不代表当前 PyPI 可用性，也不包含弹性 VRR。
+
 GSLS: [visco_gsls](#visco-gsls). VRR: [starwave.vrr](#vrr). 两者均集成于 V19 主包。
 
 ```{container} sw-page-toc

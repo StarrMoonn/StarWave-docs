@@ -131,6 +131,7 @@ INR <inversion/inr>
 :caption: Example
 
 二维波场：六类方程 <examples/wavefield-snapshots>
+弹性 VRR（V21） <examples/elastic-vrr>
 Scalar3D <examples/index>
 六面包围异常体 <examples/enclosed>
 地表采集异常体 <examples/surface>

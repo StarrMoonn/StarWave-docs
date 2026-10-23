@@ -1,5 +1,7 @@
 # 文档状态与参考来源
 
+新增：[V21 弹性 VRR 接口与可运行 CPU 示例](examples/elastic-vrr.md)。此功能需要匹配的授权 V21 源码；下文旧版本与包说明保留为历史基线，不代表当前 PyPI 可用性，也不包含弹性 VRR。
+
 ## V19 / 0.1.0.dev19 · 2026-10-12
 
 [V19 Release](https://github.com/StarrMoonn/StarWave/releases/tag/V19) 已发布；本手册对应冻结源码 `0.1.0.dev19`、提交 `46d32877e3336d531520a696d5f2e074e6f4ef74`。[PyPI **9.1.0**](https://pypi.org/project/starwave/9.1.0/) 已发布，对应 V19 源码契约并包含集成 VRR。现有 [9.0.0 wheel](https://pypi.org/project/starwave/9.0.0/) 仍对应 V18，不含集成 VRR。
