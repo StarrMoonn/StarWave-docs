@@ -12,15 +12,15 @@ from urllib.parse import parse_qsl, quote, unquote, urlsplit
 from playwright.sync_api import sync_playwright
 
 PROJECT = Path(__file__).resolve().parents[1]
-API_NAMES = ('scalar', 'scalar_born', 'ScalarBorn', 'ScalarBorn.forward', 'vrz', 'vrr', 'vrr_reference', 'vti', 'elastic', 'elastic_vrr', 'elastic_vrr_parameters',
-             'common.vpvsrho_to_lambmubuoyancy', 'common.lambmubuoyancy_to_vpvsrho',
+API_NAMES = ('scalar', 'scalar_born', 'ScalarBorn', 'ScalarBorn.forward', 'vrz', 'vrr', 'vrr_reference', 'vti', 'elastic',
+             'common.vpvsrho_to_lambmubuoyancy', 'common.lambmubuoyancy_to_vpvsrho', 'elastic_vrr', 'elastic_vrr_parameters',
              'visco_gsls', 'prepare_visco_gsls', 'visco_gsls_native_status',
              'native_status', 'prepare_native', 'prepare_elastic', 'elastic_native_status', 'ScalarIllumination',
              'ScalarIllumination.seal', 'ScalarIllumination.reduce', 'ScalarIllumination.close',
              'precondition_gradient', 'wavelets.ricker', 'torch_backend.backend_capabilities')
 BORN_SECTIONS = ('born', 'born-backends', 'born-conventions', 'born-gradients', 'born-callbacks', 'born-returns', 'born-module', 'born-forward', 'born-example', 'born-build', 'born-scope')
 ELASTIC_SECTIONS = ('elastic', 'elastic-axes', 'elastic-returns', 'elastic-memory',
-                    'elastic-examples', 'elastic-notes', 'elastic-vrr-api', 'elastic-vrr-parameters', 'elastic-conversions')
+                    'elastic-examples', 'elastic-notes', 'elastic-conversions', 'elastic-vrr-api', 'elastic-vrr-parameters')
 VRR_SECTIONS = ('vrr', 'vrr-reference', 'vrr-install', 'vrr-backends', 'vrr-physics', 'vrr-top', 'vrr-example', 'vrr-status')
 GSLS_SECTIONS = ('visco-gsls', 'visco-gsls-modes', 'visco-gsls-physics',
                  'visco-gsls-gradients', 'visco-gsls-stability', 'visco-gsls-memory',
@@ -785,7 +785,7 @@ def check_gsls_api(page, base, locale, output):
     page.goto(base + locale + '/usage.html#visco-gsls', wait_until='networkidle')
     main = page.locator('[role="main"] #visco-gsls')
     assert main.count() == 1
-    assert main.evaluate("e => e.previousElementSibling.id") == 'elastic'
+    assert main.evaluate("e => e.previousElementSibling.id") == 'elastic-vrr-api'
     assert main.evaluate("e => e.nextElementSibling.id") == 'native-runtime'
     assert main.locator('dl.py.function').count() == 3
     for name in ('visco_gsls', 'prepare_visco_gsls', 'visco_gsls_native_status'):

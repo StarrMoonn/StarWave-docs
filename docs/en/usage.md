@@ -1218,6 +1218,39 @@ For native CPU, build its matching library, change device to `torch.device("cpu"
 - V19 import initializes the available elastic library before DataParallel; {py:func}`starwave.prepare_elastic` remains an optional explicit device check. Keep complete materials in a Module and split acquisition along shots only. Successful initialization is not multi-GPU numerical acceptance.
 - This update checked the published wheel's interface and Python 3.10 syntax without running a GPU. Existing user-supplied RTX 4060 source-test reports and published-wheel CPU/host checks have their own scopes; they do not establish A30, multi-GPU, long FWI or target-GPU performance acceptance.
 
+(elastic-conversions)=
+### Material conversions
+
+```{py:function} starwave.common.vpvsrho_to_lambmubuoyancy(vp: torch.Tensor, vs: torch.Tensor, rho: torch.Tensor, eps: float=1e-15) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]
+
+:param vp: **Required.** P-wave speed, typically m/s.
+:type vp: `torch.Tensor`
+:param vs: **Required.** S-wave speed, typically m/s.
+:type vs: `torch.Tensor`
+:param rho: **Required.** Density, typically kg/m³.
+:type rho: `torch.Tensor`
+:param eps: **Default `1e-15`.** Regularizer in the inverse-density/density denominator; used as supplied, without automatic unit scaling.
+:type eps: `float`
+:returns: `(lamb, mu, buoyancy)`; each expression follows ordinary PyTorch broadcasting/type promotion independently, preserving spatial axes and the autograd chain. Supply matching full model shapes before propagation.
+:rtype: `Tuple[torch.Tensor, torch.Tensor, torch.Tensor]`
+```
+
+```{py:function} starwave.common.lambmubuoyancy_to_vpvsrho(lamb: torch.Tensor, mu: torch.Tensor, buoyancy: torch.Tensor, eps: float=1e-15) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]
+
+:param lamb: **Required.** First Lamé parameter, typically Pa.
+:type lamb: `torch.Tensor`
+:param mu: **Required.** Shear modulus, typically Pa.
+:type mu: `torch.Tensor`
+:param buoyancy: **Required.** Inverse density, typically m³/kg.
+:type buoyancy: `torch.Tensor`
+:param eps: **Default `1e-15`.** Regularizer in the inverse-density/density denominator; used as supplied, without automatic unit scaling.
+:type eps: `float`
+:returns: `(vp, vs, rho)`; each expression follows ordinary PyTorch broadcasting/type promotion independently, preserving spatial axes and the autograd chain. Supply matching full model shapes before propagation.
+:rtype: `Tuple[torch.Tensor, torch.Tensor, torch.Tensor]`
+```
+
+Forward algebra is `lamb=(vp**2-2*vs**2)*rho`, `mu=vs**2*rho`, and `buoyancy=rho/(rho**2+eps)`. The inverse first computes `vs=sqrt(mu*buoyancy)`, then `vp=sqrt(lamb*buoyancy+2*vs**2)` and `rho=buoyancy/(buoyancy**2+eps)`. The regularizer makes round trips generally approximate; squaring loses negative velocity signs. PyTorch broadcasting is preserved, but the helpers do not repair physical signs, clamp square-root inputs, detach or mutate inputs. The propagator still requires matching spatial shapes.
+
 (elastic-vrr-api)=
 ## Elastic VRR Function
 
@@ -1313,39 +1346,6 @@ V21 addition, checked against authorized dev source `ecec2876d450a2327a26114a7bb
 
 
 See the [runnable CPU forward/backward example and backend/build limits](examples/elastic-vrr.md). Native second derivatives are unsupported; full/checkpoint/boundary storage and callback snapshots are not interchangeable. This documentation update did not run new solver/GPU benchmarks.
-
-(elastic-conversions)=
-### Material conversions
-
-```{py:function} starwave.common.vpvsrho_to_lambmubuoyancy(vp: torch.Tensor, vs: torch.Tensor, rho: torch.Tensor, eps: float=1e-15) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]
-
-:param vp: **Required.** P-wave speed, typically m/s.
-:type vp: `torch.Tensor`
-:param vs: **Required.** S-wave speed, typically m/s.
-:type vs: `torch.Tensor`
-:param rho: **Required.** Density, typically kg/m³.
-:type rho: `torch.Tensor`
-:param eps: **Default `1e-15`.** Regularizer in the inverse-density/density denominator; used as supplied, without automatic unit scaling.
-:type eps: `float`
-:returns: `(lamb, mu, buoyancy)`; each expression follows ordinary PyTorch broadcasting/type promotion independently, preserving spatial axes and the autograd chain. Supply matching full model shapes before propagation.
-:rtype: `Tuple[torch.Tensor, torch.Tensor, torch.Tensor]`
-```
-
-```{py:function} starwave.common.lambmubuoyancy_to_vpvsrho(lamb: torch.Tensor, mu: torch.Tensor, buoyancy: torch.Tensor, eps: float=1e-15) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]
-
-:param lamb: **Required.** First Lamé parameter, typically Pa.
-:type lamb: `torch.Tensor`
-:param mu: **Required.** Shear modulus, typically Pa.
-:type mu: `torch.Tensor`
-:param buoyancy: **Required.** Inverse density, typically m³/kg.
-:type buoyancy: `torch.Tensor`
-:param eps: **Default `1e-15`.** Regularizer in the inverse-density/density denominator; used as supplied, without automatic unit scaling.
-:type eps: `float`
-:returns: `(vp, vs, rho)`; each expression follows ordinary PyTorch broadcasting/type promotion independently, preserving spatial axes and the autograd chain. Supply matching full model shapes before propagation.
-:rtype: `Tuple[torch.Tensor, torch.Tensor, torch.Tensor]`
-```
-
-Forward algebra is `lamb=(vp**2-2*vs**2)*rho`, `mu=vs**2*rho`, and `buoyancy=rho/(rho**2+eps)`. The inverse first computes `vs=sqrt(mu*buoyancy)`, then `vp=sqrt(lamb*buoyancy+2*vs**2)` and `rho=buoyancy/(buoyancy**2+eps)`. The regularizer makes round trips generally approximate; squaring loses negative velocity signs. PyTorch broadcasting is preserved, but the helpers do not repair physical signs, clamp square-root inputs, detach or mutate inputs. The propagator still requires matching spatial shapes.
 
 (visco-gsls)=
 ## GSLS Function

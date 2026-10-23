@@ -1218,6 +1218,39 @@ assert vs.grad is not None
 - V19 导入会在 DataParallel 前初始化可用弹性库；{py:func}`starwave.prepare_elastic` 仍可用于可选的显式设备检查。将完整材料放入 Module，只沿炮维拆分采集；初始化成功不代表多卡数值验收。
 - 本次文档维护核对发布 wheel 的接口及 Python 3.10 语法，不执行 GPU。已有用户提供的 RTX 4060 源码测试报告与公开 wheel 的 CPU/主机测试具有各自范围，不据此宣称 A30、多卡、长程 FWI 或目标 GPU 性能全部通过。
 
+(elastic-conversions)=
+### 材料参数转换
+
+```{py:function} starwave.common.vpvsrho_to_lambmubuoyancy(vp: torch.Tensor, vs: torch.Tensor, rho: torch.Tensor, eps: float=1e-15) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]
+
+:param vp: **必填。** P 波速度，典型单位 m/s。
+:type vp: `torch.Tensor`
+:param vs: **必填。** S 波速度，典型单位 m/s。
+:type vs: `torch.Tensor`
+:param rho: **必填。** 密度，典型单位 kg/m³。
+:type rho: `torch.Tensor`
+:param eps: **默认 `1e-15`。** 逆密度/密度分母的正则项；保留该值，不做自动单位缩放。
+:type eps: `float`
+:returns: `(lamb, mu, buoyancy)`；各表达式独立遵循 PyTorch 广播与类型提升，保留空间轴序和 autograd 链。传播前应提供形状匹配的完整模型。
+:rtype: `Tuple[torch.Tensor, torch.Tensor, torch.Tensor]`
+```
+
+```{py:function} starwave.common.lambmubuoyancy_to_vpvsrho(lamb: torch.Tensor, mu: torch.Tensor, buoyancy: torch.Tensor, eps: float=1e-15) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]
+
+:param lamb: **必填。** 第一 Lamé 参数，典型单位 Pa。
+:type lamb: `torch.Tensor`
+:param mu: **必填。** 剪切模量，典型单位 Pa。
+:type mu: `torch.Tensor`
+:param buoyancy: **必填。** 逆密度，典型单位 m³/kg。
+:type buoyancy: `torch.Tensor`
+:param eps: **默认 `1e-15`。** 逆密度/密度分母的正则项；保留该值，不做自动单位缩放。
+:type eps: `float`
+:returns: `(vp, vs, rho)`；各表达式独立遵循 PyTorch 广播与类型提升，保留空间轴序和 autograd 链。传播前应提供形状匹配的完整模型。
+:rtype: `Tuple[torch.Tensor, torch.Tensor, torch.Tensor]`
+```
+
+正向代数为 `lamb=(vp**2-2*vs**2)*rho`、`mu=vs**2*rho`、`buoyancy=rho/(rho**2+eps)`。逆向先取 `vs=sqrt(mu*buoyancy)`，再取 `vp=sqrt(lamb*buoyancy+2*vs**2)` 与 `rho=buoyancy/(buoyancy**2+eps)`。eps 使往返通常近似而非精确；负速度符号经平方丢失。支持 PyTorch 广播但不会校验/修复物理符号、裁剪开方输入、detach 或修改输入；传播器仍要求一致的空间形状。
+
 (elastic-vrr-api)=
 ## 弹性波 VRR 函数
 
@@ -1313,39 +1346,6 @@ V21 新增接口，按授权 dev 源码 `ecec2876d450a2327a26114a7bb7035e38d81ac
 
 
 参见[可运行 CPU 正反传示例及后端/构建限制](examples/elastic-vrr.md)。原生不支持二阶导数；full/checkpoint/boundary 存储与回调快照并不相同。本次文档更新未运行新的求解器/GPU 基准。
-
-(elastic-conversions)=
-### 材料参数转换
-
-```{py:function} starwave.common.vpvsrho_to_lambmubuoyancy(vp: torch.Tensor, vs: torch.Tensor, rho: torch.Tensor, eps: float=1e-15) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]
-
-:param vp: **必填。** P 波速度，典型单位 m/s。
-:type vp: `torch.Tensor`
-:param vs: **必填。** S 波速度，典型单位 m/s。
-:type vs: `torch.Tensor`
-:param rho: **必填。** 密度，典型单位 kg/m³。
-:type rho: `torch.Tensor`
-:param eps: **默认 `1e-15`。** 逆密度/密度分母的正则项；保留该值，不做自动单位缩放。
-:type eps: `float`
-:returns: `(lamb, mu, buoyancy)`；各表达式独立遵循 PyTorch 广播与类型提升，保留空间轴序和 autograd 链。传播前应提供形状匹配的完整模型。
-:rtype: `Tuple[torch.Tensor, torch.Tensor, torch.Tensor]`
-```
-
-```{py:function} starwave.common.lambmubuoyancy_to_vpvsrho(lamb: torch.Tensor, mu: torch.Tensor, buoyancy: torch.Tensor, eps: float=1e-15) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]
-
-:param lamb: **必填。** 第一 Lamé 参数，典型单位 Pa。
-:type lamb: `torch.Tensor`
-:param mu: **必填。** 剪切模量，典型单位 Pa。
-:type mu: `torch.Tensor`
-:param buoyancy: **必填。** 逆密度，典型单位 m³/kg。
-:type buoyancy: `torch.Tensor`
-:param eps: **默认 `1e-15`。** 逆密度/密度分母的正则项；保留该值，不做自动单位缩放。
-:type eps: `float`
-:returns: `(vp, vs, rho)`；各表达式独立遵循 PyTorch 广播与类型提升，保留空间轴序和 autograd 链。传播前应提供形状匹配的完整模型。
-:rtype: `Tuple[torch.Tensor, torch.Tensor, torch.Tensor]`
-```
-
-正向代数为 `lamb=(vp**2-2*vs**2)*rho`、`mu=vs**2*rho`、`buoyancy=rho/(rho**2+eps)`。逆向先取 `vs=sqrt(mu*buoyancy)`，再取 `vp=sqrt(lamb*buoyancy+2*vs**2)` 与 `rho=buoyancy/(buoyancy**2+eps)`。eps 使往返通常近似而非精确；负速度符号经平方丢失。支持 PyTorch 广播但不会校验/修复物理符号、裁剪开方输入、detach 或修改输入；传播器仍要求一致的空间形状。
 
 (visco-gsls)=
 ## GSLS Function
