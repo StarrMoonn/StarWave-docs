@@ -1,0 +1,8 @@
+{
+  "source_commit": "ecec2876d450a2327a26114a7bb7035e38d81acd",
+  "source_file": "starwave/elastic_vrr.py",
+  "signatures": {
+    "elastic_vrr_parameters": "vp, vs, rho, grid_spacing, *, accuracy=4",
+    "elastic_vrr": "vp, vs, rp_x, rp_z, rs_x, rs_z, grid_spacing, dt, *, source_amplitudes, source_locations, receiver_locations, source_component='pz', receiver_components=('pz',), source_type='momentum_rate', density=None, accuracy=4, pml_width=20, pml_freq=25.0, max_vel=None, backend='torch', execution='eager', memory='full', checkpoint_interval=20, forward_callback=None, callback_frequency=1, return_state=False, free_surface=False, reflectivity_layout='edge', cfl_resample=True, return_time_sampling=False, compile_steps=1"
+  }
+}

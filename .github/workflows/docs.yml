@@ -28,6 +28,7 @@ jobs:
       - run: python tools/check_scalar_dev_docs.py
       - run: python tools/check_born_docs.py
       - run: python tools/check_vrr_docs.py
+      - run: python tools/check_elastic_vrr_docs.py
       - run: python tools/check_tutorial_assets.py
       - run: python tools/check_scalar3d_examples.py _build/html
       - run: python tools/check_sls_examples.py _build/html

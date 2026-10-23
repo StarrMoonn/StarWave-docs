@@ -69,6 +69,10 @@ USAGE_NUMBERS = USAGE_NUMBERS[:_vrr_ref_insert] + (63,) + USAGE_NUMBERS[_vrr_ref
 V19_HELPER_SECTIONS = ('elastic-native-status', 'scalar-illumination', 'illumination-seal', 'illumination-reduce', 'illumination-close', 'precondition-gradient', 'ricker', 'backend-capabilities')
 USAGE_SECTIONS += V19_HELPER_SECTIONS
 USAGE_NUMBERS += tuple(range(64, 64 + len(V19_HELPER_SECTIONS)))
+# V21 elastic VRR: allocate new numbers without changing existing bookmarks.
+_elastic_vrr_insert = USAGE_SECTIONS.index('elastic-conversions')
+USAGE_SECTIONS = USAGE_SECTIONS[:_elastic_vrr_insert] + ('elastic-vrr-api', 'elastic-vrr-parameters') + USAGE_SECTIONS[_elastic_vrr_insert:]
+USAGE_NUMBERS = USAGE_NUMBERS[:_elastic_vrr_insert] + (72, 73) + USAGE_NUMBERS[_elastic_vrr_insert:]
 MODELING_FRAGMENTS = {'modeling/vrz.md', 'modeling/vti.md'}
 WAVE_SECTIONS = ('wave-propagation', 'wave-vrz', 'wave-vrz-details', 'wave-vrz-limits',
                  'wave-vti', 'wave-vti-details', 'wave-vti-limits')

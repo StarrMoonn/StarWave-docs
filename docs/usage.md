@@ -1,6 +1,6 @@
 # Usage
 
-新增：[V21 弹性 VRR 接口与可运行 CPU 示例](examples/elastic-vrr.md)。此功能需要匹配的授权 V21 源码；下文旧版本与包说明保留为历史基线，不代表当前 PyPI 可用性，也不包含弹性 VRR。
+新增：[V21 弹性 VRR 接口与可运行 CPU 示例](examples/elastic-vrr.md)。此功能需要匹配的授权 V21 源码；下文旧版本与包说明保留为历史基线，不代表当前 PyPI 可用性，也不包含弹性 VRR。 完整参考：[弹性波 VRR 函数](#elastic-vrr-api)与[参数转换](#elastic-vrr-parameters)。
 
 GSLS: [visco_gsls](#visco-gsls). VRR: [starwave.vrr](#vrr). 两者均集成于 V19 主包。
 
@@ -15,6 +15,7 @@ GSLS: [visco_gsls](#visco-gsls). VRR: [starwave.vrr](#vrr). 两者均集成于 V
 - [VTI Function](#vti)
 - [Elastic Function](#elastic)
 - [GSLS Function](#visco-gsls)
+- [弹性波 VRR 函数](#elastic-vrr-api)
 - [材料参数转换](#elastic-conversions)
 - [starwave.native_status](#native-status)
 - [starwave.prepare_native](#prepare-native)
@@ -22,7 +23,7 @@ GSLS: [visco_gsls](#visco-gsls). VRR: [starwave.vrr](#vrr). 两者均集成于 V
 - [其它导出名称与范围](#other-exports)
 ```
 
-本参考统一面向冻结 V19 源码 `0.1.0.dev19`，提交 `46d32877e3336d531520a696d5f2e074e6f4ef74`，已发布为 [Release V19](https://github.com/StarrMoonn/StarWave/releases/tag/V19)。下方签名均按该源码核对，包括 23 参数 Scalar API 与已集成的 `starwave.vrr`。PyPI 9.1.0 最终 wheel 已发布，产物身份与 CPU 检查已核验；已发布 9.0.0 是历史 V18 wheel。源码、wheel 与设备验收证据分别记录。见[文档状态](status.md)与[安装](installation.md)。
+除单独标注的 V21 弹性波 VRR 新增接口外，本参考面向冻结 V19 源码 `0.1.0.dev19`，提交 `46d32877e3336d531520a696d5f2e074e6f4ef74`，已发布为 [Release V19](https://github.com/StarrMoonn/StarWave/releases/tag/V19)。其余签名按该源码核对，包括 23 参数 Scalar API 与已集成的 `starwave.vrr`。PyPI 9.1.0 最终 wheel 已发布，产物身份与 CPU 检查已核验；已发布 9.0.0 是历史 V18 wheel。源码、wheel 与设备验收证据分别记录。见[文档状态](status.md)与[安装](installation.md)。
 
 6.0.0 的内部存储和 PML 转置维护见[发布说明](release-notes.md)，二维存储变化见[scalar 说明](modeling/scalar.md)。它们不引入新的公共参数；源码升级需重新构建配套原生库。
 
@@ -866,7 +867,7 @@ assert all(x.grad is not None and torch.isfinite(x.grad).all()
 (vrr-status)=
 ### 源码与验证范围
 
-本参考统一面向冻结 V19 源码 `0.1.0.dev19`，提交 `46d32877e3336d531520a696d5f2e074e6f4ef74`，已发布为 [Release V19](https://github.com/StarrMoonn/StarWave/releases/tag/V19)。下方签名均按该源码核对，包括 23 参数 Scalar API 与已集成的 `starwave.vrr`。PyPI 9.1.0 最终 wheel 已发布，产物身份与 CPU 检查已核验；已发布 9.0.0 是历史 V18 wheel。源码、wheel 与设备验收证据分别记录。见[文档状态](status.md)与[安装](installation.md)。
+除单独标注的 V21 弹性波 VRR 新增接口外，本参考面向冻结 V19 源码 `0.1.0.dev19`，提交 `46d32877e3336d531520a696d5f2e074e6f4ef74`，已发布为 [Release V19](https://github.com/StarrMoonn/StarWave/releases/tag/V19)。其余签名按该源码核对，包括 23 参数 Scalar API 与已集成的 `starwave.vrr`。PyPI 9.1.0 最终 wheel 已发布，产物身份与 CPU 检查已核验；已发布 9.0.0 是历史 V18 wheel。源码、wheel 与设备验收证据分别记录。见[文档状态](status.md)与[安装](installation.md)。
 
 物理参数化依据 [Whitmore 等，EAGE 2020](https://doi.org/10.3997/2214-4609.202010332)。张量顶部约定依据 [SWEEP dev](https://github.com/DeepWave-KAUST/sweep/tree/32235f796ffa5b272ca81b9016f8cc85e25ecdf1) 提交 `32235f796ffa5b272ca81b9016f8cc85e25ecdf1`；原生 VRR CUDA 步进/VJP 与边界重建为独立实现，不是上游 CUDA 移植。
 
@@ -1216,6 +1217,102 @@ assert vs.grad is not None
 - 没有公开 backward_callback、free_surface、boundary_buffer、source_fields 或 receiver_fields 参数；使用实际分量关键字。这里的 nt/storage 选项也不能直接加到 scalar、VRZ、VTI。
 - V19 导入会在 DataParallel 前初始化可用弹性库；{py:func}`starwave.prepare_elastic` 仍可用于可选的显式设备检查。将完整材料放入 Module，只沿炮维拆分采集；初始化成功不代表多卡数值验收。
 - 本次文档维护核对发布 wheel 的接口及 Python 3.10 语法，不执行 GPU。已有用户提供的 RTX 4060 源码测试报告与公开 wheel 的 CPU/主机测试具有各自范围，不据此宣称 A30、多卡、长程 FWI 或目标 GPU 性能全部通过。
+
+(elastic-vrr-api)=
+## 弹性波 VRR 函数
+
+V21 新增接口，按授权 dev 源码 `ecec2876d450a2327a26114a7bb7035e38d81acd` 核对。这是二维独立动量/应力算子，不是声学 VRR 或普通弹性波。需要匹配源码，不表示当前 PyPI 可用性或新增数值验收。
+
+```{py:function} starwave.elastic_vrr(vp, vs, rp_x, rp_z, rs_x, rs_z, grid_spacing, dt, *, source_amplitudes, source_locations, receiver_locations, source_component='pz', receiver_components=('pz',), source_type='momentum_rate', density=None, accuracy=4, pml_width=20, pml_freq=25.0, max_vel=None, backend='torch', execution='eager', memory='full', checkpoint_interval=20, forward_callback=None, callback_frequency=1, return_state=False, free_surface=False, reflectivity_layout='edge', cfl_resample=True, return_time_sampling=False, compile_steps=1)
+
+:param vp: **必填.** 正 P 波速度 [nx,nz]，通常为 m/s；每维至少 3。六个有限模型共用 float32/float64 与 CPU/CUDA 设备，要求 vp**2 > 4*vs**2/3；不支持 autocast 或 MPS。
+:type vp: `torch.Tensor`
+:param vs: **必填.** 与 vp 匹配的正 S 波速度；不支持 vs=0 模型。
+:type vs: `torch.Tensor`
+:param rp_x: **必填.** P 反射率 [nx,nz]，通常为 1/m，位于正 x 边 (i+1/2,j)；最后一条 x 边输入不起作用且梯度为零。
+:type rp_x: `torch.Tensor`
+:param rp_z: **必填.** 与 vp 匹配的 P 反射率，位于正 z 边 (i,j+1/2)；最后一条 z 边输入不起作用且梯度为零。
+:type rp_z: `torch.Tensor`
+:param rs_x: **必填.** 与 vp 匹配的正 x 边 S 反射率，外边规则同 rp_x。
+:type rs_x: `torch.Tensor`
+:param rs_z: **必填.** 与 vp 匹配的正 z 边 S 反射率，外边规则同 rp_z。
+:type rs_z: `torch.Tensor`
+:param grid_spacing: **必填.** 有限正标量或 [dx,dz]，通常为米。
+:type grid_spacing: `float | int | list[float] | tuple[float, float]`
+:param dt: **必填.** 有限正用户采样间隔，通常为秒；内部子步可更小。
+:type dt: `float | int`
+:param source_amplitudes: **必填.** 有限 [B,S,T] 张量，各维非空，dtype/device 与模型一致。每个完整交错时间步后按内部 dt 积分注入率，不要预先积分。
+:type source_amplitudes: `torch.Tensor`
+:param source_locations: **必填.** 模型设备上的 int32/int64 [B,S,2]，为无 padding 偏移的物理 [x,z] 网格下标。
+:type source_locations: `torch.Tensor`
+:param receiver_locations: **必填.** 模型设备上的 int32/int64 [B,R,2] 物理网格下标，R 可为零。
+:type receiver_locations: `torch.Tensor`
+:param source_component: **默认 `'pz'`.** 可选 px、pz、sxx、szz、sxz。动量位于 x/z 半网格面，正应力位于中心，sxz 位于角点。
+:type source_component: `str`
+:param receiver_components: **默认 `('pz',)`.** 非空分量序列或单个字符串，可选 px,pz,sxx,szz,sxz,vx,vz；输出顺序与之相同，不会把动量自动当作速度。
+:type receiver_components: `str | list[str] | tuple[str, ...]`
+:param source_type: **默认 `'momentum_rate'`.** px/pz 使用 momentum_rate 或 velocity_rate；sxx/szz/sxz 使用 stress_rate。velocity_rate 必须提供 density。
+:type source_type: `str`
+:param density: **默认 `None`.** 可选有限正 [nx,nz] 张量，匹配模型。速度率源或 vx/vz 接收必须提供；可微面密度转换仅标定单位，不改变独立 R 传播算子。
+:type density: `torch.Tensor | None`
+:param accuracy: **默认 `4`.** 空间阶数 2、4、6、8，不接受 bool。
+:type accuracy: `int`
+:param pml_width: **默认 `20`.** 非负整数或四整数 [x-low,x-high,z-low,z-high]；free_surface 将 z-low 强制置零。
+:type pml_width: `int | list[int] | tuple[int, int, int, int]`
+:param pml_freq: **默认 `25.0`.** 有限正 CPML 设计频率，通常为 Hz。
+:type pml_freq: `float | int`
+:param max_vel: **默认 `None`.** CPML 设计上界，须 >= max(vp)；None 使用当前脱离计算图的最大值。求导时固定覆盖模型的上界；CPML 设计常数不可微。
+:type max_vel: `float | int | None`
+:param backend: **默认 `'torch'`.** torch 支持 CPU/CUDA；原生 cpu/cuda 要求设备匹配及对应构建库；无隐式回退。
+:type backend: `str`
+:param execution: **默认 `'eager'`.** Torch 可选 eager 或 compile；原生后端只接受 eager。
+:type execution: `str`
+:param memory: **默认 `'full'`.** Torch 接受 full/checkpoint；原生 CPU/CUDA 接受 full/boundary。不支持的组合报错，full 历史可能过大。
+:type memory: `str`
+:param checkpoint_interval: **默认 `20`.** Torch checkpoint 段的内部时间步数，正整数；与 compile_steps 独立。
+:type checkpoint_interval: `int`
+:param forward_callback: **默认 `None`.** 可选回调，接收 ElasticVRRCallbackState；包含脱离计算图的物理场克隆 px,pz,sxx,szz,sxz，各为 [B,nx,nz]。不可用于可微 loss 或重启。
+:type forward_callback: `Callable | None`
+:param callback_frequency: **默认 `1`.** 以已完成用户步计的正整数频率；仅整除步触发，不自动补发不足间隔的末步。回调 step 从 1 开始，dt 是用户步长，另有 internal_step、internal_dt、step_ratio。
+:type callback_frequency: `int`
+:param return_state: **默认 `False`.** 追加 13 个含 padding 的交错终态数组元组：px,pz,sxx,szz,sxz 后接8 个 CPML 历史。本接口不接收初始重启态。
+:type return_state: `bool`
+:param free_surface: **默认 `False`.** 水平改进真空顶边：物理 z=0 为真空，z=1 为首个固体行。z=0 仅允许 pz 源及 pz/vz 接收。不是任意地形，也不等于只关闭顶部 PML。
+:type free_surface: `bool`
+:param reflectivity_layout: **默认 `'edge'`.** 仅接受 edge；旧单元中心反射率必须重新计算。
+:type reflectivity_layout: `str`
+:param cfl_resample: **默认 `True`.** 自动按系数相关界选择内部子步，对源和记录可微重采样；False 时拒绝过大 dt。该筛选不是任意 R 或 CPML 的稳定性保证。
+:type cfl_resample: `bool`
+:param return_time_sampling: **默认 `False`.** 在可选终态元组之后追加实际时间采样计划，包括用户/内部 dt、nt 及 step_ratio。
+:type return_time_sampling: `bool`
+:param compile_steps: **默认 `1`.** 每个 Torch 执行图的内部步数，正整数；原生要求 1。不改变物理时间采样。
+:type compile_steps: `int`
+:returns: 按接收分量顺序返回各 [B,R,T] 张量；首记录在首个用户步完成后。可选 state 在记录之后，可选 plan 最后；两标志均 True 时为 (*records, state, plan)。终态形状 [B,nx+pad_xlow+pad_xhigh,nz+pad_zlow+pad_zhigh]，各 pad = 有效该面 PML 宽度 + 2*(accuracy//2)。应力时刻在动量时刻之前 internal_dt/2。
+:rtype: tuple
+```
+
+(elastic-vrr-parameters)=
+### 物理模型转换
+
+```{py:function} starwave.elastic_vrr_parameters(vp, vs, rho, grid_spacing, *, accuracy=4)
+
+:param vp: **必填.** 正 P 波速度 [nx,nz]，通常为 m/s；每维至少 3。六个有限模型共用 float32/float64 与 CPU/CUDA 设备，要求 vp**2 > 4*vs**2/3；不支持 autocast 或 MPS。
+:type vp: `torch.Tensor`
+:param vs: **必填.** 与 vp 匹配的正 S 波速度；不支持 vs=0 模型。
+:type vs: `torch.Tensor`
+:param rho: **必填.** 有限正密度 [nx,nz]，dtype/device 匹配 vp/vs，通常为 kg/m³；保留自动微分链。
+:type rho: `torch.Tensor`
+:param grid_spacing: **必填.** 有限正标量或 [dx,dz]，通常为米。
+:type grid_spacing: `float | int | list[float] | tuple[float, float]`
+:param accuracy: **默认 `4`.** 空间阶数 2、4、6、8，不接受 bool。
+:type accuracy: `int`
+:returns: (vp, vs, rp_x, rp_z, rs_x, rs_z)，各为 [nx,nz]。R = +0.5 D_edge log(rho V)，所有 accuracy 均使用按方向间距归一化的一阶前向差分，外边为零。物理 Vp/Vs/rho 求导须保留输出计算图。该局部展开离散不保证在不连续界面与普通弹性波精确等价。
+:rtype: tuple
+```
+
+
+
+参见[可运行 CPU 正反传示例及后端/构建限制](examples/elastic-vrr.md)。原生不支持二阶导数；full/checkpoint/boundary 存储与回调快照并不相同。本次文档更新未运行新的求解器/GPU 基准。
 
 (elastic-conversions)=
 ### 材料参数转换

@@ -261,7 +261,7 @@ def check(wheel_path=None, source_root=None):
                 r'^```\{py:function\} starwave\.([A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*)(\([^\n]+|\(\)[^\n]*)\n(.*?)^```',
                 text, re.M | re.S,
             ):
-                if name in ('scalar_born', 'vrr', 'vrr_reference', 'elastic_native_status', 'precondition_gradient', 'wavelets.ricker', 'torch_backend.backend_capabilities'):
+                if name in ('elastic_vrr', 'elastic_vrr_parameters', 'scalar_born', 'vrr', 'vrr_reference', 'elastic_native_status', 'precondition_gradient', 'wavelets.ricker', 'torch_backend.backend_capabilities'):
                     # Independently checked against its own immutable V17 AST snapshot.
                     continue
                 assert name not in functions, f'{locale}: duplicate API directive: {name}'

@@ -1,6 +1,6 @@
 # Usage
 
-New: [V21 elastic VRR API and runnable CPU example](examples/elastic-vrr.md). This addition requires matching authorized V21 source; older version/package statements below remain historical baseline information and do not establish current PyPI availability or include elastic VRR.
+New: [V21 elastic VRR API and runnable CPU example](examples/elastic-vrr.md). This addition requires matching authorized V21 source; older version/package statements below remain historical baseline information and do not establish current PyPI availability or include elastic VRR. Full reference: [Elastic VRR Function](#elastic-vrr-api) and [parameter conversion](#elastic-vrr-parameters).
 
 GSLS: [visco_gsls](#visco-gsls). VRR: [starwave.vrr](#vrr). Both are included in the V19 root package.
 
@@ -15,6 +15,7 @@ GSLS: [visco_gsls](#visco-gsls). VRR: [starwave.vrr](#vrr). Both are included in
 - [VTI Function](#vti)
 - [Elastic Function](#elastic)
 - [GSLS Function](#visco-gsls)
+- [Elastic VRR Function](#elastic-vrr-api)
 - [Material conversions](#elastic-conversions)
 - [starwave.native_status](#native-status)
 - [starwave.prepare_native](#prepare-native)
@@ -22,7 +23,7 @@ GSLS: [visco_gsls](#visco-gsls). VRR: [starwave.vrr](#vrr). Both are included in
 - [Other exported names and scope](#other-exports)
 ```
 
-This reference targets frozen V19 source `0.1.0.dev19`, commit `46d32877e3336d531520a696d5f2e074e6f4ef74`, published as [Release V19](https://github.com/StarrMoonn/StarWave/releases/tag/V19). All signatures below are checked against that source, including the 23-parameter Scalar API and integrated `starwave.vrr`. The final PyPI 9.1.0 wheel is published, with verified artifact identity and CPU checks; published 9.0.0 is the historical V18 wheel. Source, wheel and device-validation evidence remain separate. See [Status](status.md) and [installation](installation.md).
+This reference targets frozen V19 source `0.1.0.dev19`, commit `46d32877e3336d531520a696d5f2e074e6f4ef74`, published as [Release V19](https://github.com/StarrMoonn/StarWave/releases/tag/V19). Except for the separately labelled V21 elastic VRR addition, signatures below are checked against that source, including the 23-parameter Scalar API and integrated `starwave.vrr`. The final PyPI 9.1.0 wheel is published, with verified artifact identity and CPU checks; published 9.0.0 is the historical V18 wheel. Source, wheel and device-validation evidence remain separate. See [Status](status.md) and [installation](installation.md).
 
 See [Release Notes](release-notes.md) for 6.0.0 internal storage and PML-transpose maintenance, and [Scalar](modeling/scalar.md) for 2D storage changes. These introduce no new public parameters; source upgrades require rebuilt matching native libraries.
 
@@ -866,7 +867,7 @@ For native CUDA, move every model, source and geometry tensor to the same CUDA d
 (vrr-status)=
 ### Source and validation scope
 
-This reference targets frozen V19 source `0.1.0.dev19`, commit `46d32877e3336d531520a696d5f2e074e6f4ef74`, published as [Release V19](https://github.com/StarrMoonn/StarWave/releases/tag/V19). All signatures below are checked against that source, including the 23-parameter Scalar API and integrated `starwave.vrr`. The final PyPI 9.1.0 wheel is published, with verified artifact identity and CPU checks; published 9.0.0 is the historical V18 wheel. Source, wheel and device-validation evidence remain separate. See [Status](status.md) and [installation](installation.md).
+This reference targets frozen V19 source `0.1.0.dev19`, commit `46d32877e3336d531520a696d5f2e074e6f4ef74`, published as [Release V19](https://github.com/StarrMoonn/StarWave/releases/tag/V19). Except for the separately labelled V21 elastic VRR addition, signatures below are checked against that source, including the 23-parameter Scalar API and integrated `starwave.vrr`. The final PyPI 9.1.0 wheel is published, with verified artifact identity and CPU checks; published 9.0.0 is the historical V18 wheel. Source, wheel and device-validation evidence remain separate. See [Status](status.md) and [installation](installation.md).
 
 The physical parameterization follows [Whitmore et al., EAGE 2020](https://doi.org/10.3997/2214-4609.202010332). The tensor top convention follows [SWEEP dev](https://github.com/DeepWave-KAUST/sweep/tree/32235f796ffa5b272ca81b9016f8cc85e25ecdf1) commit `32235f796ffa5b272ca81b9016f8cc85e25ecdf1`; the native VRR CUDA step/VJP and boundary reconstruction are independent implementations, not an upstream CUDA port.
 
@@ -1216,6 +1217,102 @@ For native CPU, build its matching library, change device to `torch.device("cpu"
 - There is no public backward_callback, free_surface, boundary_buffer, source_fields or receiver_fields argument; use the actual component keywords. Elastic nt/storage options cannot be added to scalar, VRZ or VTI calls.
 - V19 import initializes the available elastic library before DataParallel; {py:func}`starwave.prepare_elastic` remains an optional explicit device check. Keep complete materials in a Module and split acquisition along shots only. Successful initialization is not multi-GPU numerical acceptance.
 - This update checked the published wheel's interface and Python 3.10 syntax without running a GPU. Existing user-supplied RTX 4060 source-test reports and published-wheel CPU/host checks have their own scopes; they do not establish A30, multi-GPU, long FWI or target-GPU performance acceptance.
+
+(elastic-vrr-api)=
+## Elastic VRR Function
+
+V21 addition, checked against authorized dev source `ecec2876d450a2327a26114a7bb7035e38d81acd`. This is a 2D independent momentum/stress operator, not acoustic VRR or ordinary elastic. Requires matching source; no current PyPI availability or new numerical acceptance is implied.
+
+```{py:function} starwave.elastic_vrr(vp, vs, rp_x, rp_z, rs_x, rs_z, grid_spacing, dt, *, source_amplitudes, source_locations, receiver_locations, source_component='pz', receiver_components=('pz',), source_type='momentum_rate', density=None, accuracy=4, pml_width=20, pml_freq=25.0, max_vel=None, backend='torch', execution='eager', memory='full', checkpoint_interval=20, forward_callback=None, callback_frequency=1, return_state=False, free_surface=False, reflectivity_layout='edge', cfl_resample=True, return_time_sampling=False, compile_steps=1)
+
+:param vp: **Required.** Positive P-wave speed [nx,nz], typically m/s; dimensions >=3. All six finite models share float32/float64 dtype and CPU/CUDA device. Require vp**2 > 4*vs**2/3; autocast and MPS are unsupported.
+:type vp: `torch.Tensor`
+:param vs: **Required.** Positive S-wave speed matching vp; zero-Vs fluids are unsupported.
+:type vs: `torch.Tensor`
+:param rp_x: **Required.** P reflectivity [nx,nz], typically 1/m, on positive x edges (i+1/2,j). The last x edge is ignored and has zero gradient.
+:type rp_x: `torch.Tensor`
+:param rp_z: **Required.** P reflectivity matching vp on positive z edges (i,j+1/2); the last z edge is ignored and has zero gradient.
+:type rp_z: `torch.Tensor`
+:param rs_x: **Required.** S reflectivity matching vp on positive x edges; same exterior-edge convention as rp_x.
+:type rs_x: `torch.Tensor`
+:param rs_z: **Required.** S reflectivity matching vp on positive z edges; same exterior-edge convention as rp_z.
+:type rs_z: `torch.Tensor`
+:param grid_spacing: **Required.** Finite positive scalar or pair [dx,dz], typically metres.
+:type grid_spacing: `float | int | list[float] | tuple[float, float]`
+:param dt: **Required.** Finite positive user sampling interval, typically seconds; internal substeps may be smaller.
+:type dt: `float | int`
+:param source_amplitudes: **Required.** Finite [B,S,T] tensor, all dimensions nonempty, matching model dtype/device. Rates are integrated by internal dt after each complete leapfrog step; do not preintegrate.
+:type source_amplitudes: `torch.Tensor`
+:param source_locations: **Required.** int32/int64 [B,S,2] on the model device, physical [x,z] grid indices without padding offsets.
+:type source_locations: `torch.Tensor`
+:param receiver_locations: **Required.** int32/int64 [B,R,2] on the model device; physical grid indices, R may be zero.
+:type receiver_locations: `torch.Tensor`
+:param source_component: **Default `'pz'`.** One of px, pz, sxx, szz, sxz. Momentum lives on x/z half-grid faces; normal stresses at centres and sxz at corners.
+:type source_component: `str`
+:param receiver_components: **Default `('pz',)`.** Nonempty component sequence (or single string), choosing px,pz,sxx,szz,sxz,vx,vz. Output order follows this sequence; momentum is not silently relabelled velocity.
+:type receiver_components: `str | list[str] | tuple[str, ...]`
+:param source_type: **Default `'momentum_rate'`.** momentum_rate or velocity_rate for px/pz; stress_rate for sxx/szz/sxz. velocity_rate requires density.
+:type source_type: `str`
+:param density: **Default `None`.** Optional finite positive [nx,nz] tensor matching models. Required for velocity-rate sources or vx/vz receivers; differentiable face-density conversion calibrates units, not the independent-R propagation operator.
+:type density: `torch.Tensor | None`
+:param accuracy: **Default `4`.** Spatial order 2,4,6,8, excluding bool.
+:type accuracy: `int`
+:param pml_width: **Default `20`.** Nonnegative integer or four integers [x-low,x-high,z-low,z-high]. free_surface overrides z-low to zero.
+:type pml_width: `int | list[int] | tuple[int, int, int, int]`
+:param pml_freq: **Default `25.0`.** Finite positive CPML design frequency, typically Hz.
+:type pml_freq: `float | int`
+:param max_vel: **Default `None`.** CPML design bound >= max(vp); None uses the detached current maximum. Fix a covering bound for differentiation; CPML design constants are not differentiated.
+:type max_vel: `float | int | None`
+:param backend: **Default `'torch'`.** torch on CPU/CUDA, or native cpu/cuda on the matching device with a matching built library. No implicit fallback.
+:type backend: `str`
+:param execution: **Default `'eager'`.** Torch eager or compile; native backends require eager.
+:type execution: `str`
+:param memory: **Default `'full'`.** Torch accepts full/checkpoint; native CPU/CUDA accept full/boundary. Unsupported combinations raise; full history can be large.
+:type memory: `str`
+:param checkpoint_interval: **Default `20`.** Positive integer length in internal time steps for Torch checkpoint segments; independent of compile_steps.
+:type checkpoint_interval: `int`
+:param forward_callback: **Default `None`.** Optional callable receiving ElasticVRRCallbackState with detached cloned physical fields px,pz,sxx,szz,sxz, each [B,nx,nz]. Not a differentiable loss or restart state.
+:type forward_callback: `Callable | None`
+:param callback_frequency: **Default `1`.** Positive integer cadence in completed user steps; called at divisible steps only, not automatically at an unmatched final step. Callback step is one-based, dt is user_dt, with internal_step, internal_dt and step_ratio.
+:type callback_frequency: `int`
+:param return_state: **Default `False`.** Append final tuple of 13 padded staggered arrays: px,pz,sxx,szz,sxz followed by eight CPML histories. This API accepts no initial restart state.
+:type return_state: `bool`
+:param free_surface: **Default `False`.** Flat improved-vacuum top: physical z=0 is vacuum, z=1 first solid row. Only pz sources and pz/vz receivers may occupy z=0. Not arbitrary topography or simply disabling top PML.
+:type free_surface: `bool`
+:param reflectivity_layout: **Default `'edge'`.** Only edge is accepted; old cell-centred reflectivities must be recomputed.
+:type reflectivity_layout: `str`
+:param cfl_resample: **Default `True`.** Automatically choose coefficient-dependent internal substeps and differentiably resample sources/records; False rejects an excessive dt. Screening is not a stability guarantee for arbitrary R or CPML.
+:type cfl_resample: `bool`
+:param return_time_sampling: **Default `False`.** Append actual time-sampling plan after the optional state tuple, including user/internal dt and nt and step_ratio.
+:type return_time_sampling: `bool`
+:param compile_steps: **Default `1`.** Positive integer number of internal steps per Torch execution graph; native requires 1. Does not change the physical time sampling.
+:type compile_steps: `int`
+:returns: One [B,R,T] tensor per receiver component in order; first record follows the first completed user step. Optional state follows records; optional plan is last: (*records, state, plan) when both flags are True. State fields are [B,nx+pad_xlow+pad_xhigh,nz+pad_zlow+pad_zhigh], with each pad = effective face PML width + 2*(accuracy//2). Stresses precede momenta by internal_dt/2.
+:rtype: tuple
+```
+
+(elastic-vrr-parameters)=
+### Physical-model conversion
+
+```{py:function} starwave.elastic_vrr_parameters(vp, vs, rho, grid_spacing, *, accuracy=4)
+
+:param vp: **Required.** Positive P-wave speed [nx,nz], typically m/s; dimensions >=3. All six finite models share float32/float64 dtype and CPU/CUDA device. Require vp**2 > 4*vs**2/3; autocast and MPS are unsupported.
+:type vp: `torch.Tensor`
+:param vs: **Required.** Positive S-wave speed matching vp; zero-Vs fluids are unsupported.
+:type vs: `torch.Tensor`
+:param rho: **Required.** Finite positive density [nx,nz] matching vp/vs dtype/device, typically kg/m³; remains in the autograd chain.
+:type rho: `torch.Tensor`
+:param grid_spacing: **Required.** Finite positive scalar or pair [dx,dz], typically metres.
+:type grid_spacing: `float | int | list[float] | tuple[float, float]`
+:param accuracy: **Default `4`.** Spatial order 2,4,6,8, excluding bool.
+:type accuracy: `int`
+:returns: (vp, vs, rp_x, rp_z, rs_x, rs_z), each [nx,nz]. R = +0.5 D_edge log(rho V), nearest-neighbour differences divided by directional spacing for every accuracy, with zero exterior edges. Keep outputs connected for physical Vp/Vs/rho gradients. This local-expanded discretization does not guarantee exact ordinary-elastic equivalence at sharp interfaces.
+:rtype: tuple
+```
+
+
+
+See the [runnable CPU forward/backward example and backend/build limits](examples/elastic-vrr.md). Native second derivatives are unsupported; full/checkpoint/boundary storage and callback snapshots are not interchangeable. This documentation update did not run new solver/GPU benchmarks.
 
 (elastic-conversions)=
 ### Material conversions

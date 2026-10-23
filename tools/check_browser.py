@@ -12,7 +12,7 @@ from urllib.parse import parse_qsl, quote, unquote, urlsplit
 from playwright.sync_api import sync_playwright
 
 PROJECT = Path(__file__).resolve().parents[1]
-API_NAMES = ('scalar', 'scalar_born', 'ScalarBorn', 'ScalarBorn.forward', 'vrz', 'vrr', 'vrr_reference', 'vti', 'elastic',
+API_NAMES = ('scalar', 'scalar_born', 'ScalarBorn', 'ScalarBorn.forward', 'vrz', 'vrr', 'vrr_reference', 'vti', 'elastic', 'elastic_vrr', 'elastic_vrr_parameters',
              'common.vpvsrho_to_lambmubuoyancy', 'common.lambmubuoyancy_to_vpvsrho',
              'visco_gsls', 'prepare_visco_gsls', 'visco_gsls_native_status',
              'native_status', 'prepare_native', 'prepare_elastic', 'elastic_native_status', 'ScalarIllumination',
@@ -20,7 +20,7 @@ API_NAMES = ('scalar', 'scalar_born', 'ScalarBorn', 'ScalarBorn.forward', 'vrz',
              'precondition_gradient', 'wavelets.ricker', 'torch_backend.backend_capabilities')
 BORN_SECTIONS = ('born', 'born-backends', 'born-conventions', 'born-gradients', 'born-callbacks', 'born-returns', 'born-module', 'born-forward', 'born-example', 'born-build', 'born-scope')
 ELASTIC_SECTIONS = ('elastic', 'elastic-axes', 'elastic-returns', 'elastic-memory',
-                    'elastic-examples', 'elastic-notes', 'elastic-conversions')
+                    'elastic-examples', 'elastic-notes', 'elastic-vrr-api', 'elastic-vrr-parameters', 'elastic-conversions')
 VRR_SECTIONS = ('vrr', 'vrr-reference', 'vrr-install', 'vrr-backends', 'vrr-physics', 'vrr-top', 'vrr-example', 'vrr-status')
 GSLS_SECTIONS = ('visco-gsls', 'visco-gsls-modes', 'visco-gsls-physics',
                  'visco-gsls-gradients', 'visco-gsls-stability', 'visco-gsls-memory',
@@ -37,7 +37,7 @@ USAGE_TARGETS = tuple(
 ) + ('scalar-time-sampling', 'scalar-memory', 'scalar-3d-example') + ELASTIC_SECTIONS + ('elastic-function', 'usage', 'propagators', 'native-runtime',
                        'native-status', 'prepare-native', 'native-notes',
                        'native-examples', 'prepare-elastic', 'other-exports') + BORN_SECTIONS + VRR_SECTIONS + GSLS_SECTIONS + V19_HELPER_SECTIONS + ('born-function',) + ('vrr-function', 'gsls-function', 'visco-gsls-function')
-TOC_TARGETS = ('scalar', 'born', 'vrz', 'vrr', 'vti', 'elastic', 'visco-gsls', 'elastic-conversions',
+TOC_TARGETS = ('scalar', 'born', 'vrz', 'vrr', 'vti', 'elastic', 'visco-gsls', 'elastic-vrr-api', 'elastic-conversions',
                'native-status', 'prepare-native', 'prepare-elastic', 'other-exports')
 RECONSTRUCTION_SECTIONS = ('reconstruction', 'reconstruction-scalar3d', 'reconstruction-state',
                            'reconstruction-tape', 'reconstruction-reverse',
