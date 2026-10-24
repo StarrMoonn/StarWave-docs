@@ -25,6 +25,7 @@ jobs:
       - run: python tools/check_site.py _build/html
       - run: python tools/check_v19_api_contracts.py --check tools/v19_api_contract.json --docs docs
       - run: python tools/check_api_docs.py
+      - run: python tools/check_tti_docs.py
       - run: python tools/check_scalar_dev_docs.py
       - run: python tools/check_born_docs.py
       - run: python tools/check_vrr_docs.py

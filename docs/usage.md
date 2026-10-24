@@ -13,6 +13,7 @@ GSLS: [visco_gsls](#visco-gsls). VRR: [starwave.vrr](#vrr). 两者均集成于 V
 - [VRZ Function](#vrz)
 - [VRR Function](#vrr)
 - [VTI Function](#vti)
+- [qP VTI / TTI Function](#tti)
 - [Elastic Function](#elastic)
 - [GSLS Function](#visco-gsls)
 - [弹性波 VRR 函数](#elastic-vrr-api)
@@ -23,7 +24,7 @@ GSLS: [visco_gsls](#visco-gsls). VRR: [starwave.vrr](#vrr). 两者均集成于 V
 - [其它导出名称与范围](#other-exports)
 ```
 
-除单独标注的 V21 弹性波 VRR 新增接口外，本参考面向冻结 V19 源码 `0.1.0.dev19`，提交 `46d32877e3336d531520a696d5f2e074e6f4ef74`，已发布为 [Release V19](https://github.com/StarrMoonn/StarWave/releases/tag/V19)。其余签名按该源码核对，包括 23 参数 Scalar API 与已集成的 `starwave.vrr`。PyPI 9.1.0 最终 wheel 已发布，产物身份与 CPU 检查已核验；已发布 9.0.0 是历史 V18 wheel。源码、wheel 与设备验收证据分别记录。见[文档状态](status.md)与[安装](installation.md)。
+除单独标注的 V21 弹性波 VRR 与当前开发源码 qP TTI 新增接口外，本参考面向冻结 V19 源码 `0.1.0.dev19`，提交 `46d32877e3336d531520a696d5f2e074e6f4ef74`，已发布为 [Release V19](https://github.com/StarrMoonn/StarWave/releases/tag/V19)。其余签名按该源码核对，包括 23 参数 Scalar API 与已集成的 `starwave.vrr`。冻结 V19 API 契约仅作为历史兼容基线，不说明当前包的可用性。本文开发新增接口请使用匹配的完整源码，不应从历史 wheel 记录推断当前 PyPI 可用性。源码、分发产物与设备验收证据分别记录。见[文档状态](status.md)与[安装](installation.md)。
 
 6.0.0 的内部存储和 PML 转置维护见[发布说明](release-notes.md)，二维存储变化见[scalar 说明](modeling/scalar.md)。它们不引入新的公共参数；源码升级需重新构建配套原生库。
 
@@ -41,6 +42,8 @@ GSLS: [visco_gsls](#visco-gsls). VRR: [starwave.vrr](#vrr). 两者均集成于 V
 - {py:func}`starwave.vrr`：二维声学反射率向量；独立 `v, rx, rz` 模型场。已集成于主包。
 
 - {py:func}`starwave.vti`：二维/三维声学 VTI；`vp, epsilon, delta, rho`；按所选分量顺序返回记录。
+
+- {py:func}`starwave.tti`：二维局部近似伪声学 qP VTI/TTI；`vp, epsilon, delta, theta`；标量强迫，full/checkpoint；当前开发源码接口。
 
 - {py:func}`starwave.elastic`：二维/三维各向同性弹性；`lamb, mu, buoyancy`；返回完整最终状态及 p/速度记录。
 
@@ -867,7 +870,7 @@ assert all(x.grad is not None and torch.isfinite(x.grad).all()
 (vrr-status)=
 ### 源码与验证范围
 
-除单独标注的 V21 弹性波 VRR 新增接口外，本参考面向冻结 V19 源码 `0.1.0.dev19`，提交 `46d32877e3336d531520a696d5f2e074e6f4ef74`，已发布为 [Release V19](https://github.com/StarrMoonn/StarWave/releases/tag/V19)。其余签名按该源码核对，包括 23 参数 Scalar API 与已集成的 `starwave.vrr`。PyPI 9.1.0 最终 wheel 已发布，产物身份与 CPU 检查已核验；已发布 9.0.0 是历史 V18 wheel。源码、wheel 与设备验收证据分别记录。见[文档状态](status.md)与[安装](installation.md)。
+除单独标注的 V21 弹性波 VRR 新增接口外，本参考面向冻结 V19 源码 `0.1.0.dev19`，提交 `46d32877e3336d531520a696d5f2e074e6f4ef74`，已发布为 [Release V19](https://github.com/StarrMoonn/StarWave/releases/tag/V19)。其余签名按该源码核对，包括 23 参数 Scalar API 与已集成的 `starwave.vrr`。冻结 V19 API 契约仅作为历史兼容基线，不说明当前包的可用性。本文开发新增接口请使用匹配的完整源码，不应从历史 wheel 记录推断当前 PyPI 可用性。源码、分发产物与设备验收证据分别记录。见[文档状态](status.md)与[安装](installation.md)。
 
 物理参数化依据 [Whitmore 等，EAGE 2020](https://doi.org/10.3997/2214-4609.202010332)。张量顶部约定依据 [SWEEP dev](https://github.com/DeepWave-KAUST/sweep/tree/32235f796ffa5b272ca81b9016f8cc85e25ecdf1) 提交 `32235f796ffa5b272ca81b9016f8cc85e25ecdf1`；原生 VRR CUDA 步进/VJP 与边界重建为独立实现，不是上游 CUDA 移植。
 
@@ -976,6 +979,84 @@ stress_h, velocity_z = starwave.vti(
 - 时间 CFL 子步不能弥补空间采样不足；空间分辨率警告是诊断，不是精度或稳定性证书。
 - DataParallel 应把完整模型放入 Module，只拆分炮维采集；参见[多卡入门](inversion/dataparallel.md)。
 - 本页已核对接口契约，未完成目标 GPU 数值、性能或 FWI 验收。
+
+
+(tti)=
+## qP VTI / TTI Function
+
+这是当前开发源码接口，按 `starwave/tti.py` 核对，不代表冻结 V19/V21 包或 PyPI 已包含。请使用匹配的完整源码，原生路径须显式重新编译。此 Liang 局部方向单场近似 qP 方程独立于 Duveneck `starwave.vti`，不接受 rho、速度/应力源字段或接收分量选择。
+
+```{py:function} starwave.tti(vp, epsilon, delta, theta, grid_spacing, dt, *, source_amplitudes, source_locations, receiver_locations, accuracy=4, pml_freq=25.0, pml_width=20, boundary_buffer=5, memory='full', max_vel=None, freq_taper_frac=0.0, time_pad_frac=0.0, time_taper=False, backend=None, execution='eager', checkpoint_interval=None, compile_steps=1, return_wavefield=False, forward_callback=None, callback_frequency=1, free_surface=False)
+
+:param vp: 必填. 速度 [x,z]，有限且为正；CPU/CUDA float32/float64。
+:param epsilon: 必填. 同形状有限 Thomsen epsilon > -0.5。
+:param delta: 必填. 同形状有限 Thomsen delta > -0.5；满足椭圆性检查时允许 epsilon < delta。
+:param theta: 必填. 同形状有限倾角，单位弧度；零倾角选择 Liang qP VTI，而不是 Duveneck starwave.vti。四个模型的形状、dtype 和设备必须相同。
+:param grid_spacing: 必填. 正标量或 (dx,dz)，按模型轴顺序。
+:param dt: 必填. 正的用户采样间隔；自动采用内部 CFL 子步。
+:param source_amplitudes: 必填. 有限非空 [shot,source,time]，dtype/设备与模型一致。标量强迫，每内部步增量为 -vp(source)^2 * internal_dt^2 * upsampled_source，不是 VTI 应力率源。
+:param source_locations: 必填. 整数 [shot,source,2]，单源也可为 [shot,2]；物理 (x,z) 下标，不含 PML 偏移；重合源增量相加。
+:param receiver_locations: 必填. 整数 [shot,receiver,2]；允许空 [shot,0,2]；重复接收位置分别返回记录。
+:param accuracy: 默认 `4`. 空间阶数 2、4、6 或 8。
+:param pml_freq: 默认 `25.0`. 正的 CPML 参考频率。
+:param pml_width: 默认 `20`. 正整数 A、[A,A,A,A] 或 [A,A,0,A]，顺序为 [x-low,x-high,z-low,z-high]；仅允许 z-low 为零，不支持其它零面组合或不等正宽度。
+:param boundary_buffer: 默认 `5`. 非负空间 buffer，不是 checkpoint 时间间隔。
+:param memory: 默认 `'full'`. 原生与 Torch 均仅支持 full / checkpoint；拒绝 boundary。
+:param max_vel: 默认 `None`. 可选正速度上界，必须覆盖当前各向异性 qP 速度包络，而不只是 max(vp)；过小值会拒绝。
+:param freq_taper_frac: 默认 `0.0`. 时间重采样的频率渐消比例。
+:param time_pad_frac: 默认 `0.0`. 时间重采样的补零比例。
+:param time_taper: 默认 `False`. 是否在重采样中启用时间渐消。
+:param backend: 默认 `None`. None 按模型设备选择原生；native_cpu 要求 CPU，cuda 要求 CUDA，torch 选择张量实现；不隐式回退或搬移模型。
+:param execution: 默认 `'eager'`. 原生仅 eager；Torch 为 eager 或 compile；编译须显式请求。
+:param checkpoint_interval: 默认 `None`. checkpoint 的正整数内部步间隔；None 表示 32；full 时必须为 None。
+:param compile_steps: 默认 `1`. Torch 编译时间块的正整数步数；原生必须为 1。
+:param return_wavefield: 默认 `False`. True 时在记录前返回可微终态 [shot,x,z]。
+:param forward_callback: 默认 `None`. Callable(state)，接收 ScalarCallbackState；物理波场是 detached、独立、只读快照，反传重放不触发回调。
+:param callback_frequency: 默认 `1`. 正整数用户采样点间隔；每个区间及最后内部更新后回调，初始时刻不回调。
+:param free_surface: 默认 `False`. z=0 标量压力释放；顶部零 PML 同样启用；拒绝墙面震源。
+:returns: (records,)，记录为 [shot,receiver,time]；return_wavefield=True 时为 (terminal_wavefield,records)。
+```
+
+**后端与梯度。** 原生 CPU/CUDA 使用显式离散伴随，不依赖时间循环 autograd。原生 full 保存六个步前导数/历史平面；checkpoint 每 K 个内部步保存完整六平面递推状态，反传前逐段正向重放。快照加重放存储为 O(ceil(nt_internal/K)+K)，不含模型、记录和固定工作区。Torch 支持 eager/compile 与 full/checkpoint。一阶梯度覆盖 vp、epsilon、delta、theta 和源幅度，包括源位置 vp² 缩放及模型边缘完整 replicate-padding 转置。CUDA 要求默认 stream，每次 forward 仅一次 backward。不支持 boundary 重建、AMP、MPS、二阶梯度、3D 或初态 API。
+
+**物理、时间与表面。** 局部方向方程是非线性的；固定 1e-26 分母正则项在近零梯度处打破源幅度齐次性。它不是精确频谱 qP 投影，也不模拟弹性 qSV / P–S 转换。参数须通过正的冻结方向椭圆性检查。CFL 筛查包含倾角、各向异性、不等间距和混合模板，但不是普遍非线性/CPML 稳定性定理。设置极值、整数重采样比与 CPML 系数在求导中固定。原始步后记录先移位为 [0,raw[:-1]]，再降采样到用户时刻 0,dt,...；终态位于最后内部源更新之后。回调仅用于诊断，不用其快照构造可微 loss。标量压力释放显式投影 u(x,z=0)=0 并去除顶部 PML，不是弹性无牵引 P/S 转换。法向导数在前 accuracy//2 个内部网格行采用二阶中心闭合，其余使用请求阶数，不是奇镜像 ghost 闭合。
+
+**最小 CPU 示例。** 此小型 Torch 例子检查一阶梯度接线与回调时钟，不构成物理或 GPU 验收。
+
+<!-- tti:example:start -->
+```python
+import torch
+import starwave
+
+vp = torch.full((12, 10), 1500.0, requires_grad=True)
+epsilon = torch.full_like(vp, 0.1, requires_grad=True)
+delta = torch.full_like(vp, 0.05, requires_grad=True)
+theta = torch.full_like(vp, 0.2, requires_grad=True)
+source = torch.zeros((1, 1, 8), dtype=vp.dtype)
+source[..., 1] = 1.0
+source.requires_grad_()
+src = torch.tensor([[[6, 5]]], dtype=torch.long)
+rec = torch.empty((1, 0, 2), dtype=torch.long)
+steps = []
+terminal, records = starwave.tti(
+    vp, epsilon, delta, theta, (10.0, 12.0), 0.0001,
+    source_amplitudes=source, source_locations=src,
+    receiver_locations=rec, accuracy=2, pml_width=2,
+    backend="torch", execution="eager", memory="checkpoint",
+    checkpoint_interval=4, return_wavefield=True,
+    forward_callback=lambda state: steps.append(state.step),
+    callback_frequency=3,
+)
+terminal.square().sum().backward()
+assert records.shape == (1, 0, 8)
+assert terminal.shape == (1, 12, 10)
+assert steps == [3, 6, 8]
+for value in (vp, epsilon, delta, theta, source):
+    assert value.grad is not None and torch.isfinite(value.grad).all()
+```
+<!-- tti:example:end -->
+
+[完整源码 API 与验收边界](https://github.com/StarrMoonn/StarWave/blob/dev/docs/reference/TTI_API.md) · [CUDA notebook](https://github.com/StarrMoonn/StarWave/blob/dev/notebook/TTI/CUDA/TTI2D_ThreeLayer_CUDA.ipynb) · [Torch compile notebook](https://github.com/StarrMoonn/StarWave/blob/dev/notebook/TTI/TorchCompile/TTI2D_ThreeLayer_TorchCompile.ipynb)
 
 (elastic)=
 ## Elastic Function

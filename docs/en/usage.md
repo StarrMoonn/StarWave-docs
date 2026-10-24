@@ -13,6 +13,7 @@ GSLS: [visco_gsls](#visco-gsls). VRR: [starwave.vrr](#vrr). Both are included in
 - [VRZ Function](#vrz)
 - [VRR Function](#vrr)
 - [VTI Function](#vti)
+- [qP VTI / TTI Function](#tti)
 - [Elastic Function](#elastic)
 - [GSLS Function](#visco-gsls)
 - [Elastic VRR Function](#elastic-vrr-api)
@@ -23,7 +24,7 @@ GSLS: [visco_gsls](#visco-gsls). VRR: [starwave.vrr](#vrr). Both are included in
 - [Other exported names and scope](#other-exports)
 ```
 
-This reference targets frozen V19 source `0.1.0.dev19`, commit `46d32877e3336d531520a696d5f2e074e6f4ef74`, published as [Release V19](https://github.com/StarrMoonn/StarWave/releases/tag/V19). Except for the separately labelled V21 elastic VRR addition, signatures below are checked against that source, including the 23-parameter Scalar API and integrated `starwave.vrr`. The final PyPI 9.1.0 wheel is published, with verified artifact identity and CPU checks; published 9.0.0 is the historical V18 wheel. Source, wheel and device-validation evidence remain separate. See [Status](status.md) and [installation](installation.md).
+This reference targets frozen V19 source `0.1.0.dev19`, commit `46d32877e3336d531520a696d5f2e074e6f4ef74`, published as [Release V19](https://github.com/StarrMoonn/StarWave/releases/tag/V19). Except for the separately labelled V21 elastic VRR and current-development qP TTI additions, signatures below are checked against that source, including the 23-parameter Scalar API and integrated `starwave.vrr`. These frozen V19 API contracts are a historical compatibility baseline, not a statement of current package availability. Use the matching complete source checkout for the development additions on this page; do not infer current PyPI availability from historical wheel records. Source, distribution and device-validation evidence remain separate. See [Status](status.md) and [installation](installation.md).
 
 See [Release Notes](release-notes.md) for 6.0.0 internal storage and PML-transpose maintenance, and [Scalar](modeling/scalar.md) for 2D storage changes. These introduce no new public parameters; source upgrades require rebuilt matching native libraries.
 
@@ -41,6 +42,8 @@ The page organization follows the Sphinx Python API style of the [official Deepw
 - {py:func}`starwave.vrr`: `2D` acoustic vector reflectivity; independent `v, rx, rz` fields. Integrated in the root package.
 
 - {py:func}`starwave.vti`: `2D/3D` acoustic VTI; `vp, epsilon, delta, rho`; returns recordings in the selected component order.
+
+- {py:func}`starwave.tti`: `2D` local approximate pseudo-acoustic qP VTI/TTI; `vp, epsilon, delta, theta`; scalar forcing, full/checkpoint. Current development source.
 
 - {py:func}`starwave.elastic`: `2D/3D` isotropic elasticity; `lamb, mu, buoyancy`; complete final states plus p/velocity records.
 
@@ -867,7 +870,7 @@ For native CUDA, move every model, source and geometry tensor to the same CUDA d
 (vrr-status)=
 ### Source and validation scope
 
-This reference targets frozen V19 source `0.1.0.dev19`, commit `46d32877e3336d531520a696d5f2e074e6f4ef74`, published as [Release V19](https://github.com/StarrMoonn/StarWave/releases/tag/V19). Except for the separately labelled V21 elastic VRR addition, signatures below are checked against that source, including the 23-parameter Scalar API and integrated `starwave.vrr`. The final PyPI 9.1.0 wheel is published, with verified artifact identity and CPU checks; published 9.0.0 is the historical V18 wheel. Source, wheel and device-validation evidence remain separate. See [Status](status.md) and [installation](installation.md).
+This reference targets frozen V19 source `0.1.0.dev19`, commit `46d32877e3336d531520a696d5f2e074e6f4ef74`, published as [Release V19](https://github.com/StarrMoonn/StarWave/releases/tag/V19). Except for the separately labelled V21 elastic VRR and current-development qP TTI additions, signatures below are checked against that source, including the 23-parameter Scalar API and integrated `starwave.vrr`. These frozen V19 API contracts are a historical compatibility baseline, not a statement of current package availability. Use the matching complete source checkout for the development additions on this page; do not infer current PyPI availability from historical wheel records. Source, distribution and device-validation evidence remain separate. See [Status](status.md) and [installation](installation.md).
 
 The physical parameterization follows [Whitmore et al., EAGE 2020](https://doi.org/10.3997/2214-4609.202010332). The tensor top convention follows [SWEEP dev](https://github.com/DeepWave-KAUST/sweep/tree/32235f796ffa5b272ca81b9016f8cc85e25ecdf1) commit `32235f796ffa5b272ca81b9016f8cc85e25ecdf1`; the native VRR CUDA step/VJP and boundary reconstruction are independent implementations, not an upstream CUDA port.
 
@@ -976,6 +979,84 @@ This example uses 2D inputs. A 3D call needs all four models shaped `[nx,ny,nz]`
 - CFL time substeps cannot compensate for inadequate spatial sampling. Spatial-resolution warnings are diagnostics, not certificates of accuracy or stability.
 - For DataParallel, place the complete model in a Module and split acquisition inputs only along the shot dimension; see [Multi-GPU introduction](inversion/dataparallel.md).
 - This page’s interface contract has been checked. Target-GPU numerical, performance, and FWI acceptance tests have not been completed.
+
+
+(tti)=
+## qP VTI / TTI Function
+
+This is the current development-source API, checked against `starwave/tti.py`; it is not a claim about frozen V19/V21 packages or PyPI. Use a matching complete checkout and explicitly rebuild native libraries. This single-field Liang local-direction approximate qP equation is separate from Duveneck `starwave.vti`: no rho, velocity/stress source fields or component selectors are accepted.
+
+```{py:function} starwave.tti(vp, epsilon, delta, theta, grid_spacing, dt, *, source_amplitudes, source_locations, receiver_locations, accuracy=4, pml_freq=25.0, pml_width=20, boundary_buffer=5, memory='full', max_vel=None, freq_taper_frac=0.0, time_pad_frac=0.0, time_taper=False, backend=None, execution='eager', checkpoint_interval=None, compile_steps=1, return_wavefield=False, forward_callback=None, callback_frequency=1, free_surface=False)
+
+:param vp: Required. Velocity [x,z], finite and positive; float32/float64 CPU/CUDA.
+:param epsilon: Required. Same-shaped finite Thomsen epsilon > -0.5.
+:param delta: Required. Same-shaped finite Thomsen delta > -0.5; epsilon < delta is allowed if the ellipticity guard passes.
+:param theta: Required. Same-shaped finite tilt in radians. Zero selects Liang qP VTI, not the Duveneck starwave.vti equation. All four models share shape, dtype and device.
+:param grid_spacing: Required. Positive scalar or (dx,dz), in model-axis order.
+:param dt: Required. Positive user-sample interval; internal CFL substeps are automatic.
+:param source_amplitudes: Required. Finite nonempty [shot,source,time], with model dtype/device. Scalar forcing: each internal increment is -vp(source)^2 * internal_dt^2 * upsampled_source; not a VTI stress-rate source.
+:param source_locations: Required. Integer [shot,source,2], or [shot,2] for one source; physical (x,z) indices without PML offset. Duplicate sources add.
+:param receiver_locations: Required. Integer [shot,receiver,2]; empty [shot,0,2] is valid. Duplicate receivers retain separate records.
+:param accuracy: Default `4`. Spatial order 2, 4, 6 or 8.
+:param pml_freq: Default `25.0`. Positive CPML reference frequency.
+:param pml_width: Default `20`. Positive integer A, [A,A,A,A], or [A,A,0,A] in [x-low,x-high,z-low,z-high] order; only z-low may be zero. Other zero-face patterns and unequal positive widths are not supported.
+:param boundary_buffer: Default `5`. Nonnegative spatial buffer, not a checkpoint interval.
+:param memory: Default `'full'`. full or checkpoint only, on native and Torch; boundary is rejected.
+:param max_vel: Default `None`. Optional positive bound covering the current anisotropic qP speed envelope, not merely max(vp). Too-small values are rejected.
+:param freq_taper_frac: Default `0.0`. Temporal resampling frequency taper fraction.
+:param time_pad_frac: Default `0.0`. Temporal resampling padding fraction.
+:param time_taper: Default `False`. Enable the time taper during resampling.
+:param backend: Default `None`. None selects native for the model device; native_cpu requires CPU, cuda requires CUDA, torch selects the tensor implementation. No implicit fallback or device transfer.
+:param execution: Default `'eager'`. eager for native; eager or compile for Torch. Compilation must be requested explicitly.
+:param checkpoint_interval: Default `None`. Positive integer INTERNAL steps for checkpoint; None resolves to 32. Must remain None with full.
+:param compile_steps: Default `1`. Positive integer compiled time-chunk size for Torch; native requires 1.
+:param return_wavefield: Default `False`. Return differentiable terminal [shot,x,z] before records when True.
+:param forward_callback: Default `None`. Callable(state), with ScalarCallbackState detached, cloned, read-only physical wavefield; no callbacks during backward replay.
+:param callback_frequency: Default `1`. Positive integer USER samples; callback after each interval and at the final internal update, not at time zero.
+:param free_surface: Default `False`. Scalar pressure release at z=0; also implied by top-zero PML. Sources on the wall are rejected.
+:returns: (records,) with [shot,receiver,time]; or (terminal_wavefield,records) with return_wavefield=True.
+```
+
+**Backends and gradients.** Native CPU/CUDA use explicit discrete adjoints, not time-loop autograd. Native full saves six pre-step derivative/history planes; checkpoint stores all six recurrence-state planes every K internal steps and replays each segment before reverse traversal. Snapshot plus replay storage scales as O(ceil(nt_internal/K)+K), excluding models, records and fixed workspace. Torch supports eager/compile with full/checkpoint. First-order gradients reach vp, epsilon, delta, theta and source amplitudes, including source-location vp² scaling and the full replicate-padding transpose at model edges. CUDA requires the default stream and one backward per forward. No boundary reconstruction, AMP, MPS, double backward, 3D or initial-state API is supported.
+
+**Physics, time and surface.** The local-direction equation is nonlinear; its fixed 1e-26 denominator regularizer breaks source-amplitude homogeneity near zero gradients. It is neither an exact spectral qP projector nor elastic qSV/P–S conversion. Positive frozen-direction ellipticity is required. CFL screening includes tilt, anisotropy, unequal spacing and mixed stencils; it is not a universal nonlinear/CPML stability theorem. Setup extrema, integer resampling ratios and CPML profiles are frozen for differentiation. Records use user times 0,dt,... after shifting raw post-step samples to [0,raw[:-1]]; the terminal field follows the last internal source update. Callbacks are diagnostic, not differentiable loss inputs. Scalar pressure release projects u(x,z=0)=0 and removes top PML; it is not elastic traction-free conversion. Normal derivatives use second-order centered closure in the first accuracy//2 interior rows and requested order elsewhere, not odd-ghost closure.
+
+**Minimal CPU example.** This small Torch example checks first-order gradient wiring and callback timing; it is not a physics or GPU acceptance test.
+
+<!-- tti:example:start -->
+```python
+import torch
+import starwave
+
+vp = torch.full((12, 10), 1500.0, requires_grad=True)
+epsilon = torch.full_like(vp, 0.1, requires_grad=True)
+delta = torch.full_like(vp, 0.05, requires_grad=True)
+theta = torch.full_like(vp, 0.2, requires_grad=True)
+source = torch.zeros((1, 1, 8), dtype=vp.dtype)
+source[..., 1] = 1.0
+source.requires_grad_()
+src = torch.tensor([[[6, 5]]], dtype=torch.long)
+rec = torch.empty((1, 0, 2), dtype=torch.long)
+steps = []
+terminal, records = starwave.tti(
+    vp, epsilon, delta, theta, (10.0, 12.0), 0.0001,
+    source_amplitudes=source, source_locations=src,
+    receiver_locations=rec, accuracy=2, pml_width=2,
+    backend="torch", execution="eager", memory="checkpoint",
+    checkpoint_interval=4, return_wavefield=True,
+    forward_callback=lambda state: steps.append(state.step),
+    callback_frequency=3,
+)
+terminal.square().sum().backward()
+assert records.shape == (1, 0, 8)
+assert terminal.shape == (1, 12, 10)
+assert steps == [3, 6, 8]
+for value in (vp, epsilon, delta, theta, source):
+    assert value.grad is not None and torch.isfinite(value.grad).all()
+```
+<!-- tti:example:end -->
+
+[Full source API and acceptance limits](https://github.com/StarrMoonn/StarWave/blob/dev/docs/reference/TTI_API.md) · [CUDA notebook](https://github.com/StarrMoonn/StarWave/blob/dev/notebook/TTI/CUDA/TTI2D_ThreeLayer_CUDA.ipynb) · [Torch compile notebook](https://github.com/StarrMoonn/StarWave/blob/dev/notebook/TTI/TorchCompile/TTI2D_ThreeLayer_TorchCompile.ipynb)
 
 (elastic)=
 ## Elastic Function
