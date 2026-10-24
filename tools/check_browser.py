@@ -12,7 +12,7 @@ from urllib.parse import parse_qsl, quote, unquote, urlsplit
 from playwright.sync_api import sync_playwright
 
 PROJECT = Path(__file__).resolve().parents[1]
-API_NAMES = ('scalar', 'scalar_born', 'ScalarBorn', 'ScalarBorn.forward', 'vrz', 'vrr', 'vrr_reference', 'vti', 'elastic',
+API_NAMES = ('scalar', 'scalar_born', 'ScalarBorn', 'ScalarBorn.forward', 'vrz', 'vrr', 'vrr_reference', 'vti', 'tti', 'elastic',
              'common.vpvsrho_to_lambmubuoyancy', 'common.lambmubuoyancy_to_vpvsrho', 'elastic_vrr', 'elastic_vrr_parameters',
              'visco_gsls', 'prepare_visco_gsls', 'visco_gsls_native_status',
              'native_status', 'prepare_native', 'prepare_elastic', 'elastic_native_status', 'ScalarIllumination',
@@ -34,10 +34,10 @@ USAGE_TARGETS = tuple(
     for name in ('scalar', 'vrz', 'vti')
     for target in (name, f'{name}-function', f'{name}-details',
                    f'{name}-examples', f'{name}-notes')
-) + ('scalar-time-sampling', 'scalar-memory', 'scalar-3d-example') + ELASTIC_SECTIONS + ('elastic-function', 'usage', 'propagators', 'native-runtime',
+) + ('scalar-time-sampling', 'scalar-memory', 'scalar-3d-example', 'tti') + ELASTIC_SECTIONS + ('elastic-function', 'usage', 'propagators', 'native-runtime',
                        'native-status', 'prepare-native', 'native-notes',
                        'native-examples', 'prepare-elastic', 'other-exports') + BORN_SECTIONS + VRR_SECTIONS + GSLS_SECTIONS + V19_HELPER_SECTIONS + ('born-function',) + ('vrr-function', 'gsls-function', 'visco-gsls-function')
-TOC_TARGETS = ('scalar', 'born', 'vrz', 'vrr', 'vti', 'elastic', 'visco-gsls', 'elastic-vrr-api', 'elastic-conversions',
+TOC_TARGETS = ('scalar', 'born', 'vrz', 'vrr', 'vti', 'tti', 'elastic', 'visco-gsls', 'elastic-vrr-api', 'elastic-conversions',
                'native-status', 'prepare-native', 'prepare-elastic', 'other-exports')
 RECONSTRUCTION_SECTIONS = ('reconstruction', 'reconstruction-scalar3d', 'reconstruction-state',
                            'reconstruction-tape', 'reconstruction-reverse',
@@ -205,14 +205,14 @@ def check_usage(page, locale, output):
     title = main.locator('#usage > h1').evaluate("e => ({size:parseFloat(getComputedStyle(e).fontSize),font:getComputedStyle(e).fontFamily,weight:getComputedStyle(e).fontWeight})")
     assert abs(title['size'] - 40.8) < .01 and 'Georgia' in title['font'] and title['weight'] == '400', title
     for name, label in (('scalar', 'Scalar Function'), ('born', 'Born Function'), ('vrz', 'VRZ Function'),
-                        ('vrr', 'VRR Function'), ('vti', 'VTI Function'), ('elastic', 'Elastic Function'), ('visco-gsls', 'GSLS Function')):
+                        ('vrr', 'VRR Function'), ('vti', 'VTI Function'), ('tti', 'qP VTI / TTI Function'), ('elastic', 'Elastic Function'), ('visco-gsls', 'GSLS Function')):
         heading = main.locator(f'#{name} > h2')
         assert heading.evaluate("e => e.firstChild.textContent.trim()") == label
         assert abs(heading.evaluate('e => parseFloat(getComputedStyle(e).fontSize)') - 30.6) < .01
         assert 'Georgia' in heading.evaluate('e => getComputedStyle(e).fontFamily')
     assert not main.locator('h3').evaluate_all("items => items.some(e => ['Function', '函数'].includes(e.firstChild.textContent.trim()))")
     overview = main.locator('#propagators')
-    assert overview.locator('code.xref').all_text_contents() == ['starwave.scalar()', 'starwave.scalar_born()', 'starwave.vrz()', 'starwave.vrr()', 'starwave.vti()', 'starwave.elastic()', 'starwave.visco_gsls()']
+    assert overview.locator('code.xref').all_text_contents() == ['starwave.scalar()', 'starwave.scalar_born()', 'starwave.vrz()', 'starwave.vrr()', 'starwave.vti()', 'starwave.tti()', 'starwave.elastic()', 'starwave.visco_gsls()']
     assert overview.locator('a[href="#starwave.visco_gsls"] > code.xref').count() == 1
     assert overview.locator(':scope > p code.literal').all_text_contents() == ['B', 'S', 'R', 'T', 'D']
     overview_rows = overview.locator('p').evaluate_all("""items => items.map(p => {
@@ -223,12 +223,12 @@ def check_usage(page, locale, output):
                     return {text:e.textContent, size:s.fontSize, line:s.lineHeight, vertical:s.verticalAlign};
                 })};
     })""")
-    assert len(overview_rows) == 8
+    assert len(overview_rows) == 9
     assert len({row['line'] for row in overview_rows}) == 1, (locale, overview_rows)
     assert all(row['size'] == '17px' and all(code['size'] == row['size'] and code['line'] == row['line'] and code['vertical'] == 'baseline' for code in row['codes']) for row in overview_rows), (locale, overview_rows)
     if locale == 'en':
         dimensions = overview.locator('code.literal').filter(has_text=re.compile(r'^(?:1D/)?2D(?:/3D)?$'))
-        assert dimensions.all_text_contents() == ['2D/3D', '1D/2D/3D', '2D', '2D', '2D/3D', '2D/3D']
+        assert dimensions.all_text_contents() == ['2D/3D', '1D/2D/3D', '2D', '2D', '2D/3D', '2D', '2D/3D']
         # Inspect the rendered font metrics: dimension numerals must have lining
         # figures rather than a descending old-style 3 beside the uppercase D.
         metrics = dimensions.first.evaluate("""e => {
@@ -255,6 +255,10 @@ def check_usage(page, locale, output):
             sizes: [p, ...p.querySelectorAll('strong, code, span, em')].map(e => parseFloat(getComputedStyle(e).fontSize))
         }))""")
         assert all(row['name'] and row['type'] and all(size == 17 for size in row['sizes']) for row in rows), (locale, name, rows)
+    tti_contract = json.loads((PROJECT / 'tools' / 'tti_api_contract.json').read_text())
+    tti_parameters = main.locator('dt[id="starwave.tti"]').locator('..').locator('dl.field-list > dd').first.locator('p')
+    assert tti_parameters.count() == 26, (locale, tti_parameters.count())
+    assert tti_parameters.locator('strong').all_text_contents() == tti_contract['parameter_names']
     for signature in main.locator('dt.sig[id^="starwave."], dt.sig[id="starwave.vrr"]').all():
         style = signature.evaluate("e => { const s = getComputedStyle(e); return {font:s.fontFamily,size:parseFloat(s.fontSize),line:parseFloat(s.lineHeight),border:s.borderTopWidth,bg:s.backgroundColor}; }")
         assert 'Consolas' in style['font'] and 'monospace' in style['font'] and style['size'] == 17, style
@@ -269,13 +273,13 @@ def check_usage(page, locale, output):
     assert definitions == [f'starwave.{name}' for name in API_NAMES], definitions
     for name in API_NAMES:
         assert ids.count(f'starwave.{name}') == 1, (locale, name)
-    for name in BORN_SECTIONS + ELASTIC_SECTIONS + ('prepare-elastic',):
+    for name in BORN_SECTIONS + ELASTIC_SECTIONS + ('tti', 'prepare-elastic',):
         section = main.locator(f'section[id="{name}"]')
         assert section.get_attribute('data-sw-anchor') == name, (locale, name)
         assert section.locator(':scope > h2, :scope > h3').count() == 1, (locale, name)
     # The long native signature must wrap within the article, including on the
     # narrowest phone. The conversions remain independent, linkable API entries.
-    for name in ('scalar_born', 'ScalarBorn', 'ScalarBorn.forward', 'starwave.vrr', 'visco_gsls', 'prepare_visco_gsls', 'visco_gsls_native_status', 'elastic', 'common.vpvsrho_to_lambmubuoyancy',
+    for name in ('scalar_born', 'ScalarBorn', 'ScalarBorn.forward', 'starwave.vrr', 'tti', 'visco_gsls', 'prepare_visco_gsls', 'visco_gsls_native_status', 'elastic', 'common.vpvsrho_to_lambmubuoyancy',
                  'common.lambmubuoyancy_to_vpvsrho', 'prepare_elastic'):
         fullname = name if name == 'starwave.vrr' else f'starwave.{name}'
         signature = main.locator(f'dt[id="{fullname}"]')
@@ -286,7 +290,7 @@ def check_usage(page, locale, output):
     toc_links = toc.locator('a').evaluate_all('(items) => items.map(a => a.getAttribute("href"))')
     assert toc_links and all(link.startswith('#') for link in toc_links), toc_links
     assert [unquote(link[1:]) for link in toc_links] == list(TOC_TARGETS), toc_links
-    assert toc.locator('a').all_text_contents()[:7] == ['Scalar Function', 'Born Function', 'VRZ Function', 'VRR Function', 'VTI Function', 'Elastic Function', 'GSLS Function']
+    assert toc.locator('a').all_text_contents()[:8] == ['Scalar Function', 'Born Function', 'VRZ Function', 'VRR Function', 'VTI Function', 'qP VTI / TTI Function', 'Elastic Function', 'GSLS Function']
     assert all(unquote(link[1:]) in ids for link in toc_links), toc_links
     assert toc.evaluate("e => Boolean(e.compareDocumentPosition(document.getElementById('starwave.scalar')) & Node.DOCUMENT_POSITION_FOLLOWING)"), locale
     width = page.viewport_size['width']
@@ -294,7 +298,7 @@ def check_usage(page, locale, output):
     page.screenshot(path=str(output / f'{locale}-usage-top-{width}.png'))
     overview.locator('h2').evaluate("e => e.scrollIntoView({block: 'start'})")
     page.screenshot(path=str(output / f'{locale}-usage-overview-{width}.png'))
-    for name in ('scalar', 'born', 'vrz', 'vrr', 'vti', 'elastic', 'visco-gsls'):
+    for name in ('scalar', 'born', 'vrz', 'vrr', 'vti', 'tti', 'elastic', 'visco-gsls'):
         main.locator(f'#{name} > h2').evaluate("e => e.scrollIntoView({block: 'start'})")
         page.screenshot(path=str(output / f'{locale}-usage-{name}-heading-{width}.png'))
     main.locator('[id="starwave.scalar"]').evaluate("e => e.scrollIntoView({block: 'start'})")
@@ -308,7 +312,7 @@ def check_usage(page, locale, output):
     assert 'source_amplitudes' in text, locale
     fields.evaluate("e => e.scrollIntoView({block: 'start'})")
     page.screenshot(path=str(output / f'{locale}-usage-scalar-fields-{width}.png'))
-    for name in ('scalar_born', 'ScalarBorn', 'ScalarBorn.forward', 'starwave.vrr', 'visco_gsls', 'prepare_visco_gsls', 'visco_gsls_native_status', 'elastic', 'common.vpvsrho_to_lambmubuoyancy',
+    for name in ('scalar_born', 'ScalarBorn', 'ScalarBorn.forward', 'starwave.vrr', 'tti', 'visco_gsls', 'prepare_visco_gsls', 'visco_gsls_native_status', 'elastic', 'common.vpvsrho_to_lambmubuoyancy',
                  'common.lambmubuoyancy_to_vpvsrho', 'prepare_elastic'):
         fullname = name if name == 'starwave.vrr' else f'starwave.{name}'
         signature = main.locator(f'[id="{fullname}"]')
@@ -321,7 +325,7 @@ def check_usage(page, locale, output):
     toc.locator('a[href="#scalar"]').click()
     assert urlsplit(page.url).fragment == 'scalar'
     assert page.locator('[id="scalar"]').count() == 1
-    for target in ('born', 'vrr', 'elastic', 'visco-gsls', 'elastic-conversions', 'prepare-elastic'):
+    for target in ('born', 'vrr', 'tti', 'elastic', 'visco-gsls', 'elastic-conversions', 'prepare-elastic'):
         toc.locator(f'a[href="#{target}"]').click()
         assert urlsplit(page.url).fragment == target, (locale, target)
         assert main.locator(f'section[id="{target}"]').count() == 1, (locale, target)
@@ -1180,7 +1184,7 @@ def check(root, browser_path=None, browser_channel="chromium"):
             assert plain.locator('.sw-page-toc').is_visible()
             plain.locator('.sw-page-toc a[href="#scalar"]').click()
             assert urlsplit(plain.url).fragment == 'scalar'
-            for target in ('born', 'vrr', 'elastic', 'visco-gsls', 'elastic-conversions', 'prepare-elastic'):
+            for target in ('born', 'vrr', 'tti', 'elastic', 'visco-gsls', 'elastic-conversions', 'prepare-elastic'):
                 plain.locator(f'.sw-page-toc a[href="#{target}"]').click()
                 assert urlsplit(plain.url).fragment == target
             plain.locator('[data-sw-language="zh"]').click()
