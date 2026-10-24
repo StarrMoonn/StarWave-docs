@@ -112,6 +112,7 @@ Acquisition <modeling/acquisition>
 Scalar <modeling/scalar>
 Gradient <modeling/gradient>
 Wave propagation <modeling/wave-propagation>
+Free surface <modeling/free-surface>
 Reconstruction <modeling/reconstruction>
 ```
 

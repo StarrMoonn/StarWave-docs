@@ -1,0 +1,113 @@
+{
+  "source_commit": "200621cc31c0ebeebaa01ffaa3591c0ebd7e0adb",
+  "dimension": 2,
+  "device": "cpu",
+  "backend": "torch",
+  "execution": "eager",
+  "memory": "full",
+  "autograd_enabled": false,
+  "dtype": "float32",
+  "threads": 2,
+  "torch_version": "2.14.1+cpu",
+  "python_version": "3.12.14",
+  "generated_at_utc": "2026-10-24T16:19:05.804619+00:00",
+  "case": "vti",
+  "observable": "vertical particle velocity vz (m/s)",
+  "surface_convention": "Physical z=0 satisfies sV=0. Surface stiffness is locally projected. vz is sampled on its native vertical half-cell grid.",
+  "grid_shape_xz": [
+    80,
+    64
+  ],
+  "input_axes": "x,z",
+  "dx_m": 10.0,
+  "dz_m": 10.0,
+  "dt_s": 0.001,
+  "nt": 750,
+  "spatial_order": 4,
+  "pml_width_absorbing": [
+    12,
+    12,
+    12,
+    12
+  ],
+  "pml_width_free_surface": [
+    12,
+    12,
+    0,
+    12
+  ],
+  "pml_face_order": "x-low,x-high,z-low,z-high",
+  "boundary_buffer_cells": 5,
+  "model": {
+    "interface_z_m": 300,
+    "vp_above_m_s": 2000,
+    "vp_below_m_s": 2600,
+    "rho_above_kg_m3": 2000,
+    "rho_below_kg_m3": 2200,
+    "density_note": "Not an input to scalar, Born or qP TTI; VRR uses density only in explicit r=0.5 grad(log(vp*rho)) preprocessing.",
+    "epsilon": 0.1,
+    "delta": 0.05
+  },
+  "source": {
+    "type": "Ricker",
+    "peak_frequency_hz": 20.0,
+    "peak_time_s": 0.075,
+    "amplitude": 1.0,
+    "location_xz_m": [
+      400,
+      80
+    ],
+    "location_xz_indices": [
+      40,
+      8
+    ],
+    "convention": "Pa/s rate into both sH and sV"
+  },
+  "receivers": {
+    "count": 61,
+    "x_m_min": 100,
+    "x_m_max": 700,
+    "spacing_m": 10,
+    "z_index": 5,
+    "z_coordinate_m": 55,
+    "note": "Native vz half-cell grid: integer z=5 lies at z=55m"
+  },
+  "time_plan": {
+    "internal_dt_s": 0.001,
+    "internal_nt": 750,
+    "step_ratio": 1,
+    "max_vel_m_s": 2848.157470703125,
+    "cfl_max_dt_s": 0.0018260824484151912,
+    "provenance": "Same operator-specific setup helper at pinned source"
+  },
+  "elapsed_s": {
+    "absorbing": 0.41465479799990135,
+    "free_surface": 0.542980051000086
+  },
+  "stats": {
+    "absorbing": {
+      "finite": true,
+      "max_abs": 1.2866210874484807e-10,
+      "rms": 1.2067895813854458e-11
+    },
+    "free_surface": {
+      "finite": true,
+      "max_abs": 1.7664703033659634e-10,
+      "rms": 1.4488043271960275e-11
+    },
+    "difference": {
+      "finite": true,
+      "max_abs": 5.126910701536147e-11,
+      "rms": 7.458542557061169e-12
+    }
+  },
+  "difference_relative_l2": 0.618048305363926,
+  "limitations": [
+    "Documentation example, not physical acceptance or backend parity validation.",
+    "Compare only within each pair: source and observable conventions differ across operators.",
+    "Only the top boundary option changes within a pair; no added noise, FWI or 3-D modelling."
+  ],
+  "plot_shared_symmetric_clip": 6.489067616577415e-11,
+  "total_elapsed_s": 1.890282367999589,
+  "source_repository": "https://github.com/StarrMoonn/StarWave"
+}

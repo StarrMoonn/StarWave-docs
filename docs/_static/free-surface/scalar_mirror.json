@@ -1,0 +1,1676 @@
+{
+  "source_commit": "200621cc31c0ebeebaa01ffaa3591c0ebd7e0adb",
+  "torch_version": "2.14.1+cpu",
+  "backend": "torch",
+  "execution": "eager",
+  "device": "cpu",
+  "dtype": "float32",
+  "threads": 2,
+  "model": {
+    "velocity_m_s": 1500.0,
+    "x_extent_m": [
+      -300.0,
+      300.0
+    ],
+    "half_z_extent_m": "[h,300]",
+    "full_z_extent_m": [
+      -300.0,
+      300.0
+    ],
+    "wall_z_m": 0
+  },
+  "source": {
+    "real_xz_m": [
+      0,
+      60.0
+    ],
+    "image_xz_m": [
+      0,
+      -60.0
+    ],
+    "wavelet": "Q(t)=(1-2*a^2)*exp(-a^2), a=pi*f*(t-t_peak)",
+    "frequency_hz": 25.0,
+    "peak_time_s": 0.06,
+    "integrated_peak_pa": 1.0,
+    "sample_forcing": "f_real=+Q(t)/h^2; f_image=-Q(t)/h^2, in Pa/m^2",
+    "discrete_injection": "-v_at_source^2 * internal_dt^2 * f",
+    "normalization": "none; raw pressure comparison"
+  },
+  "receivers": {
+    "x_m": [
+      -120.0,
+      -90.0,
+      -60.0,
+      -30.0,
+      0.0,
+      30.0,
+      60.0,
+      90.0,
+      120.0
+    ],
+    "z_m": 30.0
+  },
+  "boundary": {
+    "public_face_order": [
+      "x-low",
+      "x-high",
+      "z-low",
+      "z-high"
+    ],
+    "half_pml_width": [
+      10,
+      10,
+      0,
+      10
+    ],
+    "full_pml_width": [
+      10,
+      10,
+      10,
+      10
+    ],
+    "boundary_buffer": 5,
+    "half_index_to_coordinate": "x=-300+i*h; z=(j+1)*h",
+    "full_index_to_coordinate": "x=-300+i*h; z=-300+k*h",
+    "interpretation": "order 2 is Dirichlet on z=0; orders >2 clamp every ghost cell to zero, not an odd extension"
+  },
+  "gate_s": [
+    0.0,
+    0.24
+  ],
+  "late_gate_s": [
+    0.11,
+    0.24
+  ],
+  "outer_boundary_gate_justification": "Shortest geometric source-to-outer-face-to-receiver distance is >= 480 m (side) or 510 m (bottom), at least 0.32 s at 1500 m/s even from source onset. Gate ends at 0.24 s; a +60 m extent control checks dispersive/pre-arrival leakage.",
+  "cases": [
+    {
+      "accuracy": 2,
+      "grid_spacing_m": 10.0,
+      "outer_extent_m": 300.0,
+      "model_half_shape_xz": [
+        61,
+        30
+      ],
+      "model_full_shape_xz": [
+        61,
+        61
+      ],
+      "padded_half_shape_xz": [
+        93,
+        47
+      ],
+      "padded_full_shape_xz": [
+        93,
+        93
+      ],
+      "half_source_indices_xz": [
+        [
+          [
+            30,
+            5
+          ]
+        ]
+      ],
+      "full_source_indices_xz": [
+        [
+          [
+            30,
+            36
+          ],
+          [
+            30,
+            24
+          ]
+        ]
+      ],
+      "half_receiver_indices_xz": [
+        [
+          [
+            18,
+            2
+          ],
+          [
+            21,
+            2
+          ],
+          [
+            24,
+            2
+          ],
+          [
+            27,
+            2
+          ],
+          [
+            30,
+            2
+          ],
+          [
+            33,
+            2
+          ],
+          [
+            36,
+            2
+          ],
+          [
+            39,
+            2
+          ],
+          [
+            42,
+            2
+          ]
+        ]
+      ],
+      "full_receiver_indices_xz": [
+        [
+          [
+            18,
+            33
+          ],
+          [
+            21,
+            33
+          ],
+          [
+            24,
+            33
+          ],
+          [
+            27,
+            33
+          ],
+          [
+            30,
+            33
+          ],
+          [
+            33,
+            33
+          ],
+          [
+            36,
+            33
+          ],
+          [
+            39,
+            33
+          ],
+          [
+            42,
+            33
+          ]
+        ]
+      ],
+      "clock": {
+        "user_dt": 0.0005,
+        "user_nt": 481,
+        "internal_dt": 0.0005,
+        "internal_nt": 481,
+        "step_ratio": 1,
+        "max_vel": 1500.0,
+        "max_dt": 0.00282842712474619
+      },
+      "gate_s": [
+        0.0,
+        0.24
+      ],
+      "late_gate_s": [
+        0.11,
+        0.24
+      ],
+      "gather": {
+        "relative_l2": 0.0,
+        "max_abs_difference": 0.0,
+        "max_abs_reference": 0.13060934841632843,
+        "max_difference_over_reference_peak": 0.0,
+        "sample_count": 4329
+      },
+      "late_gather": {
+        "relative_l2": 0.0,
+        "max_abs_difference": 0.0,
+        "max_abs_reference": 0.0997937023639679,
+        "max_difference_over_reference_peak": 0.0,
+        "sample_count": 2349
+      },
+      "wall_peak_pa": 0.0,
+      "wall_peak_over_reference_peak": 0.0,
+      "finite": true,
+      "elapsed_s": 0.4031754650000039
+    },
+    {
+      "accuracy": 2,
+      "grid_spacing_m": 7.5,
+      "outer_extent_m": 300.0,
+      "model_half_shape_xz": [
+        81,
+        40
+      ],
+      "model_full_shape_xz": [
+        81,
+        81
+      ],
+      "padded_half_shape_xz": [
+        113,
+        57
+      ],
+      "padded_full_shape_xz": [
+        113,
+        113
+      ],
+      "half_source_indices_xz": [
+        [
+          [
+            40,
+            7
+          ]
+        ]
+      ],
+      "full_source_indices_xz": [
+        [
+          [
+            40,
+            48
+          ],
+          [
+            40,
+            32
+          ]
+        ]
+      ],
+      "half_receiver_indices_xz": [
+        [
+          [
+            24,
+            3
+          ],
+          [
+            28,
+            3
+          ],
+          [
+            32,
+            3
+          ],
+          [
+            36,
+            3
+          ],
+          [
+            40,
+            3
+          ],
+          [
+            44,
+            3
+          ],
+          [
+            48,
+            3
+          ],
+          [
+            52,
+            3
+          ],
+          [
+            56,
+            3
+          ]
+        ]
+      ],
+      "full_receiver_indices_xz": [
+        [
+          [
+            24,
+            44
+          ],
+          [
+            28,
+            44
+          ],
+          [
+            32,
+            44
+          ],
+          [
+            36,
+            44
+          ],
+          [
+            40,
+            44
+          ],
+          [
+            44,
+            44
+          ],
+          [
+            48,
+            44
+          ],
+          [
+            52,
+            44
+          ],
+          [
+            56,
+            44
+          ]
+        ]
+      ],
+      "clock": {
+        "user_dt": 0.0005,
+        "user_nt": 481,
+        "internal_dt": 0.0005,
+        "internal_nt": 481,
+        "step_ratio": 1,
+        "max_vel": 1500.0,
+        "max_dt": 0.0021213203435596424
+      },
+      "gate_s": [
+        0.0,
+        0.24
+      ],
+      "late_gate_s": [
+        0.11,
+        0.24
+      ],
+      "gather": {
+        "relative_l2": 0.0,
+        "max_abs_difference": 0.0,
+        "max_abs_reference": 0.11882370710372925,
+        "max_difference_over_reference_peak": 0.0,
+        "sample_count": 4329
+      },
+      "late_gather": {
+        "relative_l2": 0.0,
+        "max_abs_difference": 0.0,
+        "max_abs_reference": 0.09557166695594788,
+        "max_difference_over_reference_peak": 0.0,
+        "sample_count": 2349
+      },
+      "wall_peak_pa": 0.0,
+      "wall_peak_over_reference_peak": 0.0,
+      "finite": true,
+      "elapsed_s": 0.5079983539999375
+    },
+    {
+      "accuracy": 2,
+      "grid_spacing_m": 5.0,
+      "outer_extent_m": 300.0,
+      "model_half_shape_xz": [
+        121,
+        60
+      ],
+      "model_full_shape_xz": [
+        121,
+        121
+      ],
+      "padded_half_shape_xz": [
+        153,
+        77
+      ],
+      "padded_full_shape_xz": [
+        153,
+        153
+      ],
+      "half_source_indices_xz": [
+        [
+          [
+            60,
+            11
+          ]
+        ]
+      ],
+      "full_source_indices_xz": [
+        [
+          [
+            60,
+            72
+          ],
+          [
+            60,
+            48
+          ]
+        ]
+      ],
+      "half_receiver_indices_xz": [
+        [
+          [
+            36,
+            5
+          ],
+          [
+            42,
+            5
+          ],
+          [
+            48,
+            5
+          ],
+          [
+            54,
+            5
+          ],
+          [
+            60,
+            5
+          ],
+          [
+            66,
+            5
+          ],
+          [
+            72,
+            5
+          ],
+          [
+            78,
+            5
+          ],
+          [
+            84,
+            5
+          ]
+        ]
+      ],
+      "full_receiver_indices_xz": [
+        [
+          [
+            36,
+            66
+          ],
+          [
+            42,
+            66
+          ],
+          [
+            48,
+            66
+          ],
+          [
+            54,
+            66
+          ],
+          [
+            60,
+            66
+          ],
+          [
+            66,
+            66
+          ],
+          [
+            72,
+            66
+          ],
+          [
+            78,
+            66
+          ],
+          [
+            84,
+            66
+          ]
+        ]
+      ],
+      "clock": {
+        "user_dt": 0.0005,
+        "user_nt": 481,
+        "internal_dt": 0.0005,
+        "internal_nt": 481,
+        "step_ratio": 1,
+        "max_vel": 1500.0,
+        "max_dt": 0.001414213562373095
+      },
+      "gate_s": [
+        0.0,
+        0.24
+      ],
+      "late_gate_s": [
+        0.11,
+        0.24
+      ],
+      "gather": {
+        "relative_l2": 0.0,
+        "max_abs_difference": 0.0,
+        "max_abs_reference": 0.11377953737974167,
+        "max_difference_over_reference_peak": 0.0,
+        "sample_count": 4329
+      },
+      "late_gather": {
+        "relative_l2": 0.0,
+        "max_abs_difference": 0.0,
+        "max_abs_reference": 0.09121836721897125,
+        "max_difference_over_reference_peak": 0.0,
+        "sample_count": 2349
+      },
+      "wall_peak_pa": 0.0,
+      "wall_peak_over_reference_peak": 0.0,
+      "finite": true,
+      "elapsed_s": 0.6841414820000864
+    },
+    {
+      "accuracy": 4,
+      "grid_spacing_m": 10.0,
+      "outer_extent_m": 300.0,
+      "model_half_shape_xz": [
+        61,
+        30
+      ],
+      "model_full_shape_xz": [
+        61,
+        61
+      ],
+      "padded_half_shape_xz": [
+        95,
+        49
+      ],
+      "padded_full_shape_xz": [
+        95,
+        95
+      ],
+      "half_source_indices_xz": [
+        [
+          [
+            30,
+            5
+          ]
+        ]
+      ],
+      "full_source_indices_xz": [
+        [
+          [
+            30,
+            36
+          ],
+          [
+            30,
+            24
+          ]
+        ]
+      ],
+      "half_receiver_indices_xz": [
+        [
+          [
+            18,
+            2
+          ],
+          [
+            21,
+            2
+          ],
+          [
+            24,
+            2
+          ],
+          [
+            27,
+            2
+          ],
+          [
+            30,
+            2
+          ],
+          [
+            33,
+            2
+          ],
+          [
+            36,
+            2
+          ],
+          [
+            39,
+            2
+          ],
+          [
+            42,
+            2
+          ]
+        ]
+      ],
+      "full_receiver_indices_xz": [
+        [
+          [
+            18,
+            33
+          ],
+          [
+            21,
+            33
+          ],
+          [
+            24,
+            33
+          ],
+          [
+            27,
+            33
+          ],
+          [
+            30,
+            33
+          ],
+          [
+            33,
+            33
+          ],
+          [
+            36,
+            33
+          ],
+          [
+            39,
+            33
+          ],
+          [
+            42,
+            33
+          ]
+        ]
+      ],
+      "clock": {
+        "user_dt": 0.0005,
+        "user_nt": 481,
+        "internal_dt": 0.0005,
+        "internal_nt": 481,
+        "step_ratio": 1,
+        "max_vel": 1500.0,
+        "max_dt": 0.00282842712474619
+      },
+      "gate_s": [
+        0.0,
+        0.24
+      ],
+      "late_gate_s": [
+        0.11,
+        0.24
+      ],
+      "gather": {
+        "relative_l2": 0.05495852343469016,
+        "max_abs_difference": 0.006156282499432564,
+        "max_abs_reference": 0.11325689405202866,
+        "max_difference_over_reference_peak": 0.05435680142000409,
+        "sample_count": 4329
+      },
+      "late_gather": {
+        "relative_l2": 0.06842532342764812,
+        "max_abs_difference": 0.006156282499432564,
+        "max_abs_reference": 0.09076819568872452,
+        "max_difference_over_reference_peak": 0.06782422469368657,
+        "sample_count": 2349
+      },
+      "wall_peak_pa": 0.0,
+      "wall_peak_over_reference_peak": 0.0,
+      "finite": true,
+      "elapsed_s": 0.5540646899999047
+    },
+    {
+      "accuracy": 4,
+      "grid_spacing_m": 7.5,
+      "outer_extent_m": 300.0,
+      "model_half_shape_xz": [
+        81,
+        40
+      ],
+      "model_full_shape_xz": [
+        81,
+        81
+      ],
+      "padded_half_shape_xz": [
+        115,
+        59
+      ],
+      "padded_full_shape_xz": [
+        115,
+        115
+      ],
+      "half_source_indices_xz": [
+        [
+          [
+            40,
+            7
+          ]
+        ]
+      ],
+      "full_source_indices_xz": [
+        [
+          [
+            40,
+            48
+          ],
+          [
+            40,
+            32
+          ]
+        ]
+      ],
+      "half_receiver_indices_xz": [
+        [
+          [
+            24,
+            3
+          ],
+          [
+            28,
+            3
+          ],
+          [
+            32,
+            3
+          ],
+          [
+            36,
+            3
+          ],
+          [
+            40,
+            3
+          ],
+          [
+            44,
+            3
+          ],
+          [
+            48,
+            3
+          ],
+          [
+            52,
+            3
+          ],
+          [
+            56,
+            3
+          ]
+        ]
+      ],
+      "full_receiver_indices_xz": [
+        [
+          [
+            24,
+            44
+          ],
+          [
+            28,
+            44
+          ],
+          [
+            32,
+            44
+          ],
+          [
+            36,
+            44
+          ],
+          [
+            40,
+            44
+          ],
+          [
+            44,
+            44
+          ],
+          [
+            48,
+            44
+          ],
+          [
+            52,
+            44
+          ],
+          [
+            56,
+            44
+          ]
+        ]
+      ],
+      "clock": {
+        "user_dt": 0.0005,
+        "user_nt": 481,
+        "internal_dt": 0.0005,
+        "internal_nt": 481,
+        "step_ratio": 1,
+        "max_vel": 1500.0,
+        "max_dt": 0.0021213203435596424
+      },
+      "gate_s": [
+        0.0,
+        0.24
+      ],
+      "late_gate_s": [
+        0.11,
+        0.24
+      ],
+      "gather": {
+        "relative_l2": 0.04638089135324044,
+        "max_abs_difference": 0.005873125046491623,
+        "max_abs_reference": 0.11137566715478897,
+        "max_difference_over_reference_peak": 0.0527325689401187,
+        "sample_count": 4329
+      },
+      "late_gather": {
+        "relative_l2": 0.058076690845665774,
+        "max_abs_difference": 0.005873125046491623,
+        "max_abs_reference": 0.08967806398868561,
+        "max_difference_over_reference_peak": 0.0654912113985045,
+        "sample_count": 2349
+      },
+      "wall_peak_pa": 0.0,
+      "wall_peak_over_reference_peak": 0.0,
+      "finite": true,
+      "elapsed_s": 0.6425672809996286
+    },
+    {
+      "accuracy": 4,
+      "grid_spacing_m": 5.0,
+      "outer_extent_m": 300.0,
+      "model_half_shape_xz": [
+        121,
+        60
+      ],
+      "model_full_shape_xz": [
+        121,
+        121
+      ],
+      "padded_half_shape_xz": [
+        155,
+        79
+      ],
+      "padded_full_shape_xz": [
+        155,
+        155
+      ],
+      "half_source_indices_xz": [
+        [
+          [
+            60,
+            11
+          ]
+        ]
+      ],
+      "full_source_indices_xz": [
+        [
+          [
+            60,
+            72
+          ],
+          [
+            60,
+            48
+          ]
+        ]
+      ],
+      "half_receiver_indices_xz": [
+        [
+          [
+            36,
+            5
+          ],
+          [
+            42,
+            5
+          ],
+          [
+            48,
+            5
+          ],
+          [
+            54,
+            5
+          ],
+          [
+            60,
+            5
+          ],
+          [
+            66,
+            5
+          ],
+          [
+            72,
+            5
+          ],
+          [
+            78,
+            5
+          ],
+          [
+            84,
+            5
+          ]
+        ]
+      ],
+      "full_receiver_indices_xz": [
+        [
+          [
+            36,
+            66
+          ],
+          [
+            42,
+            66
+          ],
+          [
+            48,
+            66
+          ],
+          [
+            54,
+            66
+          ],
+          [
+            60,
+            66
+          ],
+          [
+            66,
+            66
+          ],
+          [
+            72,
+            66
+          ],
+          [
+            78,
+            66
+          ],
+          [
+            84,
+            66
+          ]
+        ]
+      ],
+      "clock": {
+        "user_dt": 0.0005,
+        "user_nt": 481,
+        "internal_dt": 0.0005,
+        "internal_nt": 481,
+        "step_ratio": 1,
+        "max_vel": 1500.0,
+        "max_dt": 0.001414213562373095
+      },
+      "gate_s": [
+        0.0,
+        0.24
+      ],
+      "late_gate_s": [
+        0.11,
+        0.24
+      ],
+      "gather": {
+        "relative_l2": 0.03384154224630958,
+        "max_abs_difference": 0.004646427929401398,
+        "max_abs_reference": 0.10976596176624298,
+        "max_difference_over_reference_peak": 0.04233031674515281,
+        "sample_count": 4329
+      },
+      "late_gather": {
+        "relative_l2": 0.042366932078009206,
+        "max_abs_difference": 0.004646427929401398,
+        "max_abs_reference": 0.08763816952705383,
+        "max_difference_over_reference_peak": 0.05301831330430799,
+        "sample_count": 2349
+      },
+      "wall_peak_pa": 0.0,
+      "wall_peak_over_reference_peak": 0.0,
+      "finite": true,
+      "elapsed_s": 0.8473300440000457
+    },
+    {
+      "accuracy": 8,
+      "grid_spacing_m": 10.0,
+      "outer_extent_m": 300.0,
+      "model_half_shape_xz": [
+        61,
+        30
+      ],
+      "model_full_shape_xz": [
+        61,
+        61
+      ],
+      "padded_half_shape_xz": [
+        99,
+        53
+      ],
+      "padded_full_shape_xz": [
+        99,
+        99
+      ],
+      "half_source_indices_xz": [
+        [
+          [
+            30,
+            5
+          ]
+        ]
+      ],
+      "full_source_indices_xz": [
+        [
+          [
+            30,
+            36
+          ],
+          [
+            30,
+            24
+          ]
+        ]
+      ],
+      "half_receiver_indices_xz": [
+        [
+          [
+            18,
+            2
+          ],
+          [
+            21,
+            2
+          ],
+          [
+            24,
+            2
+          ],
+          [
+            27,
+            2
+          ],
+          [
+            30,
+            2
+          ],
+          [
+            33,
+            2
+          ],
+          [
+            36,
+            2
+          ],
+          [
+            39,
+            2
+          ],
+          [
+            42,
+            2
+          ]
+        ]
+      ],
+      "full_receiver_indices_xz": [
+        [
+          [
+            18,
+            33
+          ],
+          [
+            21,
+            33
+          ],
+          [
+            24,
+            33
+          ],
+          [
+            27,
+            33
+          ],
+          [
+            30,
+            33
+          ],
+          [
+            33,
+            33
+          ],
+          [
+            36,
+            33
+          ],
+          [
+            39,
+            33
+          ],
+          [
+            42,
+            33
+          ]
+        ]
+      ],
+      "clock": {
+        "user_dt": 0.0005,
+        "user_nt": 481,
+        "internal_dt": 0.0005,
+        "internal_nt": 481,
+        "step_ratio": 1,
+        "max_vel": 1500.0,
+        "max_dt": 0.00282842712474619
+      },
+      "gate_s": [
+        0.0,
+        0.24
+      ],
+      "late_gate_s": [
+        0.11,
+        0.24
+      ],
+      "gather": {
+        "relative_l2": 0.08875942440141293,
+        "max_abs_difference": 0.011413587257266045,
+        "max_abs_reference": 0.11099554598331451,
+        "max_difference_over_reference_peak": 0.10282923658019395,
+        "sample_count": 4329
+      },
+      "late_gather": {
+        "relative_l2": 0.11087972882471982,
+        "max_abs_difference": 0.011413587257266045,
+        "max_abs_reference": 0.08892028033733368,
+        "max_difference_over_reference_peak": 0.1283575266965728,
+        "sample_count": 2349
+      },
+      "wall_peak_pa": 0.0,
+      "wall_peak_over_reference_peak": 0.0,
+      "finite": true,
+      "elapsed_s": 0.8750606690000495
+    },
+    {
+      "accuracy": 8,
+      "grid_spacing_m": 7.5,
+      "outer_extent_m": 300.0,
+      "model_half_shape_xz": [
+        81,
+        40
+      ],
+      "model_full_shape_xz": [
+        81,
+        81
+      ],
+      "padded_half_shape_xz": [
+        119,
+        63
+      ],
+      "padded_full_shape_xz": [
+        119,
+        119
+      ],
+      "half_source_indices_xz": [
+        [
+          [
+            40,
+            7
+          ]
+        ]
+      ],
+      "full_source_indices_xz": [
+        [
+          [
+            40,
+            48
+          ],
+          [
+            40,
+            32
+          ]
+        ]
+      ],
+      "half_receiver_indices_xz": [
+        [
+          [
+            24,
+            3
+          ],
+          [
+            28,
+            3
+          ],
+          [
+            32,
+            3
+          ],
+          [
+            36,
+            3
+          ],
+          [
+            40,
+            3
+          ],
+          [
+            44,
+            3
+          ],
+          [
+            48,
+            3
+          ],
+          [
+            52,
+            3
+          ],
+          [
+            56,
+            3
+          ]
+        ]
+      ],
+      "full_receiver_indices_xz": [
+        [
+          [
+            24,
+            44
+          ],
+          [
+            28,
+            44
+          ],
+          [
+            32,
+            44
+          ],
+          [
+            36,
+            44
+          ],
+          [
+            40,
+            44
+          ],
+          [
+            44,
+            44
+          ],
+          [
+            48,
+            44
+          ],
+          [
+            52,
+            44
+          ],
+          [
+            56,
+            44
+          ]
+        ]
+      ],
+      "clock": {
+        "user_dt": 0.0005,
+        "user_nt": 481,
+        "internal_dt": 0.0005,
+        "internal_nt": 481,
+        "step_ratio": 1,
+        "max_vel": 1500.0,
+        "max_dt": 0.0021213203435596424
+      },
+      "gate_s": [
+        0.0,
+        0.24
+      ],
+      "late_gate_s": [
+        0.11,
+        0.24
+      ],
+      "gather": {
+        "relative_l2": 0.06977206749461885,
+        "max_abs_difference": 0.009663315489888191,
+        "max_abs_reference": 0.10969025641679764,
+        "max_difference_over_reference_peak": 0.08809638891871877,
+        "sample_count": 4329
+      },
+      "late_gather": {
+        "relative_l2": 0.08722702346966742,
+        "max_abs_difference": 0.009663315489888191,
+        "max_abs_reference": 0.08746205270290375,
+        "max_difference_over_reference_peak": 0.11048580717300462,
+        "sample_count": 2349
+      },
+      "wall_peak_pa": 0.0,
+      "wall_peak_over_reference_peak": 0.0,
+      "finite": true,
+      "elapsed_s": 1.01050541099994
+    },
+    {
+      "accuracy": 8,
+      "grid_spacing_m": 5.0,
+      "outer_extent_m": 300.0,
+      "model_half_shape_xz": [
+        121,
+        60
+      ],
+      "model_full_shape_xz": [
+        121,
+        121
+      ],
+      "padded_half_shape_xz": [
+        159,
+        83
+      ],
+      "padded_full_shape_xz": [
+        159,
+        159
+      ],
+      "half_source_indices_xz": [
+        [
+          [
+            60,
+            11
+          ]
+        ]
+      ],
+      "full_source_indices_xz": [
+        [
+          [
+            60,
+            72
+          ],
+          [
+            60,
+            48
+          ]
+        ]
+      ],
+      "half_receiver_indices_xz": [
+        [
+          [
+            36,
+            5
+          ],
+          [
+            42,
+            5
+          ],
+          [
+            48,
+            5
+          ],
+          [
+            54,
+            5
+          ],
+          [
+            60,
+            5
+          ],
+          [
+            66,
+            5
+          ],
+          [
+            72,
+            5
+          ],
+          [
+            78,
+            5
+          ],
+          [
+            84,
+            5
+          ]
+        ]
+      ],
+      "full_receiver_indices_xz": [
+        [
+          [
+            36,
+            66
+          ],
+          [
+            42,
+            66
+          ],
+          [
+            48,
+            66
+          ],
+          [
+            54,
+            66
+          ],
+          [
+            60,
+            66
+          ],
+          [
+            66,
+            66
+          ],
+          [
+            72,
+            66
+          ],
+          [
+            78,
+            66
+          ],
+          [
+            84,
+            66
+          ]
+        ]
+      ],
+      "clock": {
+        "user_dt": 0.0005,
+        "user_nt": 481,
+        "internal_dt": 0.0005,
+        "internal_nt": 481,
+        "step_ratio": 1,
+        "max_vel": 1500.0,
+        "max_dt": 0.001414213562373095
+      },
+      "gate_s": [
+        0.0,
+        0.24
+      ],
+      "late_gate_s": [
+        0.11,
+        0.24
+      ],
+      "gather": {
+        "relative_l2": 0.04774260950571384,
+        "max_abs_difference": 0.006815625354647636,
+        "max_abs_reference": 0.10933811217546463,
+        "max_difference_over_reference_peak": 0.062335312171020424,
+        "sample_count": 4329
+      },
+      "late_gather": {
+        "relative_l2": 0.05971536278328182,
+        "max_abs_difference": 0.006815625354647636,
+        "max_abs_reference": 0.08707842975854874,
+        "max_difference_over_reference_peak": 0.07826996161444363,
+        "sample_count": 2349
+      },
+      "wall_peak_pa": 0.0,
+      "wall_peak_over_reference_peak": 0.0,
+      "finite": true,
+      "elapsed_s": 1.5774411709999185
+    }
+  ],
+  "boundary_distance_control": {
+    "numerical": {
+      "relative_l2": 0.0,
+      "max_abs_difference": 0.0,
+      "max_abs_reference": 0.1097867339849472,
+      "max_difference_over_reference_peak": 0.0,
+      "sample_count": 4329
+    },
+    "reference": {
+      "relative_l2": 0.0,
+      "max_abs_difference": 0.0,
+      "max_abs_reference": 0.10969025641679764,
+      "max_difference_over_reference_peak": 0.0,
+      "sample_count": 4329
+    },
+    "grid_spacing_m": 7.5,
+    "accuracy": 8,
+    "base_extent_m": 300.0,
+    "extended_extent_m": 360.0,
+    "extended_case": {
+      "accuracy": 8,
+      "grid_spacing_m": 7.5,
+      "outer_extent_m": 360.0,
+      "model_half_shape_xz": [
+        97,
+        48
+      ],
+      "model_full_shape_xz": [
+        97,
+        97
+      ],
+      "padded_half_shape_xz": [
+        135,
+        71
+      ],
+      "padded_full_shape_xz": [
+        135,
+        135
+      ],
+      "half_source_indices_xz": [
+        [
+          [
+            48,
+            7
+          ]
+        ]
+      ],
+      "full_source_indices_xz": [
+        [
+          [
+            48,
+            56
+          ],
+          [
+            48,
+            40
+          ]
+        ]
+      ],
+      "half_receiver_indices_xz": [
+        [
+          [
+            32,
+            3
+          ],
+          [
+            36,
+            3
+          ],
+          [
+            40,
+            3
+          ],
+          [
+            44,
+            3
+          ],
+          [
+            48,
+            3
+          ],
+          [
+            52,
+            3
+          ],
+          [
+            56,
+            3
+          ],
+          [
+            60,
+            3
+          ],
+          [
+            64,
+            3
+          ]
+        ]
+      ],
+      "full_receiver_indices_xz": [
+        [
+          [
+            32,
+            52
+          ],
+          [
+            36,
+            52
+          ],
+          [
+            40,
+            52
+          ],
+          [
+            44,
+            52
+          ],
+          [
+            48,
+            52
+          ],
+          [
+            52,
+            52
+          ],
+          [
+            56,
+            52
+          ],
+          [
+            60,
+            52
+          ],
+          [
+            64,
+            52
+          ]
+        ]
+      ],
+      "clock": {
+        "user_dt": 0.0005,
+        "user_nt": 481,
+        "internal_dt": 0.0005,
+        "internal_nt": 481,
+        "step_ratio": 1,
+        "max_vel": 1500.0,
+        "max_dt": 0.0021213203435596424
+      },
+      "gate_s": [
+        0.0,
+        0.24
+      ],
+      "late_gate_s": [
+        0.11,
+        0.24
+      ],
+      "gather": {
+        "relative_l2": 0.06977206749461885,
+        "max_abs_difference": 0.009663315489888191,
+        "max_abs_reference": 0.10969025641679764,
+        "max_difference_over_reference_peak": 0.08809638891871877,
+        "sample_count": 4329
+      },
+      "late_gather": {
+        "relative_l2": 0.08722702346966742,
+        "max_abs_difference": 0.009663315489888191,
+        "max_abs_reference": 0.08746205270290375,
+        "max_difference_over_reference_peak": 0.11048580717300462,
+        "sample_count": 2349
+      },
+      "wall_peak_pa": 0.0,
+      "wall_peak_over_reference_peak": 0.0,
+      "finite": true,
+      "elapsed_s": 1.2608650879997185
+    }
+  },
+  "selected_npz_alias": "order8_h5",
+  "limitations": [
+    "Homogeneous horizontal planar scalar2D forward validation only.",
+    "Reference is the same interior finite-difference scheme in doubled full space, not an independent continuum solver.",
+    "Order-2 exact matching validates geometry/sign/discrete symmetry, not continuum accuracy.",
+    "No native CPU, CUDA, 3D, heterogeneous media, arbitrary faces, gradients, or general PML acceptance claim."
+  ],
+  "source_repository": "https://github.com/StarrMoonn/StarWave"
+}

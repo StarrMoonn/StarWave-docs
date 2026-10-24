@@ -1,0 +1,187 @@
+{
+  "operator": "elastic_vrr",
+  "source_commit": "200621cc31c0ebeebaa01ffaa3591c0ebd7e0adb",
+  "dimension": 2,
+  "device": "cpu",
+  "backend": "torch",
+  "execution": "eager",
+  "dtype": "float32",
+  "torch_version": "2.14.1+cpu",
+  "threads": 2,
+  "gradient_enabled": false,
+  "memory": "full",
+  "nx": 80,
+  "nz": 64,
+  "dx_m": 10.0,
+  "dz_m": 10.0,
+  "dt_s": 0.001,
+  "nt": 750,
+  "accuracy": 2,
+  "pml_width_cells": 15,
+  "pml_freq_hz": 15.0,
+  "min_s_wave_grid_points_at_peak_frequency": 6.666666666666667,
+  "source_frequency_note": "Elastic examples use 15 Hz to avoid the package 20 Hz, five-grid-point S-wavelength warning. A peak-frequency sampling check is not a convergence or full-bandwidth accuracy test.",
+  "layer_interface_depth_m": 300.0,
+  "vp_m_s": [
+    2000.0,
+    2600.0
+  ],
+  "vs_m_s": [
+    1000.0,
+    1400.0
+  ],
+  "rho_kg_m3": [
+    2000.0,
+    2200.0
+  ],
+  "source": {
+    "wavelet": "Ricker",
+    "frequency_hz": 15.0,
+    "peak_time_s": 0.1,
+    "peak_amplitude": 1000000000.0,
+    "units": "Pa/s",
+    "grid_index_x_z": [
+      40,
+      8
+    ],
+    "nominal_x_z_m": [
+      400.0,
+      80.0
+    ],
+    "component": "szz stress_rate only (not isotropic pressure source)"
+  },
+  "receivers": {
+    "component": "vertical_particle_velocity",
+    "units": "m/s",
+    "count": 61,
+    "nominal_x_m": [
+      100,
+      110,
+      120,
+      130,
+      140,
+      150,
+      160,
+      170,
+      180,
+      190,
+      200,
+      210,
+      220,
+      230,
+      240,
+      250,
+      260,
+      270,
+      280,
+      290,
+      300,
+      310,
+      320,
+      330,
+      340,
+      350,
+      360,
+      370,
+      380,
+      390,
+      400,
+      410,
+      420,
+      430,
+      440,
+      450,
+      460,
+      470,
+      480,
+      490,
+      500,
+      510,
+      520,
+      530,
+      540,
+      550,
+      560,
+      570,
+      580,
+      590,
+      600,
+      610,
+      620,
+      630,
+      640,
+      650,
+      660,
+      670,
+      680,
+      690,
+      700
+    ],
+    "grid_index_z": 5,
+    "nominal_depth_m": 50.0,
+    "staggering": "Native staggered component samples retained, not interpolated to normal-stress nodes.",
+    "api_component": "vz",
+    "actual_depth_m": 55.0,
+    "density_conversion": "Requested vz explicitly: pz divided by package geometric face density; pz itself is momentum, not velocity."
+  },
+  "comparison_scope": "Within each operator only: identical physical inputs and source/receiver indices; change top boundary. Amplitudes and phases are not a cross-operator equivalence test.",
+  "validation_scope": "Finite CPU 2-D forward illustrative run only; no convergence, physical acceptance, long-time stability, GPU, 3-D, inversion, or performance benchmark.",
+  "model_axes": [
+    "x",
+    "z"
+  ],
+  "reflectivity_layout": "edge",
+  "reflectivity_definition": "Physical coefficients from elastic_vrr_parameters: R = 0.5 D log(rho V), positive-edge samples.",
+  "surface_convention": "Flat improved-vacuum closure: physical row z=0 is vacuum, first solid normal-stress row z=1 (10 m); zero vacuum moduli and half-mass normal face. Top CPML removed; side/bottom CPML retained.",
+  "time_convention": "API samples completed user steps: dt, 2*dt, ..., nt*dt; native momentum/stress half-step staggering retained.",
+  "time_sampling": {
+    "absorbing": {
+      "user_dt": 0.001,
+      "user_nt": 750,
+      "internal_dt": 0.001,
+      "internal_nt": 750,
+      "step_ratio": 1,
+      "max_vel": 2600.0,
+      "max_dt": 0.0015128944330567923
+    },
+    "free_surface": {
+      "user_dt": 0.001,
+      "user_nt": 750,
+      "internal_dt": 0.001,
+      "internal_nt": 750,
+      "step_ratio": 1,
+      "max_vel": 2600.0,
+      "max_dt": 0.001069777912833835
+    }
+  },
+  "statistics": {
+    "absorbing": {
+      "finite": true,
+      "max_abs": 0.33460697531700134,
+      "rms": 0.01643499544353379
+    },
+    "free_surface": {
+      "finite": true,
+      "max_abs": 0.33100080490112305,
+      "rms": 0.022841024315489445
+    },
+    "difference": {
+      "finite": true,
+      "max_abs": 0.12237697839736938,
+      "rms": 0.015845817705841037
+    },
+    "relative_difference_l2": 0.9641510251878677
+  },
+  "plot": {
+    "colormap": "RdBu_r",
+    "shared_symmetric_limit_m_s": 0.11558429896831512,
+    "clip_quantile": 0.995,
+    "shared_for": [
+      "absorbing",
+      "free_surface",
+      "difference"
+    ],
+    "normalization": "No AGC or per-trace normalization; 99.5th-percentile clipping shared across all panels."
+  },
+  "source_repository": "https://github.com/StarrMoonn/StarWave"
+}

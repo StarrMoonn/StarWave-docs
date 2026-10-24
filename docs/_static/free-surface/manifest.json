@@ -1,0 +1,344 @@
+{
+  "source_commit": "200621cc31c0ebeebaa01ffaa3591c0ebd7e0adb",
+  "source_repository": "https://github.com/StarrMoonn/StarWave",
+  "dimension": 2,
+  "device": "cpu",
+  "cuda_executed": false,
+  "simulation_date": "2026-10-24",
+  "runtime": {
+    "python": "3.12.14",
+    "torch": "2.14.1+cpu",
+    "backend": "torch",
+    "execution": "eager",
+    "threads": 2
+  },
+  "cases": [
+    {
+      "id": "scalar",
+      "observable": "pressure, normalized forcing",
+      "backend": "torch",
+      "execution": "eager",
+      "dtype": "float32",
+      "source_frequency_hz": 20.0
+    },
+    {
+      "id": "born",
+      "observable": "linearized scattered pressure",
+      "backend": "torch",
+      "execution": "eager",
+      "dtype": "float32",
+      "source_frequency_hz": 20.0
+    },
+    {
+      "id": "vrz",
+      "observable": "pressure, normalized forcing",
+      "backend": "torch",
+      "execution": "eager",
+      "dtype": "float32",
+      "source_frequency_hz": 20.0
+    },
+    {
+      "id": "vrr",
+      "observable": "pressure, normalized forcing",
+      "backend": "torch",
+      "execution": "eager",
+      "dtype": "float32",
+      "source_frequency_hz": 20.0
+    },
+    {
+      "id": "vti",
+      "observable": "vertical particle velocity vz (m/s)",
+      "backend": "torch",
+      "execution": "eager",
+      "dtype": "float32",
+      "source_frequency_hz": 20.0
+    },
+    {
+      "id": "tti",
+      "observable": "single qP scalar field u",
+      "backend": "torch",
+      "execution": "eager",
+      "dtype": "float32",
+      "source_frequency_hz": 20.0
+    },
+    {
+      "id": "elastic",
+      "observable": "vertical_particle_velocity",
+      "backend": "torch",
+      "execution": "eager",
+      "dtype": "float32",
+      "source_frequency_hz": 15.0
+    },
+    {
+      "id": "elastic_vrr",
+      "observable": "vertical_particle_velocity",
+      "backend": "torch",
+      "execution": "eager",
+      "dtype": "float32",
+      "source_frequency_hz": 15.0
+    },
+    {
+      "id": "elastic_tti",
+      "observable": "vertical_particle_velocity",
+      "backend": "torch",
+      "execution": "eager",
+      "dtype": "float32",
+      "source_frequency_hz": 15.0
+    },
+    {
+      "id": "gsls",
+      "observable": "pressure (Pa)",
+      "backend": "torch",
+      "execution": "eager",
+      "dtype": "float32",
+      "source_frequency_hz": 20.0
+    }
+  ],
+  "validations": [
+    {
+      "id": "scalar_mirror",
+      "scope": "Homogeneous 2-D scalar zero-halo versus same-order full-space negative-image reference; not general physical acceptance."
+    }
+  ],
+  "notes": [
+    "Ten within-operator absorbing-top/free-surface pairs, not cross-operator amplitude or phase comparisons.",
+    "PNG and NPZ bytes are preserved from the final CPU runs. Public JSON omits machine-local import paths only and adds the source repository URL.",
+    "Born background PNG is supplementary; Born main PNG shows linearized scattered pressure.",
+    "Two early GSLS harness failures and coarse 20 Hz elastic trials are not used as successful publication results.",
+    "Paired-gather illustration, scalar mirror validation, source inspection and full physical acceptance are distinct evidence."
+  ],
+  "assets": [
+    {
+      "path": "born.json",
+      "bytes": 3567,
+      "sha256": "48d68791e4984ade36141fe1d207d102ef0043f6b86fc6b2cb4922bec3d2483b"
+    },
+    {
+      "path": "born.npz",
+      "bytes": 898795,
+      "sha256": "52865149f49f16c149d80845b7df2bb530e7aed1dbcff5bc9ee56d9bd2b3cb48"
+    },
+    {
+      "path": "born.png",
+      "bytes": 679524,
+      "sha256": "381785ad1c17d5bacb64214e8b609bfb5b9be9de8dbc831b4c67782e0272add2",
+      "pixels": [
+        2046,
+        1441
+      ]
+    },
+    {
+      "path": "born_background.png",
+      "bytes": 447263,
+      "sha256": "a4997a1210188c3d826db2cdf875f56bc6efe38a0af0bb770acd17c89a8701f5",
+      "pixels": [
+        2046,
+        1441
+      ]
+    },
+    {
+      "path": "elastic.json",
+      "bytes": 4672,
+      "sha256": "b4beb229d2f662b766005a250786d16ae082de98ddb23e05eebcde33c6262524"
+    },
+    {
+      "path": "elastic.npz",
+      "bytes": 485023,
+      "sha256": "69f1f3a73474b8bc807b1670da26e9792dd440e7e0280229970dcab9ab126d94"
+    },
+    {
+      "path": "elastic.png",
+      "bytes": 380920,
+      "sha256": "fbc1808dd2778d9770f7ed3d344e5980598fc45012de11fad1bb3dcaa0475c35",
+      "pixels": [
+        2480,
+        1440
+      ]
+    },
+    {
+      "path": "elastic_tti.json",
+      "bytes": 4402,
+      "sha256": "dfa943697f74ea83d1a4640a56afad8a6aa7c3fc9e68e83476b5d9217647d2ec"
+    },
+    {
+      "path": "elastic_tti.npz",
+      "bytes": 531150,
+      "sha256": "efa4abd9a9c89bf3876dd9db7a22d87efc5fdb1a5e4bfc65b1ceafbe88c23d13"
+    },
+    {
+      "path": "elastic_tti.png",
+      "bytes": 417969,
+      "sha256": "d6b806bcbb9178daccd872973f638bcfc66a98f80e23ea3e8697149443b83482",
+      "pixels": [
+        2480,
+        1440
+      ]
+    },
+    {
+      "path": "elastic_vrr.json",
+      "bytes": 4565,
+      "sha256": "fdc0945c6875bb14ac62918fd9d1619ba57e5134e7b47e6dafd2bba31fcda70d"
+    },
+    {
+      "path": "elastic_vrr.npz",
+      "bytes": 488988,
+      "sha256": "35e0c7876991a2b8d433edbbe28ae0d1a015687d9df889eaad60e748d299442a"
+    },
+    {
+      "path": "elastic_vrr.png",
+      "bytes": 422571,
+      "sha256": "5bb36be6e34262ac374f22d90ed56ccf0898f464936341ae0cdca3f8f76c73dc",
+      "pixels": [
+        2480,
+        1440
+      ]
+    },
+    {
+      "path": "gsls.json",
+      "bytes": 3454,
+      "sha256": "b1affae7d28f292bc41d421236b3fea1630fae5b5d17aadc9ce7ff101dbbf762"
+    },
+    {
+      "path": "gsls.npz",
+      "bytes": 494137,
+      "sha256": "5b43c78d20bd640b9606a2ff1bcaa3948826143da655c12757b8985780ae3a20"
+    },
+    {
+      "path": "gsls.png",
+      "bytes": 427685,
+      "sha256": "cbd997690c43759f4e615f1427344be4ac222f50fc5086ac6a2ade4715b1609f",
+      "pixels": [
+        2046,
+        1441
+      ]
+    },
+    {
+      "path": "scalar.json",
+      "bytes": 2939,
+      "sha256": "a189ee5c291ff9dcddede211de513cdfa80b95930b8c36f483326c25af9fbd5b"
+    },
+    {
+      "path": "scalar.npz",
+      "bytes": 488179,
+      "sha256": "e997f9174862ce6c0d4b4c4347de13648126159a9b6a7a344b52909487f4a878"
+    },
+    {
+      "path": "scalar.png",
+      "bytes": 449677,
+      "sha256": "bce5c976629ace1bc5a9706303597f5b664986d36cd3caa2fe11a99912cb3365",
+      "pixels": [
+        2046,
+        1441
+      ]
+    },
+    {
+      "path": "scalar_mirror.json",
+      "bytes": 30549,
+      "sha256": "64ed9fdeefc65452f65f4d418ff467b7c6d1bb641cd3831bf7384005d58e9682"
+    },
+    {
+      "path": "scalar_mirror.npz",
+      "bytes": 288116,
+      "sha256": "5f66b03c5a5d2c1dad96f3e2e9f4da62008d4637c4d047aa3e5cc883bedb3784"
+    },
+    {
+      "path": "scalar_mirror.png",
+      "bytes": 321539,
+      "sha256": "74dd5143c3c0010de29804f10345b267865119322f3c915269ff408e077daad5",
+      "pixels": [
+        2376,
+        1584
+      ]
+    },
+    {
+      "path": "tti.json",
+      "bytes": 3024,
+      "sha256": "daa38823c11607ce3667936159327dbcd6086395be774c4121bf4a8b2c2448e2"
+    },
+    {
+      "path": "tti.npz",
+      "bytes": 519479,
+      "sha256": "f4823dba77aa890052ac50e2bb7a63acadb3cd55893db4e6d1a063c8cda27bb5"
+    },
+    {
+      "path": "tti.png",
+      "bytes": 438561,
+      "sha256": "92a43a4f4e80f03a4179d922d2fdad2a4df58db27d9c55c851f43c7b0e6be9a7",
+      "pixels": [
+        2046,
+        1441
+      ]
+    },
+    {
+      "path": "vrr.json",
+      "bytes": 2977,
+      "sha256": "2373364ba7b0a5e31d5de004638ed25794fd74899382c56c96b84def7e114495"
+    },
+    {
+      "path": "vrr.npz",
+      "bytes": 488222,
+      "sha256": "e9d6c9d2a9f3fd700b4ea6fb61ae1cd44ac808e3d0ebde148dae3e11737a5af2"
+    },
+    {
+      "path": "vrr.png",
+      "bytes": 451953,
+      "sha256": "84c41a092f721baa892794e9f443f6e47a3ff88a9d707ea123e90f1b8e1ab886",
+      "pixels": [
+        2046,
+        1441
+      ]
+    },
+    {
+      "path": "vrz.json",
+      "bytes": 2913,
+      "sha256": "a60d03f0cd2b36562cff3d574e1ad17d8dfffd717e026ee4003a879d0c62ae4c"
+    },
+    {
+      "path": "vrz.npz",
+      "bytes": 487585,
+      "sha256": "c8b39d338298264a28ebb9c06206b5683250478f654b8c1f2246558fbd6c35c2"
+    },
+    {
+      "path": "vrz.png",
+      "bytes": 464186,
+      "sha256": "d2d59e2b4b9ee2929b6de8f3a78cf01cb1d5e4e46abec8999a6ce278037b001c",
+      "pixels": [
+        2046,
+        1441
+      ]
+    },
+    {
+      "path": "vti.json",
+      "bytes": 2995,
+      "sha256": "8d6cd144fdd543193d1553f15b99efad557bf5a0f1430f7123735bc7d2a2d57c"
+    },
+    {
+      "path": "vti.npz",
+      "bytes": 485484,
+      "sha256": "c542238ae4064c54aa5f7b95e9630a44373fcfe687ec16e85746a10d271f5bb8"
+    },
+    {
+      "path": "vti.png",
+      "bytes": 853576,
+      "sha256": "efd38eb515da9ac562692cee959b9b7cd67995014d886c7647b16f5868eca3f7",
+      "pixels": [
+        2046,
+        1441
+      ]
+    }
+  ],
+  "reproduction_scripts": [
+    {
+      "path": "tools/run_free_surface_acoustic.py",
+      "sha256": "d828218415d16df8a472b12f5780294c01b9509f9e7db6b6fdb0b611773d2db0"
+    },
+    {
+      "path": "tools/run_free_surface_elastic.py",
+      "sha256": "eb031cf6c46fd34613c9eac2eb3611306a7b005ab1c661e10a65c244ab9bda04"
+    },
+    {
+      "path": "tools/run_scalar_mirror.py",
+      "sha256": "d9411d93fa1ea1c9a52702ff78cffa14f7edc6cbf17277741e98188d45372fac"
+    }
+  ]
+}

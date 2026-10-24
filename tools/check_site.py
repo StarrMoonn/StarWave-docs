@@ -15,6 +15,7 @@ from check_presentation_asset import ASSET_PATH, check as check_presentation
 from check_scalar3d_examples import approved_assets, check as check_scalar3d
 from check_sls_examples import check as check_sls
 from check_wavefield_examples import approved_assets as approved_wavefield_assets, check as check_wavefield
+from check_free_surface_examples import approved_assets as approved_free_surface_assets, check as check_free_surface
 from landing import approved_assets as approved_landing_assets, check as check_landing
 
 
@@ -293,6 +294,7 @@ def check(root):
     errors.extend(check_scalar3d(root))
     errors.extend(check_sls(root))
     errors.extend(check_wavefield(root))
+    errors.extend(check_free_surface(root))
     errors.extend(check_landing(root))
     pages = {p: Page(p.read_text(encoding="utf-8")) for p in root.rglob("*.html")}
     if not pages or not (root / "index.html").is_file():
@@ -396,7 +398,7 @@ def check(root):
         docnames = json.loads(index.removeprefix('Search.setIndex(').removesuffix(')'))['docnames']
         if not {'usage', 'pytorch-backend'} <= set(docnames) or {'visco-sls', 'visco-gsls', 'vrr'} & set(docnames) or any(name.startswith('api/') for name in docnames):
             errors.append(f'API search entries are duplicated or missing: {locale}')
-        if not {'modeling/wave-propagation', 'modeling/acquisition', 'modeling/reconstruction', 'docker', 'presentation'} <= set(docnames) or {'modeling/vrz', 'modeling/vti'} & set(docnames):
+        if not {'modeling/wave-propagation', 'modeling/acquisition', 'modeling/reconstruction', 'modeling/free-surface', 'docker', 'presentation'} <= set(docnames) or {'modeling/vrz', 'modeling/vti'} & set(docnames):
             errors.append(f'Modeling search entries are duplicated or missing: {locale}')
         combined = (root / locale / 'modeling/wave-propagation.html').read_text()
         if len(re.findall(r'data-sw-anchor="wave-[^"]+"', combined)) != 7:
@@ -549,6 +551,7 @@ def check(root):
     allowed = {".md", ".py", ".txt", ".css", ".yml", ".yaml", ".html", ".js", ".json"}
     scalar3d_assets = approved_assets()
     wavefield_assets = approved_wavefield_assets()
+    free_surface_assets = approved_free_surface_assets()
     landing_assets = approved_landing_assets()
     sources = []
     for p in project.rglob("*"):
@@ -567,16 +570,18 @@ def check(root):
         is_presentation = p == ASSET_PATH
         is_scalar3d_asset = p in scalar3d_assets
         is_wavefield_asset = p in wavefield_assets
+        is_free_surface_asset = p in free_surface_assets
+        is_free_surface_binary = is_free_surface_asset and p.suffix in {".png", ".npz"}
         is_landing_asset = p in landing_assets
         is_landing_binary = is_landing_asset and p.suffix in {".mp4", ".gif", ".jpg", ".png"}
-        if p.name not in {".gitignore", ".gitattributes"} and p.suffix not in allowed and not is_tutorial_png and not is_tutorial_notebook and not is_brand_file and not is_font_file and not is_diagram_file and not is_reconstruction_file and not is_presentation and not is_scalar3d_asset and not is_wavefield_asset and not is_landing_asset:
+        if p.name not in {".gitignore", ".gitattributes"} and p.suffix not in allowed and not is_tutorial_png and not is_tutorial_notebook and not is_brand_file and not is_font_file and not is_diagram_file and not is_reconstruction_file and not is_presentation and not is_scalar3d_asset and not is_wavefield_asset and not is_free_surface_asset and not is_landing_asset:
             errors.append(f"Unexpected source file: {relative}")
         if p.suffix == ".py":
             try:
                 ast.parse(p.read_text(encoding="utf-8"))
             except SyntaxError as exc:
                 errors.append(f"Python syntax: {relative}: {exc.msg}")
-        if p not in {Path(__file__).resolve(), project / 'tools' / 'check_presentation_asset.py', project / 'tools' / 'check_sls_examples.py'} and not is_tutorial_png and not (is_brand_file and p.suffix == ".png") and not is_font_file and not is_presentation and not is_scalar3d_asset and not is_wavefield_asset and not is_landing_binary:
+        if p not in {Path(__file__).resolve(), project / 'tools' / 'check_presentation_asset.py', project / 'tools' / 'check_sls_examples.py'} and not is_tutorial_png and not (is_brand_file and p.suffix == ".png") and not is_font_file and not is_presentation and not is_scalar3d_asset and not is_wavefield_asset and not is_free_surface_binary and not is_landing_binary:
             text = p.read_text(encoding="utf-8")
             if any(pattern.search(text) for pattern in forbidden):
                 errors.append(f"Review restricted content: {relative}")

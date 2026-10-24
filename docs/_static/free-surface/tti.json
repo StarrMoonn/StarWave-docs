@@ -1,0 +1,114 @@
+{
+  "source_commit": "200621cc31c0ebeebaa01ffaa3591c0ebd7e0adb",
+  "dimension": 2,
+  "device": "cpu",
+  "backend": "torch",
+  "execution": "eager",
+  "memory": "full",
+  "autograd_enabled": false,
+  "dtype": "float32",
+  "threads": 2,
+  "torch_version": "2.14.1+cpu",
+  "python_version": "3.12.14",
+  "generated_at_utc": "2026-10-24T16:19:07.861702+00:00",
+  "case": "tti",
+  "observable": "single qP scalar field u",
+  "surface_convention": "Physical z=0 is projected to u=0. Normal derivatives use order-2 closure on the first M interior rows; not elastic traction-free.",
+  "grid_shape_xz": [
+    80,
+    64
+  ],
+  "input_axes": "x,z",
+  "dx_m": 10.0,
+  "dz_m": 10.0,
+  "dt_s": 0.001,
+  "nt": 750,
+  "spatial_order": 4,
+  "pml_width_absorbing": [
+    12,
+    12,
+    12,
+    12
+  ],
+  "pml_width_free_surface": [
+    12,
+    12,
+    0,
+    12
+  ],
+  "pml_face_order": "x-low,x-high,z-low,z-high",
+  "boundary_buffer_cells": 5,
+  "model": {
+    "interface_z_m": 300,
+    "vp_above_m_s": 2000,
+    "vp_below_m_s": 2600,
+    "rho_above_kg_m3": 2000,
+    "rho_below_kg_m3": 2200,
+    "density_note": "Not an input to scalar, Born or qP TTI; VRR uses density only in explicit r=0.5 grad(log(vp*rho)) preprocessing.",
+    "epsilon": 0.1,
+    "delta": 0.05,
+    "theta_degrees": 20.0
+  },
+  "source": {
+    "type": "Ricker",
+    "peak_frequency_hz": 20.0,
+    "peak_time_s": 0.075,
+    "amplitude": 1.0,
+    "location_xz_m": [
+      400,
+      80
+    ],
+    "location_xz_indices": [
+      40,
+      8
+    ],
+    "convention": "normalized forcing; internal increment -v_source^2*internal_dt^2*upsampled_wavelet"
+  },
+  "receivers": {
+    "count": 61,
+    "x_m_min": 100,
+    "x_m_max": 700,
+    "spacing_m": 10,
+    "z_index": 5,
+    "z_coordinate_m": 50,
+    "note": "Off-surface receiver row, z=50m"
+  },
+  "time_plan": {
+    "internal_dt_s": 0.001,
+    "internal_nt": 750,
+    "step_ratio": 1,
+    "max_vel_m_s": 2848.157302563601,
+    "cfl_max_dt_s": 0.0015529436940136653,
+    "provenance": "Same operator-specific setup helper at pinned source"
+  },
+  "elapsed_s": {
+    "absorbing": 0.5496802169996045,
+    "free_surface": 0.5737970220002353
+  },
+  "stats": {
+    "absorbing": {
+      "finite": true,
+      "max_abs": 12.821677207946777,
+      "rms": 1.0763513565366227
+    },
+    "free_surface": {
+      "finite": true,
+      "max_abs": 13.01992130279541,
+      "rms": 1.472444384924426
+    },
+    "difference": {
+      "finite": true,
+      "max_abs": 6.366271018981934,
+      "rms": 0.792916662706367
+    }
+  },
+  "difference_relative_l2": 0.7366708444143519,
+  "limitations": [
+    "Documentation example, not physical acceptance or backend parity validation.",
+    "Compare only within each pair: source and observable conventions differ across operators.",
+    "Only the top boundary option changes within a pair; no added noise, FWI or 3-D modelling."
+  ],
+  "plot_shared_symmetric_clip": 8.093692779541016,
+  "total_elapsed_s": 1.9877243010000711,
+  "source_repository": "https://github.com/StarrMoonn/StarWave"
+}

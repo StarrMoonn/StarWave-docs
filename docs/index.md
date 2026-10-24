@@ -112,6 +112,7 @@ WSL <wsl>
 标量声学 <modeling/scalar>
 梯度 <modeling/gradient>
 波传播 <modeling/wave-propagation>
+自由表面 <modeling/free-surface>
 波场反传重建 <modeling/reconstruction>
 ```
 
