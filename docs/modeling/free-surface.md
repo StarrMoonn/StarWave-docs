@@ -240,7 +240,7 @@ Scalar/Born/VRZ/VRR/VTI/qP TTI/GSLS 使用四阶空间模板和 20 Hz Ricker；�
 (free-surface-reproduce)=
 ## 数据与复现边界
 
-下载[总清单](../_static/free-surface/manifest.json)核对源提交、每个算子的后端、dtype、文件大小和 SHA-256；各算子的运行 JSON 给出具体模型、采集、时间步、边界与范数。复现时使用匹配源码和记录中的参数，而不是假定当前安装的 wheel 具备相同接口。
+下载<a href="../_static/free-surface/manifest.json">总清单</a>核对源提交、每个算子的后端、dtype、文件大小和 SHA-256；各算子的运行 JSON 给出具体模型、采集、时间步、边界与范数。复现时使用匹配源码和记录中的参数，而不是假定当前安装的 wheel 具备相同接口。
 
 复现脚本：[声学七算子](https://github.com/StarrMoonn/StarWave-docs/blob/main/tools/run_free_surface_acoustic.py)、[弹性三算子](https://github.com/StarrMoonn/StarWave-docs/blob/main/tools/run_free_surface_elastic.py)、[Scalar 镜像试验](https://github.com/StarrMoonn/StarWave-docs/blob/main/tools/run_scalar_mirror.py)。脚本使用正常的 `import starwave`；先安装与本章固定提交匹配的源码。命令及输出路径以各脚本的 `--help` 为准。
 

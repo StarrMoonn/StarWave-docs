@@ -240,7 +240,7 @@ Only a flat top is represented here; no topographic free-surface capability is i
 (free-surface-reproduce)=
 ## Data and reproduction scope
 
-Download the [aggregate manifest](../_static/free-surface/manifest.json) to check the source commit, per-operator backend, dtype, file sizes, and SHA-256 hashes. Each run JSON gives its model, acquisition, timesteps, boundary settings, and norms. Reproduce with the matching source and recorded parameters rather than assuming an installed wheel has the same API.
+Download the <a href="../_static/free-surface/manifest.json">aggregate manifest</a> to check the source commit, per-operator backend, dtype, file sizes, and SHA-256 hashes. Each run JSON gives its model, acquisition, timesteps, boundary settings, and norms. Reproduce with the matching source and recorded parameters rather than assuming an installed wheel has the same API.
 
 Reproduction scripts: [seven acoustic operators](https://github.com/StarrMoonn/StarWave-docs/blob/main/tools/run_free_surface_acoustic.py), [three elastic operators](https://github.com/StarrMoonn/StarWave-docs/blob/main/tools/run_free_surface_elastic.py), and [Scalar mirror test](https://github.com/StarrMoonn/StarWave-docs/blob/main/tools/run_scalar_mirror.py). They use ordinary `import starwave`; first install the source matching this chapter's pinned commit. Consult each script's `--help` for its command and output destination.
 

@@ -169,6 +169,8 @@ def check(root):
             for suffix in ('npz', 'json'):
                 if f'../_static/free-surface/{name}.{suffix}' not in links:
                     errors.append(f'Missing free-surface raw-data link: {locale}/{name}.{suffix}')
+        if '../_static/free-surface/manifest.json' not in links:
+            errors.append('Missing canonical free-surface manifest download: ' + locale)
         sidebar = next((node for node in tree.iter('div')
                         if 'wy-menu-vertical' in node.get('class', '').split()), None)
         label = '自由表面' if locale == 'zh' else 'Free surface'
