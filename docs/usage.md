@@ -24,7 +24,7 @@ GSLS: [visco_gsls](#visco-gsls). VRR: [starwave.vrr](#vrr). 两者均集成于 V
 - [其它导出名称与范围](#other-exports)
 ```
 
-除单独标注的 V21 弹性波 VRR 与当前开发源码 qP TTI 新增接口外，本参考面向冻结 V19 源码 `0.1.0.dev19`，提交 `46d32877e3336d531520a696d5f2e074e6f4ef74`，已发布为 [Release V19](https://github.com/StarrMoonn/StarWave/releases/tag/V19)。其余签名按该源码核对，包括 23 参数 Scalar API 与已集成的 `starwave.vrr`。冻结 V19 API 契约仅作为历史兼容基线，不说明当前包的可用性。本文开发新增接口请使用匹配的完整源码，不应从历史 wheel 记录推断当前 PyPI 可用性。源码、分发产物与设备验收证据分别记录。见[文档状态](status.md)与[安装](installation.md)。
+除单独标注的 V21 弹性波 VRR 与V22 qP TTI 新增接口外，本参考面向冻结 V19 源码 `0.1.0.dev19`，提交 `46d32877e3336d531520a696d5f2e074e6f4ef74`，已发布为 [Release V19](https://github.com/StarrMoonn/StarWave/releases/tag/V19)。其余签名按该源码核对，包括 23 参数 Scalar API 与已集成的 `starwave.vrr`。冻结 V19 API 契约仅作为历史兼容基线，不说明当前包的可用性。本文单独标注的新增接口请使用匹配的完整源码，不应从历史 wheel 记录推断当前 PyPI 可用性。源码、分发产物与设备验收证据分别记录。见[文档状态](status.md)与[安装](installation.md)。
 
 6.0.0 的内部存储和 PML 转置维护见[发布说明](release-notes.md)，二维存储变化见[scalar 说明](modeling/scalar.md)。它们不引入新的公共参数；源码升级需重新构建配套原生库。
 
@@ -43,7 +43,7 @@ GSLS: [visco_gsls](#visco-gsls). VRR: [starwave.vrr](#vrr). 两者均集成于 V
 
 - {py:func}`starwave.vti`：二维/三维声学 VTI；`vp, epsilon, delta, rho`；按所选分量顺序返回记录。
 
-- {py:func}`starwave.tti`：二维局部近似伪声学 qP VTI/TTI；`vp, epsilon, delta, theta`；标量强迫，full/checkpoint；当前开发源码接口。
+- {py:func}`starwave.tti`：二维局部近似伪声学 qP VTI/TTI；`vp, epsilon, delta, theta`；标量强迫，full/checkpoint；已包含于 [V22 完整源码发布](https://github.com/StarrMoonn/StarWave/releases/tag/V22)。
 
 - {py:func}`starwave.elastic`：二维/三维各向同性弹性；`lamb, mu, buoyancy`；返回完整最终状态及 p/速度记录。
 
@@ -870,7 +870,7 @@ assert all(x.grad is not None and torch.isfinite(x.grad).all()
 (vrr-status)=
 ### 源码与验证范围
 
-除单独标注的 V21 弹性波 VRR 新增接口外，本参考面向冻结 V19 源码 `0.1.0.dev19`，提交 `46d32877e3336d531520a696d5f2e074e6f4ef74`，已发布为 [Release V19](https://github.com/StarrMoonn/StarWave/releases/tag/V19)。其余签名按该源码核对，包括 23 参数 Scalar API 与已集成的 `starwave.vrr`。冻结 V19 API 契约仅作为历史兼容基线，不说明当前包的可用性。本文开发新增接口请使用匹配的完整源码，不应从历史 wheel 记录推断当前 PyPI 可用性。源码、分发产物与设备验收证据分别记录。见[文档状态](status.md)与[安装](installation.md)。
+除单独标注的 V21 弹性波 VRR 新增接口外，本参考面向冻结 V19 源码 `0.1.0.dev19`，提交 `46d32877e3336d531520a696d5f2e074e6f4ef74`，已发布为 [Release V19](https://github.com/StarrMoonn/StarWave/releases/tag/V19)。其余签名按该源码核对，包括 23 参数 Scalar API 与已集成的 `starwave.vrr`。冻结 V19 API 契约仅作为历史兼容基线，不说明当前包的可用性。本文单独标注的新增接口请使用匹配的完整源码，不应从历史 wheel 记录推断当前 PyPI 可用性。源码、分发产物与设备验收证据分别记录。见[文档状态](status.md)与[安装](installation.md)。
 
 物理参数化依据 [Whitmore 等，EAGE 2020](https://doi.org/10.3997/2214-4609.202010332)。张量顶部约定依据 [SWEEP dev](https://github.com/DeepWave-KAUST/sweep/tree/32235f796ffa5b272ca81b9016f8cc85e25ecdf1) 提交 `32235f796ffa5b272ca81b9016f8cc85e25ecdf1`；原生 VRR CUDA 步进/VJP 与边界重建为独立实现，不是上游 CUDA 移植。
 
@@ -984,7 +984,7 @@ stress_h, velocity_z = starwave.vti(
 (tti)=
 ## qP VTI / TTI Function
 
-这是当前开发源码接口，按 `starwave/tti.py` 核对，不代表冻结 V19/V21 包或 PyPI 已包含。请使用匹配的完整源码，原生路径须显式重新编译。此 Liang 局部方向单场近似 qP 方程独立于 Duveneck `starwave.vti`，不接受 rho、速度/应力源字段或接收分量选择。
+此接口已包含于 [V22 完整源码发布](https://github.com/StarrMoonn/StarWave/releases/tag/V22)，签名已按该标签的 `starwave/tti.py` 核对；不改变冻结 V19/V21 包，也不代表 PyPI 可用性。请使用匹配的完整源码，原生路径须显式重新编译。此 Liang 局部方向单场近似 qP 方程独立于 Duveneck `starwave.vti`，不接受 rho、速度/应力源字段或接收分量选择。
 
 ```{py:function} starwave.tti(vp, epsilon, delta, theta, grid_spacing, dt, *, source_amplitudes, source_locations, receiver_locations, accuracy=4, pml_freq=25.0, pml_width=20, boundary_buffer=5, memory='full', max_vel=None, freq_taper_frac=0.0, time_pad_frac=0.0, time_taper=False, backend=None, execution='eager', checkpoint_interval=None, compile_steps=1, return_wavefield=False, forward_callback=None, callback_frequency=1, free_surface=False)
 

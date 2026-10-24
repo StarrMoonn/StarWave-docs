@@ -24,7 +24,7 @@ GSLS: [visco_gsls](#visco-gsls). VRR: [starwave.vrr](#vrr). Both are included in
 - [Other exported names and scope](#other-exports)
 ```
 
-This reference targets frozen V19 source `0.1.0.dev19`, commit `46d32877e3336d531520a696d5f2e074e6f4ef74`, published as [Release V19](https://github.com/StarrMoonn/StarWave/releases/tag/V19). Except for the separately labelled V21 elastic VRR and current-development qP TTI additions, signatures below are checked against that source, including the 23-parameter Scalar API and integrated `starwave.vrr`. These frozen V19 API contracts are a historical compatibility baseline, not a statement of current package availability. Use the matching complete source checkout for the development additions on this page; do not infer current PyPI availability from historical wheel records. Source, distribution and device-validation evidence remain separate. See [Status](status.md) and [installation](installation.md).
+This reference targets frozen V19 source `0.1.0.dev19`, commit `46d32877e3336d531520a696d5f2e074e6f4ef74`, published as [Release V19](https://github.com/StarrMoonn/StarWave/releases/tag/V19). Except for the separately labelled V21 elastic VRR and V22 qP TTI additions, signatures below are checked against that source, including the 23-parameter Scalar API and integrated `starwave.vrr`. These frozen V19 API contracts are a historical compatibility baseline, not a statement of current package availability. Use the matching complete source checkout for the separately labelled additions on this page; do not infer current PyPI availability from historical wheel records. Source, distribution and device-validation evidence remain separate. See [Status](status.md) and [installation](installation.md).
 
 See [Release Notes](release-notes.md) for 6.0.0 internal storage and PML-transpose maintenance, and [Scalar](modeling/scalar.md) for 2D storage changes. These introduce no new public parameters; source upgrades require rebuilt matching native libraries.
 
@@ -43,7 +43,7 @@ The page organization follows the Sphinx Python API style of the [official Deepw
 
 - {py:func}`starwave.vti`: `2D/3D` acoustic VTI; `vp, epsilon, delta, rho`; returns recordings in the selected component order.
 
-- {py:func}`starwave.tti`: `2D` local approximate pseudo-acoustic qP VTI/TTI; `vp, epsilon, delta, theta`; scalar forcing, full/checkpoint. Current development source.
+- {py:func}`starwave.tti`: `2D` local approximate pseudo-acoustic qP VTI/TTI; `vp, epsilon, delta, theta`; scalar forcing, full/checkpoint. Included in the [V22 complete-source release](https://github.com/StarrMoonn/StarWave/releases/tag/V22).
 
 - {py:func}`starwave.elastic`: `2D/3D` isotropic elasticity; `lamb, mu, buoyancy`; complete final states plus p/velocity records.
 
@@ -870,7 +870,7 @@ For native CUDA, move every model, source and geometry tensor to the same CUDA d
 (vrr-status)=
 ### Source and validation scope
 
-This reference targets frozen V19 source `0.1.0.dev19`, commit `46d32877e3336d531520a696d5f2e074e6f4ef74`, published as [Release V19](https://github.com/StarrMoonn/StarWave/releases/tag/V19). Except for the separately labelled V21 elastic VRR and current-development qP TTI additions, signatures below are checked against that source, including the 23-parameter Scalar API and integrated `starwave.vrr`. These frozen V19 API contracts are a historical compatibility baseline, not a statement of current package availability. Use the matching complete source checkout for the development additions on this page; do not infer current PyPI availability from historical wheel records. Source, distribution and device-validation evidence remain separate. See [Status](status.md) and [installation](installation.md).
+This reference targets frozen V19 source `0.1.0.dev19`, commit `46d32877e3336d531520a696d5f2e074e6f4ef74`, published as [Release V19](https://github.com/StarrMoonn/StarWave/releases/tag/V19). Except for the separately labelled V21 elastic VRR and V22 qP TTI additions, signatures below are checked against that source, including the 23-parameter Scalar API and integrated `starwave.vrr`. These frozen V19 API contracts are a historical compatibility baseline, not a statement of current package availability. Use the matching complete source checkout for the separately labelled additions on this page; do not infer current PyPI availability from historical wheel records. Source, distribution and device-validation evidence remain separate. See [Status](status.md) and [installation](installation.md).
 
 The physical parameterization follows [Whitmore et al., EAGE 2020](https://doi.org/10.3997/2214-4609.202010332). The tensor top convention follows [SWEEP dev](https://github.com/DeepWave-KAUST/sweep/tree/32235f796ffa5b272ca81b9016f8cc85e25ecdf1) commit `32235f796ffa5b272ca81b9016f8cc85e25ecdf1`; the native VRR CUDA step/VJP and boundary reconstruction are independent implementations, not an upstream CUDA port.
 
@@ -984,7 +984,7 @@ This example uses 2D inputs. A 3D call needs all four models shaped `[nx,ny,nz]`
 (tti)=
 ## qP VTI / TTI Function
 
-This is the current development-source API, checked against `starwave/tti.py`; it is not a claim about frozen V19/V21 packages or PyPI. Use a matching complete checkout and explicitly rebuild native libraries. This single-field Liang local-direction approximate qP equation is separate from Duveneck `starwave.vti`: no rho, velocity/stress source fields or component selectors are accepted.
+This API is included in the [V22 complete-source release](https://github.com/StarrMoonn/StarWave/releases/tag/V22), with its signature verified against tagged `starwave/tti.py`. This does not change frozen V19/V21 packages or establish PyPI availability. Use a matching complete checkout and explicitly rebuild native libraries. This single-field Liang local-direction approximate qP equation is separate from Duveneck `starwave.vti`: no rho, velocity/stress source fields or component selectors are accepted.
 
 ```{py:function} starwave.tti(vp, epsilon, delta, theta, grid_spacing, dt, *, source_amplitudes, source_locations, receiver_locations, accuracy=4, pml_freq=25.0, pml_width=20, boundary_buffer=5, memory='full', max_vel=None, freq_taper_frac=0.0, time_pad_frac=0.0, time_taper=False, backend=None, execution='eager', checkpoint_interval=None, compile_steps=1, return_wavefield=False, forward_callback=None, callback_frequency=1, free_surface=False)
 
