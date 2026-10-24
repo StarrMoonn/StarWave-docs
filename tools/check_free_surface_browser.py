@@ -108,7 +108,11 @@ def check_language_switch(page, base, locale):
     assert unquote(urlsplit(page.url).fragment) == target
     anchor = page.locator(f'[id="{target}"]')
     assert anchor.count() == 1
-    assert anchor.evaluate("e => !!e.closest('section').querySelector('[id=\"free-surface-mirror\"]')"), (
+    assert anchor.evaluate("""e => {
+        const section = e.closest('section');
+        return !!section && (section.id === 'free-surface-mirror'
+            || !!section.querySelector('[id="free-surface-mirror"]'));
+    }"""), (
         'Language switch reached the wrong section', locale, target)
     close_mobile_menu(page)
     page.go_back()
