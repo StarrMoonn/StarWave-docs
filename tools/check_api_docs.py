@@ -230,6 +230,8 @@ def check(wheel_path=None, source_root=None):
     check_born(source_root)
     from check_vrr_docs import check as check_vrr
     check_vrr(source_root)
+    from check_gpr_docs import check as check_gpr
+    check_gpr(Path(source_root) if source_root else None)
     released_contracts = json.loads((project / 'tools' / 'api_contract.json').read_text())
     from check_scalar_dev_docs import check as check_scalar_dev
     scalar_dev = check_scalar_dev(source_root)
@@ -261,6 +263,9 @@ def check(wheel_path=None, source_root=None):
                 r'^```\{py:function\} starwave\.([A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*)(\([^\n]+|\(\)[^\n]*)\n(.*?)^```',
                 text, re.M | re.S,
             ):
+                if name in ('gpr', 'maxwell'):
+                    # Current-source Maxwell/GPR is checked independently above.
+                    continue
                 if name in ('tti', 'elastic_vrr', 'elastic_vrr_parameters', 'scalar_born', 'vrr', 'vrr_reference', 'elastic_native_status', 'precondition_gradient', 'wavelets.ricker', 'torch_backend.backend_capabilities'):
                     # Independently checked against its own immutable V17 AST snapshot.
                     continue

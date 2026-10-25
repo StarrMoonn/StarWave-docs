@@ -2,6 +2,8 @@
 
 新增：[V21 弹性 VRR 接口与可运行 CPU 示例](examples/elastic-vrr.md)。此功能需要匹配的授权 V21 源码；下文旧版本与包说明保留为历史基线，不代表当前 PyPI 可用性，也不包含弹性 VRR。 完整参考：[弹性波 VRR 函数](#elastic-vrr-api)与[参数转换](#elastic-vrr-parameters)。
 
+新增：[Maxwell / GPR 接口](#gpr)，覆盖体素材料的二维 TMz/TEz 与三维电磁传播，支持 full/checkpoint。请使用匹配的当前源码，而非冻结 V19 包基线。
+
 GSLS: [visco_gsls](#visco-gsls). VRR: [starwave.vrr](#vrr). 两者均集成于 V19 主包。
 
 ```{container} sw-page-toc
@@ -17,6 +19,7 @@ GSLS: [visco_gsls](#visco-gsls). VRR: [starwave.vrr](#vrr). 两者均集成于 V
 - [Elastic Function](#elastic)
 - [GSLS Function](#visco-gsls)
 - [弹性波 VRR 函数](#elastic-vrr-api)
+- [Maxwell / GPR Function](#gpr)
 - [材料参数转换](#elastic-conversions)
 - [starwave.native_status](#native-status)
 - [starwave.prepare_native](#prepare-native)
@@ -24,7 +27,7 @@ GSLS: [visco_gsls](#visco-gsls). VRR: [starwave.vrr](#vrr). 两者均集成于 V
 - [其它导出名称与范围](#other-exports)
 ```
 
-除单独标注的 V21 弹性波 VRR 与V22 qP TTI 新增接口外，本参考面向冻结 V19 源码 `0.1.0.dev19`，提交 `46d32877e3336d531520a696d5f2e074e6f4ef74`，已发布为 [Release V19](https://github.com/StarrMoonn/StarWave/releases/tag/V19)。其余签名按该源码核对，包括 23 参数 Scalar API 与已集成的 `starwave.vrr`。冻结 V19 API 契约仅作为历史兼容基线，不说明当前包的可用性。本文单独标注的新增接口请使用匹配的完整源码，不应从历史 wheel 记录推断当前 PyPI 可用性。源码、分发产物与设备验收证据分别记录。见[文档状态](status.md)与[安装](installation.md)。
+除单独标注的 V21 弹性波 VRR、V22 qP TTI 与当前 Maxwell/GPR 新增接口外，本参考面向冻结 V19 源码 `0.1.0.dev19`，提交 `46d32877e3336d531520a696d5f2e074e6f4ef74`，已发布为 [Release V19](https://github.com/StarrMoonn/StarWave/releases/tag/V19)。其余签名按该源码核对，包括 23 参数 Scalar API 与已集成的 `starwave.vrr`。冻结 V19 API 契约仅作为历史兼容基线，不说明当前包的可用性。本文单独标注的新增接口请使用匹配的完整源码，不应从历史 wheel 记录推断当前 PyPI 可用性。源码、分发产物与设备验收证据分别记录。见[文档状态](status.md)与[安装](installation.md)。
 
 6.0.0 的内部存储和 PML 转置维护见[发布说明](release-notes.md)，二维存储变化见[scalar 说明](modeling/scalar.md)。它们不引入新的公共参数；源码升级需重新构建配套原生库。
 
@@ -48,6 +51,8 @@ GSLS: [visco_gsls](#visco-gsls). VRR: [starwave.vrr](#vrr). 两者均集成于 V
 - {py:func}`starwave.elastic`：二维/三维各向同性弹性；`lamb, mu, buoyancy`；返回完整最终状态及 p/速度记录。
 
 - {py:func}`starwave.visco_gsls`：二维广义标准线性固体声学；固定可变密度，原生 full/checkpoint；详见下方 [GSLS Function](#visco-gsls)。
+
+- {py:func}`starwave.gpr` / {py:func}`starwave.maxwell`：体素材料的二维 TMz/TEz 与六分量三维 Maxwell；epsilon_r、sigma 及给定 mu_r，返回完整重启态和一个 E/H 接收分量。
 
 符号约定：`B` 炮数、`S` 每炮源数、`R` 每炮接收点数、`T` 用户时间采样数、`D` 空间维数。源和接收点使用物理模型的整数网格下标，不是米坐标，不包含 PML 偏移。
 
@@ -1810,6 +1815,184 @@ CUDA 数值、实际多卡、长 FWI 和性能均须在目标设备单独验证�
 - Hao & Greenhalgh (2021), “Nearly constant Q models of the generalized standard linear solid type and the corresponding wave equations”, GEOPHYSICS 86(4), T239–T260. [DOI](https://doi.org/10.1190/geo2020-0548.1).
 
 论文描述物理模型；本 API 的负源、参考相速度归一化、离散采样、PML、扩边与伴随遵循本页契约，不声称与其他实现逐位相同。常规目标函数组织见[反演](inversion/fwi.md)。历史 SLS 实验不是当前 GSLS 的运行证据。
+
+(gpr)=
+## Maxwell / GPR Function
+
+当前源码新增接口，独立于冻结 V19。两个入口共享输入检查及离散传播契约；下方完整列出 24 个参数，保持源码默认值不变。`C0` 表示真空光速。
+
+```{py:function} starwave.gpr(epsilon_r, sigma, grid_spacing, dt, source_amplitudes=None, source_locations=None, receiver_locations=None, *, nt=None, accuracy=2, pml_width=10, backend='torch', storage_mode='full', checkpoint_interval=20, initial_state=None, source_component='ez', receiver_component='ez', compile_steps=1, forward_callback=None, callback_frequency=1, callback_requires_grad=False, mu_r=1.0, pml_max_velocity=C0, model_gradient_sampling_interval=1, polarization=None)
+
+传播采用体素材料与 Yee 交错网格的各向同性、无色散 Maxwell 场。这是张量/autograd 接口，不是 gprMax 的输入文件语言；GPR 约定不会改变地震算子的轴序或默认值。
+
+:param epsilon_r: **必填；位置或关键字参数。** 体素单元上的有限、严格为正的相对介电常数，float32/float64，形状 `[Ny,Nx]` 或 `[Nz,Ny,Nx]`，每轴至少一个单元。无量纲，实际介电常数为 epsilon0 乘 epsilon_r。维数决定默认极化，支持梯度。
+:type epsilon_r: `torch.Tensor`
+:param sigma: **必填；位置或关键字参数。** 有限、非负的电导率，单位 S/m，形状、dtype 和 device 必须与 epsilon_r 完全相同。它表示欧姆损耗，不是声学 Q 或 PML 阻尼曲线，支持梯度。
+:type sigma: `torch.Tensor`
+:param grid_spacing: **必填；位置或关键字参数。** 正且有限的网格间距，单位米；接受标量或按模型轴序的 `(dy,dx)` / `(dz,dy,dx)`。允许轴间不同间距，不自动转置。
+:type grid_spacing: `float | int | list[float] | tuple[float, ...]`
+:param dt: **必填；位置或关键字参数。** 正且有限的传播步长，单位秒。根据材料、空间阶数及网格间距检查 CFL，安全系数为 0.95；没有隐式子步、时间重采样或自动调整 dt。
+:type dt: `float | int`
+:param source_amplitudes: **默认 `None`；位置或关键字参数。** 有限的电流密度 J，单位 A/m²，形状 `[B,S,T]`，dtype/device 与模型相同。与 source_locations 同时提供或同时省略。波形的炮数/源数轴为 1 时可扩展到显式几何，梯度累加回共享波形。电场更新减去 J；不要预乘 dt 或体积因子。
+:type source_amplitudes: `torch.Tensor | None`
+:param source_locations: **默认 `None`；位置或关键字参数。** 模型 device 上的 int64 `[B,S,D]`，索引源分量的物理 Yee 锚点而非体素中心，不附加 PML 偏移。整格轴允许 0..N，半格轴允许 0..N-1。几何不广播，重合源相加。
+:type source_locations: `torch.Tensor | None`
+:param receiver_locations: **默认 `None`；位置或关键字参数。** 模型 device 上的 int64 `[B,R,D]`，采用接收分量自身的锚点范围。炮数须与显式源几何及初态一致；重复接收点保留独立道。None 或 `[B,0,D]` 请求零接收道，仍返回完整终态。
+:type receiver_locations: `torch.Tensor | None`
+:param nt: **默认 `None`；仅关键字。** 非负传播步数；提供源时由时间轴推断，显式 nt 必须与其相等。无源时必须提供 nt。若几何与初态均不存在，默认一炮。
+:type nt: `int | None`
+:param accuracy: **默认 `2`；仅关键字。** 交错网格空间差分阶数，可取 2、4 或 8；本接口不包含六阶。
+:type accuracy: `int`
+:param pml_width: **默认 `10`；仅关键字。** 各面的非负单元数，接受单一整数或 `[y-low,y-high,x-low,x-high]` / `[z-low,z-high,y-low,y-high,x-low,x-high]`。允许不等宽及零宽面。外部 CPML 通过可微边缘复制构造，复制部分梯度累加回物理单元。零宽为反射性的零 ghost 截断，不是开放空间或一般 PEC/PMC 边界。
+:type pml_width: `int | list[int] | tuple[int, ...]`
+:param backend: **默认 `'torch'`；仅关键字。** 可选 `torch`、`torch_compile`、`native_cpu`（别名 `cpu`）或 `cuda`。不隐式移动输入。原生 CPU/CUDA 需要显式编译的配套库及对应设备，不可用时直接报错，不回退或自动编译。Torch 路径无需 StarWave 原生编译。
+:type backend: `str`
+:param storage_mode: **默认 `'full'`；仅关键字。** 支持的后端可选 `full` 或 `checkpoint`。full 保留所需可微历史，checkpoint 重算完整 E/H/CPML 状态；拒绝 `boundary`。参数名是 storage_mode，不是地震接口中的 memory。
+:type storage_mode: `str`
+:param checkpoint_interval: **默认 `20`；仅关键字。** checkpoint 重放的正整数分段长度，以传播步计。更长分段减少边界快照但增加段内重放历史，不保证降低峰值内存；full 模式也验证该值。
+:type checkpoint_interval: `int`
+:param initial_state: **默认 `None`；仅关键字。** 包含完整场及所有 CPML 记忆项，dtype/device、炮数及补边形状 `[B,*(N+1+PML_low+PML_high)]` 须匹配。None 表示零初态。所有半格轴高端非物理 guard 及对应 psi 必须为零。重启态可微且不会被修改，须沿用相同网格、间距、PML 与材料约定。
+:type initial_state: `MaxwellState | None`
+:param source_component: **默认 `'ez'`；仅关键字。** TMz 为 `ez`；TEz 为 `ex` 或 `ey`；3D 为 `ex`、`ey` 或 `ez`。只支持电流源。TEz 必须显式选 ex 或 ey，因为默认值仍为 ez。
+:type source_component: `str`
+:param receiver_component: **默认 `'ez'`；仅关键字。** TMz 可选 `ez/hx/hy`；TEz 可选 `ex/ey/hz`；3D 可选任一 E/H 分量。每次调用记录一个分量及其原生交错位置。TEz 需显式有效选择；hz 是接收分量，不是电流源。
+:type receiver_component: `str`
+:param compile_steps: **默认 `1`；仅关键字。** 非 bool 的正整数，限制显式 backend='torch_compile' 时的纯张量时间块长度。保留末尾不足一块的步数。full-graph 编译不回退 eager，也不改变 dt、nt、炮数或目标函数。
+:type compile_steps: `int`
+:param forward_callback: **默认 `None`；仅关键字。** 在完成各间隔及最终更新后接收 GprCallbackState 的回调。场为独立、只读的物理 N+1 锚点快照，不含 CPML 记忆；半格轴端点 guard 为零。初始时刻及 checkpoint 反向重放均不回调，禁止修改快照。
+:type forward_callback: `Callable | None`
+:param callback_frequency: **默认 `1`；仅关键字。** 非 bool 的正整数，以完成的传播步计。最终步即使不足一个间隔也会回调；无回调时仍验证该值。
+:type callback_frequency: `int`
+:param callback_requires_grad: **默认 `False`；仅关键字。** False 时回调快照脱离计算图；True 时保留计算图，可收集快照构造可微目标。保留快照或 loss 也保留相应图内存，可能抵消 checkpoint/采样的节省。
+:type callback_requires_grad: `bool`
+:param mu_r: **默认 `1.0`；仅关键字。** 给定的有限、严格为正的相对磁导率，接受标量、匹配的 0D 张量或体素模型形状张量。实际磁导率为 mu0 乘 mu_r。张量采用独立的 H 面调和映射，TEz Hz 退化为本地体素值。拒绝 requires_grad=True 张量，不支持磁导率反演。
+:type mu_r: `float | int | torch.Tensor`
+:param pml_max_velocity: **默认 `C0`；仅关键字。** 给定的正且有限 CPML 参考速度，单位 m/s，约 299792458 m/s。仅控制 CPML 衰减率，不是物理波速，也不能替代材料相关 CFL 上限。
+:type pml_max_velocity: `float | int`
+:param model_gradient_sampling_interval: **默认 `1`；仅关键字。** 非 bool 的正整数。1 给出精确离散一阶材料 VJP；s>1 仅近似 epsilon_r/sigma 梯度累加：在本次调用全局零基步 t 可被 s 整除时取样，权重为 min(s,nt-t)。传播仍逐步执行，源及完整初态 VJP 保持精确。详见下方采样约定。
+:type model_gradient_sampling_interval: `int`
+:param polarization: **默认 `None`；仅关键字。** None 根据模型维数选择二维 `tmz` 或三维 `full`。二维显式可选 `tmz`、`tez`，三维只能为 `full`；拒绝不匹配的维数/模式。切换极化会改变分量和几何，不能只改标签。
+:type polarization: `str | None`
+:returns: MaxwellResult(state, receiver_amplitudes)：完整补边重启态及 `[B,R,T]` 记录，dtype/device 与模型相同。E 记录在 `(n+1)*dt`，H 记录在 `(n+1/2)*dt`；`result[-1]` 为接收张量。
+:rtype: `MaxwellResult`
+```
+
+```{py:function} starwave.maxwell(epsilon_r, sigma, grid_spacing, dt, source_amplitudes=None, source_locations=None, receiver_locations=None, *, nt=None, accuracy=2, pml_width=10, backend='torch', storage_mode='full', checkpoint_interval=20, initial_state=None, source_component='ez', receiver_component='ez', compile_steps=1, forward_callback=None, callback_frequency=1, callback_requires_grad=False, mu_r=1.0, pml_max_velocity=C0, model_gradient_sampling_interval=1, polarization=None)
+
+电磁入口与 {py:func}`starwave.gpr` 的签名、默认值、单位、返回值及梯度范围完全相同。GPR 委托该实现传播；一次传播使用其中一个入口即可。
+
+:returns: 同上所述的 `MaxwellResult(state, receiver_amplitudes)`。
+:rtype: `MaxwellResult`
+```
+
+(gpr-materials)=
+### 体素材料、轴序与 Yee 锚点
+
+物理模型包含 N 个单元、覆盖 N*spacing 米，不是 N 个节点值。二维为 `[y,x]`、间距 `(dy,dx)`、坐标 `[iy,ix]`；三维为 `[z,y,x]`、`(dz,dy,dx)`、`[iz,iy,ix]`。不要未经核对就沿用地震例子的轴序。旧节点材料、几何及重启态不能仅凭形状相同继续使用；没有旧节点模式开关。
+
+在每个电场位置，先分别算术平均 epsilon_r 与 sigma，再构造系数：TMz Ez 和三维各 E 边取四个横向体素；TEz Ex 取两个 y 横向体素，Ey 取两个 x 横向体素。记映射后的实际介电常数及电导率为 epsilon_e、sigma_e，则 `A=(epsilon_e-sigma_e*dt/2)/(epsilon_e+sigma_e*dt/2)`、`B=dt/(epsilon_e+sigma_e*dt/2)`，更新为 `E_new=A*E_old+B*(curl(H)-J)`，curl 中包含 CPML 修正。不能改为平均 A/B 或阻抗。固定张量 mu_r 在每个 H 面采用法向相邻两个体素的调和平均，TEz Hz 使用本地体素值。电导损耗作用于 E 更新。
+
+- TMz `(Ez,Hx,Hy)`：Ez 在 y/x 整格锚点；Hx 沿 y 偏移半格，Hy 沿 x 偏移半格。
+- TEz `(Ex,Ey,Hz)`：Ex 沿 x 偏移半格，Ey 沿 y 偏移半格，Hz 沿两轴均偏移半格。磁场 Hz 可接收，不代表可作为电流源。
+- 三维 `(Ex,Ey,Ez,Hx,Hy,Hz)`：E_i 沿 i 轴偏移半格，H_i 沿另外两轴偏移半格。不同分量的同一整数下标不是同一物理位置。
+
+E 单位 V/m，H 单位 A/m。空气/地下界面由显式 epsilon_r/sigma 材料构成，不是声学压力释放面。空气厚度、物理几何、CPML 与网格分辨率应分别设置。二维电流是不变线源理想化，不能视为已标定的有限天线。
+
+(gpr-state)=
+### 返回状态、时间与重启
+
+`starwave.MaxwellResult` 是含 `state`、`receiver_amplitudes` 的命名元组；`starwave.MaxwellState` 包含 `fields`、`psi` 两个元组。场顺序由上方极化约定决定；二维有四个、三维有十二个 CPML 记忆项。每个状态张量形状均为 `[B,*(N+1+PML_low+PML_high)]`。半格轴高端分配的槽是零 guard，不是物理样本，其初态余切也为零。所有初始场与记忆项都必须有限、完整。
+
+调用开始时 E 位于 0，H 位于 -dt/2。源样本 n 是 `(n+1/2)*dt` 的 J；完成第 n+1 步后，E 位于 `(n+1)*dt`，H 位于 `(n+1/2)*dt`，所以终态的 E/H 不在同一时刻。只有在兼容的几何、网格/PML 及材料约定下，才传入 `initial_state=result.state`；新的公开调用会重置本地时间。回调快照不含 CPML 记忆，不能替代完整重启态。若需截断重启的梯度链，应显式 detach 全部 fields 与 psi。
+
+(gpr-storage)=
+### 存储、自动微分与梯度采样
+
+一阶 VJP 支持 epsilon_r、sigma、源波形及包括 CPML 记忆在内的完整初态。外部复制单元的梯度累加回物理模型边缘。算子不会替用户选择残差、归一化 loss 或执行 optimizer.step。几何、数值设置、固定 mu_r 与 CPML 设计不是反演参数。原生高阶 AD 被拒绝；张量路径的高阶求导需另行验证。
+
+支持 `full` 与完整状态 `checkpoint`，不支持 `boundary`。原生材料历史保存紧凑的步前 E/curl 数据，并非每一步全部场/psi。checkpoint 保存完整段边界状态，重放当前段并保留所需紧凑材料历史。Torch 保留传播 AD 图或重算检查点。仅源/仅初态梯度不需要材料相关历史；没有隐含 CPU/磁盘卸载或 FP16 历史压缩。
+
+当 `model_gradient_sampling_interval=s>1` 时，正演及伴随/状态传播仍每步执行。只在零基 t=0,s,2s,... 累加材料相关项，权重 min(s,nt-t) 正确覆盖末尾不足一个间隔的部分。回调、checkpoint 和编译块边界不重置本次调用全局时钟；单独的新重启调用则重置时钟和时长。源/初态 VJP 仍精确；材料梯度是近似的，高阶模型导数也不精确。反演使用 s>1 前，应以实际目标函数对照 s=1。
+
+原生 full/checkpoint 仅保留采样步的 E/curl 帧；Torch 在未采样步分离材料系数，以省去适用的局部材料梯度中间量，但仍保留传播 AD 图。总进程内存或总耗时不保证按 1/s 缩减。`starwave.maxwell_utils.estimate_compute_memory(..., model_gradient_sampling_interval=s)` 仅估计选定 CPU 数组载荷，不是实测峰值 RSS 或 CUDA 显存。`recommended_sampling_interval` 只是建议，不是误差上界，也不会自动改变求解器设置。
+
+(gpr-callbacks)=
+### 回调快照与可微目标
+
+`starwave.GprCallbackState` 提供 `fields`、`component_names`、`wavefields`（分量名到场的映射）、`receiver_component` 及 `wavefield`（所选接收分量）。快照物理形状为 `[B,*(N+1)]`，半格轴高端 guard 被置零，即使对应运行时位置位于 PML 内。快照是独立、只读克隆，修改会报错。
+
+`step=user_step=internal_step` 表示已完成步数；`dt=internal_dt`，且 `step_ratio=1`，因为 GPR 不做时间重采样。`time=electric_time=step*dt`；`magnetic_time=(step-0.5)*dt`。H 观测应使用磁场时钟。每 callback_frequency 步及最终步回调，初始时刻和反向 checkpoint 重放不回调。`callback_requires_grad=True` 可用快照构造 loss；False 仅用于诊断。DataParallel 回调闭包需自行处理并发记录。
+
+(gpr-example)=
+### 可运行的 TMz、TEz 与三维 CPU 示例
+
+使用匹配且已安装的 StarWave 包。此例用 Torch CPU checkpoint 检查三种极化的接口/梯度连接，不是模型恢复、性能或 GPU 验收实验。保留默认精确材料采样间隔；真实数据目标可以替换这里的合成记录/状态/快照 loss。
+
+<!-- gpr:example:start -->
+```python
+import starwave
+import torch
+
+for polarization, shape, source_component, receiver_component in (
+    ("tmz", (8, 10), "ez", "ez"),
+    ("tez", (8, 10), "ex", "hz"),
+    ("full", (5, 6, 7), "ez", "hy"),
+):
+    epsilon_r = torch.full(shape, 6.0, dtype=torch.float64, requires_grad=True)
+    sigma = torch.full(shape, 0.002, dtype=torch.float64, requires_grad=True)
+    mu_r = torch.ones(shape, dtype=torch.float64)  # fixed, not trainable
+    source = torch.zeros((1, 1, 9), dtype=torch.float64)
+    source[..., 1] = 1.0  # electric current density, A/m²
+    source.requires_grad_()
+    src = torch.tensor([[[2] * len(shape)]], dtype=torch.long)
+    rec = torch.tensor([[[3] * len(shape)]], dtype=torch.long)
+    callbacks = []
+
+    def observe(state):
+        callbacks.append((state.step, state.wavefield.square().mean()))
+
+    result = starwave.gpr(
+        epsilon_r, sigma, grid_spacing=0.02, dt=1e-11,
+        source_amplitudes=source, source_locations=src,
+        receiver_locations=rec, accuracy=2, pml_width=1,
+        backend="torch", storage_mode="checkpoint", checkpoint_interval=4,
+        polarization=polarization, source_component=source_component,
+        receiver_component=receiver_component, mu_r=mu_r,
+        model_gradient_sampling_interval=1,
+        forward_callback=observe, callback_frequency=4,
+        callback_requires_grad=True,
+    )
+    loss = result.receiver_amplitudes.square().mean()
+    loss = loss + sum(value.square().mean() for value in result.state.fields)
+    loss = loss + sum(value for _, value in callbacks)
+    loss.backward()
+    assert result.receiver_amplitudes.shape == (1, 1, 9)
+    assert [step for step, _ in callbacks] == [4, 8, 9]
+    for value in (epsilon_r, sigma, source):
+        assert value.grad is not None and torch.isfinite(value.grad).all()
+```
+<!-- gpr:example:end -->
+
+(gpr-build)=
+### 显式编译与已安装包导入
+
+在完整 StarWave 源码根目录中，使用之后运行求解器的同一 Python 环境：
+
+```bash
+python -m pip install -e .
+python compile_all.py --backend cpu --equation maxwell
+# Choose the actual CUDA architecture(s) for your machine:
+python compile_all.py --backend cuda --equation maxwell --arch 80,89
+```
+
+`--equation gpr` 是 maxwell 的别名；默认 `--equation all` 会与地震组件一起编译 Maxwell。随后启动新的 Python/Jupyter 进程并正常 `import starwave`，也可在源码目录外导入。import 一次性绑定已编译库，无需手动 preload、注入 sys.path、源码哈希门控或自动编译/回退。纯 `torch` / `torch_compile` 无需 StarWave 原生编译；通过 `backend='torch_compile'` 与 compile_steps 显式选择张量编译，而不是地震接口的 execution='compile'。源码更改后，应重新编译并重启进程再调用原生后端。
+
+(gpr-scope)=
+### 范围与源码参考
+
+本新增接口对应 Maxwell/GPR 功能源码 `ab82ca51aedf745a00f26692361cf25156c3e13f` 及其选择性 dev 集成，独立于上方冻结 V19 基线，不据此宣称 PyPI wheel 可用。支持固定的非均匀磁导率，但磁导率反演、色散、各向异性、磁流源、几何梯度、物理 PEC/PMC/周期壁面及通用高阶 AD 不在此契约内。CUDA 编译成功不等于数值验收，设备/编译器验证只覆盖明确记录的组合。
+
+[当前源码 API](https://github.com/StarrMoonn/StarWave/blob/dc3eee1807370b97f2327b0f929faadfdd156cce/docs/reference/API_REFERENCE.md#gpr-voxel-api) · [离散契约](https://github.com/StarrMoonn/StarWave/blob/dc3eee1807370b97f2327b0f929faadfdd156cce/docs/maxwell_discrete_contract.md) · [体素迁移](https://github.com/StarrMoonn/StarWave/blob/dc3eee1807370b97f2327b0f929faadfdd156cce/docs/gpr_voxel_migration.md) · [TEz 几何](https://github.com/StarrMoonn/StarWave/blob/dc3eee1807370b97f2327b0f929faadfdd156cce/docs/gpr_tez.md) · [快速入门](https://github.com/StarrMoonn/StarWave/blob/dc3eee1807370b97f2327b0f929faadfdd156cce/docs/gpr_quickstart.md) · [验收范围](https://github.com/StarrMoonn/StarWave/blob/dc3eee1807370b97f2327b0f929faadfdd156cce/docs/development/MAXWELL_ACCEPTANCE_20261025.md)
 
 (native-runtime)=
 ## 原生运行库

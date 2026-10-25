@@ -2,6 +2,8 @@
 
 New: [V21 elastic VRR API and runnable CPU example](examples/elastic-vrr.md). This addition requires matching authorized V21 source; older version/package statements below remain historical baseline information and do not establish current PyPI availability or include elastic VRR. Full reference: [Elastic VRR Function](#elastic-vrr-api) and [parameter conversion](#elastic-vrr-parameters).
 
+New: [Maxwell / GPR API](#gpr) covers voxel-based 2D TMz/TEz and 3D electromagnetic propagation with full/checkpoint storage. Use the matching current source, not the frozen V19 package baseline.
+
 GSLS: [visco_gsls](#visco-gsls). VRR: [starwave.vrr](#vrr). Both are included in the V19 root package.
 
 ```{container} sw-page-toc
@@ -17,6 +19,7 @@ GSLS: [visco_gsls](#visco-gsls). VRR: [starwave.vrr](#vrr). Both are included in
 - [Elastic Function](#elastic)
 - [GSLS Function](#visco-gsls)
 - [Elastic VRR Function](#elastic-vrr-api)
+- [Maxwell / GPR Function](#gpr)
 - [Material conversions](#elastic-conversions)
 - [starwave.native_status](#native-status)
 - [starwave.prepare_native](#prepare-native)
@@ -24,7 +27,7 @@ GSLS: [visco_gsls](#visco-gsls). VRR: [starwave.vrr](#vrr). Both are included in
 - [Other exported names and scope](#other-exports)
 ```
 
-This reference targets frozen V19 source `0.1.0.dev19`, commit `46d32877e3336d531520a696d5f2e074e6f4ef74`, published as [Release V19](https://github.com/StarrMoonn/StarWave/releases/tag/V19). Except for the separately labelled V21 elastic VRR and V22 qP TTI additions, signatures below are checked against that source, including the 23-parameter Scalar API and integrated `starwave.vrr`. These frozen V19 API contracts are a historical compatibility baseline, not a statement of current package availability. Use the matching complete source checkout for the separately labelled additions on this page; do not infer current PyPI availability from historical wheel records. Source, distribution and device-validation evidence remain separate. See [Status](status.md) and [installation](installation.md).
+This reference targets frozen V19 source `0.1.0.dev19`, commit `46d32877e3336d531520a696d5f2e074e6f4ef74`, published as [Release V19](https://github.com/StarrMoonn/StarWave/releases/tag/V19). Except for the separately labelled V21 elastic VRR, V22 qP TTI and current Maxwell/GPR additions, signatures below are checked against that source, including the 23-parameter Scalar API and integrated `starwave.vrr`. These frozen V19 API contracts are a historical compatibility baseline, not a statement of current package availability. Use the matching complete source checkout for the separately labelled additions on this page; do not infer current PyPI availability from historical wheel records. Source, distribution and device-validation evidence remain separate. See [Status](status.md) and [installation](installation.md).
 
 See [Release Notes](release-notes.md) for 6.0.0 internal storage and PML-transpose maintenance, and [Scalar](modeling/scalar.md) for 2D storage changes. These introduce no new public parameters; source upgrades require rebuilt matching native libraries.
 
@@ -48,6 +51,8 @@ The page organization follows the Sphinx Python API style of the [official Deepw
 - {py:func}`starwave.elastic`: `2D/3D` isotropic elasticity; `lamb, mu, buoyancy`; complete final states plus p/velocity records.
 
 - {py:func}`starwave.visco_gsls`: 2D generalized-standard-linear-solid viscoacoustics, fixed variable density and native full/checkpoint; see the [GSLS Function](#visco-gsls) section below.
+
+- {py:func}`starwave.gpr` / {py:func}`starwave.maxwell`: voxel-based `2D TMz/TEz` and six-component `3D` Maxwell; epsilon_r, sigma and prescribed mu_r; complete restart state plus one E/H receiver component.
 
 Notation: `B` is the number of shots, `S` the sources per shot, `R` the receivers per shot, `T` the number of user time samples, and `D` the number of spatial dimensions. Sources and receivers use integer grid indices in the physical model, not coordinates in meters, and do not include PML offsets.
 
@@ -1811,6 +1816,184 @@ Unsupported: 3D, rho gradients, trainable PML/dt, boundary reconstruction, initi
 - Hao & Greenhalgh (2021), “Nearly constant Q models of the generalized standard linear solid type and the corresponding wave equations”, GEOPHYSICS 86(4), T239–T260. [DOI](https://doi.org/10.1190/geo2020-0548.1).
 
 The paper describes the physical model. This API follows the source sign, reference-phase normalization, discrete sampling, PML, padding and adjoint contracts above; bitwise agreement with other implementations is not claimed. See [inversion](inversion/fwi.md) for general objective organization. Historical SLS experiments are not current GSLS execution evidence.
+
+(gpr)=
+## Maxwell / GPR Function
+
+Current-source addition, separate from frozen V19. Both entry points share the same validation and discrete propagation contract; the full 24-parameter signature is shown without changing the source defaults. `C0` denotes the vacuum wave speed.
+
+```{py:function} starwave.gpr(epsilon_r, sigma, grid_spacing, dt, source_amplitudes=None, source_locations=None, receiver_locations=None, *, nt=None, accuracy=2, pml_width=10, backend='torch', storage_mode='full', checkpoint_interval=20, initial_state=None, source_component='ez', receiver_component='ez', compile_steps=1, forward_callback=None, callback_frequency=1, callback_requires_grad=False, mu_r=1.0, pml_max_velocity=C0, model_gradient_sampling_interval=1, polarization=None)
+
+Propagates isotropic, nondispersive Maxwell fields with voxel materials and Yee staggering. This is a tensor/autograd API, not the gprMax input-file language. The GPR contract does not change any seismic operator’s axes or defaults.
+
+:param epsilon_r: **Required; positional or keyword.** Finite, strictly positive relative permittivity on voxel cells: float32/float64 `[Ny,Nx]` or `[Nz,Ny,Nx]`, with at least one cell per axis. Dimensionless; physical permittivity is epsilon0 times epsilon_r. The rank selects the default polarization. Gradients are supported.
+:type epsilon_r: `torch.Tensor`
+:param sigma: **Required; positional or keyword.** Finite nonnegative electric conductivity in S/m, with exactly the model shape, dtype and device. It is Ohmic conductivity, not acoustic Q or a PML damping profile. Gradients are supported.
+:type sigma: `torch.Tensor`
+:param grid_spacing: **Required; positional or keyword.** Positive finite spacing in metres: scalar or `(dy,dx)` / `(dz,dy,dx)`, following model-axis order. Unequal spacings between axes are supported; no automatic transpose occurs.
+:type grid_spacing: `float | int | list[float] | tuple[float, ...]`
+:param dt: **Required; positional or keyword.** Positive finite propagation step in seconds. Material/order/spacing-aware CFL is enforced with safety factor 0.95. There are no hidden substeps, temporal resampling or automatic dt adjustment.
+:type dt: `float | int`
+:param source_amplitudes: **Default `None`; positional or keyword.** Finite electric current density J in A/m², shape `[B,S,T]`, matching model dtype/device. Supply together with source_locations or omit both. Singleton shot/source waveform axes may expand to the explicit geometry; gradients sum over those uses. The electric update subtracts J; do not pre-scale by dt or cell volume.
+:type source_amplitudes: `torch.Tensor | None`
+:param source_locations: **Default `None`; positional or keyword.** int64 `[B,S,D]` on the model device. Indices select the source component’s physical Yee anchors, not voxel centres; no PML offset is supplied. Integer-aligned axes allow 0..N and half-offset axes 0..N-1. Geometry never broadcasts; coincident sources add.
+:type source_locations: `torch.Tensor | None`
+:param receiver_locations: **Default `None`; positional or keyword.** int64 `[B,R,D]` on the model device, using the receiver component’s own anchor bounds. Shot counts match explicit source geometry and initial state. Duplicates retain separate traces. None or `[B,0,D]` requests zero receiver traces; the complete final state is still returned.
+:type receiver_locations: `torch.Tensor | None`
+:param nt: **Default `None`; keyword-only.** Nonnegative number of propagation steps. Inferred from the source time axis when supplied; an explicit nt must match it. Without sources, nt is required. With no geometry or initial state, the shot count defaults to one.
+:type nt: `int | None`
+:param accuracy: **Default `2`; keyword-only.** Staggered spatial finite-difference order: 2, 4 or 8. Order 6 is not part of this API.
+:type accuracy: `int`
+:param pml_width: **Default `10`; keyword-only.** Nonnegative cells per face, either one integer or `[y-low,y-high,x-low,x-high]` / `[z-low,z-high,y-low,y-high,x-low,x-high]`. Unequal widths and zero faces are accepted. External CPML material is edge-replicated differentiably; replicated gradients accumulate back to physical cells. Zero width is reflecting zero-ghost truncation, not open space or a general PEC/PMC boundary.
+:type pml_width: `int | list[int] | tuple[int, ...]`
+:param backend: **Default `'torch'`; keyword-only.** `torch`, `torch_compile`, `native_cpu` (`cpu` alias), or `cuda`. Inputs stay on their device. Native CPU/CUDA require explicitly built matching libraries and an appropriate device; unavailable implementations fail without fallback or automatic compilation. Torch routes require no StarWave native build.
+:type backend: `str`
+:param storage_mode: **Default `'full'`; keyword-only.** `full` or `checkpoint` on the supported backends. Full retains the selected differentiable history; checkpoint recomputes complete E/H/CPML states. `boundary` is rejected. This is storage_mode, not the seismic memory keyword.
+:type storage_mode: `str`
+:param checkpoint_interval: **Default `20`; keyword-only.** Positive segment length in propagation steps for checkpoint replay. Longer segments trade fewer boundary states for larger replay history; they need not reduce peak memory. Validated even in full mode.
+:type checkpoint_interval: `int`
+:param initial_state: **Default `None`; keyword-only.** Complete fields and every CPML memory, matching model dtype/device, shot count and padded `[B,*(N+1+PML_low+PML_high)]` shape. None starts from zero. All nonphysical high-side half-offset guard slots and associated psi must be zero. Restart state is differentiable, never mutated, and must use the same grid, spacing, PML and material convention.
+:type initial_state: `MaxwellState | None`
+:param source_component: **Default `'ez'`; keyword-only.** TMz: `ez`; TEz: `ex` or `ey`; 3D: `ex`, `ey` or `ez`. Only electric-current sources are supported. For TEz, explicitly select ex or ey because the default remains ez.
+:type source_component: `str`
+:param receiver_component: **Default `'ez'`; keyword-only.** TMz: `ez/hx/hy`; TEz: `ex/ey/hz`; 3D: any E/H component. One component is recorded per call at its native staggered site. TEz needs an explicit valid selector; hz is a receiver component, not an electric source.
+:type receiver_component: `str`
+:param compile_steps: **Default `1`; keyword-only.** Positive integer, excluding bool, limiting pure-tensor chunks for explicit backend='torch_compile'. A final partial chunk is retained. Full-graph compilation has no eager fallback and does not alter dt, nt, shots or the objective.
+:type compile_steps: `int`
+:param forward_callback: **Default `None`; keyword-only.** Callable receiving a GprCallbackState after completed intervals and the final update. Fields are independent, read-only physical N+1-anchor snapshots, without CPML memories. Half-offset endpoint guards are zero. No initial-time callback or checkpoint-replay callback is made; mutation is rejected.
+:type forward_callback: `Callable | None`
+:param callback_frequency: **Default `1`; keyword-only.** Positive integer, excluding bool, counting completed propagation steps. The final step is included even for a partial interval; validated even when no callback is supplied.
+:type callback_frequency: `int`
+:param callback_requires_grad: **Default `False`; keyword-only.** False detaches callback snapshots. True retains their graph for user-collected differentiable objectives. Retaining snapshots or losses also retains graph memory and may reduce checkpoint/sampling savings.
+:type callback_requires_grad: `bool`
+:param mu_r: **Default `1.0`; keyword-only.** Prescribed finite positive relative permeability: scalar, matching 0D tensor, or voxel-model-shaped tensor. Physical permeability is mu0 times mu_r. Tensor values use a separate harmonic H-face map, reducing to the local voxel for TEz Hz. Any requires_grad=True tensor is rejected; magnetic inversion is not supported.
+:type mu_r: `float | int | torch.Tensor`
+:param pml_max_velocity: **Default `C0`; keyword-only.** Prescribed positive finite CPML reference speed in m/s, about 299792458 m/s. It sets CPML rates only, not physical wave speed, and does not replace the material-aware CFL bound.
+:type pml_max_velocity: `float | int`
+:param model_gradient_sampling_interval: **Default `1`; keyword-only.** Positive integer, excluding bool. One gives the exact discrete first-order material VJP. Values s>1 approximate only epsilon_r/sigma gradient accumulation: sample call-global zero-based t divisible by s, weighted by min(s,nt-t). Propagation still executes every step; source and complete initial-state VJPs remain exact. See the sampling contract below.
+:type model_gradient_sampling_interval: `int`
+:param polarization: **Default `None`; keyword-only.** None selects 2D `tmz` or 3D `full` from model rank. Explicit 2D modes are `tmz` and `tez`; explicit 3D mode is `full` only. Incompatible rank/mode pairs are rejected. Switching polarization changes components and geometry, not just a label.
+:type polarization: `str | None`
+:returns: MaxwellResult(state, receiver_amplitudes): complete padded restart state and `[B,R,T]` records on the model dtype/device. E records are at `(n+1)*dt`; H records at `(n+1/2)*dt`. `result[-1]` is the receiver tensor.
+:rtype: `MaxwellResult`
+```
+
+```{py:function} starwave.maxwell(epsilon_r, sigma, grid_spacing, dt, source_amplitudes=None, source_locations=None, receiver_locations=None, *, nt=None, accuracy=2, pml_width=10, backend='torch', storage_mode='full', checkpoint_interval=20, initial_state=None, source_component='ez', receiver_component='ez', compile_steps=1, forward_callback=None, callback_frequency=1, callback_requires_grad=False, mu_r=1.0, pml_max_velocity=C0, model_gradient_sampling_interval=1, polarization=None)
+
+The electromagnetic entry point has exactly the same signature, defaults, units, returns and gradient scope as {py:func}`starwave.gpr`. GPR delegates to this implementation; use either name, not both for one propagation.
+
+:returns: The same `MaxwellResult(state, receiver_amplitudes)` described above.
+:rtype: `MaxwellResult`
+```
+
+(gpr-materials)=
+### Voxel materials, axes and Yee anchors
+
+The physical model contains N cells spanning N*spacing metres, not N nodal values. In 2D, axes are `[y,x]`, spacing `(dy,dx)` and coordinates `[iy,ix]`; in 3D they are `[z,y,x]`, `(dz,dy,dx)` and `[iz,iy,ix]`. Do not copy a seismic example’s axis order without checking it. Old nodal models, surveys and states are not compatible by shape alone; no legacy-nodal selector exists.
+
+At each electric site, epsilon_r and sigma are arithmetic-averaged separately before forming coefficients: four transverse voxels for TMz Ez and each 3D E edge; two y-transverse voxels for TEz Ex and two x-transverse voxels for TEz Ey. With the resulting physical epsilon_e and sigma_e, `A=(epsilon_e-sigma_e*dt/2)/(epsilon_e+sigma_e*dt/2)` and `B=dt/(epsilon_e+sigma_e*dt/2)` give `E_new=A*E_old+B*(curl(H)-J)`, including CPML curl corrections. Do not average A/B or impedance instead. Fixed tensor mu_r uses the harmonic mean of two voxels normal to each H face; TEz Hz uses the local voxel value. Conduction belongs to the E update.
+
+- TMz `(Ez,Hx,Hy)`: Ez has integer y/x anchors; Hx has y+1/2, Hy has x+1/2.
+- TEz `(Ex,Ey,Hz)`: Ex has x+1/2, Ey has y+1/2, Hz has both offsets. A magnetic Hz receiver does not permit an Hz current source.
+- 3D `(Ex,Ey,Ez,Hx,Hy,Hz)`: E_i has a half-cell offset along i; H_i along the other two axes. Identical integer indices do not collocate different components.
+
+E is in V/m and H in A/m. Air/ground is an explicit epsilon_r/sigma material interface, not an acoustic pressure-release surface. Keep air thickness, physical geometry, CPML and grid resolution distinct. The 2D current is an invariant-line idealization, not a calibrated finite antenna.
+
+(gpr-state)=
+### Return state, clocks and restart
+
+`starwave.MaxwellResult` is a named tuple with `state` and `receiver_amplitudes`. `starwave.MaxwellState` contains `fields` and `psi` tuples. Field order is the polarization-specific order above; there are four CPML memories in 2D and twelve in 3D. Every state tensor is `[B,*(N+1+PML_low+PML_high)]`; high-side half-offset slots are allocated zero guards, not physical samples. Their initial-state cotangents are zero. Initial fields and all memory tensors must be finite and complete.
+
+At call start E is at 0 and H at -dt/2. Source sample n is J at `(n+1/2)*dt`; after step n+1, E is at `(n+1)*dt` and H at `(n+1/2)*dt`. The final state is therefore not collocated in time. Pass `initial_state=result.state` only with compatible geometry, grid/PML and material convention; a new public call starts a new local clock. Callback snapshots omit CPML memories and cannot replace this restart state. Detach all fields and psi explicitly if a restart must truncate the gradient chain.
+
+(gpr-storage)=
+### Storage, autograd and gradient sampling
+
+First-order VJPs support epsilon_r, sigma, source waveforms and the complete initial state, including CPML memories. Replicated external-cell gradients accumulate back to physical model edges. The operator does not choose a residual, normalize the loss or perform an optimizer step. Geometry, numerical settings, fixed mu_r and CPML design are not inversion parameters. Native higher-order AD is rejected; tensor higher-order operations need independent validation.
+
+`full` and complete-state `checkpoint` are supported; `boundary` is not. Native material history stores compact pre-step E/curl data, not every field/psi at every time. Checkpoint saves complete segment-boundary states, replays a segment and retains its needed compact material history. Torch retains its propagation AD graph or recomputes checkpoints. Source-only/state-only gradients do not need material correlation history. No CPU/disk offload or FP16 history compression is implied.
+
+For `model_gradient_sampling_interval=s>1`, forward and adjoint/state propagation still execute every step. Only material correlations are sampled at zero-based t=0,s,2s,..., with weight min(s,nt-t), so the final partial interval is weighted correctly. Callback, checkpoint and compiled chunk boundaries do not reset this call-global clock. A separate public restart call starts a new clock and horizon. Source/initial-state VJPs remain exact; material gradients are approximate and higher-order model derivatives are not exact. Compare s>1 with s=1 for the actual objective before using it in inversion.
+
+Native full/checkpoint retains only sampled E/curl frames. Torch detaches material coefficients on unsampled steps to avoid applicable local material-gradient intermediates, but retains propagation AD. Neither whole-process memory nor time is promised to scale as 1/s. `starwave.maxwell_utils.estimate_compute_memory(..., model_gradient_sampling_interval=s)` reports selected CPU array payloads, not measured peak RSS or CUDA memory. `recommended_sampling_interval` is advisory, not an error bound, and never changes the solver setting automatically.
+
+(gpr-callbacks)=
+### Callback snapshots and differentiable objectives
+
+`starwave.GprCallbackState` exposes `fields`, `component_names`, `wavefields` (a name-to-field mapping), `receiver_component` and `wavefield` (the selected receiver component). Snapshots have `[B,*(N+1)]` physical shape, with half-offset endpoint guards masked to zero even when the corresponding runtime point lies in PML. They are independent read-only clones; mutation raises.
+
+`step=user_step=internal_step` counts completed steps; `dt=internal_dt` and `step_ratio=1` because GPR does not resample. `time=electric_time=step*dt`; `magnetic_time=(step-0.5)*dt`. Use the magnetic clock for H observations. Callbacks occur every callback_frequency steps plus the final step, never at time zero or during backward checkpoint replay. `callback_requires_grad=True` permits losses built from snapshots; False is diagnostic-only. DataParallel callback closures must handle their own concurrent bookkeeping.
+
+(gpr-example)=
+### Runnable TMz, TEz and 3D CPU example
+
+Use the matching installed StarWave package. The example checks API/gradient wiring for three polarization choices using Torch CPU checkpoint storage; it is not a recovery, performance or GPU-acceptance experiment. The default exact material-sampling interval is retained. A real data objective can replace the synthetic record/state/snapshot loss.
+
+<!-- gpr:example:start -->
+```python
+import starwave
+import torch
+
+for polarization, shape, source_component, receiver_component in (
+    ("tmz", (8, 10), "ez", "ez"),
+    ("tez", (8, 10), "ex", "hz"),
+    ("full", (5, 6, 7), "ez", "hy"),
+):
+    epsilon_r = torch.full(shape, 6.0, dtype=torch.float64, requires_grad=True)
+    sigma = torch.full(shape, 0.002, dtype=torch.float64, requires_grad=True)
+    mu_r = torch.ones(shape, dtype=torch.float64)  # fixed, not trainable
+    source = torch.zeros((1, 1, 9), dtype=torch.float64)
+    source[..., 1] = 1.0  # electric current density, A/m²
+    source.requires_grad_()
+    src = torch.tensor([[[2] * len(shape)]], dtype=torch.long)
+    rec = torch.tensor([[[3] * len(shape)]], dtype=torch.long)
+    callbacks = []
+
+    def observe(state):
+        callbacks.append((state.step, state.wavefield.square().mean()))
+
+    result = starwave.gpr(
+        epsilon_r, sigma, grid_spacing=0.02, dt=1e-11,
+        source_amplitudes=source, source_locations=src,
+        receiver_locations=rec, accuracy=2, pml_width=1,
+        backend="torch", storage_mode="checkpoint", checkpoint_interval=4,
+        polarization=polarization, source_component=source_component,
+        receiver_component=receiver_component, mu_r=mu_r,
+        model_gradient_sampling_interval=1,
+        forward_callback=observe, callback_frequency=4,
+        callback_requires_grad=True,
+    )
+    loss = result.receiver_amplitudes.square().mean()
+    loss = loss + sum(value.square().mean() for value in result.state.fields)
+    loss = loss + sum(value for _, value in callbacks)
+    loss.backward()
+    assert result.receiver_amplitudes.shape == (1, 1, 9)
+    assert [step for step, _ in callbacks] == [4, 8, 9]
+    for value in (epsilon_r, sigma, source):
+        assert value.grad is not None and torch.isfinite(value.grad).all()
+```
+<!-- gpr:example:end -->
+
+(gpr-build)=
+### Explicit build and installed-package import
+
+Run from the complete StarWave source checkout, using the Python environment that will execute the solver:
+
+```bash
+python -m pip install -e .
+python compile_all.py --backend cpu --equation maxwell
+# Choose the actual CUDA architecture(s) for your machine:
+python compile_all.py --backend cuda --equation maxwell --arch 80,89
+```
+
+`--equation gpr` is an alias for maxwell; the default `--equation all` includes Maxwell alongside the seismic components. Then start a new Python/Jupyter process and use ordinary `import starwave`, including from outside the checkout. Import binds available compiled libraries once; no manual preload, sys.path injection, source-hash gate or automatic compile/fallback is needed. Pure `torch` / `torch_compile` needs no StarWave native build; `backend='torch_compile'` and compile_steps explicitly select tensor compilation. It is not the seismic execution='compile' API. Rebuild after source changes and restart the process before native use.
+
+(gpr-scope)=
+### Scope and source references
+
+This addition follows Maxwell/GPR feature source `ab82ca51aedf745a00f26692361cf25156c3e13f` and its selective dev integration. It is separate from the frozen V19 baseline above and is not a claim about PyPI wheel availability. Fixed heterogeneous permeability is supported, but permeability inversion, dispersion, anisotropy, magnetic sources, geometry gradients, physical PEC/PMC/periodic walls and general higher-order AD are outside this contract. CUDA compilation alone is not numerical acceptance; device/compiler validation is limited to the explicitly recorded cases.
+
+[Current source API](https://github.com/StarrMoonn/StarWave/blob/dc3eee1807370b97f2327b0f929faadfdd156cce/docs/reference/API_REFERENCE.md#gpr-voxel-api) · [Discrete contract](https://github.com/StarrMoonn/StarWave/blob/dc3eee1807370b97f2327b0f929faadfdd156cce/docs/maxwell_discrete_contract.md) · [Voxel migration](https://github.com/StarrMoonn/StarWave/blob/dc3eee1807370b97f2327b0f929faadfdd156cce/docs/gpr_voxel_migration.md) · [TEz geometry](https://github.com/StarrMoonn/StarWave/blob/dc3eee1807370b97f2327b0f929faadfdd156cce/docs/gpr_tez.md) · [Quickstart](https://github.com/StarrMoonn/StarWave/blob/dc3eee1807370b97f2327b0f929faadfdd156cce/docs/gpr_quickstart.md) · [Acceptance scope](https://github.com/StarrMoonn/StarWave/blob/dc3eee1807370b97f2327b0f929faadfdd156cce/docs/development/MAXWELL_ACCEPTANCE_20261025.md)
 
 (native-runtime)=
 ## Native runtime

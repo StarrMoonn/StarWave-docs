@@ -14,10 +14,11 @@ from playwright.sync_api import sync_playwright
 PROJECT = Path(__file__).resolve().parents[1]
 API_NAMES = ('scalar', 'scalar_born', 'ScalarBorn', 'ScalarBorn.forward', 'vrz', 'vrr', 'vrr_reference', 'vti', 'tti', 'elastic',
              'common.vpvsrho_to_lambmubuoyancy', 'common.lambmubuoyancy_to_vpvsrho', 'elastic_vrr', 'elastic_vrr_parameters',
-             'visco_gsls', 'prepare_visco_gsls', 'visco_gsls_native_status',
+             'visco_gsls', 'prepare_visco_gsls', 'visco_gsls_native_status', 'gpr', 'maxwell',
              'native_status', 'prepare_native', 'prepare_elastic', 'elastic_native_status', 'ScalarIllumination',
              'ScalarIllumination.seal', 'ScalarIllumination.reduce', 'ScalarIllumination.close',
              'precondition_gradient', 'wavelets.ricker', 'torch_backend.backend_capabilities')
+GPR_SECTIONS = ('gpr', 'gpr-materials', 'gpr-state', 'gpr-storage', 'gpr-callbacks', 'gpr-example', 'gpr-build', 'gpr-scope')
 BORN_SECTIONS = ('born', 'born-backends', 'born-conventions', 'born-gradients', 'born-callbacks', 'born-returns', 'born-module', 'born-forward', 'born-example', 'born-build', 'born-scope')
 ELASTIC_SECTIONS = ('elastic', 'elastic-axes', 'elastic-returns', 'elastic-memory',
                     'elastic-examples', 'elastic-notes', 'elastic-conversions', 'elastic-vrr-api', 'elastic-vrr-parameters')
@@ -36,8 +37,8 @@ USAGE_TARGETS = tuple(
                    f'{name}-examples', f'{name}-notes')
 ) + ('scalar-time-sampling', 'scalar-memory', 'scalar-3d-example', 'tti') + ELASTIC_SECTIONS + ('elastic-function', 'usage', 'propagators', 'native-runtime',
                        'native-status', 'prepare-native', 'native-notes',
-                       'native-examples', 'prepare-elastic', 'other-exports') + BORN_SECTIONS + VRR_SECTIONS + GSLS_SECTIONS + V19_HELPER_SECTIONS + ('born-function',) + ('vrr-function', 'gsls-function', 'visco-gsls-function')
-TOC_TARGETS = ('scalar', 'born', 'vrz', 'vrr', 'vti', 'tti', 'elastic', 'visco-gsls', 'elastic-vrr-api', 'elastic-conversions',
+                       'native-examples', 'prepare-elastic', 'other-exports') + BORN_SECTIONS + VRR_SECTIONS + GSLS_SECTIONS + GPR_SECTIONS + V19_HELPER_SECTIONS + ('born-function',) + ('vrr-function', 'gsls-function', 'visco-gsls-function')
+TOC_TARGETS = ('scalar', 'born', 'vrz', 'vrr', 'vti', 'tti', 'elastic', 'visco-gsls', 'elastic-vrr-api', 'gpr', 'elastic-conversions',
                'native-status', 'prepare-native', 'prepare-elastic', 'other-exports')
 RECONSTRUCTION_SECTIONS = ('reconstruction', 'reconstruction-scalar3d', 'reconstruction-state',
                            'reconstruction-tape', 'reconstruction-reverse',
@@ -205,14 +206,14 @@ def check_usage(page, locale, output):
     title = main.locator('#usage > h1').evaluate("e => ({size:parseFloat(getComputedStyle(e).fontSize),font:getComputedStyle(e).fontFamily,weight:getComputedStyle(e).fontWeight})")
     assert abs(title['size'] - 40.8) < .01 and 'Georgia' in title['font'] and title['weight'] == '400', title
     for name, label in (('scalar', 'Scalar Function'), ('born', 'Born Function'), ('vrz', 'VRZ Function'),
-                        ('vrr', 'VRR Function'), ('vti', 'VTI Function'), ('tti', 'qP VTI / TTI Function'), ('elastic', 'Elastic Function'), ('visco-gsls', 'GSLS Function')):
+                        ('vrr', 'VRR Function'), ('vti', 'VTI Function'), ('tti', 'qP VTI / TTI Function'), ('elastic', 'Elastic Function'), ('visco-gsls', 'GSLS Function'), ('gpr', 'Maxwell / GPR Function')):
         heading = main.locator(f'#{name} > h2')
         assert heading.evaluate("e => e.firstChild.textContent.trim()") == label
         assert abs(heading.evaluate('e => parseFloat(getComputedStyle(e).fontSize)') - 30.6) < .01
         assert 'Georgia' in heading.evaluate('e => getComputedStyle(e).fontFamily')
     assert not main.locator('h3').evaluate_all("items => items.some(e => ['Function', '函数'].includes(e.firstChild.textContent.trim()))")
     overview = main.locator('#propagators')
-    assert overview.locator('code.xref').all_text_contents() == ['starwave.scalar()', 'starwave.scalar_born()', 'starwave.vrz()', 'starwave.vrr()', 'starwave.vti()', 'starwave.tti()', 'starwave.elastic()', 'starwave.visco_gsls()']
+    assert overview.locator('code.xref').all_text_contents() == ['starwave.scalar()', 'starwave.scalar_born()', 'starwave.vrz()', 'starwave.vrr()', 'starwave.vti()', 'starwave.tti()', 'starwave.elastic()', 'starwave.visco_gsls()', 'starwave.gpr()', 'starwave.maxwell()']
     assert overview.locator('a[href="#starwave.visco_gsls"] > code.xref').count() == 1
     assert overview.locator(':scope > p code.literal').all_text_contents() == ['B', 'S', 'R', 'T', 'D']
     overview_rows = overview.locator('p').evaluate_all("""items => items.map(p => {
@@ -223,7 +224,7 @@ def check_usage(page, locale, output):
                     return {text:e.textContent, size:s.fontSize, line:s.lineHeight, vertical:s.verticalAlign};
                 })};
     })""")
-    assert len(overview_rows) == 9
+    assert len(overview_rows) == 10
     assert len({row['line'] for row in overview_rows}) == 1, (locale, overview_rows)
     assert all(row['size'] == '17px' and all(code['size'] == row['size'] and code['line'] == row['line'] and code['vertical'] == 'baseline' for code in row['codes']) for row in overview_rows), (locale, overview_rows)
     if locale == 'en':
@@ -244,7 +245,7 @@ def check_usage(page, locale, output):
     for name, count in (('scalar', 23), ('scalar_born', 47), ('ScalarBorn', 13), ('ScalarBorn.forward', 41), ('vrz', 22), ('starwave.vrr', 21), ('vti', 24), ('elastic', 66),
                         ('common.vpvsrho_to_lambmubuoyancy', 4),
                         ('common.lambmubuoyancy_to_vpvsrho', 4),
-                        ('prepare_native', 1), ('prepare_elastic', 1), ('visco_gsls', 23),
+                        ('prepare_native', 1), ('prepare_elastic', 1), ('visco_gsls', 23), ('gpr', 24),
                         ('prepare_visco_gsls', 2), ('visco_gsls_native_status', 1)):
         fullname = name if name == 'starwave.vrr' else f'starwave.{name}'
         parameters = main.locator(f'dt[id="{fullname}"]').locator('..').locator('dl.field-list > dd').first.locator('p')
@@ -273,13 +274,13 @@ def check_usage(page, locale, output):
     assert definitions == [f'starwave.{name}' for name in API_NAMES], definitions
     for name in API_NAMES:
         assert ids.count(f'starwave.{name}') == 1, (locale, name)
-    for name in BORN_SECTIONS + ELASTIC_SECTIONS + ('tti', 'prepare-elastic',):
+    for name in BORN_SECTIONS + ELASTIC_SECTIONS + GPR_SECTIONS + ('tti', 'prepare-elastic',):
         section = main.locator(f'section[id="{name}"]')
         assert section.get_attribute('data-sw-anchor') == name, (locale, name)
         assert section.locator(':scope > h2, :scope > h3').count() == 1, (locale, name)
     # The long native signature must wrap within the article, including on the
     # narrowest phone. The conversions remain independent, linkable API entries.
-    for name in ('scalar_born', 'ScalarBorn', 'ScalarBorn.forward', 'starwave.vrr', 'tti', 'visco_gsls', 'prepare_visco_gsls', 'visco_gsls_native_status', 'elastic', 'common.vpvsrho_to_lambmubuoyancy',
+    for name in ('scalar_born', 'ScalarBorn', 'ScalarBorn.forward', 'starwave.vrr', 'tti', 'gpr', 'maxwell', 'visco_gsls', 'prepare_visco_gsls', 'visco_gsls_native_status', 'elastic', 'common.vpvsrho_to_lambmubuoyancy',
                  'common.lambmubuoyancy_to_vpvsrho', 'prepare_elastic'):
         fullname = name if name == 'starwave.vrr' else f'starwave.{name}'
         signature = main.locator(f'dt[id="{fullname}"]')
@@ -298,7 +299,7 @@ def check_usage(page, locale, output):
     page.screenshot(path=str(output / f'{locale}-usage-top-{width}.png'))
     overview.locator('h2').evaluate("e => e.scrollIntoView({block: 'start'})")
     page.screenshot(path=str(output / f'{locale}-usage-overview-{width}.png'))
-    for name in ('scalar', 'born', 'vrz', 'vrr', 'vti', 'tti', 'elastic', 'visco-gsls'):
+    for name in ('scalar', 'born', 'vrz', 'vrr', 'vti', 'tti', 'elastic', 'visco-gsls', 'gpr'):
         main.locator(f'#{name} > h2').evaluate("e => e.scrollIntoView({block: 'start'})")
         page.screenshot(path=str(output / f'{locale}-usage-{name}-heading-{width}.png'))
     main.locator('[id="starwave.scalar"]').evaluate("e => e.scrollIntoView({block: 'start'})")
@@ -312,7 +313,7 @@ def check_usage(page, locale, output):
     assert 'source_amplitudes' in text, locale
     fields.evaluate("e => e.scrollIntoView({block: 'start'})")
     page.screenshot(path=str(output / f'{locale}-usage-scalar-fields-{width}.png'))
-    for name in ('scalar_born', 'ScalarBorn', 'ScalarBorn.forward', 'starwave.vrr', 'tti', 'visco_gsls', 'prepare_visco_gsls', 'visco_gsls_native_status', 'elastic', 'common.vpvsrho_to_lambmubuoyancy',
+    for name in ('scalar_born', 'ScalarBorn', 'ScalarBorn.forward', 'starwave.vrr', 'tti', 'gpr', 'maxwell', 'visco_gsls', 'prepare_visco_gsls', 'visco_gsls_native_status', 'elastic', 'common.vpvsrho_to_lambmubuoyancy',
                  'common.lambmubuoyancy_to_vpvsrho', 'prepare_elastic'):
         fullname = name if name == 'starwave.vrr' else f'starwave.{name}'
         signature = main.locator(f'[id="{fullname}"]')

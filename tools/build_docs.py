@@ -77,6 +77,10 @@ USAGE_NUMBERS = USAGE_NUMBERS[:_elastic_vrr_insert] + (72, 73) + USAGE_NUMBERS[_
 _tti_insert = USAGE_SECTIONS.index('elastic')
 USAGE_SECTIONS = USAGE_SECTIONS[:_tti_insert] + ('tti',) + USAGE_SECTIONS[_tti_insert:]
 USAGE_NUMBERS = USAGE_NUMBERS[:_tti_insert] + (74,) + USAGE_NUMBERS[_tti_insert:]
+# Maxwell/GPR addition: preserve every previously published positional anchor.
+_gpr_insert = USAGE_SECTIONS.index('native-runtime')
+USAGE_SECTIONS = USAGE_SECTIONS[:_gpr_insert] + ('gpr', 'gpr-materials', 'gpr-state', 'gpr-storage', 'gpr-callbacks', 'gpr-example', 'gpr-build', 'gpr-scope') + USAGE_SECTIONS[_gpr_insert:]
+USAGE_NUMBERS = USAGE_NUMBERS[:_gpr_insert] + tuple(range(75, 83)) + USAGE_NUMBERS[_gpr_insert:]
 MODELING_FRAGMENTS = {'modeling/vrz.md', 'modeling/vti.md'}
 WAVE_SECTIONS = ('wave-propagation', 'wave-vrz', 'wave-vrz-details', 'wave-vrz-limits',
                  'wave-vti', 'wave-vti-details', 'wave-vti-limits')

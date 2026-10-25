@@ -1,0 +1,46 @@
+{
+  "source_repository": "StarrMoonn/StarWave",
+  "source_feature_commit": "ab82ca51aedf745a00f26692361cf25156c3e13f",
+  "source_paths": {
+    "gpr": "starwave/gpr.py",
+    "maxwell": "starwave/maxwell.py"
+  },
+  "signature": "(epsilon_r, sigma, grid_spacing, dt, source_amplitudes=None, source_locations=None, receiver_locations=None, *, nt=None, accuracy=2, pml_width=10, backend='torch', storage_mode='full', checkpoint_interval=20, initial_state=None, source_component='ez', receiver_component='ez', compile_steps=1, forward_callback=None, callback_frequency=1, callback_requires_grad=False, mu_r=1.0, pml_max_velocity=C0, model_gradient_sampling_interval=1, polarization=None)",
+  "parameter_names": [
+    "epsilon_r",
+    "sigma",
+    "grid_spacing",
+    "dt",
+    "source_amplitudes",
+    "source_locations",
+    "receiver_locations",
+    "nt",
+    "accuracy",
+    "pml_width",
+    "backend",
+    "storage_mode",
+    "checkpoint_interval",
+    "initial_state",
+    "source_component",
+    "receiver_component",
+    "compile_steps",
+    "forward_callback",
+    "callback_frequency",
+    "callback_requires_grad",
+    "mu_r",
+    "pml_max_velocity",
+    "model_gradient_sampling_interval",
+    "polarization"
+  ],
+  "section_numbers": {
+    "gpr": 75,
+    "gpr-materials": 76,
+    "gpr-state": 77,
+    "gpr-storage": 78,
+    "gpr-callbacks": 79,
+    "gpr-example": 80,
+    "gpr-build": 81,
+    "gpr-scope": 82
+  },
+  "source_dev_commit": "dc3eee1807370b97f2327b0f929faadfdd156cce"
+}

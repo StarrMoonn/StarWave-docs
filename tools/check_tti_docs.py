@@ -35,7 +35,7 @@ def check(source_root=None):
     for statement in module.body:
         if isinstance(statement, (ast.Assign, ast.AugAssign)):
             names = {n.id for n in ast.walk(statement) if isinstance(n, ast.Name)}
-            if names & {'USAGE_SECTIONS', 'USAGE_NUMBERS', 'BORN_SECTIONS', 'V19_HELPER_SECTIONS', '_born_insert', '_vrr_ref_insert', '_elastic_vrr_insert', '_tti_insert'}:
+            if names & {'USAGE_SECTIONS', 'USAGE_NUMBERS', 'BORN_SECTIONS', 'V19_HELPER_SECTIONS', '_born_insert', '_vrr_ref_insert', '_elastic_vrr_insert', '_tti_insert', '_gpr_insert'}:
                 exec(compile(ast.Module(body=[statement], type_ignores=[]), '<section map>', 'exec'), scope)
     for path in ('docs/usage.md', 'docs/en/usage.md'):
         source_sections = ['usage'] + re.findall(r'^\(([^)]+)\)=\n#+ ', (ROOT / path).read_text(), re.M)

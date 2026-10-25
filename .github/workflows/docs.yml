@@ -26,6 +26,7 @@ jobs:
       - run: python tools/check_v19_api_contracts.py --check tools/v19_api_contract.json --docs docs
       - run: python tools/check_api_docs.py
       - run: python tools/check_tti_docs.py
+      - run: python tools/check_gpr_docs.py
       - run: python tools/check_scalar_dev_docs.py
       - run: python tools/check_born_docs.py
       - run: python tools/check_vrr_docs.py
@@ -75,3 +76,4 @@ jobs:
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
+
