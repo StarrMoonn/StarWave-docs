@@ -791,7 +791,10 @@ def check_gsls_api(page, base, locale, output):
     main = page.locator('[role="main"] #visco-gsls')
     assert main.count() == 1
     assert main.evaluate("e => e.previousElementSibling.id") == 'elastic-vrr-api'
-    assert main.evaluate("e => e.nextElementSibling.id") == 'native-runtime'
+    assert main.evaluate("e => e.nextElementSibling.id") == 'gpr'
+    gpr = page.locator('[role="main"] #gpr')
+    assert gpr.count() == 1
+    assert gpr.evaluate("e => e.nextElementSibling.id") == 'native-runtime'
     assert main.locator('dl.py.function').count() == 3
     for name in ('visco_gsls', 'prepare_visco_gsls', 'visco_gsls_native_status'):
         assert main.locator('[id="starwave.' + name + '"]').count() == 1
