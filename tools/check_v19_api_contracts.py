@@ -61,21 +61,26 @@ def main():
    if normalized(api['parameters'])!=normalized(data['apis'][name]['parameters']):errors.append('SOURCE CONTRACT CHANGED '+name)
   if old['exports']!=data['exports']:errors.append('SOURCE EXPORTS CHANGED')
  if a.docs:
+  # Keep V19 source/snapshots immutable; the manual explicitly overlays current VTI.
+  from check_vti_docs import check as check_vti
+  current_vti=check_vti()
+  docs_apis=dict(data['apis'])
+  docs_apis['starwave.vti']=dict(docs_apis['starwave.vti'],parameters=unpack(ast.parse('def current'+current_vti['signature']+': pass').body[0]))
   for f in [a.docs/'usage.md',a.docs/'en/usage.md']:
    if not f.exists():continue
    seen=set()
    for kind,name,sig in re.findall(r'```\{py:(function|class|method)\}\s+([\w.]+)(\([^\n]+)',f.read_text()):
-    if name not in data['apis']:
+    if name not in docs_apis:
      if name.startswith('starwave_vrr.'):errors.append(str(f)+': obsolete namespace '+name)
      continue
     seen.add(name)
     body=re.search(r'```\{py:'+kind+r'\} '+re.escape(name)+r'[^\n]*\n(.*?)^```',f.read_text(),re.M|re.S).group(1)
     fields=re.findall(r'^:param (\w+): (.+)$',body,re.M)
-    if [n for n,_ in fields]!=[p['name'] for p in data['apis'][name]['parameters']]:errors.append(str(f)+': parameter prose missing '+name)
+    if [n for n,_ in fields]!=[p['name'] for p in docs_apis[name]['parameters']]:errors.append(str(f)+': parameter prose missing '+name)
     try: node=ast.parse('def temp'+sig+':\n pass').body[0]
     except SyntaxError as e:errors.append(str(f)+': unparsable '+name+': '+str(e));continue
-    if normalized(unpack(node))!=normalized(data['apis'][name]['parameters']):errors.append(str(f)+': signature mismatch '+name)
-   for name in [n for n in data['apis'] if not n.startswith('starwave.torch_backend.') or n.endswith('backend_capabilities')]:
+    if normalized(unpack(node))!=normalized(docs_apis[name]['parameters']):errors.append(str(f)+': signature mismatch '+name)
+   for name in [n for n in docs_apis if not n.startswith('starwave.torch_backend.') or n.endswith('backend_capabilities')]:
     if name not in seen:errors.append(str(f)+': missing public signature '+name)
  print(json.dumps(dict(api_count=len(data['apis']),errors=errors),indent=2))
  raise SystemExit(bool(errors))

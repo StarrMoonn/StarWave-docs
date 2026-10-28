@@ -188,6 +188,11 @@ def check_torch_backend_docs(project, contracts):
                 assert [p.arg for p in removed.kwonlyargs[-3:]] == ['return_wavefield', 'forward_callback', 'callback_frequency']
                 removed.kwonlyargs = removed.kwonlyargs[:-3]
                 removed.kw_defaults = removed.kw_defaults[:-3]
+            if name == 'vti':
+                assert removed.kwonlyargs[-1].arg == 'model_gradient_sampling_interval'
+                assert ast.literal_eval(removed.kw_defaults[-1]) == 1
+                removed.kwonlyargs = removed.kwonlyargs[:-1]
+                removed.kw_defaults = removed.kw_defaults[:-1]
             assert tuple(param.arg for param in removed.kwonlyargs[-4:]) == added
             removed.kwonlyargs = removed.kwonlyargs[:-4]
             removed.kw_defaults = removed.kw_defaults[:-4]
@@ -237,6 +242,8 @@ def check(wheel_path=None, source_root=None):
     scalar_dev = check_scalar_dev(source_root)
     contracts = copy.deepcopy(released_contracts)
     contracts['scalar'] = scalar_dev
+    from check_vti_docs import check as check_vti
+    contracts['vti'] = check_vti()
     assert set(contracts) == set(MODULES), 'Public contract inventory changed'
     check_scalar3d_examples(project, contracts['scalar'], released_contracts['scalar'])
     check_gsls_contract(project, contracts)
@@ -308,12 +315,15 @@ def check(wheel_path=None, source_root=None):
         source = SourceArchive()
         for name, module in MODULES.items():
             actual = wheel_function(source, module, name.rsplit('.', 1)[-1])
-            assert arguments_without_annotations(languages['zh'][name]) == arguments_without_annotations(actual.args), f'{name}: differs from source'
+            # --source-root retains the frozen V19 source contract. Current VTI
+            # is checked separately by check_vti_docs.py --source-root.
+            documented = parse_signature(released_contracts[name]['signature']).args if name == 'vti' else languages['zh'][name]
+            assert arguments_without_annotations(documented) == arguments_without_annotations(actual.args), f'{name}: differs from source'
         exports = parse_python(source.read('starwave/__init__.py').decode('utf-8'))
         public = next(ast.literal_eval(n.value) for n in exports.body if isinstance(n, ast.Assign) and any(isinstance(t, ast.Name) and t.id == '__all__' for t in n.targets))
         assert {'visco_gsls', 'prepare_visco_gsls', 'visco_gsls_native_status'} <= set(public)
         assert not {'visco_sls', 'prepare_visco_sls', 'visco_sls_native_status'} & set(public), 'Removed standalone SLS APIs are exported'
-        print(f'PASS: {len(MODULES)} documented signatures match the supplied source tree (not a wheel verification).')
+        print(f'PASS: {len(MODULES)} baseline signatures match the supplied source tree (VTI current-source check is separate; not a wheel verification).')
     if wheel_path:
         wheel_path = Path(wheel_path)
         assert WHEEL_SHA256, 'Public wheel identity has not yet been pinned'
@@ -359,7 +369,7 @@ def check(wheel_path=None, source_root=None):
             assert not {'visco_sls', 'prepare_visco_sls', 'visco_sls_native_status'} & set(public), 'Removed standalone SLS APIs are exported'
     counts = {name: len(parameter_defaults(languages['zh'][name])) for name in MODULES}
     print(f'PASS: both languages: typed signatures, descriptions/defaults {counts}, {len(MODULES)} return contracts; {blocks} Python blocks parsed as Python 3.10.')
-    print(f'PASS: all {len(MODULES)} V16 signatures match verified {WHEEL_VERSION} binary wheel; metadata, source identity and four native-library receipt hashes match. No propagation libraries were imported or executed.' if wheel_path else f'PASS: bilingual docs match released APIs plus V19 scalar/VRR contracts; frozen-source AST with --source-root; immutable {WHEEL_VERSION} wheel contract only with --wheel.')
+    print(f'PASS: all {len(MODULES)} V16 signatures match verified {WHEEL_VERSION} binary wheel; metadata, source identity and four native-library receipt hashes match. No propagation libraries were imported or executed.' if wheel_path else f'PASS: bilingual docs match released APIs plus V19 scalar/VRR and current VTI contracts; frozen-source AST with --source-root; immutable {WHEEL_VERSION} wheel contract only with --wheel.')
 
 
 if __name__ == '__main__':

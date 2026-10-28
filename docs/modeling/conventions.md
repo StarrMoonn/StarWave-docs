@@ -1,5 +1,7 @@
 # 模型、采集与时间约定
 
+**当前 VTI 例外：** VTI 接口现包含原生 CPU/CUDA full/boundary、完整复制扩边/CPML 材料梯度及可选内部步采样。下方冻结 V19 的 CPU 与裁剪梯度限制不代表当前 VTI，详见{ref}`当前 VTI 契约 <vti>`；这里不改写其他方程的历史范围。
+
 本章当前契约对应冻结 V19。完整参数与后端限制见 [Usage](../usage.md)，发布渠道见[安装](../installation.md)。历史推导与实测例子保留其注明版本。
 
 未特别注明时，下方张量表与 scalar/VRZ/VTI 限制描述 V19 原生默认路径。显式 Torch CPU/CUDA full/checkpoint 及 Scalar2D MPS 有独立设备与功能限制，见 [PyTorch 后端](../pytorch-backend.md)。

@@ -1,5 +1,7 @@
 # StarWave-docs · 中文 / English
 
+当前 VTI 增量 / Current VTI update: [中文 API](docs/usage.md#vti-function) / [English API](docs/en/usage.md#vti-function) now follow reviewed source `7145b5306af11615eb50c28a9ef64bb991a0bd97`: native CPU/CUDA selective history and `model_gradient_sampling_interval=1` (internal CFL steps; values >1 request approximate material gradients). Frozen V19/V16 snapshots and historical wheel claims below are unchanged.
+
 新增 V21 弹性 VRR：[中文](docs/examples/elastic-vrr.md) / [English](docs/en/examples/elastic-vrr.md)。本次为独立接口与示例增补，要求匹配的授权 V21 源码；下文保留 V19 历史基线，不代表当前 PyPI 包可用性。
 
 StarWave V19 源码契约双语使用手册，使用 Sphinx、Read the Docs 主题与 MyST Markdown；每种语言独立构建、导航和搜索。
@@ -33,6 +35,7 @@ python -m pip install -r docs/requirements.txt
 python tools/build_docs.py
 python tools/check_site.py _build/html
 python tools/check_api_docs.py
+python tools/check_vti_docs.py
 python tools/check_v19_api_contracts.py --check tools/v19_api_contract.json --docs docs
 python tools/check_scalar_dev_docs.py
 python tools/check_born_docs.py
@@ -51,13 +54,14 @@ Each page has an accessible language switch. Section and Python-object anchors s
 
 ## 检查 / Checks
 
+- `check_vti_docs.py`: current 25-parameter VTI overlay, immutable historical snapshots, bilingual parameter/default/type and sampling scope checks; optional `--source-root` verifies the reviewed VTI source hashes and AST without imports.
 - `check_v19_api_contracts.py`: 31-callable frozen-source inventory, current bilingual signature/name/kind/default checks and parameter coverage; optional source path performs AST comparison without importing StarWave.
 - `check_site.py`: local links, anchors, resources, complete locale coverage, independent search assets, English translation coverage, Python syntax and restricted-content guardrails.
 - `check_presentation_asset.py` (also run by `check_site.py`): the reviewed PDF's SHA-256, exactly 30 slides, an image hash for each reviewed watermark-bearing page, absence of active PDF actions or embedded files, and a strict publication allowlist. These checks preserve the independently reviewed pixels; they do not claim to recognize a watermark automatically.
 - `check_scalar_dev_docs.py`: isolated current V19 scalar contract, exactly three additive options, preserved 20-parameter release snapshot, source AST and bilingual terminal-only checkpoint example.
 - `check_born_docs.py`: preserved Born signature snapshot with V19 source AST and file-hash verification for scalar_born / ScalarBorn / forward (47/13/41 parameters), exact defaults/types/returns, bilingual checkpoint example and V19 scope; optional `--source-root` checks the reviewed source file SHA-256 and AST without importing it. The 12 original API snapshots remain unchanged.
 - `check_vrr_docs.py`: integrated VRR signature/defaults, parameter coverage, bilingual examples and V19 scope; optional `--source-root` compares the authorized local source through AST without importing it.
-- `check_api_docs.py`: typed function signatures, types/defaults/descriptions, historical scalar 20 / current scalar 23 / VRZ 22 / VTI 24 / elastic 66 parameter coverage, material conversions, native helpers, GSLS contracts, return contracts and Python snippets. The checked-in public contract snapshot prevents cross-language agreement from hiding interface drift.
+- `check_api_docs.py`: typed function signatures, types/defaults/descriptions, historical scalar 20 / current scalar 23 / VRZ 22 / current VTI 25 (frozen VTI 24) / elastic 66 parameter coverage, material conversions, native helpers, GSLS contracts, return contracts and Python snippets. The checked-in public contract snapshot prevents cross-language agreement from hiding interface drift.
 - `check_tutorial_assets.py`: clean notebook/script parity, numerical-source provenance, safe metadata, configuration and measured-result invariants.
 - Optional `--wheel PATH`: verifies the pinned 7.1.0 binary wheel SHA-256, package/platform metadata, native-library receipt hashes, and signatures through AST parsing, without importing or running StarWave. Wheels are never part of the source or published site.
 

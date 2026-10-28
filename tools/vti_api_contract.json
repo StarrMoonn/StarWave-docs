@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "source_commit": "7145b5306af11615eb50c28a9ef64bb991a0bd97",
+  "source_files_sha256": {
+    "starwave/_vti_time.py": "bda22f700bc3970b4d06fbbeeef68d2569c0d82b9ce01cad5c2744cba5deb497",
+    "starwave/vti.py": "2ec6811852828930b3dec77e91247659b21cd165b3a3a5ab00f030c4682c6304",
+    "starwave/torch_backend/vti.py": "2e08514c4bcb1cda2d55da16b3db1fe6241bee84b7a319e6bf3d4e6b144dc095"
+  },
+  "released_contract_sha256": "3ab09ba9b61863f3358b00a052b18a555f4ad0b87336df079bb8f23e812d4c9b",
+  "v19_contract_sha256": "ad6b0a4a9790d5e063617262fa540a4e444e85edcd2e06db92660eed63b35dfc",
+  "scope": "Current VTI only; historical contracts and other operators are unchanged; source API checks are not numerical/GPU acceptance.",
+  "apis": {
+    "vti": {
+      "signature": "(vp: torch.Tensor, epsilon: torch.Tensor, delta: torch.Tensor, rho: torch.Tensor, grid_spacing: float | int | list[float] | tuple[float, ...], dt: float | int, *, source_amplitudes: torch.Tensor, source_locations: torch.Tensor, receiver_locations: torch.Tensor, source_fields: str | list[str] | tuple[str, ...]=('sH', 'sV'), receiver_fields: str | list[str] | tuple[str, ...]=('vz',), accuracy: int=4, pml_freq: float | int=25.0, pml_width: int | list[int] | tuple[int, ...]=20, boundary_buffer: int=5, memory: str='boundary', max_vel: float | int | None=None, freq_taper_frac: float | int=0.0, time_pad_frac: float | int=0.0, time_taper: bool=False, backend: str | None=None, execution: str='eager', checkpoint_interval: int | None=None, compile_steps: int=1, model_gradient_sampling_interval: int=1) -> tuple[torch.Tensor, ...]",
+      "types": {
+        "vp": "torch.Tensor",
+        "epsilon": "torch.Tensor",
+        "delta": "torch.Tensor",
+        "rho": "torch.Tensor",
+        "grid_spacing": "float | int | list[float] | tuple[float, ...]",
+        "dt": "float | int",
+        "source_amplitudes": "torch.Tensor",
+        "source_locations": "torch.Tensor",
+        "receiver_locations": "torch.Tensor",
+        "source_fields": "str | list[str] | tuple[str, ...]",
+        "receiver_fields": "str | list[str] | tuple[str, ...]",
+        "accuracy": "int",
+        "pml_freq": "float | int",
+        "pml_width": "int | list[int] | tuple[int, ...]",
+        "boundary_buffer": "int",
+        "memory": "str",
+        "max_vel": "float | int | None",
+        "freq_taper_frac": "float | int",
+        "time_pad_frac": "float | int",
+        "time_taper": "bool",
+        "backend": "str | None",
+        "execution": "str",
+        "checkpoint_interval": "int | None",
+        "compile_steps": "int",
+        "model_gradient_sampling_interval": "int"
+      },
+      "return": "tuple[torch.Tensor, ...]",
+      "torch_backend": {
+        "devices": [
+          "cpu",
+          "cuda"
+        ],
+        "memory": [
+          "full",
+          "checkpoint"
+        ],
+        "execution": [
+          "eager",
+          "compile"
+        ],
+        "checkpoint_interval_default_internal_steps": 32,
+        "mps": false,
+        "amp": false,
+        "gradient_order": 1,
+        "native_default_preserved": true
+      }
+    }
+  }
+}

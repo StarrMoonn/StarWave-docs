@@ -884,17 +884,19 @@ assert all(x.grad is not None and torch.isfinite(x.grad).all()
 (vti)=
 ## VTI Function
 
-```{py:function} starwave.vti(vp: torch.Tensor, epsilon: torch.Tensor, delta: torch.Tensor, rho: torch.Tensor, grid_spacing: float | int | list[float] | tuple[float, ...], dt: float | int, *, source_amplitudes: torch.Tensor, source_locations: torch.Tensor, receiver_locations: torch.Tensor, source_fields: str | list[str] | tuple[str, ...]=('sH', 'sV'), receiver_fields: str | list[str] | tuple[str, ...]=('vz',), accuracy: int=4, pml_freq: float | int=25.0, pml_width: int | list[int] | tuple[int, ...]=20, boundary_buffer: int=5, memory: str='boundary', max_vel: float | int | None=None, freq_taper_frac: float | int=0.0, time_pad_frac: float | int=0.0, time_taper: bool=False, backend: str | None=None, execution: str='eager', checkpoint_interval: int | None=None, compile_steps: int=1) -> tuple[torch.Tensor, ...]
+本节对应[当前 VTI 源码契约](https://github.com/StarrMoonn/StarWave/blob/7145b5306af11615eb50c28a9ef64bb991a0bd97/starwave/vti.py)，包含原生 CPU/CUDA 按需历史与可选材料梯度采样；不改写冻结 V19/V16 快照，也不代表旧 PyPI wheel 已支持。请使用匹配源码并显式重建原生库。
+
+```{py:function} starwave.vti(vp: torch.Tensor, epsilon: torch.Tensor, delta: torch.Tensor, rho: torch.Tensor, grid_spacing: float | int | list[float] | tuple[float, ...], dt: float | int, *, source_amplitudes: torch.Tensor, source_locations: torch.Tensor, receiver_locations: torch.Tensor, source_fields: str | list[str] | tuple[str, ...]=('sH', 'sV'), receiver_fields: str | list[str] | tuple[str, ...]=('vz',), accuracy: int=4, pml_freq: float | int=25.0, pml_width: int | list[int] | tuple[int, ...]=20, boundary_buffer: int=5, memory: str='boundary', max_vel: float | int | None=None, freq_taper_frac: float | int=0.0, time_pad_frac: float | int=0.0, time_taper: bool=False, backend: str | None=None, execution: str='eager', checkpoint_interval: int | None=None, compile_steps: int=1, model_gradient_sampling_interval: int=1) -> tuple[torch.Tensor, ...]
 
 传播 Duveneck 型一阶声学 VTI 系统，以 `vp.ndim` 选择二维或三维。输出按所选接收分量排列；四个模型可独立请求一次一阶梯度。固定模型仍参与全部物理计算；本接口不是完整弹性 VTI。
 
-:param vp: **必填；位置或关键字参数。** 竖直 P 波速度，单位 m/s。float32（原生 CUDA；Torch 为 CPU/CUDA），正且有限，形状 `[nx,nz]` 或 `[nx,ny,nz]`，每维至少为 2；最后一轴始终竖直。四个模型必须形状、dtype、设备一致；不会自动推断或转换物理轴序。
+:param vp: **必填；位置或关键字参数。** 竖直 P 波速度，单位 m/s。float32（原生 CPU/CUDA；Torch 为 CPU/CUDA），正且有限，形状 `[nx,nz]` 或 `[nx,ny,nz]`，每维至少为 2；最后一轴始终竖直。四个模型必须形状、dtype、设备一致；不会自动推断或转换物理轴序。
 :type vp: `torch.Tensor`
-:param epsilon: **必填；位置或关键字参数。** 无量纲 Thomsen epsilon，float32（原生 CUDA；Torch 为 CPU/CUDA），与 `vp` 形状/设备相同；有限且严格大于 -0.5，并须满足系数和导数的数值可表示性。允许 `epsilon<delta`，不作隐式裁剪；存在增长模式的已知限制。
+:param epsilon: **必填；位置或关键字参数。** 无量纲 Thomsen epsilon，float32（原生 CPU/CUDA；Torch 为 CPU/CUDA），与 `vp` 形状/设备相同；有限且严格大于 -0.5，并须满足系数和导数的数值可表示性。允许 `epsilon<delta`，不作隐式裁剪；存在增长模式的已知限制。
 :type epsilon: `torch.Tensor`
-:param delta: **必填；位置或关键字参数。** 无量纲 Thomsen delta，float32（原生 CUDA；Torch 为 CPU/CUDA），与 `vp` 形状/设备相同；有限且严格大于 -0.5，并须满足系数和导数的数值可表示性。没有 `delta<=epsilon` 的输入强制约束，不会隐式改模型。
+:param delta: **必填；位置或关键字参数。** 无量纲 Thomsen delta，float32（原生 CPU/CUDA；Torch 为 CPU/CUDA），与 `vp` 形状/设备相同；有限且严格大于 -0.5，并须满足系数和导数的数值可表示性。没有 `delta<=epsilon` 的输入强制约束，不会隐式改模型。
 :type delta: `torch.Tensor`
-:param rho: **必填；位置或关键字参数。** 密度，单位 kg/m³。float32（原生 CUDA；Torch 为 CPU/CUDA），与 `vp` 形状/设备相同，正且有限；倒数、刚度及导数须可表示。无默认密度，不做隐式单位换算；若原数据单位已确认为 g/cm³，应在调用前显式乘 1000。
+:param rho: **必填；位置或关键字参数。** 密度，单位 kg/m³。float32（原生 CPU/CUDA；Torch 为 CPU/CUDA），与 `vp` 形状/设备相同，正且有限；倒数、刚度及导数须可表示。无默认密度，不做隐式单位换算；若原数据单位已确认为 g/cm³，应在调用前显式乘 1000。
 :type rho: `torch.Tensor`
 :param grid_spacing: **必填；位置或关键字参数。** 正且有限的网格间距，单位 m。接受单值或逐轴间距 `[dx,dz]` / `[dx,dy,dz]`，允许不等间距；轴序必须对应模型。拒绝布尔值、零/负值和长度不匹配。
 :type grid_spacing: `float | int | list[float] | tuple[float, ...]`
@@ -918,7 +920,7 @@ assert all(x.grad is not None and torch.isfinite(x.grad).all()
 :type pml_width: `int | list[int] | tuple[int, ...]`
 :param boundary_buffer: **默认 `5`；仅关键字参数。** 非负空间网格 buffer，不是时间步数或 checkpoint 间隔。boundary 模式要求至少 `accuracy // 2 + 1`，8 阶时为 5；full 模式允许 0。各吸收侧总填充为 `pml_width + boundary_buffer + accuracy // 2`；顶面为零时只保留 `accuracy // 2` 个 halo 单元，不含顶部 PML 或 buffer。
 :type boundary_buffer: `int`
-:param memory: **默认 `'boundary'`；仅关键字参数。** 模型反传历史策略。`"boundary"` 保存边界条带并重构，`"full"` 保存完整历史。full 可能耗尽显存；原生没有自动降级或 checkpoint；Torch 另支持 full/checkpoint（不支持 boundary），其图/检查点存储与原生历史不同。没有模型梯度需求的正演不保留模型反传历史。
+:param memory: **默认 `'boundary'`；仅关键字参数。** 模型梯度历史策略。原生 CPU/CUDA 支持 full/boundary、不支持 checkpoint；full 保存按需求导的有效材料操作数，boundary 保留完整重建数据。Torch 支持 full/checkpoint、不支持 boundary。不自动回退；未请求模型梯度时不保存模型反传历史。详见下方按需历史与采样说明。
 :type memory: `str`
 :param max_vel: **默认 `None`；仅关键字参数。** CFL/PML 各向异性速度包络，单位 m/s。`None` 时动态计算；显式值须正、有限并覆盖 `max(vp*sqrt(max(1,1+2*epsilon,sqrt(1+2*delta))))`。只覆盖 `max(vp)` 不足。密度反差仍重新计算；规划还取决于维数、间距和差分系数，不参与求导。
 :type max_vel: `float | int | None`
@@ -928,7 +930,7 @@ assert all(x.grad is not None and torch.isfinite(x.grad).all()
 :type time_pad_frac: `float | int`
 :param time_taper: **默认 `False`；仅关键字参数。** 是否在时间重采样中应用非周期 Hann 窗：上采样后、下采样前应用。改变信号及其反传转置；仅接受布尔值，不接受整数 0/1。内部重采样比为 1 时不改变信号。
 :type time_taper: `bool`
-:param backend: **默认 `None`；仅关键字参数。** None 保留原生行为，不自动选择 Torch；`'cuda'` 显式要求 CUDA 模型；`'torch'` 使用 CPU/CUDA 张量正演和 autograd。设备取自输入，不自动移动模型；不接受 `'cpu'` 或 MPS。scalar/VRZ/VTI 的 Torch 路径须显式选择 full/checkpoint。
+:param backend: **默认 `None`；仅关键字参数。** None 按模型 CPU/CUDA 设备选择原生后端，不自动选择 Torch；`'native_cpu'` 显式选择已构建 CPU 内核，`'cuda'` 要求 CUDA 模型，`'torch'` 使用 CPU/CUDA 张量传播与 autograd。不自动搬移设备或回退；拒绝 `'cpu'` 和 MPS。Torch 须显式选择 full/checkpoint。
 :type backend: `str | None`
 :param execution: **默认 `'eager'`；仅关键字参数。** Torch 可选 `'eager'` 或 `'compile'`；compile 使用 PyTorch Inductor/AOTAutograd，失败不回退 eager。原生仅接受 eager。
 :type execution: `str`
@@ -936,7 +938,9 @@ assert all(x.grad is not None and torch.isfinite(x.grad).all()
 :type checkpoint_interval: `int | None`
 :param compile_steps: **默认 `1`；仅关键字参数。** 正整数，拒绝 bool；Torch 每个执行段包含的连续内部时间步数。compile 可尝试 4，完整处理尾段；不改变 dt、nt、炮数或损失。原生只接受 1。
 :type compile_steps: `int`
-:returns: **`(records_0, ..., records_n)`**，每个 `receiver_fields` 条目对应一个 `[B,R,T]` 连续 float32（原生 CUDA；Torch 为 CPU/CUDA） 张量，顺序严格对应输入分量顺序。默认只有 `(vz_records,)`，为竖直质点速度 m/s，不是压力；`sH/sV` 为应力 Pa。张量与模型在同一设备，名义用户时间 `0, dt, ..., (T-1)*dt`，不包含最终状态。
+:param model_gradient_sampling_interval: **默认 `1`；仅关键字参数。** `1..2^31-1` 内的整数，拒绝 bool；单位是 **CFL 细分后的内部时间步**，不是用户采样点。1 保留逐步离散材料 VJP；s>1 在本次调用全局 `t % s == 0` 处累计材料项，权重为 `min(s, internal_nt - t)`，包含非整段尾部。这是近似材料梯度求积，不是未变正演的精确导数。正演与耦合伴随仍执行每个内部步，不自动乘 CFL 比率。
+:type model_gradient_sampling_interval: `int`
+:returns: **`(records_0, ..., records_n)`**，每个 `receiver_fields` 条目对应一个 `[B,R,T]` 连续 float32（原生 CPU/CUDA；Torch 为 CPU/CUDA） 张量，顺序严格对应输入分量顺序。默认只有 `(vz_records,)`，为竖直质点速度 m/s，不是压力；`sH/sV` 为应力 Pa。张量与模型在同一设备，名义用户时间 `0, dt, ..., (T-1)*dt`，不包含最终状态。
 :rtype: `tuple[torch.Tensor, ...]`
 ```
 
@@ -953,9 +957,13 @@ assert all(x.grad is not None and torch.isfinite(x.grad).all()
 
 `epsilon<delta` 不被自动修复；较小 dt 不能保证消除负刚度增长或任意 PML 不稳定。速度包络的覆盖只是一项必要的输入条件。
 
-模型梯度采用固定扩展模型、CFL 与 PML 的条件。重新生成物理边缘的 replicate padding 时，当前返回梯度不包含完整扩展链的转置累积，不能当作整个重建边界过程的全导数；切换 full 不改变这一限制。
+当前 VTI 材料 VJP 包含有效 CPML 操作数与完整 replicate-padding 转置：buffer/PML 副本敏感度求和归并到原物理边缘、棱和角。数值 setup（CFL 比率、极值/`max_vel` 规划与 CPML profiles）仍固定、不求导。旧的冻结扩边/裁剪梯度限制对 VTI 已是历史说明；采样间隔 1 保留固定 setup 下逐步离散一阶材料导数，大于 1 则明确近似其时间积分。
 
-顶面 `pml_width` 为零时在用户 `z=0` 处施加 `sV=0`。消去法向应变后，表面本构系数为 `diag(2*rho*vp**2*(epsilon-delta),0)`；法向应力奇镜像与面速度偶镜像构成精确负转置导数对。这是局部伪声学闭合，不是完整弹性 VTI，也不承诺表面达到内部高阶精度。拒绝 `z=0` 处含 `sV` 的源，包括默认双分量源；表面 `sV` 接收值为零。`sH` 源和速度接收点保留原生交错位置。原生 full/boundary 保留顶部条带，Torch full/checkpoint 使用相同闭合。投影材料链参与求导，但固定扩展/裁剪模型 VJP 限制和 `epsilon<delta` 不稳定性仍存在。
+顶面 `pml_width` 为零时在用户 `z=0` 处施加 `sV=0`。消去法向应变后，表面本构系数为 `diag(2*rho*vp**2*(epsilon-delta),0)`；法向应力奇镜像与面速度偶镜像构成精确负转置导数对。这是局部伪声学闭合，不是完整弹性 VTI，也不承诺表面达到内部高阶精度。拒绝 `z=0` 处含 `sV` 的源，包括默认双分量源；表面 `sV` 接收值为零。`sH` 源和速度接收点保留原生交错位置。原生 full/boundary 保留顶部条带，Torch full/checkpoint 使用相同闭合。投影材料链和完整扩边转置参与求导；`epsilon<delta` 不稳定性仍存在。
+
+**按需历史与采样。** 固定参数仍参与正演与耦合伴随物理；不放入 optimizer 不等于冻结张量。原生 CPU/CUDA full 在 rho 无需梯度时保存两组有效应变历史，rho 需要 VJP 时再保存二维/三维的 2/3 组有效力历史。可微的 `rho = f(vp)` 保留完整密度链，即使 rho 不是 optimizer 的叶子参数。Torch 分别保留各输入的求导路径；不要用包住整个传播的 `no_grad` 来冻结单个参数。
+
+`model_gradient_sampling_interval=s` 时，原生 full 保留 `ceil(internal_nt/s)` 组材料帧。boundary 仍保存并执行每步完整重建、壳层/状态与耦合场，其峰值内存不保证随 s 降低。Torch full/checkpoint eager/compile 采用相同的全局材料 VJP 权重，checkpoint 分段与 compile chunk 不重置相位；其 AD 存储不等于原生 full 历史。正演记录、CFL 细分、源/接收时钟、batch 与 optimizer 语义不变。实际频带和目标函数应先用 s=1 对照 s>1；不承诺通用误差上界或总内存/耗时按 1/s 缩减。
 
 (vti-examples)=
 ### 示例
@@ -980,10 +988,10 @@ stress_h, velocity_z = starwave.vti(
 (vti-notes)=
 ### 注意事项
 
-- 原生路径仅 CUDA FP32 默认 stream；每次 forward 只支持一次一阶 backward。源梯度、高阶导数、AMP、CUDA graphs、自定义 stream、公开初始/最终状态不在支持范围。
+- 原生 CPU/CUDA FP32 支持 full/boundary；原生 CUDA 要求默认 stream，且每次 forward 只支持一次一阶 backward；原生 CPU 支持保留计算图的一阶 backward。源梯度、高阶导数、AMP、CUDA graphs、自定义 stream、公开初始/最终状态不在支持范围。
 - 时间 CFL 子步不能弥补空间采样不足；空间分辨率警告是诊断，不是精度或稳定性证书。
 - DataParallel 应把完整模型放入 Module，只拆分炮维采集；参见[多卡入门](inversion/dataparallel.md)。
-- 本页已核对接口契约，未完成目标 GPU 数值、性能或 FWI 验收。
+- 接口检查不重跑数值或性能验收；分后端证据与未测硬件范围见[源码验证报告](https://github.com/StarrMoonn/StarWave/blob/7145b5306af11615eb50c28a9ef64bb991a0bd97/docs/development/VTI_CPU_TORCH_SAMPLING_20261028.md)，不作任意 GPU 或长程收敛保证。
 
 
 (tti)=

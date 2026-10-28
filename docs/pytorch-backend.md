@@ -25,7 +25,8 @@ V19 保留 V18 的 23 参数 scalar 契约：任意零宽面组合（正宽度�
 
 | 入口 / 后端 | 设备 | memory | 默认 / 限制 |
 |---|---|---|---|
-| scalar / VRZ / VTI 原生 | CUDA | full、boundary | 默认 boundary；不接受 checkpoint |
+| scalar / VRZ 原生（历史 V19 范围） | CUDA | full、boundary | 默认 boundary；不接受 checkpoint |
+| 当前 VTI 原生 | CPU/CUDA float32 | full、boundary | 默认 boundary；显式 native_cpu/cuda 或按模型设备选择原生；不接受 checkpoint |
 | Born 原生 | CPU/CUDA float32/64 | full；boundary 仅 CUDA | 默认 full；无原生 checkpoint |
 | elastic 原生 | CPU/CUDA | full；boundary 仅 CUDA | 默认 full；原有卸载/压缩条件独立保留 |
 | GSLS 原生 | CUDA 或显式 native_cpu | full、checkpoint | 默认 full；None 间隔按形状和所需历史估算 |
@@ -42,6 +43,8 @@ Torch full 保留 autograd 所需的中间张量；checkpoint 保存完整段起
 
 compile_steps 只改变执行块大小，不改变 dt、nt、精度、炮数、loss 或更新次数；非整块尾部完整执行。checkpoint_interval 是内部时间步数，boundary_buffer 是空间网格点，两者不能互换。没有按 GPU 型号、SM、L2、空闲显存自动调参或拆炮。
 
+当前 VTI 在原生 CPU/CUDA full/boundary 与 Torch CPU/CUDA full/checkpoint eager/compile 均支持 `model_gradient_sampling_interval=1`（逐步材料 VJP）及 s>1（近似材料求积）。按 **CFL 内部时间步**计数，不乘 CFL 比率；全局 `t % s == 0` 时以 `min(s, internal_nt - t)` 为权重，checkpoint/compile 分界不重置相位。正演/伴随仍每步执行；固定 rho 仍参与物理，可微 `rho = f(vp)` 保留完整链。原生 full 只保存所需采样材料操作数；boundary 完整重建不丢步，不保证降低峰值内存。本项为当前源码增量，不改写冻结 V19 wheel。
+
 (torch-scope)=
 ## 科学契约与限制
 
@@ -57,7 +60,7 @@ compile_steps 只改变执行块大小，不改变 dt、nt、精度、炮数、l
 
 上述 CPU/CUDA 路径支持 2/4/6/8 阶 full/checkpoint；MPS 仅支持 Scalar2D accuracy=4 float32。各方程继续使用自己的轴序、源单位、源尺度、采样时刻、CFL 与重采样契约，不能相互套用。详见 [Usage](usage.md) 与 {ref}`GSLS <visco-gsls>`。GSLS 保留 hao1、band_fit、sls_compat、material_model；单机制仅显式 `mode="sls_compat", n_mechanisms=1`，不恢复独立 SLS API。
 
-scalar/VRZ/VTI 复制延拓值，但延拓区模型梯度冻结，保留 crop-image 约定。若对外边缘做有限差分且重新生成延拓，得到的是另一映射；应区分内部模型方向检查。GSLS 与 VRR 的复制延拓梯度完整累加回物理模型。Torch VRZ full/checkpoint 要求 `boundary_buffer >= accuracy//2`。
+历史 V19 scalar/VRZ/VTI 复制延拓值，但延拓区模型梯度冻结，保留 crop-image 约定。当前 VTI 例外：完整复制扩边转置与有效 CPML 材料操作数参与求导，仅数值 setup 固定，见[当前 VTI](usage.md#vti-function)。若对外边缘做有限差分且重新生成延拓，得到的是另一映射；应区分内部模型方向检查。GSLS 与 VRR 的复制延拓梯度完整累加回物理模型。Torch VRZ full/checkpoint 要求 `boundary_buffer >= accuracy//2`。
 
 Torch elastic 对每个内部时间步求导，要求 `model_gradient_sampling_interval=1`。原生材料梯度按 `CFL step_ratio × model_gradient_sampling_interval` 抽样；即使 interval=1，step_ratio>1 时也可能与完整 AD 不同。精确 native/Torch 材料梯度对照还需 step_ratio=1；这是后端梯度语义差别，不能归因于 compile。
 
@@ -186,6 +189,7 @@ outputs = starwave.vti(vp, epsilon, delta, rho, grid_spacing, dt,
     execution="eager",
     checkpoint_interval=32,
     compile_steps=1,
+    model_gradient_sampling_interval=1,
 )
 ```
 <!-- torch-api:vti:full:end -->

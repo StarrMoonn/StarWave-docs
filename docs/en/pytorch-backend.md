@@ -25,7 +25,8 @@ V19 preserves the V18 23-parameter scalar contract: arbitrary zero-face subsets 
 
 | Entry / backend | Device | memory | Defaults / limits |
 |---|---|---|---|
-| Native scalar / VRZ / VTI | CUDA | full, boundary | boundary default; no checkpoint |
+| Native scalar / VRZ (historical V19 scope) | CUDA | full, boundary | boundary default; no checkpoint |
+| Current native VTI | CPU/CUDA float32 | full, boundary | boundary default; explicit native_cpu/cuda or native selection from model device; no checkpoint |
 | Born native | CPU/CUDA float32/64 | full; boundary only on CUDA | Default full; no native checkpoint |
 | Native elastic | CPU/CUDA | full; boundary on CUDA only | full default; existing offload/compression conditions remain separate |
 | Native GSLS | CUDA or explicit native_cpu | full, checkpoint | full default; None interval uses a shape/history estimate |
@@ -42,6 +43,8 @@ Torch full retains autograd intermediate tensors; checkpoint saves complete segm
 
 compile_steps changes execution block size, not dt, nt, accuracy, shots, loss or update count; final partial blocks execute completely. checkpoint_interval counts internal time steps, whereas boundary_buffer counts spatial cells. There is no automatic GPU-model, SM, L2, free-memory tuning or shot splitting.
 
+Current VTI supports `model_gradient_sampling_interval=1` (dense material VJP) or s>1 (approximate material quadrature) on native CPU/CUDA full/boundary and Torch CPU/CUDA full/checkpoint, eager/compile. Count **internal CFL steps**, without multiplying by the CFL ratio; sample global `t % s == 0` with `min(s, internal_nt - t)` weight. Checkpoint/compile boundaries do not reset phase. Every forward/adjoint step remains; fixed rho still affects physics and a differentiable `rho = f(vp)` keeps its chain. Native full saves only required sampled material operands; boundary reconstruction stays complete and has no promised peak-memory reduction. This is a current source addition, not a change to frozen V19 wheels.
+
 (torch-scope)=
 ## Scientific contracts and limits
 
@@ -57,7 +60,7 @@ compile_steps changes execution block size, not dt, nt, accuracy, shots, loss or
 
 All listed CPU/CUDA paths support orders 2/4/6/8 with full/checkpoint; MPS supports only Scalar2D accuracy=4 float32. Each equation retains its own axes, source units/scaling, recording clock, CFL and resampling contract; they are not interchangeable. See [Usage](usage.md) and {ref}`GSLS <visco-gsls>`. GSLS retains hao1, band_fit, sls_compat and material_model. A single mechanism explicitly requires `mode="sls_compat", n_mechanisms=1`; independent SLS APIs are not restored.
 
-scalar/VRZ/VTI replicate edge values but freeze gradients through the extension, retaining the crop-image convention. Finite differences at outer model edges that regenerate padding differentiate a different map; distinguish interior-direction checks. GSLS and VRR accumulate the complete replicated-padding gradient back into the physical model. Torch VRZ full/checkpoint requires `boundary_buffer >= accuracy//2`.
+The historical V19 scalar/VRZ/VTI contract replicated edge values but froze gradients through the extension, retaining the crop-image convention. Current VTI is an exception: its complete replicate-padding transpose and effective CPML material operands are differentiated; only numerical setup remains fixed. See [current VTI](usage.md#vti-function). Finite differences at outer model edges that regenerate padding differentiate a different map; distinguish interior-direction checks. GSLS and VRR accumulate the complete replicated-padding gradient back into the physical model. Torch VRZ full/checkpoint requires `boundary_buffer >= accuracy//2`.
 
 Torch elastic differentiates every internal step and requires `model_gradient_sampling_interval=1`. Native material gradients are sampled at `CFL step_ratio × model_gradient_sampling_interval`. Even interval=1 can differ from complete AD when step_ratio>1. Exact native/Torch material-gradient comparisons also require step_ratio=1; this backend semantic distinction is not caused by compilation.
 
@@ -186,6 +189,7 @@ outputs = starwave.vti(vp, epsilon, delta, rho, grid_spacing, dt,
     execution="eager",
     checkpoint_interval=32,
     compile_steps=1,
+    model_gradient_sampling_interval=1,
 )
 ```
 <!-- torch-api:vti:full:end -->
