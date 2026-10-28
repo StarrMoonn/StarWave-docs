@@ -242,7 +242,7 @@ def check_usage(page, locale, output):
         assert 'monospace' in metrics['font'] and metrics['variant'] == 'lining-nums', metrics
         assert max(g['ascent'] for g in metrics['glyphs']) - min(g['ascent'] for g in metrics['glyphs']) <= 2, metrics
         assert all(g['descent'] <= 1 for g in metrics['glyphs']), metrics
-    for name, count in (('scalar', 23), ('scalar_born', 47), ('ScalarBorn', 13), ('ScalarBorn.forward', 41), ('vrz', 22), ('starwave.vrr', 21), ('vti', 24), ('elastic', 66),
+    for name, count in (('scalar', 23), ('scalar_born', 47), ('ScalarBorn', 13), ('ScalarBorn.forward', 41), ('vrz', 22), ('starwave.vrr', 21), ('vti', 25), ('elastic', 66),
                         ('common.vpvsrho_to_lambmubuoyancy', 4),
                         ('common.lambmubuoyancy_to_vpvsrho', 4),
                         ('prepare_native', 1), ('prepare_elastic', 1), ('visco_gsls', 23), ('gpr', 24),
