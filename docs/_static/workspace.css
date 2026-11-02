@@ -16,7 +16,7 @@ body { background:var(--sw-surface); }
 .wy-breadcrumbs { font-size:13px; color:var(--sw-muted); }
 .wy-breadcrumbs + hr { margin:18px 0; border-color:var(--sw-line); }
 .sw-doc-toolbar { display:flex; align-items:center; gap:12px; border-bottom:1px solid var(--sw-line); padding:0 0 18px; margin-bottom:28px; font:13px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; color:var(--sw-muted); }
-.sw-doc-toolbar > span:nth-last-child(2) { overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+.sw-doc-toolbar > span:nth-child(3) { min-width:0; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
 .sw-toolbar-api { margin-left:auto; white-space:nowrap; font-weight:700; }
 .sw-doc-layout { display:grid; grid-template-columns:minmax(0,1fr) 192px; gap:36px; align-items:start; }
 .sw-doc-home { display:block; }
