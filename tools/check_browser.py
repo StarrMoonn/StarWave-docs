@@ -843,6 +843,12 @@ def check_search(page, base):
         page.locator(f'[data-sw-language="{other}"]').click()
         assert urlsplit(page.url).path == f'/{other}/search.html'
         assert 'q=illumination' in urlsplit(page.url).query
+        if locale == 'zh':
+            page.goto(base + 'zh/search.html?q=' + quote('梯度'))
+            page.wait_for_function('document.querySelectorAll("#search-results li").length > 0')
+            cjk_links = page.locator('#search-results li a').evaluate_all('(items) => items.map(a => a.href)')
+            assert any(urlsplit(link).path == '/zh/modeling/gradient.html' for link in cjk_links), cjk_links
+            assert all('/zh/' in urlsplit(link).path for link in cjk_links), cjk_links
         page.goto(base + locale + '/search.html?q=zzzznosuchstarwaveresult')
         expected_status = '搜索未找到匹配页面' if locale == 'zh' else 'Your search did not match any documents'
         page.wait_for_function("expected => document.querySelector('.search-summary')?.textContent.includes(expected)", arg=expected_status)

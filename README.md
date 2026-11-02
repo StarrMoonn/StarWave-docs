@@ -112,3 +112,5 @@ page, published at `/agent/` beside the docs. It contains no private Agent code,
 credentials, live task data, or backend. The repository remains private; its
 installation link explicitly requires access. `tools/agent_page.py` copies only
 the manifest-approved assets; the document toolbar links to this standalone page.
+
+Chinese full-text search uses the pinned build-only `jieba==0.42.1` tokenizer. No runtime service or telemetry is added. Static and browser checks require a Chinese gradient query to find the existing gradient guide; English search remains independently checked.

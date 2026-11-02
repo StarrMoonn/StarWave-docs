@@ -33,7 +33,7 @@
 <span id="main-content" tabindex="-1"></span>
 <div class="sw-doc-toolbar"><a href="{{ pathto('index') }}">{{ '文档中心' if sw_locale == 'zh' else 'Documentation' }}</a><span>/</span><span>{{ title|striptags }}</span><a class="sw-toolbar-agent" href="{{ pathto('../agent/index.html', 1) }}">Agent ↗</a><a class="sw-toolbar-api" href="{{ pathto('usage') }}">API ↗</a></div>
 <div class="sw-doc-layout{% if pagename == 'index' %} sw-doc-home{% endif %}">
-<div class="sw-doc-article" itemprop="articleBody">{{ body }}</div>
+<div class="sw-doc-article" itemprop="articleBody">{{ self.body() }}</div>
 {% if pagename != 'index' and toc %}
 <aside class="sw-outline" aria-label="{{ '本页导航' if sw_locale == 'zh' else 'On this page' }}">
 <details open><summary>{{ '本页导航' if sw_locale == 'zh' else 'On this page' }}</summary>

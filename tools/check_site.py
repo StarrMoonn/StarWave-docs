@@ -312,6 +312,19 @@ def check(root):
         for required in ('index.html', 'search.html', 'genindex.html', 'searchindex.js'):
             if not (folder / required).is_file():
                 errors.append(f'Missing {locale} output: {required}')
+        # Search and index are template-generated, not ordinary body context.
+        # A custom layout must dispatch their inherited Sphinx body blocks.
+        search_page = folder / 'search.html'
+        if search_page.is_file() and 'id="search-results"' not in search_page.read_text():
+            errors.append(f'Missing rendered search-results container: {locale}')
+        index_page = folder / 'genindex.html'
+        if index_page.is_file() and 'genindextable' not in index_page.read_text():
+            errors.append(f'Missing rendered general index entries: {locale}')
+        if locale == 'zh' and (folder / 'searchindex.js').is_file():
+            raw_index = (folder / 'searchindex.js').read_text()
+            search_index = json.loads(raw_index.removeprefix('Search.setIndex(').removesuffix(')'))
+            if '梯度' not in search_index.get('terms', {}) and '梯度' not in search_index.get('titleterms', {}):
+                errors.append('Chinese search index lacks gradient token; check jieba build dependency')
         if (folder / '_sources').exists() and any((folder / '_sources').rglob('*')):
             errors.append(f'Unexpected {locale} published source directory')
         for relative in localized[locale]:
