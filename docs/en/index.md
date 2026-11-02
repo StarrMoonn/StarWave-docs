@@ -19,7 +19,17 @@
 </div>
 ```
 
+
+```{raw} html
+<nav class="sw-start-grid" aria-label="Find your starting point"><a href="quickstart.html"><span>01 · LEARN</span><strong>Run your first wavefield</strong><small>Installation → Quickstart → acquisition</small><b aria-hidden="true">↗</b></a><a href="usage.html"><span>02 · REFERENCE</span><strong>Find an API</strong><small>Signatures, parameters and return values</small><b aria-hidden="true">↗</b></a><a href="examples/wavefield-snapshots.html"><span>03 · EXPLORE</span><strong>Build on an experiment</strong><small>Wavefields, gradients and inversion</small><b aria-hidden="true">↗</b></a></nav>
+<details class="sw-release-note"><summary>Version and scope · check before you run</summary>
+```
+
 [V19 Release](https://github.com/StarrMoonn/StarWave/releases/tag/V19) is published. This manual follows frozen source `0.1.0.dev19`, commit `46d32877e3336d531520a696d5f2e074e6f4ef74`. [PyPI **9.1.0**](https://pypi.org/project/starwave/9.1.0/) is published with the V19 source contract and integrated VRR. The existing [9.0.0 wheel](https://pypi.org/project/starwave/9.0.0/) remains V18 and excludes integrated VRR.
+
+```{raw} html
+</details>
+```
 
 (home-capabilities)=
 ## From physical models to learnable models
@@ -94,12 +104,21 @@ loss.backward()
 :hidden:
 :caption: Getting started
 
+Quickstart <quickstart>
+Installation <installation>
+WSL <wsl>
 About StarWave <about>
 Presentation <presentation>
-Installation <installation>
 Docker <docker>
-WSL <wsl>
-Quickstart <quickstart>
+```
+
+```{toctree}
+:maxdepth: 1
+:hidden:
+:caption: Usage
+
+Usage <usage>
+PyTorch backend <pytorch-backend>
 ```
 
 ```{toctree}
@@ -140,14 +159,7 @@ Undulating layers <examples/layered>
 Reproduce <examples/reproduce>
 ```
 
-```{toctree}
-:maxdepth: 1
-:hidden:
-:caption: Usage
 
-Usage <usage>
-PyTorch backend <pytorch-backend>
-```
 
 ```{toctree}
 :maxdepth: 1

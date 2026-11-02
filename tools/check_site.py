@@ -17,6 +17,7 @@ from check_sls_examples import check as check_sls
 from check_wavefield_examples import approved_assets as approved_wavefield_assets, check as check_wavefield
 from check_free_surface_examples import approved_assets as approved_free_surface_assets, check as check_free_surface
 from landing import approved_assets as approved_landing_assets, check as check_landing
+from agent_page import approved_assets as approved_agent_assets, check as check_agent
 
 
 RECONSTRUCTION_SECTIONS = ('reconstruction', 'reconstruction-scalar3d', 'reconstruction-state',
@@ -296,6 +297,7 @@ def check(root):
     errors.extend(check_wavefield(root))
     errors.extend(check_free_surface(root))
     errors.extend(check_landing(root))
+    errors.extend(check_agent(root))
     pages = {p: Page(p.read_text(encoding="utf-8")) for p in root.rglob("*.html")}
     if not pages or not (root / "index.html").is_file():
         errors.append("Missing HTML output or index.html")
@@ -553,11 +555,11 @@ def check(root):
     scalar3d_assets = approved_assets()
     wavefield_assets = approved_wavefield_assets()
     free_surface_assets = approved_free_surface_assets()
-    landing_assets = approved_landing_assets()
+    landing_assets = approved_landing_assets() | approved_agent_assets()
     sources = []
     for p in project.rglob("*"):
         relative = p.relative_to(project)
-        if any(part in {".git", ".venv", "_build", "_readthedocs", "__pycache__"} for part in relative.parts):
+        if any(part in {".git", ".venv", "_build", "_readthedocs", "__pycache__", ".openai"} for part in relative.parts):
             continue
         if not p.is_file():
             continue

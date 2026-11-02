@@ -1,13 +1,5 @@
 # Usage
 
-新增：[VTI-VRR 完整接口与可运行 CPU 示例](#vti-vrr)：展开式（15）、四分量接收、原生 full/boundary 与纯 Torch AD full/checkpoint。请使用匹配的当前源码，不以旧 V19 包推断可用性。
-
-新增：[V21 弹性 VRR 接口与可运行 CPU 示例](examples/elastic-vrr.md)。此功能需要匹配的授权 V21 源码；下文旧版本与包说明保留为历史基线，不代表当前 PyPI 可用性，也不包含弹性 VRR。 完整参考：[弹性波 VRR 函数](#elastic-vrr-api)与[参数转换](#elastic-vrr-parameters)。
-
-新增：[Maxwell / GPR 接口](#gpr)，覆盖体素材料的二维 TMz/TEz 与三维电磁传播，支持 full/checkpoint。请使用匹配的当前源码，而非冻结 V19 包基线。
-
-GSLS: [visco_gsls](#visco-gsls). VRR: [starwave.vrr](#vrr). 两者均集成于 V19 主包。
-
 ```{container} sw-page-toc
 
 **本页内容**
@@ -30,11 +22,29 @@ GSLS: [visco_gsls](#visco-gsls). VRR: [starwave.vrr](#vrr). 两者均集成于 V
 - [其它导出名称与范围](#other-exports)
 ```
 
+```{raw} html
+<details class="sw-release-note"><summary>版本、更新与适用范围</summary>
+```
+
+新增：[VTI-VRR 完整接口与可运行 CPU 示例](#vti-vrr)：展开式（15）、四分量接收、原生 full/boundary 与纯 Torch AD full/checkpoint。请使用匹配的当前源码，不以旧 V19 包推断可用性。
+
+新增：[V21 弹性 VRR 接口与可运行 CPU 示例](examples/elastic-vrr.md)。此功能需要匹配的授权 V21 源码；下文旧版本与包说明保留为历史基线，不代表当前 PyPI 可用性，也不包含弹性 VRR。 完整参考：[弹性波 VRR 函数](#elastic-vrr-api)与[参数转换](#elastic-vrr-parameters)。
+
+新增：[Maxwell / GPR 接口](#gpr)，覆盖体素材料的二维 TMz/TEz 与三维电磁传播，支持 full/checkpoint。请使用匹配的当前源码，而非冻结 V19 包基线。
+
+GSLS: [visco_gsls](#visco-gsls). VRR: [starwave.vrr](#vrr). 两者均集成于 V19 主包。
+
+
 除单独标注的 V21 弹性波 VRR、V22 qP TTI、当前 VTI-VRR 与 Maxwell/GPR 新增接口外，本参考面向冻结 V19 源码 `0.1.0.dev19`，提交 `46d32877e3336d531520a696d5f2e074e6f4ef74`，已发布为 [Release V19](https://github.com/StarrMoonn/StarWave/releases/tag/V19)。其余签名按该源码核对，包括 23 参数 Scalar API 与已集成的 `starwave.vrr`。冻结 V19 API 契约仅作为历史兼容基线，不说明当前包的可用性。本文单独标注的新增接口请使用匹配的完整源码，不应从历史 wheel 记录推断当前 PyPI 可用性。源码、分发产物与设备验收证据分别记录。见[文档状态](status.md)与[安装](installation.md)。
 
 6.0.0 的内部存储和 PML 转置维护见[发布说明](release-notes.md)，二维存储变化见[scalar 说明](modeling/scalar.md)。它们不引入新的公共参数；源码升级需重新构建配套原生库。
 
 页面组织参考 [Deepwave 官方 Usage](https://ausargeo.com/deepwave/usage) 的 Sphinx Python API 风格，正文按 StarWave 的实际契约重新编写。两者的参数集合、源单位、返回结构和可微范围不能互换。
+
+
+```{raw} html
+</details>
+```
 
 (propagators)=
 ## 传播函数速查

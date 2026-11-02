@@ -1,13 +1,5 @@
 # Usage
 
-New: [VTI-VRR API and runnable CPU example](#vti-vrr): expanded Eq. (15), four receiver components, native full/boundary and pure Torch AD full/checkpoint. Use matching current source, not the frozen V19 package.
-
-New: [V21 elastic VRR API and runnable CPU example](examples/elastic-vrr.md). This addition requires matching authorized V21 source; older version/package statements below remain historical baseline information and do not establish current PyPI availability or include elastic VRR. Full reference: [Elastic VRR Function](#elastic-vrr-api) and [parameter conversion](#elastic-vrr-parameters).
-
-New: [Maxwell / GPR API](#gpr) covers voxel-based 2D TMz/TEz and 3D electromagnetic propagation with full/checkpoint storage. Use the matching current source, not the frozen V19 package baseline.
-
-GSLS: [visco_gsls](#visco-gsls). VRR: [starwave.vrr](#vrr). Both are included in the V19 root package.
-
 ```{container} sw-page-toc
 
 **On this page**
@@ -30,11 +22,29 @@ GSLS: [visco_gsls](#visco-gsls). VRR: [starwave.vrr](#vrr). Both are included in
 - [Other exported names and scope](#other-exports)
 ```
 
+```{raw} html
+<details class="sw-release-note"><summary>Versions, updates and compatibility</summary>
+```
+
+New: [VTI-VRR API and runnable CPU example](#vti-vrr): expanded Eq. (15), four receiver components, native full/boundary and pure Torch AD full/checkpoint. Use matching current source, not the frozen V19 package.
+
+New: [V21 elastic VRR API and runnable CPU example](examples/elastic-vrr.md). This addition requires matching authorized V21 source; older version/package statements below remain historical baseline information and do not establish current PyPI availability or include elastic VRR. Full reference: [Elastic VRR Function](#elastic-vrr-api) and [parameter conversion](#elastic-vrr-parameters).
+
+New: [Maxwell / GPR API](#gpr) covers voxel-based 2D TMz/TEz and 3D electromagnetic propagation with full/checkpoint storage. Use the matching current source, not the frozen V19 package baseline.
+
+GSLS: [visco_gsls](#visco-gsls). VRR: [starwave.vrr](#vrr). Both are included in the V19 root package.
+
+
 This reference targets frozen V19 source `0.1.0.dev19`, commit `46d32877e3336d531520a696d5f2e074e6f4ef74`, published as [Release V19](https://github.com/StarrMoonn/StarWave/releases/tag/V19). Except for the separately labelled V21 elastic VRR, V22 qP TTI, current VTI-VRR and Maxwell/GPR additions, signatures below are checked against that source, including the 23-parameter Scalar API and integrated `starwave.vrr`. These frozen V19 API contracts are a historical compatibility baseline, not a statement of current package availability. Use the matching complete source checkout for the separately labelled additions on this page; do not infer current PyPI availability from historical wheel records. Source, distribution and device-validation evidence remain separate. See [Status](status.md) and [installation](installation.md).
 
 See [Release Notes](release-notes.md) for 6.0.0 internal storage and PML-transpose maintenance, and [Scalar](modeling/scalar.md) for 2D storage changes. These introduce no new public parameters; source upgrades require rebuilt matching native libraries.
 
 The page organization follows the Sphinx Python API style of the [official Deepwave Usage documentation](https://ausargeo.com/deepwave/usage). All descriptions are newly written from StarWave’s actual contracts. The libraries’ parameter sets, source units, return structures, and differentiability scopes are not interchangeable.
+
+
+```{raw} html
+</details>
+```
 
 (propagators)=
 ## Propagators at a glance

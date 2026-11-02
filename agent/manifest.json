@@ -1,0 +1,9 @@
+{
+  "scope": "Reviewed public product introduction only; private implementation excluded.",
+  "sha256": {
+    "assets/icon.svg": "9d594960d302b2f2b0c59209ba8ee0acc1c1be5ff7df3d83712df76266d9f027",
+    "index.html": "801a5499eb064df6f3dee58d1ac8258501f415b3bb9183e8c1a0e58b980dd7db",
+    "script.js": "8092f187df9749b04dc9a7413c7f85813d557f9c09f7a56ea89d5359f8f2a227",
+    "style.css": "643947c1e0566f7a041beeb5b3e85dd855d8095e7820dc79b358485ba50e691e"
+  }
+}

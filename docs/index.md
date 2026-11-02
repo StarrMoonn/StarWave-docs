@@ -19,7 +19,17 @@
 </div>
 ```
 
+
+```{raw} html
+<nav class="sw-start-grid" aria-label="选择你的阅读路径"><a href="quickstart.html"><span>01 · 入门</span><strong>运行第一个波场</strong><small>安装 → 快速入门 → 采集设置</small><b aria-hidden="true">↗</b></a><a href="usage.html"><span>02 · 查阅</span><strong>直接找到接口</strong><small>函数签名、参数与返回值</small><b aria-hidden="true">↗</b></a><a href="examples/wavefield-snapshots.html"><span>03 · 实验</span><strong>从示例走向反演</strong><small>波场可视化、梯度与 FWI</small><b aria-hidden="true">↗</b></a></nav>
+<details class="sw-release-note"><summary>版本与适用范围 · 阅读前请核对</summary>
+```
+
 [V19 Release](https://github.com/StarrMoonn/StarWave/releases/tag/V19) 已发布；本手册对应冻结源码 `0.1.0.dev19`、提交 `46d32877e3336d531520a696d5f2e074e6f4ef74`。[PyPI **9.1.0**](https://pypi.org/project/starwave/9.1.0/) 已发布，对应 V19 源码契约并包含集成 VRR。现有 [9.0.0 wheel](https://pypi.org/project/starwave/9.0.0/) 仍对应 V18，不含集成 VRR。
+
+```{raw} html
+</details>
+```
 
 (home-capabilities)=
 ## 从物理模型，到可学习的模型
@@ -94,12 +104,21 @@ loss.backward()
 :hidden:
 :caption: 开始使用
 
+快速入门 <quickstart>
+安装 <installation>
+WSL <wsl>
 关于 StarWave <about>
 演示文稿 <presentation>
-安装 <installation>
 Docker <docker>
-WSL <wsl>
-快速入门 <quickstart>
+```
+
+```{toctree}
+:maxdepth: 1
+:hidden:
+:caption: Usage
+
+Usage <usage>
+PyTorch 后端 <pytorch-backend>
 ```
 
 ```{toctree}
@@ -140,14 +159,7 @@ Scalar3D <examples/index>
 下载与复现 <examples/reproduce>
 ```
 
-```{toctree}
-:maxdepth: 1
-:hidden:
-:caption: Usage
 
-Usage <usage>
-PyTorch 后端 <pytorch-backend>
-```
 
 ```{toctree}
 :maxdepth: 1

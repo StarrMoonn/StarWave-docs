@@ -105,7 +105,7 @@ def check_navigation(page, locale, relative):
     })"""), f'Wrapped or clipped sidebar label: {relative}'
     search = page.locator('#rtd-search-form input[name="q"]')
     assert search.count() == 1, relative
-    assert search.get_attribute('placeholder') == 'Search docs', relative
+    assert search.get_attribute('placeholder') == ('搜索文档' if locale == 'zh' else 'Search docs'), relative
     submit = page.locator('#rtd-search-form button[type="submit"]')
     assert submit.count() == 1 and submit.get_attribute('aria-label'), relative
     input_box, button_box = search.bounding_box(), submit.bounding_box()
@@ -244,7 +244,8 @@ def check_usage(page, locale, output):
     for signature in main.locator('dt.sig[id^="starwave."], dt.sig[id="starwave.vrr"]').all():
         style = signature.evaluate("e => { const s = getComputedStyle(e); return {font:s.fontFamily,size:parseFloat(s.fontSize),line:parseFloat(s.lineHeight),border:s.borderTopWidth,bg:s.backgroundColor}; }")
         assert 'Consolas' in style['font'] and 'monospace' in style['font'] and style['size'] == 17, style
-        assert style['border'] == '0px' and style['bg'] == 'rgba(0, 0, 0, 0)', style
+        assert style['border'] == '1px' and style['bg'] == 'rgb(244, 248, 250)', style
+        assert signature.locator('.sig-param').evaluate_all("items => items.every(e => getComputedStyle(e).fontStyle === 'normal')")
         assert abs(signature.locator('.sig-name').evaluate('e => parseFloat(getComputedStyle(e).fontSize)') - 18.7) < .1
     assert main.locator('code.literal').first.evaluate('e => getComputedStyle(e).borderTopWidth') == '0px'
     if locale == 'en':
@@ -423,7 +424,7 @@ def check_homepage(page, base, locale, output):
     assert logo.count() == 1 and logo.get_attribute('alt') == 'StarWave'
     assert logo.evaluate('e => e.complete && e.naturalWidth === 950 && e.naturalHeight === 645')
     box = logo.bounding_box()
-    assert box and 150 <= box['width'] <= 240, box
+    assert box and 140 <= box['width'] <= 240, box
     assert abs(box['width'] / box['height'] - 950 / 645) < .01, box
     sidebar_logo = page.locator('.sw-sidebar-brand img')
     assert sidebar_logo.evaluate('e => e.complete && e.naturalWidth === 512')
@@ -468,7 +469,8 @@ def check_homepage(page, base, locale, output):
         return Array.from(document.querySelectorAll('.sw-home-kicker, .sw-home-lead, .sw-home-capabilities p, .sw-home-capabilities a, .sw-home-code-label, .sw-home-code-note, .sw-home-next p, .sw-home-next a, .sw-home-identity p, .sw-path-copy strong, .sw-path-copy > span, .sw-button')).every(e => {
             const style = getComputedStyle(e);
             const fg = luminance(style.color);
-            const bg = e.classList.contains('sw-button-primary') ? luminance(style.backgroundColor) : 1;
+            let parent = e; while (parent && getComputedStyle(parent).backgroundColor === 'rgba(0, 0, 0, 0)') parent = parent.parentElement;
+            const bg = parent ? luminance(getComputedStyle(parent).backgroundColor) : 1;
             return (Math.max(fg,bg)+.05)/(Math.min(fg,bg)+.05) >= 4.5;
         });
     }"""), f'Homepage contrast failed: {locale}'
@@ -901,7 +903,7 @@ def check_scalar3d_examples(page, base, output):
             for case in ('index', 'enclosed', 'surface', 'layered', 'reproduce'):
                 page.goto(base + locale + '/examples/' + case + '.html', wait_until='networkidle')
                 captions = page.locator('.wy-menu-vertical .caption-text').all_text_contents()
-                assert captions.count('Example') == 1 and captions[captions.index('Example') + 1] == 'Usage'
+                assert captions.count('Example') == 1 and captions.index('Usage') < captions.index('Example')
                 title = page.locator('.sw-example-page > h1')
                 style = title.evaluate("e => ({size:parseFloat(getComputedStyle(e).fontSize),font:getComputedStyle(e).fontFamily,weight:getComputedStyle(e).fontWeight})")
                 assert abs(style['size'] - 40.8) < .01 and 'Georgia' in style['font'] and style['weight'] == '400'
@@ -1050,6 +1052,82 @@ def check_landing_page(page, base, output):
     context.close()
 
 
+def check_agent_intro(page, base, output):
+    """The public intro is standalone and never contacts a private service."""
+    for width in (1440, 390, 320):
+        page.set_viewport_size({'width': width, 'height': 900})
+        page.goto(base + 'zh/index.html', wait_until='networkidle')
+        page.locator('.sw-toolbar-agent').click()
+        page.wait_for_url(base + 'agent/index.html')
+        assert page.locator('.wy-nav-side').count() == 0
+        assert page.locator('h1').count() == 1
+        assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
+        assert page.locator('a[href^="https://github.com/"]').count() > 0
+        assert '私有' in page.locator('#start').inner_text()
+        page.locator('.hero a[href="#start"]').click()
+        assert urlsplit(page.url).fragment == 'start'
+        page.screenshot(path=str(output / f'agent-intro-{width}.png'), full_page=True)
+        page.locator('footer a[href="../zh/index.html"]').click()
+        page.wait_for_url(base + 'zh/index.html')
+        page.goto(base + 'zh/index.html')
+    page.goto(base + 'agent/index.html', wait_until='networkidle')
+    resources = page.evaluate('performance.getEntriesByType("resource").map(e => e.name)')
+    assert all(url.startswith(base) for url in resources), resources
+    assert page.locator('form, iframe').count() == 0
+    plain_context = page.context.browser.new_context(java_script_enabled=False)
+    plain = plain_context.new_page()
+    plain.goto(base + 'agent/index.html')
+    assert plain.locator('h1').is_visible()
+    plain.locator('.hero a[href="#start"]').click()
+    assert urlsplit(plain.url).fragment == 'start'
+    plain_context.close()
+
+
+def check_workspace(page, base, locale, output):
+    """Navigation enhancements stay additive and follow the rendered API set."""
+    page.goto(base + locale + '/usage.html', wait_until='networkidle')
+    entries = page.locator('#usage dt.sig[id]').count()
+    assert entries > 0
+    results = page.locator('#sw-api-results a')
+    assert results.count() == entries
+    query = page.locator('#sw-api-query')
+    query.fill('vti')
+    assert results.count() > 0
+    assert all('vti' in name.lower() for name in results.all_text_contents())
+    assert page.locator('#usage dt.sig[id]').count() == entries
+    query.fill('no-such-api-xyz')
+    assert results.count() == 0 and page.locator('.sw-api-status').inner_text()
+    query.fill('scalar')
+    first = results.first
+    target = unquote(first.get_attribute('href')[1:])
+    first.focus()
+    page.keyboard.press('Enter')
+    assert unquote(urlsplit(page.url).fragment) == target
+    assert page.locator(f'[id="{target}"]').is_visible()
+    page.go_back()
+    query.fill('')
+    assert results.count() == entries
+    # Canonical section links must all resolve, including future additions.
+    for href in page.locator('.sw-outline nav a').evaluate_all('items => items.map(a => a.getAttribute("href"))'):
+        assert page.locator(f'[id="{unquote(href[1:])}"]').count() == 1, href
+    assert page.locator('.sw-outline').evaluate("e => e.parentElement.classList.contains('sw-doc-layout')")
+    details = page.locator('.sw-outline details')
+    if page.viewport_size['width'] <= 1200:
+        assert details.get_attribute('open') is None
+        details.locator('summary').click()
+        assert details.get_attribute('open') is not None
+        details.locator('summary').click()
+        assert details.get_attribute('open') is None
+    release = page.locator('#usage > .sw-release-note')
+    assert not release.evaluate('e => e.open')
+    release.locator('summary').click()
+    assert release.evaluate('e => e.open')
+    release.locator('summary').click()
+    assert not release.evaluate('e => e.open')
+    assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
+    page.screenshot(path=str(output / f'{locale}-workspace-{page.viewport_size["width"]}.png'))
+
+
 def check(root, browser_path=None, browser_channel="chromium"):
     handler = partial(SimpleHTTPRequestHandler, directory=str(root))
     server = ThreadingHTTPServer(('127.0.0.1', 0), handler)
@@ -1066,6 +1144,7 @@ def check(root, browser_path=None, browser_channel="chromium"):
             browser = playwright.chromium.launch(**options)
             page = browser.new_page(viewport={'width': 1440, 'height': 1000})
             page.on('pageerror', lambda error: errors.append(str(error)))
+            check_agent_intro(page, base, output)
             check_landing_page(page, base, output)
             check_scalar3d_examples(page, base, output)
             check_wavefield_examples(page, base, output)
@@ -1085,6 +1164,7 @@ def check(root, browser_path=None, browser_channel="chromium"):
                             raise AssertionError(f'Horizontal overflow: {relative} at {size}; {wide}')
                     page.goto(base + locale + '/usage.html', wait_until='networkidle')
                     check_usage(page, locale, output)
+                    check_workspace(page, base, locale, output)
                     check_tutorials(page, base, locale, output)
                     check_homepage(page, base, locale, output)
                     check_forward_modeling(page, base, locale, output)

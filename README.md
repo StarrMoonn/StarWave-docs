@@ -65,7 +65,7 @@ Each page has an accessible language switch. Section and Python-object anchors s
 - `check_tutorial_assets.py`: clean notebook/script parity, numerical-source provenance, safe metadata, configuration and measured-result invariants.
 - Optional `--wheel PATH`: verifies the pinned 7.1.0 binary wheel SHA-256, package/platform metadata, native-library receipt hashes, and signatures through AST parsing, without importing or running StarWave. Wheels are never part of the source or published site.
 
-Usage uses a 40.8px regular Georgia page title and single 30.6px Scalar Function, Born Function, VRZ Function, VRR Function, VTI Function, Elastic Function, and GSLS Function headings in both languages. Parameter names, types, defaults, and prose all use 17px text. Signatures retain 17px naturally wrapping monospace text and bold 18.7px function names; the propagator overview uses matching 17px API links, dimension tokens, and notation with consistent baselines. Code blocks and other inline code outside API fields retain their separate 15.3px size. Original section bookmarks, positional aliases, language switching, and legacy API routes are preserved.
+Usage uses a 40.8px regular Georgia page title and single 30.6px Scalar Function, Born Function, VRZ Function, VRR Function, VTI Function, Elastic Function, and GSLS Function headings in both languages. Parameter names, types, defaults, and prose all use 17px text. Signatures use a bordered, nonitalic 17px naturally wrapping monospace panel and bold 18.7px function names; the propagator overview uses matching 17px API links, dimension tokens, and notation with consistent baselines. Code blocks and other inline code outside API fields retain their separate 15.3px size. Original section bookmarks, positional aliases, language switching, and legacy API routes are preserved.
 
 Browser regression checks include the homepage logo, desktop/mobile layout, typography, text contrast, keyboard targets, calls to action and screenshots in both languages. They also retain the full documentation regression suite.
 
@@ -96,3 +96,19 @@ The Presentation chapter publishes only the approved original 30-slide watermark
 ## Historical tutorials and examples
 
 The original 0.1.0.dev9 tutorials, the bounded Scalar3D experiments and the reconstruction chapter retain their historical evidence and asset hashes. They are not rerun or relabelled as V19 results. See [Status](docs/en/status.md), [Scalar3D examples](docs/en/examples/index.md), and [Release Notes](docs/en/release-notes.md) for scope and history.
+
+## Documentation workspace redesign
+
+The bilingual guide now separates global chapters, a canonical per-page outline,
+and in-page API quick links. The API finder derives its entries from rendered
+signatures and filters links only; the complete reference remains available.
+Compatibility notes use native disclosures, including without JavaScript.
+The reading typography and all scientific contracts/bookmarks are preserved;
+signatures use a nonitalic code panel. Desktop outlines become collapsible
+above the article on narrow screens.
+
+The separate `agent/` introduction is a reviewed, hash-allowlisted static product
+page, published at `/agent/` beside the docs. It contains no private Agent code,
+credentials, live task data, or backend. The repository remains private; its
+installation link explicitly requires access. `tools/agent_page.py` copies only
+the manifest-approved assets; the document toolbar links to this standalone page.

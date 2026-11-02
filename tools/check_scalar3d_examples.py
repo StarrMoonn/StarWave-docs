@@ -74,7 +74,7 @@ def check(root):
    tree=HTMLTree(page.read_text()).root;main=tree.find('.//*[@role="main"]')
    nav=next((e for e in tree.iter('div') if 'wy-menu-vertical' in e.get('class','').split()),None)
    captions=[] if nav is None else [element_text(e) for e in nav.iter('span') if 'caption-text' in e.get('class','').split()]
-   if captions.count('Example')!=1 or captions.index('Example')+1>=len(captions) or captions[captions.index('Example')+1]!='Usage':errors.append('Example must immediately precede Usage: '+locale+'/'+name)
+   if captions.count('Example')!=1 or captions.count('Usage')!=1 or captions.index('Usage')>=captions.index('Example'):errors.append('API reference must precede experiments: '+locale+'/'+name)
    if main is None:errors.append('Missing example article');continue
    sections=list(main.iter('section'))
    styled=[section for section in sections if 'sw-example-page' in section.get('class','').split()]

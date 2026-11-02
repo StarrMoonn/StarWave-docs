@@ -13,6 +13,7 @@ import shutil
 import subprocess
 import sys
 from landing import publish as publish_landing
+from agent_page import publish as publish_agent
 
 PROJECT = Path(__file__).resolve().parents[1]
 SECTION = re.compile(r'<section id="([^"]+)">\s*((?:<span id="[^"]+"></span>\s*)*)(<h[1-6]\b.*?</h[1-6]>)', re.S)
@@ -310,7 +311,19 @@ def build(destination):
         if relative == 'modeling/reconstruction.html':
             stable = RECONSTRUCTION_SECTIONS
             numbers = RECONSTRUCTION_NUMBERS
-        rendered = [add_anchors(text, stable, numbers) for text in texts]
+        # Build local navigation from canonical IDs, not Sphinx's temporary
+        # localized heading slugs. This also includes future headings naturally.
+        outlined = []
+        for text in texts:
+            items = []
+            for sid, _, heading in SECTION.findall(text):
+                if not heading.startswith('<h2'):
+                    continue
+                label = re.sub(r'<a[^>]*class="headerlink"[^>]*>.*?</a>', '', heading)
+                label = html.unescape(re.sub('<[^>]+>', '', label)).strip()
+                items.append(f'<li><a href="#{html.escape(sid, quote=True)}">{html.escape(label)}</a></li>')
+            outlined.append(text.replace('<!-- sw-canonical-outline -->', '<ul class="sw-outline-items">' + ''.join(items) + '</ul>'))
+        rendered = [add_anchors(text, stable, numbers) for text in outlined]
         if relative.startswith('examples/'):
             rendered = [text.replace('<section id=', '<section class="sw-example-page" id=', 1) for text in rendered]
         path.write_text(rendered[0], encoding='utf-8')
@@ -338,6 +351,7 @@ def build(destination):
                                          locale='zh' if source == 'root' else source,
                                          default_fragment=route['default']), encoding='utf-8')
     publish_landing(destination, home_fragments)
+    publish_agent(destination)
     (destination / '.nojekyll').touch()
     print(f'Built {len(source_paths["zh"])} pages per language with independent search indexes and legacy routes.')
 

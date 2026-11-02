@@ -25,15 +25,16 @@ nitpick_ignore = [('py:class', x) for x in ('torch.Tensor', 'torch.device', 'tor
 html_theme = 'sphinx_rtd_theme'
 html_theme_options = {
     'collapse_navigation': False,
+    'sticky_navigation': False,
     'navigation_depth': 1,
     'titles_only': True,
     'style_nav_header_background': '#487eae',
 }
 html_static_path = [str(CONF_DIR / '_static')]
 templates_path = [str(CONF_DIR / '_templates')]
-html_css_files = ['custom.css']
+html_css_files = ['custom.css', 'workspace.css']
 html_favicon = str(CONF_DIR / '_static' / 'brand' / 'starwave-favicon.png')
-html_js_files = ['language.js']
+html_js_files = ['language.js', 'workspace.js']
 html_title = 'StarWave V19 使用手册' if LOCALE == 'zh' else 'StarWave V19 User Guide'
 html_show_sourcelink = False
 html_copy_source = False
