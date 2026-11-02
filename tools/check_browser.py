@@ -846,6 +846,9 @@ def check_search(page, base):
         if locale == 'zh':
             page.goto(base + 'zh/search.html?q=' + quote('梯度'))
             page.wait_for_function('document.querySelectorAll("#search-results li").length > 0')
+            # Sphinx appends ranked results asynchronously; the first result
+            # is not evidence that the complete result set has finished.
+            page.wait_for_function("document.querySelector('.search-summary')?.textContent.includes('搜索完成')")
             cjk_links = page.locator('#search-results li a').evaluate_all('(items) => items.map(a => a.href)')
             assert any(urlsplit(link).path == '/zh/modeling/gradient.html' for link in cjk_links), cjk_links
             assert all('/zh/' in urlsplit(link).path for link in cjk_links), cjk_links
