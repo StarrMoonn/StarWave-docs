@@ -85,6 +85,25 @@ USAGE_NUMBERS = USAGE_NUMBERS[:_gpr_insert] + tuple(range(75, 83)) + USAGE_NUMBE
 _vti_vrr_insert = USAGE_SECTIONS.index('tti')
 USAGE_SECTIONS = USAGE_SECTIONS[:_vti_vrr_insert] + ('vti-vrr', 'vti-vrr-conventions', 'vti-vrr-execution', 'vti-vrr-example') + USAGE_SECTIONS[_vti_vrr_insert:]
 USAGE_NUMBERS = USAGE_NUMBERS[:_vti_vrr_insert] + tuple(range(83, 87)) + USAGE_NUMBERS[_vti_vrr_insert:]
+def usage_section_map(locale='zh'):
+    """Discover named Usage sections; existing bookmark numbers never change.
+
+    New sections need only a normal explicit Markdown anchor, not registration
+    in a Python whitelist. Use the same anchor in translated pages.
+    """
+    source = PROJECT / 'docs' / ('en/usage.md' if locale == 'en' else 'usage.md')
+    names = ['usage'] + re.findall(r'^\(([^)]+)\)=\n#+ ', source.read_text(), re.M)
+    if len(names) != len(set(names)):
+        raise ValueError(f'Duplicate Usage section anchors: {locale}')
+    numbers = dict(zip(USAGE_SECTIONS, USAGE_NUMBERS))
+    next_number = max(numbers.values()) + 1
+    for name in names:
+        if name not in numbers:
+            numbers[name] = next_number
+            next_number += 1
+    return tuple(names), tuple(numbers[name] for name in names)
+
+
 MODELING_FRAGMENTS = {'modeling/vrz.md', 'modeling/vti.md'}
 WAVE_SECTIONS = ('wave-propagation', 'wave-vrz', 'wave-vrz-details', 'wave-vrz-limits',
                  'wave-vti', 'wave-vti-details', 'wave-vti-limits')
@@ -124,8 +143,9 @@ def canonical_wave_sections(text):
 
 def canonical_usage_sections(text, locale):
     aliases = json.loads((PROJECT / 'tools' / 'usage_anchors.json').read_text())[locale]
-    assert len(sections(text)) == len(USAGE_SECTIONS), 'Usage section structure changed'
-    targets = iter(zip(USAGE_SECTIONS, USAGE_NUMBERS))
+    names, numbers = usage_section_map(locale)
+    assert len(sections(text)) == len(names), 'Give each Usage heading an explicit Markdown anchor'
+    targets = iter(zip(names, numbers))
     def replace(match):
         target, number = next(targets)
         # Discard regenerated idN aliases, whose meaning can shift when headings
@@ -278,12 +298,10 @@ def build(destination):
             texts = [add_page_toc(text, locale) for text, locale in zip(texts, ('zh', 'en'))]
         stable = None
         if relative == 'usage.html':
-            stable = USAGE_SECTIONS
-            for source in (PROJECT / 'docs', PROJECT / 'docs' / 'en'):
-                source_sections = ['usage'] + re.findall(r'^\(([^)]+)\)=\n#+ ', (source / 'usage.md').read_text(), re.M)
-                assert source_sections == list(stable), f'Usage source order differs from stable section map: {source.name}'
+            stable, usage_numbers = usage_section_map('zh')
+            assert usage_section_map('en') == (stable, usage_numbers), 'Translated Usage anchors/order differ'
             assert len(stable) == len(pairs[0]), 'Usage anchors must cover every section'
-        numbers = USAGE_NUMBERS if relative == 'usage.html' else None
+        numbers = usage_numbers if relative == 'usage.html' else None
         if relative == 'inversion/fwi.html':
             numbers = FWI_NUMBERS
             stable = FWI_SECTIONS

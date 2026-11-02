@@ -10,7 +10,7 @@ import re
 import sys
 import xml.etree.ElementTree as ET
 from urllib.parse import unquote, urlsplit
-from build_docs import USAGE_SECTIONS, USAGE_NUMBERS
+from build_docs import usage_section_map
 from check_presentation_asset import ASSET_PATH, check as check_presentation
 from check_scalar3d_examples import approved_assets, check as check_scalar3d
 from check_sls_examples import check as check_sls
@@ -370,10 +370,11 @@ def check(root):
             errors.append(f'Wrong Usage title: {locale}')
         if 'Usage / API' in content or 'toctree-l2' in content:
             errors.append(f'Navigation is not flat: {locale}')
+        usage_sections, usage_numbers = usage_section_map(locale)
         anchors = re.findall(r'data-sw-anchor="([^"]+)"', content)
-        if tuple(anchors) != USAGE_SECTIONS or len(set(anchors)) != len(USAGE_SECTIONS) or any(anchor not in pages[usage].ids for anchor in anchors):
+        if tuple(anchors) != usage_sections or len(set(anchors)) != len(usage_sections) or any(anchor not in pages[usage].ids for anchor in anchors):
             errors.append(f'Missing or invalid stable Usage section metadata: {locale}')
-        for anchor, number in zip(USAGE_SECTIONS, USAGE_NUMBERS):
+        for anchor, number in zip(usage_sections, usage_numbers):
             if pages[usage].id_sections.get(anchor) != f'sw-section-{number}':
                 errors.append(f'Usage positional anchor drift: {locale}/{anchor}')
         aliases = json.loads((project / 'tools' / 'usage_anchors.json').read_text())[locale]

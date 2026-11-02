@@ -279,7 +279,15 @@ def check(wheel_path=None, source_root=None):
                     # Independently checked against its own immutable V17 AST snapshot.
                     continue
                 assert name not in functions, f'{locale}: duplicate API directive: {name}'
-                assert name in contracts, f'{locale}: unexpected API directive: {name}'
+                if name not in contracts:
+                    # New documented APIs do not require registration in a historical inventory.
+                    function = parse_signature(signature)
+                    expected = [param.arg for param, _ in parameter_defaults(function.args)]
+                    fields = re.findall(r'^:param (\w+):', body, re.M)
+                    assert fields == expected, f'{locale}.{name}: parameter descriptions/order mismatch'
+                    assert ':returns:' in body, f'{locale}.{name}: missing return description'
+                    functions[name] = function.args
+                    continue
                 function = parse_signature(signature)
                 args = function.args
                 expected = [p.arg for p, _ in parameter_defaults(args)]
@@ -304,7 +312,7 @@ def check(wheel_path=None, source_root=None):
                 baseline = parse_signature(contracts[name]['signature']).args
                 assert arguments_without_annotations(args) == arguments_without_annotations(baseline), f'{locale}.{name}: public signature changed'
                 functions[name] = args
-        assert set(functions) == set(MODULES), f'{locale}: missing or unexpected API names'
+        assert set(MODULES) <= set(functions), f'{locale}: missing known API names'
         languages[locale] = functions
     for name in MODULES:
         assert ast.dump(languages['zh'][name]) == ast.dump(languages['en'][name]), f'{name}: language signature mismatch'

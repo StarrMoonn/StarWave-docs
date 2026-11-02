@@ -13,17 +13,10 @@ def signature_args(signature):
 
 
 def section_map():
-    """Read the build's literal section assignments without running a site build."""
-    scope = {}
-    for statement in ast.parse((ROOT / 'tools/build_docs.py').read_text()).body:
-        if isinstance(statement, (ast.Assign, ast.AugAssign)):
-            names = {n.id for n in ast.walk(statement) if isinstance(n, ast.Name)}
-            if names & {'USAGE_SECTIONS', 'USAGE_NUMBERS', 'BORN_SECTIONS',
-                        'V19_HELPER_SECTIONS', '_born_insert', '_vrr_ref_insert',
-                        '_elastic_vrr_insert', '_tti_insert', '_gpr_insert'}:
-                exec(compile(ast.Module(body=[statement], type_ignores=[]),
-                             '<section map>', 'exec'), scope)
-    return scope['USAGE_SECTIONS'], scope['USAGE_NUMBERS']
+    """Read current sections while retaining published bookmark numbers."""
+    from build_docs import usage_section_map
+    return usage_section_map()
+
 
 
 def check(source_root=None):
