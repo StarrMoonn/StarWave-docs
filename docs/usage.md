@@ -1,5 +1,7 @@
 # Usage
 
+新增：[VTI-VRR 完整接口与可运行 CPU 示例](#vti-vrr)：展开式（15）、四分量接收、原生 full/boundary 与纯 Torch AD full/checkpoint。请使用匹配的当前源码，不以旧 V19 包推断可用性。
+
 新增：[V21 弹性 VRR 接口与可运行 CPU 示例](examples/elastic-vrr.md)。此功能需要匹配的授权 V21 源码；下文旧版本与包说明保留为历史基线，不代表当前 PyPI 可用性，也不包含弹性 VRR。 完整参考：[弹性波 VRR 函数](#elastic-vrr-api)与[参数转换](#elastic-vrr-parameters)。
 
 新增：[Maxwell / GPR 接口](#gpr)，覆盖体素材料的二维 TMz/TEz 与三维电磁传播，支持 full/checkpoint。请使用匹配的当前源码，而非冻结 V19 包基线。
@@ -15,6 +17,7 @@ GSLS: [visco_gsls](#visco-gsls). VRR: [starwave.vrr](#vrr). 两者均集成于 V
 - [VRZ Function](#vrz)
 - [VRR Function](#vrr)
 - [VTI Function](#vti)
+- [VTI-VRR Function](#vti-vrr)
 - [qP VTI / TTI Function](#tti)
 - [Elastic Function](#elastic)
 - [GSLS Function](#visco-gsls)
@@ -27,7 +30,7 @@ GSLS: [visco_gsls](#visco-gsls). VRR: [starwave.vrr](#vrr). 两者均集成于 V
 - [其它导出名称与范围](#other-exports)
 ```
 
-除单独标注的 V21 弹性波 VRR、V22 qP TTI 与当前 Maxwell/GPR 新增接口外，本参考面向冻结 V19 源码 `0.1.0.dev19`，提交 `46d32877e3336d531520a696d5f2e074e6f4ef74`，已发布为 [Release V19](https://github.com/StarrMoonn/StarWave/releases/tag/V19)。其余签名按该源码核对，包括 23 参数 Scalar API 与已集成的 `starwave.vrr`。冻结 V19 API 契约仅作为历史兼容基线，不说明当前包的可用性。本文单独标注的新增接口请使用匹配的完整源码，不应从历史 wheel 记录推断当前 PyPI 可用性。源码、分发产物与设备验收证据分别记录。见[文档状态](status.md)与[安装](installation.md)。
+除单独标注的 V21 弹性波 VRR、V22 qP TTI、当前 VTI-VRR 与 Maxwell/GPR 新增接口外，本参考面向冻结 V19 源码 `0.1.0.dev19`，提交 `46d32877e3336d531520a696d5f2e074e6f4ef74`，已发布为 [Release V19](https://github.com/StarrMoonn/StarWave/releases/tag/V19)。其余签名按该源码核对，包括 23 参数 Scalar API 与已集成的 `starwave.vrr`。冻结 V19 API 契约仅作为历史兼容基线，不说明当前包的可用性。本文单独标注的新增接口请使用匹配的完整源码，不应从历史 wheel 记录推断当前 PyPI 可用性。源码、分发产物与设备验收证据分别记录。见[文档状态](status.md)与[安装](installation.md)。
 
 6.0.0 的内部存储和 PML 转置维护见[发布说明](release-notes.md)，二维存储变化见[scalar 说明](modeling/scalar.md)。它们不引入新的公共参数；源码升级需重新构建配套原生库。
 
@@ -45,6 +48,8 @@ GSLS: [visco_gsls](#visco-gsls). VRR: [starwave.vrr](#vrr). 两者均集成于 V
 - {py:func}`starwave.vrr`：二维声学反射率向量；独立 `v, rx, rz` 模型场。已集成于主包。
 
 - {py:func}`starwave.vti`：二维/三维声学 VTI；`vp, epsilon, delta, rho`；按所选分量顺序返回记录。
+
+- {py:func}`starwave.vti_vrr`：二维 VTI 矢量反射率；独立 c/epsilon/delta/Rx/Rz，按请求顺序返回应力/速度 tuple；速度读出须显式 density。
 
 - {py:func}`starwave.tti`：二维局部近似伪声学 qP VTI/TTI；`vp, epsilon, delta, theta`；标量强迫，full/checkpoint；已包含于 [V22 完整源码发布](https://github.com/StarrMoonn/StarWave/releases/tag/V22)。
 
@@ -993,6 +998,117 @@ stress_h, velocity_z = starwave.vti(
 - DataParallel 应把完整模型放入 Module，只拆分炮维采集；参见[多卡入门](inversion/dataparallel.md)。
 - 接口检查不重跑数值或性能验收；分后端证据与未测硬件范围见[源码验证报告](https://github.com/StarrMoonn/StarWave/blob/7145b5306af11615eb50c28a9ef64bb991a0bd97/docs/development/VTI_CPU_TORCH_SAMPLING_20261028.md)，不作任意 GPU 或长程收敛保证。
 
+
+(vti-vrr)=
+## VTI-VRR Function
+
+本节新增展开式（15）的二维 VTI 矢量反射率接口，**不属于下文冻结的 V19 包基线**；须使用匹配的当前源码和重新编译的原生库。它独立于常规 `starwave.vti`、各向同性 `starwave.vrr` 和 qP `starwave.tti`，这些算子的观测数据不能默认互换。
+
+```{py:function} starwave.vti_vrr(c, epsilon, delta, source_amplitudes, source_locations, receiver_locations, *, dx, dz, dt, rx, rz, backend=None, accuracy=2, memory='full', memory_mode=None, formulation='eq15_expanded', boundary='none', free_surface=False, sponge_width=0, sponge_strength=0.0, pml_width=20, pml_max_vel=6000.0, pml_freq=25.0, pml_reflection=1e-6, pml_kappa=5.0, receiver_fields=('sV',), density=None, max_vel=None, cfl_resample=True, freq_taper_frac=0.0, time_pad_frac=0.0, time_taper=False, execution='eager', checkpoint_interval=None, compile_steps=1) -> tuple[torch.Tensor, ...]
+
+以独立矢量反射率场进行二维 VTI 应力–动量传播。
+
+:param c: 正、有限的速度，单位 m/s，[x, z] 浮点张量，每维至少 3。
+:param epsilon: 有限的无量纲各向异性 [x, z]，大于 -0.5。
+:param delta: 有限的无量纲各向异性 [x, z]，大于 -0.5；epsilon-delta 至少为 -1e-6。被接受的近椭圆值不裁剪。
+:param source_amplitudes: 应力率 Pa/s，[shot, source, time]；兼容单源旧形状 [shot, time]。
+:param source_locations: 模型域内 int64 [shot, source, 2]；单源兼容 [shot, 2]。
+:param receiver_locations: 各炮共用的 int64 [receiver, 2]，或逐炮 [shot, receiver, 2]。
+:param dx: 正、有限的 x 向网格间距，单位 m。
+:param dz: 正、有限的 z 向网格间距，单位 m。
+:param dt: 正、有限的用户采样间隔，单位 s。
+:param rx: 有限的 x 向反射率，单位 1/m，与 c 同形状、dtype、device。
+:param rz: 有限的 z 向反射率，单位 1/m，与 c 同形状、dtype、device。
+:param backend: None 按 c.device 选原生后端；可显式选 "native_cpu"/"cpu"、"cuda" 或 "torch"。不隐式搬移或静默回退。
+:param accuracy: 内部波场导数模板阶数：2、4、6 或 8。
+:param memory: 原生 "full"/"boundary"，Torch "full"/"checkpoint"；原生 boundary 存储要求 boundary="pml"。
+:param memory_mode: memory 的可选别名；冲突的显式设置会报错。
+:param formulation: 生产接口只接受 "eq15_expanded"。
+:param boundary: "none"（历史默认）、"sponge" 或 "pml"；吸收边界实验应显式选 "pml"。
+:param free_surface: 显式平坦顶部自由表面，要求 boundary="pml"。
+:param sponge_width: 海绵层厚度；启用时须为正且小于模型最短边的一半。
+:param sponge_strength: 非负海绵衰减率；非零海绵设置要求 boundary="sponge"。
+:param pml_width: 正标量厚度或 (x_low, x_high, z_low, z_high)；自由表面顶部为零、其余为正。
+:param pml_max_vel: CPML 固定速度尺度，单位 m/s；不同于 max_vel。
+:param pml_freq: CPML 参考频率，单位 Hz。
+:param pml_reflection: CPML 目标反射参数，严格介于 0 和 1 之间。
+:param pml_kappa: CPML 拉伸参数，范围为 1 至 5。
+:param receiver_fields: 从 "vx"、"vz"、"sH"、"sV" 中选取不重复、非空序列；默认 ("sV",)。
+:param density: 正、有限的 kg/m³ [x, z]，速度接收必需；只用于读出，不改变传播。
+:param max_vel: CFL 规划中 c 的可选固定上界，不是常规 VTI 的相速度包络。
+:param cfl_resample: 默认 True，自动子步并重采样源与接收记录；False 时拒绝不安全的用户 dt。
+:param freq_taper_frac: 时间重采样的频率渐消比例。
+:param time_pad_frac: 时间重采样的补零比例。
+:param time_taper: 是否使用时间渐消。
+:param execution: Torch 的 "eager"/"compile"；原生仅接受 "eager"。
+:param checkpoint_interval: Torch 检查点块长度，以内部时间步计；None 使用 32。原生必须为 None。
+:param compile_steps: Torch 编译块的内部时间步数，默认 1；原生必须为 1。
+:returns: 严格按 receiver_fields 顺序返回 tuple，每项为 [shot, receiver, user_time]，保持模型 dtype/device。
+```
+
+(vti-vrr-conventions)=
+### 材料、采集与返回约定
+
+浮点输入均须与 c 一致，支持 CPU/CUDA 上的 float32/float64；位置张量为同设备 int64。模型跨炮共享，梯度对炮求和；重复接收点的伴随贡献累加。源等量注入两个正应力，**只乘一次内部 dt**，不除以单元面积。
+
+展开式（15）保留 `K=c**2`、`a=1+2*epsilon`、`b=sqrt(1+2*delta)` 和 `g_i=D_i(c)/c-2*R_i`，不丢弃速度梯度项，也不从独立 R 反推全局可积密度。固定 epsilon/delta 仍参与物理计算，只省略其未请求的原生梯度缓冲；非叶张量链保留，包括 c 派生材料及显式传入 `density=Z/c` 的梯度链。
+
+返回值**始终为 tuple**：默认用 `(sV,) = starwave.vti_vrr(...)`；四分量可用 `sH, sV, vx, vz = starwave.vti_vrr(..., receiver_fields=("sH", "sV", "vx", "vz"), density=rho)`。b7 系列接收扩展之前的默认值是裸 Tensor，旧调用须改为解包或取 `[0]`。
+
+记录时刻为 **(n+1)*user_dt**，不是从名义零时刻开始。拉应力 sH/sV 位于中心 (x,z)，单位 Pa，不是压力别名。vx/vz 位于 (x+1/2,z)/(x,z+1/2)，单位 m/s，直接读对应面、不做空间插值；新旧动量平均对齐完成步的应力时刻。面密度使用相邻中心密度算术平均，边缘复制。density 仅将动量换成速度，不改变传播，应力读出不使用它。
+
+(vti-vrr-execution)=
+### 后端、存储、边界与梯度
+
+| 路线 | 设备 / 精度 | 存储 | 执行 |
+|---|---|---|---|
+| 原生 CPU/CUDA | CPU/CUDA、float32/float64 | full；CPML 下 boundary | 编译后的手推一阶离散伴随 |
+| 纯 Torch AD | CPU/CUDA、float32/float64 | full；checkpoint | eager 或 compile |
+
+原生 boundary 保存定向核心轨迹、终态与稀疏外壳检查点，重放外壳并逆向重建无损核心；不是反演阻尼，也不是 AD 重放，小网格未必省内存。Torch checkpoint 按内部时间块重放普通 AD；Torch `memory="boundary"` 显式拒绝，不自动转换。原生高阶导数不支持；CUDA 库编译成功不等于 GPU 数值或性能验收。
+
+CPML 复制 c/epsilon/delta；R 在自身法向超出物理域时置零、切向复制，保留 padding 转置。`free_surface=True` 支持 accuracy=2/4/6/8，侧面及底部保留 CPML；标量厚度 w 变为 (w,w,0,w)，显式厚度的顶部须为零。顶部 sV=0；源及 sV 接收深度必须 z>=1，sH/vx/vz 可在 z=0 采样。不支持地形。
+
+**accuracy 表示内部波场模板阶数，不保证整体 PDE 收敛阶。** 材料系数导数 D 与插值 A 仍是二阶，非均匀材料及自由表面闭合不能称为全局八阶。时间推进采用初始化后的应力 kick / 动量 drift。CFL 筛选包含各向异性及速度梯度/反射率项，但不是任意大幅或不可积 R 的稳定性证明。CFL 极值、子步比例及 CPML 剖面不参与求导；有限差分核验须保持同一内部时间网格与剖面。源上采样、接收抗混叠降采样保留梯度链与完成步相位。
+
+(vti-vrr-example)=
+### 可运行 CPU 示例
+
+无需编译原生库；仅训练 c/Rx/Rz，各向异性独立固定。
+
+```python
+import torch
+import starwave
+
+dtype = torch.float64
+c = torch.full((16, 18), 2000.0, dtype=dtype, requires_grad=True)
+epsilon = torch.full_like(c, 0.15)  # independently fixed anisotropy
+delta = torch.full_like(c, 0.05)
+rx = torch.zeros_like(c, requires_grad=True)
+rz = torch.zeros_like(c, requires_grad=True)
+source = torch.zeros((1, 1, 32), dtype=dtype)
+source[0, 0, 0] = 1.0e6  # Pa/s, not a stress increment
+source_locations = torch.tensor([[[7, 5]]], dtype=torch.int64)
+receiver_locations = torch.tensor([[6, 5], [8, 5]], dtype=torch.int64)
+density = torch.full_like(c, 2000.0)  # kg/m^3; readout only
+
+sH, sV, vx, vz = starwave.vti_vrr(
+    c, epsilon, delta, source, source_locations, receiver_locations,
+    dx=10.0, dz=10.0, dt=0.0005, rx=rx, rz=rz,
+    backend="torch", execution="eager", memory="full", accuracy=4,
+    boundary="pml", pml_width=4, pml_max_vel=2500.0,
+    max_vel=2500.0, receiver_fields=("sH", "sV", "vx", "vz"),
+    density=density,
+)
+assert sV.shape == (1, 2, 32)
+sV.square().mean().backward()
+assert c.grad is not None and rx.grad is not None and rz.grad is not None
+assert epsilon.grad is None and delta.grad is None
+```
+
+Torch 编译检查点可显式选择 `backend="torch", memory="checkpoint", execution="compile", checkpoint_interval=32, compile_steps=2`，须有兼容的 PyTorch 编译环境。原生 CPU/CUDA 须先显式构建匹配的 vti_vrr 库、重启 Python，再分别使用 CPU/CUDA 张量。
+
+详细[接口及保留的数值限制](https://github.com/StarrMoonn/StarWave/blob/dev/docs/reference/VTI_VRR_RESEARCH_API.md)、[接收/CFL 证据](https://github.com/StarrMoonn/StarWave/blob/dev/docs/development/VTI_VRR_RECEIVERS_CFL_20261102.md)与[自由表面验收范围](https://github.com/StarrMoonn/StarWave/blob/dev/docs/development/VTI_VRR_FREE_SURFACE_HIGHORDER_VALIDATION_20261101.md)区分实现与设备/工作负载验收。历史 FP32 近零梯度严格阈值偏差仍保留记录；小示例或已有 A30 运行不构成全设备、长时间 FWI 精度保证。
 
 (tti)=
 ## qP VTI / TTI Function

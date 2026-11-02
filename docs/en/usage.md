@@ -1,5 +1,7 @@
 # Usage
 
+New: [VTI-VRR API and runnable CPU example](#vti-vrr): expanded Eq. (15), four receiver components, native full/boundary and pure Torch AD full/checkpoint. Use matching current source, not the frozen V19 package.
+
 New: [V21 elastic VRR API and runnable CPU example](examples/elastic-vrr.md). This addition requires matching authorized V21 source; older version/package statements below remain historical baseline information and do not establish current PyPI availability or include elastic VRR. Full reference: [Elastic VRR Function](#elastic-vrr-api) and [parameter conversion](#elastic-vrr-parameters).
 
 New: [Maxwell / GPR API](#gpr) covers voxel-based 2D TMz/TEz and 3D electromagnetic propagation with full/checkpoint storage. Use the matching current source, not the frozen V19 package baseline.
@@ -15,6 +17,7 @@ GSLS: [visco_gsls](#visco-gsls). VRR: [starwave.vrr](#vrr). Both are included in
 - [VRZ Function](#vrz)
 - [VRR Function](#vrr)
 - [VTI Function](#vti)
+- [VTI-VRR Function](#vti-vrr)
 - [qP VTI / TTI Function](#tti)
 - [Elastic Function](#elastic)
 - [GSLS Function](#visco-gsls)
@@ -27,7 +30,7 @@ GSLS: [visco_gsls](#visco-gsls). VRR: [starwave.vrr](#vrr). Both are included in
 - [Other exported names and scope](#other-exports)
 ```
 
-This reference targets frozen V19 source `0.1.0.dev19`, commit `46d32877e3336d531520a696d5f2e074e6f4ef74`, published as [Release V19](https://github.com/StarrMoonn/StarWave/releases/tag/V19). Except for the separately labelled V21 elastic VRR, V22 qP TTI and current Maxwell/GPR additions, signatures below are checked against that source, including the 23-parameter Scalar API and integrated `starwave.vrr`. These frozen V19 API contracts are a historical compatibility baseline, not a statement of current package availability. Use the matching complete source checkout for the separately labelled additions on this page; do not infer current PyPI availability from historical wheel records. Source, distribution and device-validation evidence remain separate. See [Status](status.md) and [installation](installation.md).
+This reference targets frozen V19 source `0.1.0.dev19`, commit `46d32877e3336d531520a696d5f2e074e6f4ef74`, published as [Release V19](https://github.com/StarrMoonn/StarWave/releases/tag/V19). Except for the separately labelled V21 elastic VRR, V22 qP TTI, current VTI-VRR and Maxwell/GPR additions, signatures below are checked against that source, including the 23-parameter Scalar API and integrated `starwave.vrr`. These frozen V19 API contracts are a historical compatibility baseline, not a statement of current package availability. Use the matching complete source checkout for the separately labelled additions on this page; do not infer current PyPI availability from historical wheel records. Source, distribution and device-validation evidence remain separate. See [Status](status.md) and [installation](installation.md).
 
 See [Release Notes](release-notes.md) for 6.0.0 internal storage and PML-transpose maintenance, and [Scalar](modeling/scalar.md) for 2D storage changes. These introduce no new public parameters; source upgrades require rebuilt matching native libraries.
 
@@ -45,6 +48,8 @@ The page organization follows the Sphinx Python API style of the [official Deepw
 - {py:func}`starwave.vrr`: `2D` acoustic vector reflectivity; independent `v, rx, rz` fields. Integrated in the root package.
 
 - {py:func}`starwave.vti`: `2D/3D` acoustic VTI; `vp, epsilon, delta, rho`; returns recordings in the selected component order.
+
+- {py:func}`starwave.vti_vrr`: 2D VTI vector reflectivity; independent c/epsilon/delta/Rx/Rz, requested stress/velocity tuple; explicit density for velocity readout.
 
 - {py:func}`starwave.tti`: `2D` local approximate pseudo-acoustic qP VTI/TTI; `vp, epsilon, delta, theta`; scalar forcing, full/checkpoint. Included in the [V22 complete-source release](https://github.com/StarrMoonn/StarWave/releases/tag/V22).
 
@@ -993,6 +998,117 @@ This example uses 2D inputs. A 3D call needs all four models shaped `[nx,ny,nz]`
 - For DataParallel, place the complete model in a Module and split acquisition inputs only along the shot dimension; see [Multi-GPU introduction](inversion/dataparallel.md).
 - Interface checks do not rerun numerical or performance acceptance. Backend-specific evidence and untested hardware limits are recorded in the [source validation report](https://github.com/StarrMoonn/StarWave/blob/7145b5306af11615eb50c28a9ef64bb991a0bd97/docs/development/VTI_CPU_TORCH_SAMPLING_20261028.md); no blanket GPU or long-run convergence guarantee is implied.
 
+
+(vti-vrr)=
+## VTI-VRR Function
+
+This addition documents the integrated expanded-Eq. (15) VTI vector-reflectivity operator, not the frozen V19 package. Use matching current source and rebuilt native libraries. It is distinct from conventional `starwave.vti`, isotropic `starwave.vrr` and qP `starwave.tti`; their observations are not interchangeable.
+
+```{py:function} starwave.vti_vrr(c, epsilon, delta, source_amplitudes, source_locations, receiver_locations, *, dx, dz, dt, rx, rz, backend=None, accuracy=2, memory='full', memory_mode=None, formulation='eq15_expanded', boundary='none', free_surface=False, sponge_width=0, sponge_strength=0.0, pml_width=20, pml_max_vel=6000.0, pml_freq=25.0, pml_reflection=1e-6, pml_kappa=5.0, receiver_fields=('sV',), density=None, max_vel=None, cfl_resample=True, freq_taper_frac=0.0, time_pad_frac=0.0, time_taper=False, execution='eager', checkpoint_interval=None, compile_steps=1) -> tuple[torch.Tensor, ...]
+
+Propagate 2D VTI stress/momentum with independently specified vector reflectivity.
+
+:param c: Positive finite speed in m/s, floating tensor [x, z], each dimension at least 3.
+:param epsilon: Finite dimensionless anisotropy [x, z], greater than -0.5.
+:param delta: Finite dimensionless anisotropy [x, z], greater than -0.5; epsilon - delta must be at least -1e-6. Accepted near-elliptic values are not clipped.
+:param source_amplitudes: Stress rate in Pa/s, [shot, source, time]; legacy [shot, time] is accepted for one source.
+:param source_locations: In-bounds int64 [shot, source, 2]; legacy [shot, 2] for one source.
+:param receiver_locations: In-bounds int64 [receiver, 2] shared across shots, or [shot, receiver, 2].
+:param dx: Positive finite x spacing in metres.
+:param dz: Positive finite z spacing in metres.
+:param dt: Positive finite user sampling interval in seconds.
+:param rx: Finite x reflectivity in 1/m, same shape, dtype and device as c.
+:param rz: Finite z reflectivity in 1/m, same shape, dtype and device as c.
+:param backend: None selects native backend from c.device; "native_cpu"/"cpu", "cuda", or explicit "torch". No implicit transfers or silent fallback.
+:param accuracy: Interior wave-derivative stencil order: 2, 4, 6 or 8.
+:param memory: Native "full"/"boundary"; Torch "full"/"checkpoint". Native boundary saving requires boundary="pml".
+:param memory_mode: Optional alias of memory; conflicting explicit values are rejected.
+:param formulation: Only "eq15_expanded" is a production formulation.
+:param boundary: "none" (historical default), "sponge", or "pml". Select "pml" explicitly for absorbing experiments.
+:param free_surface: Explicit flat top traction-free closure; requires boundary="pml".
+:param sponge_width: Sponge thickness in cells, positive and less than half the minimum model dimension when enabled.
+:param sponge_strength: Nonnegative sponge decay rate; nonzero sponge settings require boundary="sponge".
+:param pml_width: Positive scalar cell width or (x_low, x_high, z_low, z_high); free surface uses zero z_low and positive other sides.
+:param pml_max_vel: Fixed velocity scale for CPML profiles in m/s; distinct from max_vel.
+:param pml_freq: CPML reference frequency in Hz.
+:param pml_reflection: CPML target reflection parameter, strictly between 0 and 1.
+:param pml_kappa: CPML stretching parameter, from 1 through 5.
+:param receiver_fields: Unique nonempty sequence from "vx", "vz", "sH", "sV"; default ("sV",).
+:param density: Positive finite kg/m^3 [x, z], required for velocity receivers; readout-only, not a propagation parameter.
+:param max_vel: Optional fixed upper bound on c for CFL planning, not the conventional VTI phase-velocity envelope.
+:param cfl_resample: Default True automatically substeps with source upsampling and receiver downsampling; False rejects an unsafe user dt.
+:param freq_taper_frac: Frequency taper fraction for time resampling.
+:param time_pad_frac: Time padding fraction for time resampling.
+:param time_taper: Whether to apply the resampling time taper.
+:param execution: Torch "eager"/"compile"; native accepts only "eager".
+:param checkpoint_interval: Torch checkpoint chunk length in internal steps; None uses 32. Native requires None.
+:param compile_steps: Torch compilation chunk length in internal steps, default 1; native requires 1.
+:returns: Tuple in exactly receiver_fields order, each tensor [shot, receiver, user_time], on the model device and dtype.
+```
+
+(vti-vrr-conventions)=
+### Materials, source and receiver convention
+
+All floating inputs must match `c` in float32/float64 and CPU/CUDA device; locations are int64 on that device. Models are shared across shots and gradients sum over shots. Repeated receiver indices accumulate their adjoints. Sources inject equally into both normal stresses, multiplied by the **internal dt exactly once**, with no cell-area normalization.
+
+Expanded Eq. (15) retains `K=c**2`, `a=1+2*epsilon`, `b=sqrt(1+2*delta)` and `g_i=D_i(c)/c-2*R_i`. It neither drops the speed-gradient term nor infers a globally integrable density from independent R. Fixed epsilon/delta still affect the physics; their unrequested native gradient buffers are omitted. Differentiable non-leaf material chains remain intact, including c-dependent coefficients and an explicitly supplied `density=Z/c`.
+
+Returns are **always a tuple**: `(sV,) = starwave.vti_vrr(...)` for the default, or `sH, sV, vx, vz = starwave.vti_vrr(..., receiver_fields=("sH", "sV", "vx", "vz"), density=rho)`. Before the receiver extension in the b7 lineage, the default was a bare tensor; legacy callers must unpack or use `[0]`.
+
+The record clock is **(n+1)*user_dt**, not a nominal zero-time sample. Tensile `sH/sV` are in Pa at centers (x,z), not pressure aliases. `vx/vz` are in m/s at (x+1/2,z)/(x,z+1/2), using the corresponding face directly, without spatial interpolation. Old/new momentum averaging aligns velocity with the completed stress step. Face density is the arithmetic mean of adjacent center densities, with edge replication. Density only converts momentum to velocity; it does not change propagation, and stresses ignore it.
+
+(vti-vrr-execution)=
+### Execution, boundaries and differentiation
+
+| Route | Device / precision | Storage | Execution |
+|---|---|---|---|
+| Native CPU/CUDA | CPU/CUDA, float32/float64 | full; boundary with CPML | compiled manual first-order adjoint |
+| Pure Torch AD | CPU/CUDA, float32/float64 | full; checkpoint | eager or compile |
+
+Native boundary storage saves directional core traces, terminal states and sparse outer-shell checkpoints; it replays the outer shell while reverse-reconstructing the lossless core, not damping inversion or AD replay. Small grids need not save memory. Torch checkpointing replays ordinary AD in internal-time chunks; Torch `memory="boundary"` is rejected, not silently translated. Native higher derivatives are unsupported. Compiling a CUDA library is not GPU numerical or performance acceptance.
+
+CPML replicates c/epsilon/delta; normal R is zero outside its physical axis while tangential R is replicated, retaining the padding transpose. `free_surface=True` supports accuracy 2/4/6/8 with side/bottom CPML. Scalar width w becomes (w,w,0,w); explicit widths must have zero top. Top sV is zero; sources and sV receivers must have z >= 1, while sH/vx/vz can use z=0. No topography is implemented.
+
+**Accuracy is the interior wave stencil, not a global PDE convergence promise.** Material-coefficient derivatives D and interpolation A remain second order, and heterogeneous/free-surface closure is not globally eighth order. Time stepping uses the initialized stress-kick/momentum-drift scheme. CFL screening includes anisotropy and speed-gradient/reflectivity terms, but is not a stability proof for arbitrary large or nonintegrable R. CFL extrema, substep ratio and CPML profiles are frozen for differentiation; finite-difference checks must keep the same internal time grid and profiles. Upsampled sources and anti-aliased receivers retain their gradient chains and completed-step phase.
+
+(vti-vrr-example)=
+### Runnable CPU example
+
+No native build is needed for this example; c/Rx/Rz are trainable and anisotropy is independently fixed.
+
+```python
+import torch
+import starwave
+
+dtype = torch.float64
+c = torch.full((16, 18), 2000.0, dtype=dtype, requires_grad=True)
+epsilon = torch.full_like(c, 0.15)  # independently fixed anisotropy
+delta = torch.full_like(c, 0.05)
+rx = torch.zeros_like(c, requires_grad=True)
+rz = torch.zeros_like(c, requires_grad=True)
+source = torch.zeros((1, 1, 32), dtype=dtype)
+source[0, 0, 0] = 1.0e6  # Pa/s, not a stress increment
+source_locations = torch.tensor([[[7, 5]]], dtype=torch.int64)
+receiver_locations = torch.tensor([[6, 5], [8, 5]], dtype=torch.int64)
+density = torch.full_like(c, 2000.0)  # kg/m^3; readout only
+
+sH, sV, vx, vz = starwave.vti_vrr(
+    c, epsilon, delta, source, source_locations, receiver_locations,
+    dx=10.0, dz=10.0, dt=0.0005, rx=rx, rz=rz,
+    backend="torch", execution="eager", memory="full", accuracy=4,
+    boundary="pml", pml_width=4, pml_max_vel=2500.0,
+    max_vel=2500.0, receiver_fields=("sH", "sV", "vx", "vz"),
+    density=density,
+)
+assert sV.shape == (1, 2, 32)
+sV.square().mean().backward()
+assert c.grad is not None and rx.grad is not None and rz.grad is not None
+assert epsilon.grad is None and delta.grad is None
+```
+
+For Torch checkpoint/compile, select `backend="torch", memory="checkpoint", execution="compile", checkpoint_interval=32, compile_steps=2` explicitly; this requires a compatible PyTorch compiler environment. For native CPU or CUDA, explicitly build the matching `vti_vrr` library and restart Python; use matching CPU or CUDA tensors, respectively.
+
+Detailed [API and retained numerical limits](https://github.com/StarrMoonn/StarWave/blob/dev/docs/reference/VTI_VRR_RESEARCH_API.md), [receiver/CFL evidence](https://github.com/StarrMoonn/StarWave/blob/dev/docs/development/VTI_VRR_RECEIVERS_CFL_20261102.md) and [free-surface validation scope](https://github.com/StarrMoonn/StarWave/blob/dev/docs/development/VTI_VRR_FREE_SURFACE_HIGHORDER_VALIDATION_20261101.md) distinguish implementation from device/workload acceptance. Historical strict FP32 near-zero gradient discrepancies remain documented; neither a small example nor recorded A30 runs establish all-device, long-time FWI accuracy.
 
 (tti)=
 ## qP VTI / TTI Function

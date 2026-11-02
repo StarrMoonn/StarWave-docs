@@ -81,6 +81,11 @@ USAGE_NUMBERS = USAGE_NUMBERS[:_tti_insert] + (74,) + USAGE_NUMBERS[_tti_insert:
 _gpr_insert = USAGE_SECTIONS.index('native-runtime')
 USAGE_SECTIONS = USAGE_SECTIONS[:_gpr_insert] + ('gpr', 'gpr-materials', 'gpr-state', 'gpr-storage', 'gpr-callbacks', 'gpr-example', 'gpr-build', 'gpr-scope') + USAGE_SECTIONS[_gpr_insert:]
 USAGE_NUMBERS = USAGE_NUMBERS[:_gpr_insert] + tuple(range(75, 83)) + USAGE_NUMBERS[_gpr_insert:]
+# VTI-VRR addition: preserve every previously published positional anchor.
+_vti_vrr_insert = USAGE_SECTIONS.index('tti')
+VTI_VRR_SECTIONS = ('vti-vrr', 'vti-vrr-conventions', 'vti-vrr-execution', 'vti-vrr-example')
+USAGE_SECTIONS = USAGE_SECTIONS[:_vti_vrr_insert] + VTI_VRR_SECTIONS + USAGE_SECTIONS[_vti_vrr_insert:]
+USAGE_NUMBERS = USAGE_NUMBERS[:_vti_vrr_insert] + tuple(range(83, 87)) + USAGE_NUMBERS[_vti_vrr_insert:]
 MODELING_FRAGMENTS = {'modeling/vrz.md', 'modeling/vti.md'}
 WAVE_SECTIONS = ('wave-propagation', 'wave-vrz', 'wave-vrz-details', 'wave-vrz-limits',
                  'wave-vti', 'wave-vti-details', 'wave-vti-limits')
