@@ -35,25 +35,6 @@ jobs:
       - run: python tools/check_scalar3d_examples.py _build/html
       - run: python tools/check_sls_examples.py _build/html
       - run: python tools/check_wavefield_examples.py _build/html
-      - run: python -m pip install -r docs/requirements-browser.txt
-      - run: python -m playwright install --with-deps chrome
-      - run: python tools/check_free_surface_browser.py --browser-channel chrome
-      - run: python tools/check_browser.py --browser-channel chrome
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: documentation-browser-qa
-          path: _build/qa
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: reconstruction-browser-qa
-          path: |
-            _build/qa/*-reconstruction-top-1440.png
-            _build/qa/*-reconstruction-*-figure-1440.png
-            _build/qa/*-reconstruction-*-figure-320.png
-            _build/qa/*-reconstruction-*-scroll-end-320.png
-            _build/qa/*-reconstruction-*-figure-390-nojs.png
       - uses: actions/upload-artifact@v4
         with:
           name: documentation-html
@@ -77,3 +58,37 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
+
+  browser-acceptance:
+    # Publish the statically validated build first; retain full browser acceptance.
+    if: always() && needs.build.result == 'success' && (needs.deploy.result == 'success' || needs.deploy.result == 'skipped')
+    needs: [build, deploy]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/download-artifact@v4
+        with:
+          name: documentation-html
+          path: _build/html
+      - run: python -m pip install -r docs/requirements-browser.txt
+      - run: python -m playwright install --with-deps chrome
+      - run: python tools/check_free_surface_browser.py --browser-channel chrome
+      - run: python tools/check_browser.py --browser-channel chrome
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: documentation-browser-qa
+          path: _build/qa
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: reconstruction-browser-qa
+          path: |
+            _build/qa/*-reconstruction-top-1440.png
+            _build/qa/*-reconstruction-*-figure-1440.png
+            _build/qa/*-reconstruction-*-figure-320.png
+            _build/qa/*-reconstruction-*-scroll-end-320.png
+            _build/qa/*-reconstruction-*-figure-390-nojs.png
