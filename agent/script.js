@@ -32,3 +32,96 @@
   if (selectHash() < 0) select(0);
   window.addEventListener('hashchange', selectHash);
 })();
+
+/* Lightweight entry animations; content stays visible without JS or motion. */
+(() => {
+  const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  if (!motion.matches && 'IntersectionObserver' in window) {
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.remove('reveal-pending');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, {threshold: 0.08});
+    document.querySelectorAll('[data-reveal]').forEach(element => {
+      if (element.getBoundingClientRect().top >= window.innerHeight) {
+        element.classList.add('reveal-pending');
+        observer.observe(element);
+      }
+    });
+    motion.addEventListener('change', event => {
+      if (event.matches) {
+        observer.disconnect();
+        document.querySelectorAll('.reveal-pending').forEach(element => element.classList.remove('reveal-pending'));
+      }
+    });
+  }
+})();
+
+/* Local static QR: the destination is the public page, never a login token. */
+(() => {
+  const widget = document.querySelector('.qr-widget');
+  const toggle = widget.querySelector('.qr-toggle');
+  const panel = widget.querySelector('.qr-panel');
+  const close = widget.querySelector('.qr-close');
+  const desktop = window.matchMedia('(min-width: 1101px)');
+  function setOpen(open, focus = false) {
+    panel.hidden = !open;
+    toggle.setAttribute('aria-expanded', String(open));
+    if (focus) (open ? close : toggle).focus();
+  }
+  widget.hidden = false;
+  setOpen(desktop.matches && window.scrollY < 120);
+  // The introductory card yields to the gallery when reading begins.
+  function collapseIntro() {
+    if (window.scrollY > 120) {
+      setOpen(false);
+      window.removeEventListener('scroll', collapseIntro);
+    }
+  }
+  window.addEventListener('scroll', collapseIntro, {passive: true});
+  toggle.addEventListener('click', () => setOpen(panel.hidden, true));
+  close.addEventListener('click', () => setOpen(false, true));
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && !panel.hidden) {
+      const focusInside = widget.contains(document.activeElement);
+      setOpen(false, focusInside);
+    }
+  });
+  document.addEventListener('click', event => {
+    if (!panel.hidden && !widget.contains(event.target)) setOpen(false);
+  });
+  desktop.addEventListener('change', () => setOpen(false));
+})();
+
+/* A bounded hero expansion follows native scrolling; never intercept input. */
+(() => {
+  const stage = document.querySelector('.hero-stage');
+  const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const links = Array.from(document.querySelectorAll('.nav nav a[href^="#"]'));
+  let scheduled = false;
+  function render() {
+    scheduled = false;
+    const rect = stage.getBoundingClientRect();
+    const progress = Math.max(0, Math.min(1, (innerHeight - rect.top) / (innerHeight * .75)));
+    stage.style.setProperty('--stage-scale', motion.matches ? '1' : String(.965 + .035 * progress));
+    let current = null;
+    links.forEach(link => {
+      const section = document.querySelector(link.getAttribute('href'));
+      if (section && section.getBoundingClientRect().top <= 150) current = link;
+    });
+    links.forEach(link => {
+      if (link === current) link.setAttribute('aria-current', 'location');
+      else link.removeAttribute('aria-current');
+    });
+  }
+  function requestRender() {
+    if (!scheduled) { scheduled = true; requestAnimationFrame(render); }
+  }
+  window.addEventListener('scroll', requestRender, {passive: true});
+  window.addEventListener('resize', requestRender);
+  motion.addEventListener('change', requestRender);
+  render();
+})();

@@ -1074,6 +1074,12 @@ def check_agent_intro(page, base, output):
         assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
         assert page.locator('a[href^="https://github.com/"]').count() > 0
         assert '私有' in page.locator('#start').inner_text()
+        assert '设计预览' not in page.locator('body').inner_text()
+        assert page.locator('.hero-note').inner_text() == 'Windows · Linux · iOS'
+        assert page.locator('.hero .secondary').inner_text().startswith('探索界面')
+        assert page.locator('.hero .eyebrow span, .workspace-heading .demo-pill, .stage-caption span:nth-child(2)').count() == 0
+        assert '安装包尚未发布' in page.locator('#start .release-note').inner_text()
+        assert '非实测结果' in page.locator('#start .release-note').inner_text()
         page.locator('.hero a[href="#start"]').click()
         assert urlsplit(page.url).fragment == 'start'
         page.screenshot(path=str(output / f'agent-intro-{width}.png'), full_page=True)
@@ -1083,6 +1089,33 @@ def check_agent_intro(page, base, output):
     page.goto(base + 'agent/index.html', wait_until='networkidle')
     assert page.locator('.phone').count() == 4
     assert page.locator('body').evaluate('(e) => getComputedStyle(e).backgroundColor') == 'rgb(255, 255, 255)'
+    page.set_viewport_size({'width': 1440, 'height': 900})
+    page.reload(wait_until='networkidle')
+    assert page.locator('.announcement').is_visible()
+    assert page.locator('.nav nav').bounding_box()['x'] < 400
+    assert page.locator('.qr-panel').is_visible()
+    assert page.locator('.qr-image').get_attribute('src') == 'assets/page-qr.svg'
+    assert page.locator('.qr-panel > a').get_attribute('href') == 'https://starrmoonn.github.io/StarWave-docs/agent/'
+    page.locator('.qr-close').click()
+    assert page.locator('.qr-panel').is_hidden()
+    assert page.locator('.qr-toggle').evaluate('(e) => e === document.activeElement')
+    page.keyboard.press('Enter')
+    assert page.locator('.qr-panel').is_visible()
+    page.keyboard.press('Escape')
+    assert page.locator('.qr-panel').is_hidden()
+    page.locator('.qr-toggle').click()
+    page.locator('h1').click()
+    assert page.locator('.qr-panel').is_hidden()
+    page.locator('.nav a[href="#mobile"]').click()
+    page.wait_for_function("document.querySelector('#mobile .section-heading').classList.contains('reveal-pending') === false")
+    assert page.locator('.nav a[href="#mobile"]').get_attribute('aria-current') == 'location'
+    page.set_viewport_size({'width': 390, 'height': 900})
+    assert page.locator('.qr-widget').is_hidden()
+    page.emulate_media(reduced_motion='reduce')
+    page.reload(wait_until='networkidle')
+    assert page.locator('.reveal-pending').count() == 0
+    assert page.locator('.hero-stage .desktop').evaluate('(e) => getComputedStyle(e).transform') == 'none'
+    page.emulate_media(reduced_motion='no-preference')
     tabs = page.get_by_role('tab')
     assert tabs.count() == 3
     for platform in ('windows', 'linux', 'ios'):
@@ -1112,6 +1145,8 @@ def check_agent_intro(page, base, output):
     plain = plain_context.new_page()
     plain.goto(base + 'agent/index.html')
     assert plain.locator('h1').is_visible()
+    assert plain.locator('.reveal-pending').count() == 0
+    assert plain.locator('.qr-widget').is_hidden()
     assert plain.locator('.platform-panel:visible').count() == 3
     assert plain.locator('.download-button:disabled').count() == 3
     assert plain.evaluate('document.documentElement.scrollWidth <= innerWidth')
