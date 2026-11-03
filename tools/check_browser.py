@@ -1063,7 +1063,8 @@ def check_landing_page(page, base, output):
 
 
 def check_agent_intro(page, base, output):
-    """The public intro is standalone and never contacts a private service."""
+    """Public binary links work without enabling the unreleased platforms."""
+    download = json.loads((PROJECT / "agent/manifest.json").read_text())["downloads"]["windows"]
     for width in (1440, 390, 320):
         page.set_viewport_size({'width': width, 'height': 900})
         page.goto(base + 'zh/index.html', wait_until='networkidle')
@@ -1127,7 +1128,21 @@ def check_agent_intro(page, base, output):
         assert tab.get_attribute('aria-selected') == 'true'
         assert page.locator(f'#panel-{platform}').is_visible()
         assert page.locator('.platform-panel:visible').count() == 1
-        assert page.locator(f'#panel-{platform} button').is_disabled()
+        if platform == 'windows':
+            panel = page.locator('#panel-windows')
+            link = panel.locator('a.download-button')
+            assert link.is_visible() and link.get_attribute('href') == download['url']
+            assert link.get_attribute('aria-disabled') is None
+            assert '0.1.0' in panel.inner_text() and 'Windows x64' in panel.inner_text()
+            assert '已有 StarWave Hub' in panel.inner_text()
+            assert '未签名' in panel.inner_text() and 'SmartScreen' in panel.inner_text()
+            assert panel.locator('a[href$=".sha256"]').get_attribute('href') == download['checksum_url']
+            panel.locator('.checksum-details summary').click()
+            assert panel.locator('.checksum-details code').inner_text() == download['sha256']
+            assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
+        else:
+            assert page.locator(f'#panel-{platform} button').is_disabled()
+            assert page.locator(f'#panel-{platform} a.download-button').count() == 0
     page.locator('#tab-ios').focus()
     page.keyboard.press('ArrowRight')
     assert page.locator('#tab-windows').get_attribute('aria-selected') == 'true'
@@ -1151,7 +1166,9 @@ def check_agent_intro(page, base, output):
     assert plain.locator('.reveal-pending').count() == 0
     assert plain.locator('.qr-widget').is_hidden()
     assert plain.locator('.platform-panel:visible').count() == 3
-    assert plain.locator('.download-button:disabled').count() == 3
+    assert plain.locator('.download-button:disabled').count() == 2
+    assert plain.locator('#panel-windows a.download-button').is_visible()
+    assert plain.locator('#panel-windows a.download-button').get_attribute('href') == download['url']
     assert plain.evaluate('document.documentElement.scrollWidth <= innerWidth')
     plain.locator('#tab-linux').click()
     assert urlsplit(plain.url).fragment == 'panel-linux'
