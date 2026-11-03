@@ -1107,7 +1107,7 @@ def check_agent_intro(page, base, output):
     page.locator('h1').click()
     assert page.locator('.qr-panel').is_hidden()
     page.locator('.nav a[href="#mobile"]').click()
-    page.wait_for_function("document.querySelector('#mobile .section-heading').classList.contains('reveal-pending') === false")
+    page.locator("#mobile .section-heading:not(.reveal-pending)").wait_for(state="visible")
     assert page.locator('.nav a[href="#mobile"]').get_attribute('aria-current') == 'location'
     page.set_viewport_size({'width': 390, 'height': 900})
     assert page.locator('.qr-widget').is_hidden()
