@@ -128,7 +128,7 @@
 
 /* Mobile scenes autoplay only while visible; desktop scenes remain reader-controlled.
    Manual browsing pauses rotation. No timers or animation with reduced motion. */
-document.querySelectorAll('[data-gallery]').forEach(gallery => {
+document.querySelectorAll('[data-gallery]:not(.mobile-gallery)').forEach(gallery => {
   const list = gallery.querySelector('.gallery-tabs');
   const tabs = Array.from(gallery.querySelectorAll('[data-gallery-tab]'));
   const panels = tabs.map(tab => document.getElementById(tab.getAttribute('href').slice(1)));
@@ -212,3 +212,41 @@ document.querySelectorAll('[data-gallery]').forEach(gallery => {
   if (selectHash() < 0) select(0);
   window.addEventListener('hashchange', selectHash);
 });
+
+/* A white, automatic visual story. No mode switcher; reduced motion shows all scenes. */
+(() => {
+  const gallery = document.querySelector('.mobile-gallery');
+  const panels = Array.from(gallery.querySelectorAll('.gallery-panel'));
+  const play = gallery.querySelector('[data-gallery-play]');
+  const controls = gallery.querySelector('.showcase-controls');
+  if (!('IntersectionObserver' in window)) return;
+  const motion = matchMedia('(prefers-reduced-motion: reduce)');
+  let current = 0, timer = null, paused = false, visible = false;
+  function sync() {
+    clearTimeout(timer);
+    gallery.classList.toggle('is-playing', !paused && visible && !document.hidden && !motion.matches);
+    gallery.classList.toggle('is-enhanced', !motion.matches);
+    controls.hidden = motion.matches;
+    panels.forEach((panel, i) => { panel.hidden = !motion.matches && i !== current; });
+    play.textContent = paused ? '播放动画' : '暂停动画';
+    play.setAttribute('aria-label', paused ? '播放动态演示' : '暂停动态演示');
+    play.setAttribute('aria-pressed', String(paused));
+    if (!paused && visible && !document.hidden && !motion.matches) {
+      timer = setTimeout(() => { current = (current + 1) % panels.length; sync(); }, 6500);
+    }
+  }
+  function hash() {
+    const index = panels.findIndex(panel => '#' + panel.id === location.hash);
+    if (index >= 0) { current = index; paused = true; }
+    sync();
+  }
+  play.addEventListener('click', () => { paused = !paused; sync(); });
+  gallery.addEventListener('focusin', event => { if (event.target !== play) { paused = true; sync(); } });
+  motion.addEventListener('change', sync);
+  document.addEventListener('visibilitychange', sync);
+  window.addEventListener('hashchange', hash);
+  if ('IntersectionObserver' in window) new IntersectionObserver(entries => {
+    visible = entries[0].isIntersecting; sync();
+  }, {threshold: .15}).observe(gallery);
+  hash();
+})();
