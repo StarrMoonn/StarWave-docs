@@ -6,7 +6,7 @@ Requires a running preview of the built candidate. Never starts a server.
 from pathlib import Path
 import argparse
 import xml.etree.ElementTree as ET
-from playwright.sync_api import sync_playwright
+from playwright.sync_api import sync_playwright, expect
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -28,6 +28,16 @@ def run(url, browser_path=None, browser_channel='chromium'):
             page.goto(url, wait_until='networkidle')
             assert page.locator('.phones > .phone-figure').count() == 4
             assert page.locator('.gallery-panel').count() == 6
+            mobile = page.locator('.mobile-gallery')
+            assert mobile.locator('.showcase-note').count() == 0
+            assert mobile.locator('.showcase-label').inner_text() == 'iOS'
+            assert mobile.locator('[data-gallery-play]').is_disabled()
+            assert 'is-playing' not in (mobile.get_attribute('class') or '')
+            assert mobile.locator('.gallery-panel:not([hidden]) img').evaluate('(img) => getComputedStyle(img).animationName') == 'none'
+            if width == 1440:
+                assert mobile.locator('.gallery-panel:not([hidden]) img').bounding_box()['width'] >= 360
+            else:
+                assert mobile.locator('.gallery-panel:not([hidden]) img').bounding_box()['width'] >= width - 110
             for gallery in page.locator('[data-gallery]').all():
                 tabs = gallery.locator('[role=tab]')
                 panels = gallery.locator('[role=tabpanel]')
@@ -64,14 +74,63 @@ def run(url, browser_path=None, browser_channel='chromium'):
         for image in page.locator('.gallery-art img').all():
             image.scroll_into_view_if_needed()
         assert page.locator('.phones > .phone-figure').count() == 4
+        assert page.locator('[data-gallery-play]:visible').count() == 0
+        assert page.evaluate('document.documentElement.scrollWidth <= innerWidth + 1')
         page.close()
         page = browser.new_page(viewport={'width':1440,'height':1000})
         page.goto(url + '#mobile-receipt')
         assert page.locator('#mobile-receipt').is_visible()
         assert page.locator('#tab-mobile-receipt').get_attribute('aria-selected') == 'true'
         page.close()
+        # Autoplay uses a controlled browser clock, never sleeps for entire loops.
+        page = browser.new_page(viewport={'width':1440,'height':1000})
+        page.clock.install()
+        page.goto(url)
+        mobile = page.locator('.mobile-gallery')
+        mobile.scroll_into_view_if_needed()
+        expect(mobile).to_have_class('client-gallery mobile-gallery is-enhanced is-playing')
+        page.clock.run_for(6600)
+        expect(page.locator('#tab-mobile-connections')).to_have_attribute('aria-selected', 'true')
+        page.clock.run_for(6600)
+        expect(page.locator('#tab-mobile-receipt')).to_have_attribute('aria-selected', 'true')
+        page.clock.run_for(6600)
+        expect(page.locator('#tab-mobile-tasks')).to_have_attribute('aria-selected', 'true')
+        play = mobile.locator('[data-gallery-play]')
+        play.click()
+        expect(play).to_have_text('播放')
+        page.clock.run_for(15000)
+        expect(page.locator('#tab-mobile-tasks')).to_have_attribute('aria-selected', 'true')
+        play.click()
+        page.clock.run_for(6600)
+        expect(page.locator('#tab-mobile-connections')).to_have_attribute('aria-selected', 'true')
+        page.locator('#tab-mobile-receipt').click()
+        expect(play).to_have_text('播放')
+        page.clock.run_for(10000)
+        expect(page.locator('#tab-mobile-receipt')).to_have_attribute('aria-selected', 'true')
+        play.click()
+        # Dispatch deterministic background/foreground events. Real browser tabs may
+        # stay visible under headless Chromium, so explicitly test the visibility gate.
+        page.evaluate("Object.defineProperty(document, 'hidden', {configurable:true, get:()=>true}); document.dispatchEvent(new Event('visibilitychange'))")
+        assert 'is-playing' not in mobile.get_attribute('class')
+        page.clock.run_for(15000)
+        expect(page.locator('#tab-mobile-receipt')).to_have_attribute('aria-selected', 'true')
+        page.evaluate("Object.defineProperty(document, 'hidden', {configurable:true, get:()=>false}); document.dispatchEvent(new Event('visibilitychange'))")
+        page.clock.run_for(6600)
+        expect(page.locator('#tab-mobile-tasks')).to_have_attribute('aria-selected', 'true')
+        page.emulate_media(reduced_motion='reduce')
+        expect(play).to_be_disabled()
+        page.clock.run_for(10000)
+        expect(page.locator('#tab-mobile-tasks')).to_have_attribute('aria-selected', 'true')
+        page.emulate_media(reduced_motion='no-preference')
+        expect(play).to_be_enabled()
+        # Leaving the scene stops the timer without changing the selected tab.
+        page.locator('.hero h1').scroll_into_view_if_needed()
+        expect(mobile).not_to_have_class('client-gallery mobile-gallery is-enhanced is-playing')
+        page.clock.run_for(15000)
+        expect(page.locator('#tab-mobile-tasks')).to_have_attribute('aria-selected', 'true')
+        page.close()
         browser.close()
-    print('PASS: six SVGs, unique IDs, image loads, 1440/390/320 responsive, tabs, wraparound, Home/End/Space, arrows, no-JS, deep link, no console errors')
+    print('PASS: six SVGs, unique IDs, image loads, 1440/390/320 responsive, tabs, wraparound, Home/End/Space, arrows, no-JS, deep link, no console errors, enlarged mobile stage, autoplay, pause/resume, reduced motion, visibility and offscreen pause')
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

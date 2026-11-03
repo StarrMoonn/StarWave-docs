@@ -1079,8 +1079,10 @@ def check_agent_intro(page, base, output):
         assert page.locator('.hero-note').inner_text() == 'Windows · Linux · iOS'
         assert page.locator('.hero .secondary').inner_text().startswith('探索界面')
         assert page.locator('.hero .eyebrow span, .workspace-heading .demo-pill, .stage-caption span:nth-child(2)').count() == 0
-        assert '安装包尚未发布' in page.locator('#start .release-note').inner_text()
-        assert '非实测结果' in page.locator('#start .release-note').inner_text()
+        assert page.locator('#start .release-note p').count() == 1
+        assert '客户端即将推出，安装包尚未发布' not in page.locator('#start').inner_text()
+        assert '非实测结果' not in page.locator('#start .release-note').inner_text()
+        assert page.locator('#start .release-note a').get_attribute('href') == 'https://github.com/StarrMoonn/StarWave-agent#首次安装与绑定'
         page.locator('.hero a[href="#start"]').click()
         assert urlsplit(page.url).fragment == 'start'
         page.screenshot(path=str(output / f'agent-intro-{width}.png'), full_page=True)

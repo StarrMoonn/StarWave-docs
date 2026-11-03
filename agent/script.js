@@ -126,14 +126,38 @@
   render();
 })();
 
-/* No autoplay: readers control each illustrated client scene. Without JS all remain visible. */
+/* Mobile scenes autoplay only while visible; desktop scenes remain reader-controlled.
+   Manual browsing pauses rotation. No timers or animation with reduced motion. */
 document.querySelectorAll('[data-gallery]').forEach(gallery => {
   const list = gallery.querySelector('.gallery-tabs');
   const tabs = Array.from(gallery.querySelectorAll('[data-gallery-tab]'));
   const panels = tabs.map(tab => document.getElementById(tab.getAttribute('href').slice(1)));
   const live = gallery.querySelector('.gallery-live');
+  const play = gallery.querySelector('[data-gallery-play]');
+  const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const duration = Number(gallery.dataset.autoplay) || 0;
   let current = 0;
+  let timer = null;
+  let paused = false;
+  let inView = false;
   list.setAttribute('role', 'tablist');
+  gallery.classList.add('is-enhanced');
+
+  function syncPlayback() {
+    clearTimeout(timer);
+    timer = null;
+    gallery.classList.remove('is-playing');
+    if (!play) return;
+    play.disabled = motion.matches;
+    play.textContent = motion.matches ? '静态' : paused ? '播放' : '暂停';
+    play.setAttribute('aria-label', motion.matches ? '已按减少动态效果设置停止自动播放' : paused ? '开始自动播放' : '暂停自动播放');
+    if (duration && !paused && !motion.matches && !document.hidden && inView) {
+      // Restart the active scene's progress when resuming; never catch up off-screen.
+      void gallery.offsetWidth;
+      gallery.classList.add('is-playing');
+      timer = setTimeout(() => select(current + 1), duration);
+    }
+  }
   function select(index, focus = false, announce = false) {
     current = (index + tabs.length) % tabs.length;
     tabs.forEach((tab, i) => {
@@ -143,25 +167,46 @@ document.querySelectorAll('[data-gallery]').forEach(gallery => {
     });
     if (focus) tabs[current].focus();
     if (announce) live.textContent = `${current + 1} / ${tabs.length}：${tabs[current].textContent.trim()}`;
+    syncPlayback();
+  }
+  function manual(index, focus = false, announce = false) {
+    paused = true;
+    select(index, focus, announce);
   }
   tabs.forEach((tab, index) => {
     tab.setAttribute('role', 'tab');
     tab.setAttribute('aria-controls', panels[index].id);
     panels[index].setAttribute('role', 'tabpanel');
     panels[index].tabIndex = 0;
-    tab.addEventListener('click', event => { event.preventDefault(); select(index); });
+    tab.addEventListener('click', event => { event.preventDefault(); manual(index); });
     tab.addEventListener('keydown', event => {
       const next = {ArrowRight: index + 1, ArrowLeft: index - 1, Home: 0, End: tabs.length - 1}[event.key];
-      if (next !== undefined) { event.preventDefault(); select(next, true); }
-      else if (event.key === ' ') { event.preventDefault(); select(index, true); }
+      if (next !== undefined) { event.preventDefault(); manual(next, true); }
+      else if (event.key === ' ') { event.preventDefault(); manual(index, true); }
     });
   });
-  gallery.querySelector('[data-gallery-prev]').addEventListener('click', () => select(current - 1, false, true));
-  gallery.querySelector('[data-gallery-next]').addEventListener('click', () => select(current + 1, false, true));
+  gallery.querySelector('[data-gallery-prev]').addEventListener('click', () => manual(current - 1, false, true));
+  gallery.querySelector('[data-gallery-next]').addEventListener('click', () => manual(current + 1, false, true));
   gallery.querySelector('.gallery-arrows').hidden = false;
+  if (play) {
+    play.addEventListener('click', () => { paused = !paused; syncPlayback(); });
+    // Do not replace the scene beneath a keyboard reader. Resume is always explicit.
+    gallery.addEventListener('focusin', event => {
+      if (event.target !== play) { paused = true; syncPlayback(); }
+    });
+    document.addEventListener('visibilitychange', syncPlayback);
+    motion.addEventListener('change', syncPlayback);
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(entries => {
+        inView = entries[0].isIntersecting;
+        syncPlayback();
+      }, {threshold: 0.15}).observe(gallery);
+    }
+    // If visibility observation is unavailable, stay in manual mode.
+  }
   function selectHash() {
     const index = panels.findIndex(panel => `#${panel.id}` === location.hash);
-    if (index >= 0) select(index);
+    if (index >= 0) manual(index);
     return index;
   }
   if (selectHash() < 0) select(0);
