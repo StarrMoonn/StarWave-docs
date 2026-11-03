@@ -1,5 +1,5 @@
 {
-  "scope": "Public introduction, illustrative client UI, and links to the reviewed Windows x64 0.1.0 preview binary release. Linux and iOS clients are not released. Private implementation and configuration excluded.",
+  "scope": "Public introduction, illustrative client UI, and links to the reviewed Windows x64 0.1.6 preview binary release. Linux and iOS clients are not released. Private implementation and configuration excluded.",
   "sha256": {
     "assets/favicon.svg": "5086825616f0c8073c7e0ba6b55652e42f8f3e60cb2052cf9324c3bea11c748b",
     "assets/gallery/desktop-comparison.svg": "21cead680bcb49b65878522dc773a062399c1bec5b7138a6748a930990256451",
@@ -10,24 +10,30 @@
     "assets/gallery/mobile-tasks.svg": "20cdbb830731f16c37420acc147a9ee262f16404c4c437bb0bcf12145788300f",
     "assets/icon.svg": "c16c30bd242365649db97301e58ca05c0096f440e968a77942e7e0396447dc15",
     "assets/page-qr.svg": "5bd7b80172bd0d6840d69e78288be3b0519003e2b6746c44237df9abcda8d002",
-    "index.html": "d6dda1e89be5862505aaa24e41a15cb21d179371b629f92603c1d5671ee91f50",
+    "index.html": "df08a84dd9fba84943051049b38e722da8cddde6918ccb7b1788c754cf045c25",
     "script.js": "6095ec0791b2b6669480f3b94d41a94b10561c3cf1aef18f7e4ca30da4324b61",
     "style.css": "3e332bc28965b1329642d5fd27cab529d12338535dfb05530e5672a9c7a0ea5f"
   },
   "downloads": {
     "windows": {
-      "version": "0.1.0",
+      "version": "0.1.6",
       "channel": "preview",
       "architecture": "x64",
       "format": "portable-zip",
-      "url": "https://github.com/StarrMoonn/StarWave-docs/releases/download/agent-windows-v0.1.0-preview.1/StarWave-WPF-0.1.0-win-x64.zip",
-      "checksum_url": "https://github.com/StarrMoonn/StarWave-docs/releases/download/agent-windows-v0.1.0-preview.1/StarWave-WPF-0.1.0-win-x64.zip.sha256",
-      "release_url": "https://github.com/StarrMoonn/StarWave-docs/releases/tag/agent-windows-v0.1.0-preview.1",
-      "size_bytes": 62213177,
-      "sha256": "d5700421b73451a6113fb2d4aa4309979b9936807b40c442e543e8e4d46ad9ca",
-      "source_commit": "4a954665d1c37ac9e890ae17617bfd987ebe0501",
+      "url": "https://github.com/StarrMoonn/StarWave-docs/releases/download/agent-windows-v0.1.6-preview.1/StarWave-WPF-0.1.6-win-x64.zip",
+      "checksum_url": "https://github.com/StarrMoonn/StarWave-docs/releases/download/agent-windows-v0.1.6-preview.1/StarWave-WPF-0.1.6-win-x64.zip.sha256",
+      "release_url": "https://github.com/StarrMoonn/StarWave-docs/releases/tag/agent-windows-v0.1.6-preview.1",
+      "size_bytes": 62284350,
+      "sha256": "5bbbc74054a54b3471519c88c3392a2517c7f4824911cb6d428f02a30e8e1aa7",
+      "source_commit": "4cadfbf8c104e46c90344cb68dd451718c43c0cc",
       "requires_existing_hub": true,
-      "code_signed": false
+      "code_signed": false,
+      "feature_requirements": {
+        "project_rename": {
+          "hub_tool": "rename_project",
+          "introduced_in_branch_hub_version": "0.14.7"
+        }
+      }
     },
     "linux": {
       "released": false

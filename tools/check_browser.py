@@ -1133,8 +1133,10 @@ def check_agent_intro(page, base, output):
             link = panel.locator('a.download-button')
             assert link.is_visible() and link.get_attribute('href') == download['url']
             assert link.get_attribute('aria-disabled') is None
-            assert '0.1.0' in panel.inner_text() and 'Windows x64' in panel.inner_text()
+            assert download['version'] in panel.inner_text() and 'Windows x64' in panel.inner_text()
             assert '已有 StarWave Hub' in panel.inner_text()
+            assert 'rename_project' in panel.inner_text() and '0.14.7' in panel.inner_text()
+            assert '不会自动更新 Hub' in panel.inner_text()
             assert '未签名' in panel.inner_text() and 'SmartScreen' in panel.inner_text()
             assert panel.locator('a[href$=".sha256"]').get_attribute('href') == download['checksum_url']
             panel.locator('.checksum-details summary').click()
