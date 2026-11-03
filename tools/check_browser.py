@@ -10,6 +10,7 @@ import threading
 import time
 from urllib.parse import parse_qsl, quote, unquote, urlsplit
 from playwright.sync_api import sync_playwright
+from check_agent_gallery import run as check_agent_gallery
 
 PROJECT = Path(__file__).resolve().parents[1]
 GPR_SECTIONS = ('gpr', 'gpr-materials', 'gpr-state', 'gpr-storage', 'gpr-callbacks', 'gpr-example', 'gpr-build', 'gpr-scope')
@@ -1370,6 +1371,7 @@ def check(root, browser_path=None, browser_channel="chromium"):
                 # Form navigation works without JS; Sphinx result rendering still requires JS.
             context.close()
             browser.close()
+        check_agent_gallery(base + 'agent/', browser_path, browser_channel)
         assert not errors, errors
         print('PASS: flat desktop/mobile navigation, Usage TOC and API fields, reconstruction figures and readable scrolling, search, direct legacy routes, language anchors, history, keyboard, PDF preview/download, and no-JS fallback.')
     finally:

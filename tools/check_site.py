@@ -467,7 +467,7 @@ def check(root):
             if fwi.id_sections.get(alias) != target:
                 errors.append(f'Legacy FWI anchor drift: {locale}/{alias}')
 
-    # Only the selected, unchanged public logo assets may enter the site.
+    # Only the approved concept-04 production logo assets may enter the site.
     brand_dir = project / 'docs' / '_static' / 'brand'
     brand_manifest = json.loads((brand_dir / 'manifest.json').read_text())
     brand_names = {'starwave-main.svg', 'starwave-icon-white.svg', 'starwave-favicon.png'}
@@ -499,6 +499,32 @@ def check(root):
                 errors.append(f'Invalid brand SVG: {path.name}')
         elif data[:8] != b'\x89PNG\r\n\x1a\n' or struct.unpack('>II', data[16:24]) != (32, 32):
             errors.append('Favicon is not the selected 32px PNG')
+    # All public surfaces use the same mark; the favicon is an intentional
+    # simplified vector, never a raster embedded into an SVG wrapper.
+    canonical_icon = (project / 'agent/assets/icon.svg').read_bytes()
+    for relative in ('landing/assets/brand-icon.svg',):
+        if (project / relative).read_bytes() != canonical_icon:
+            errors.append(f'Inconsistent concept-04 icon: {relative}')
+    colored_paths = [element.get('d') for element in ET.fromstring(canonical_icon).findall('{http://www.w3.org/2000/svg}path')]
+    white_paths = ET.fromstring((brand_dir / 'starwave-icon-white.svg').read_bytes()).findall('{http://www.w3.org/2000/svg}path')
+    if [element.get('d') for element in white_paths] != colored_paths or any(element.get('fill') != '#ffffff' for element in white_paths):
+        errors.append('White sidebar icon must retain the concept-04 silhouette')
+    favicon_svg = ET.fromstring((project / 'agent/assets/favicon.svg').read_bytes())
+    if len(favicon_svg.findall('{http://www.w3.org/2000/svg}path')) != 3:
+        errors.append('Small-size logo must contain one wavefront, wave and star')
+    for element in favicon_svg.iter():
+        tag = element.tag.rsplit('}', 1)[-1]
+        if tag in {'script', 'foreignObject', 'image', 'use', 'style'}:
+            errors.append(f'Unsafe favicon SVG element: {tag}')
+        for key, value in element.attrib.items():
+            if key.lower().startswith('on') or 'href' in key.lower():
+                errors.append(f'Active favicon SVG attribute: {key}')
+            if 'url(' in value and not re.fullmatch(r'url\(#[A-Za-z0-9_-]+\)', value):
+                errors.append(f'External favicon SVG reference: {key}')
+    if '✳' in (project / 'agent/index.html').read_text():
+        errors.append('Agent mockups retain placeholder brand symbols')
+    if 'Bitstream Vera is a trademark' not in (brand_dir / 'starwave-main.svg').read_text():
+        errors.append('Outlined wordmark is missing its font license')
     for locale in ('zh', 'en'):
         homepage = (root / locale / 'index.html').read_text()
         if 'sw-api-overview' in homepage or '<table' in homepage:

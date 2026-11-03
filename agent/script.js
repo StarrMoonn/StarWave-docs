@@ -125,3 +125,45 @@
   motion.addEventListener('change', requestRender);
   render();
 })();
+
+/* No autoplay: readers control each illustrated client scene. Without JS all remain visible. */
+document.querySelectorAll('[data-gallery]').forEach(gallery => {
+  const list = gallery.querySelector('.gallery-tabs');
+  const tabs = Array.from(gallery.querySelectorAll('[data-gallery-tab]'));
+  const panels = tabs.map(tab => document.getElementById(tab.getAttribute('href').slice(1)));
+  const live = gallery.querySelector('.gallery-live');
+  let current = 0;
+  list.setAttribute('role', 'tablist');
+  function select(index, focus = false, announce = false) {
+    current = (index + tabs.length) % tabs.length;
+    tabs.forEach((tab, i) => {
+      tab.setAttribute('aria-selected', String(i === current));
+      tab.tabIndex = i === current ? 0 : -1;
+      panels[i].hidden = i !== current;
+    });
+    if (focus) tabs[current].focus();
+    if (announce) live.textContent = `${current + 1} / ${tabs.length}：${tabs[current].textContent.trim()}`;
+  }
+  tabs.forEach((tab, index) => {
+    tab.setAttribute('role', 'tab');
+    tab.setAttribute('aria-controls', panels[index].id);
+    panels[index].setAttribute('role', 'tabpanel');
+    panels[index].tabIndex = 0;
+    tab.addEventListener('click', event => { event.preventDefault(); select(index); });
+    tab.addEventListener('keydown', event => {
+      const next = {ArrowRight: index + 1, ArrowLeft: index - 1, Home: 0, End: tabs.length - 1}[event.key];
+      if (next !== undefined) { event.preventDefault(); select(next, true); }
+      else if (event.key === ' ') { event.preventDefault(); select(index, true); }
+    });
+  });
+  gallery.querySelector('[data-gallery-prev]').addEventListener('click', () => select(current - 1, false, true));
+  gallery.querySelector('[data-gallery-next]').addEventListener('click', () => select(current + 1, false, true));
+  gallery.querySelector('.gallery-arrows').hidden = false;
+  function selectHash() {
+    const index = panels.findIndex(panel => `#${panel.id}` === location.hash);
+    if (index >= 0) select(index);
+    return index;
+  }
+  if (selectHash() < 0) select(0);
+  window.addEventListener('hashchange', selectHash);
+});

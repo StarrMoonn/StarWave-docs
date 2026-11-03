@@ -1,63 +1,84 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="950" height="645" viewBox="0 0 950 645" role="img" aria-labelledby="title desc">
-<title id="title">StarWave — primary stacked logo</title><desc id="desc">Vector reconstruction from the approved raster concept. Bezier path outlines and reconstructed gradients; not original vector source. Raster texture is simplified. All lettering is outlined.</desc>
-<defs>
-<linearGradient id="starBase" x1="76" y1="150" x2="446" y2="249" gradientUnits="userSpaceOnUse">
- <stop offset="0" stop-color="#061B36"/><stop offset=".48" stop-color="#034372"/><stop offset="1" stop-color="#05AACA"/>
-</linearGradient>
-<linearGradient id="starTop" x1="256" y1="23" x2="256" y2="260" gradientUnits="userSpaceOnUse">
- <stop offset="0" stop-color="#092655" stop-opacity=".98"/><stop offset=".55" stop-color="#092655" stop-opacity=".3"/><stop offset="1" stop-color="#092655" stop-opacity="0"/>
-</linearGradient>
-<linearGradient id="waveBand" x1="75" y1="260" x2="439" y2="260" gradientUnits="userSpaceOnUse">
- <stop offset="0" stop-color="#168DB9"/><stop offset=".16" stop-color="#075789"/><stop offset=".47" stop-color="#007AA5"/><stop offset=".53" stop-color="#09A7BB"/><stop offset=".76" stop-color="#07638D"/><stop offset="1" stop-color="#04364D"/>
-</linearGradient>
-<linearGradient id="waveShade" x1="256" y1="165" x2="256" y2="297" gradientUnits="userSpaceOnUse">
- <stop offset="0" stop-color="#003A5F" stop-opacity=".65"/><stop offset=".75" stop-color="#003A5F" stop-opacity="0"/><stop offset="1" stop-color="#05A9B9" stop-opacity=".12"/>
-</linearGradient>
-<linearGradient id="layer2" x1="124" y1="314" x2="390" y2="314" gradientUnits="userSpaceOnUse">
- <stop offset="0" stop-color="#B1D9DD"/><stop offset=".22" stop-color="#52ACC1"/><stop offset=".52" stop-color="#0180A1"/><stop offset=".84" stop-color="#075073"/><stop offset="1" stop-color="#061D33"/>
-</linearGradient>
-<linearGradient id="layer3" x1="161" y1="346" x2="353" y2="346" gradientUnits="userSpaceOnUse">
- <stop offset="0" stop-color="#B8DADF"/><stop offset=".2" stop-color="#84BFC9"/><stop offset=".5" stop-color="#4A9BAF"/><stop offset=".81" stop-color="#196385"/><stop offset="1" stop-color="#072D47"/>
-</linearGradient>
-<linearGradient id="layer4" x1="191" y1="382" x2="323" y2="382" gradientUnits="userSpaceOnUse">
- <stop offset="0" stop-color="#BDD8DB"/><stop offset=".45" stop-color="#A1C7CE"/><stop offset=".76" stop-color="#70A7B6"/><stop offset="1" stop-color="#36748E"/>
-</linearGradient>
-<linearGradient id="layer5" x1="223" y1="421" x2="292" y2="421" gradientUnits="userSpaceOnUse">
- <stop offset="0" stop-color="#BED1D5"/><stop offset=".53" stop-color="#A7BEC7"/><stop offset="1" stop-color="#789DAE"/>
-</linearGradient>
-<linearGradient id="wordBlue" x1="560" y1="15" x2="560" y2="145" gradientUnits="userSpaceOnUse">
- <stop offset="0" stop-color="#087DAA"/><stop offset="1" stop-color="#005372"/>
-</linearGradient>
-<linearGradient id="appBg" x1=".08" y1="0" x2=".9" y2="1">
- <stop offset="0" stop-color="#24374D"/><stop offset=".42" stop-color="#081D31"/><stop offset="1" stop-color="#031421"/>
-</linearGradient>
-<radialGradient id="appGlow" cx=".4" cy=".28" r=".73">
- <stop offset="0" stop-color="#224A64" stop-opacity=".34"/><stop offset="1" stop-color="#224A64" stop-opacity="0"/>
-</radialGradient>
+<svg xmlns="http://www.w3.org/2000/svg" width="950" height="645" viewBox="0 0 950 645" role="img" aria-labelledby="title desc"><title id="title">StarWave — concept 04</title><desc id="desc">Production vector interpretation of the user-selected AI-generated concept 04. Open cyan, blue and violet wavefronts, a flowing wave and coral star. DejaVu Sans lettering converted to outlines.</desc><metadata>Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: DejaVu fonts
+Upstream-Author: Stepan Roh &lt;src@users.sourceforge.net&gt; (original author),
+                  see /usr/share/doc/fonts-dejavu-core/AUTHORS for full list
+Source: https://dejavu-fonts.github.io/
 
-<linearGradient id="appStarBase" x1="76" y1="150" x2="446" y2="249" gradientUnits="userSpaceOnUse">
- <stop offset="0" stop-color="#126EA8"/><stop offset=".48" stop-color="#168DBD"/><stop offset="1" stop-color="#1ABBD1"/>
-</linearGradient>
-<linearGradient id="appStarTop" x1="256" y1="23" x2="256" y2="260" gradientUnits="userSpaceOnUse">
- <stop offset="0" stop-color="#64B8F2" stop-opacity=".96"/><stop offset=".5" stop-color="#429CD6" stop-opacity=".35"/><stop offset="1" stop-color="#1B83B2" stop-opacity="0"/>
-</linearGradient>
-<linearGradient id="appWaveBand" x1="75" y1="260" x2="439" y2="260" gradientUnits="userSpaceOnUse">
- <stop offset="0" stop-color="#2198C0"/><stop offset=".5" stop-color="#42C6D2"/><stop offset="1" stop-color="#167693"/>
-</linearGradient>
-<linearGradient id="appWaveShade" x1="256" y1="165" x2="256" y2="297" gradientUnits="userSpaceOnUse">
- <stop offset="0" stop-color="#06537B" stop-opacity=".25"/><stop offset=".7" stop-color="#06537B" stop-opacity="0"/><stop offset="1" stop-color="#32BED0" stop-opacity=".08"/>
-</linearGradient>
-<linearGradient id="appLayer2" x1="124" y1="314" x2="390" y2="314" gradientUnits="userSpaceOnUse">
- <stop offset="0" stop-color="#74D3D9"/><stop offset=".5" stop-color="#55C0CF"/><stop offset="1" stop-color="#245D7F"/>
-</linearGradient>
-<linearGradient id="appLayer3" x1="161" y1="346" x2="353" y2="346" gradientUnits="userSpaceOnUse">
- <stop offset="0" stop-color="#8BCED6"/><stop offset=".5" stop-color="#68B3C4"/><stop offset="1" stop-color="#376F8D"/>
-</linearGradient>
-<linearGradient id="appLayer4" x1="191" y1="382" x2="323" y2="382" gradientUnits="userSpaceOnUse">
- <stop offset="0" stop-color="#9DC9D2"/><stop offset=".5" stop-color="#7FAFBF"/><stop offset="1" stop-color="#457C97"/>
-</linearGradient>
-<linearGradient id="appLayer5" x1="223" y1="421" x2="292" y2="421" gradientUnits="userSpaceOnUse">
- <stop offset="0" stop-color="#9ABFC9"/><stop offset=".5" stop-color="#86AEBD"/><stop offset="1" stop-color="#5C8CA3"/>
-</linearGradient>
-</defs><g transform="translate(218,6)"><path d="M256 23 C246 49 235 82 222 113 C207 150 194 175 169 191 C136 212 77 231 25 241 C22 241.6 22 243 26 244 C79 251 124 246 155 232 C170 225 177 217 186 218 C197 219 207 235 217 255 C225 235 232 204 239 178 L247 148 C250 138 253 134 257 134 C265 134 269 146 273 163 L286 217 C290 233 293 246 297 255 C307 235 317 218 327 218 C336 218 344 224 356 231 C389 249 441 252 488 244 C492 243 492 241 488 240 C434 226 377 210 344 189 C319 173 307 151 294 121 C279 86 268 51 259 25 C258 22 257 21 256 23 Z" fill="url(#starBase)"/><path d="M256 23 C246 49 235 82 222 113 C207 150 194 175 169 191 C136 212 77 231 25 241 C22 241.6 22 243 26 244 C79 251 124 246 155 232 C170 225 177 217 186 218 C197 219 207 235 217 255 C225 235 232 204 239 178 L247 148 C250 138 253 134 257 134 C265 134 269 146 273 163 L286 217 C290 233 293 246 297 255 C307 235 317 218 327 218 C336 218 344 224 356 231 C389 249 441 252 488 244 C492 243 492 241 488 240 C434 226 377 210 344 189 C319 173 307 151 294 121 C279 86 268 51 259 25 C258 22 257 21 256 23 Z" fill="url(#starTop)"/><path d="M75 259 C109 266 141 255 164 242 C175 235 180 231 185 234 C192 238 200 259 207 269 C212 277 220 278 226 271 C238 258 248 196 257 163 C262 184 268 211 274 237 C279 256 285 274 295 275 C307 276 313 259 320 245 C325 234 329 231 335 235 C365 257 400 266 439 259 L419 268 C389 276 351 279 322 285 C297 292 278 297 257 297 C234 297 213 293 192 287 C157 279 128 276 109 274 Z" fill="url(#waveBand)"/><path d="M75 259 C109 266 141 255 164 242 C175 235 180 231 185 234 C192 238 200 259 207 269 C212 277 220 278 226 271 C238 258 248 196 257 163 C262 184 268 211 274 237 C279 256 285 274 295 275 C307 276 313 259 320 245 C325 234 329 231 335 235 C365 257 400 266 439 259 L419 268 C389 276 351 279 322 285 C297 292 278 297 257 297 C234 297 213 293 192 287 C157 279 128 276 109 274 Z" fill="url(#waveShade)"/><path d="M124 282 C166 290 212 315 257 315 C302 315 344 289 390 282 L365 300 C332 310 291 343 257 343 C222 343 188 319 148 301 Z" fill="url(#layer2)"/><path d="M161 312 C191 325 222 351 257 351 C294 351 326 322 353 312 L335 335 C309 349 283 377 257 377 C231 377 208 357 182 339 Z" fill="url(#layer3)"/><path d="M191 350 C213 366 235 385 257 385 C280 385 302 365 323 350 L307 375 C291 392 274 410 257 410 C240 410 221 390 207 372 Z" fill="url(#layer4)"/><path d="M223 401 C235 413 247 418 257 418 C269 418 281 411 292 401 L278 425 C270 438 264 444 257 444 C249 444 243 437 236 425 Z" fill="url(#layer5)"/></g><g transform="translate(47,457)"><path d="M119 15 H70 C46 15 31 31 31 53 C31 74 44 84 68 92 L83 97 C98 102 106 108 106 116 C106 123 98 126 84 126 H34 V145 H82 C111 145 128 132 128 109 C128 89 112 81 89 73 L72 67 C59 63 53 58 53 50 C53 40 61 33 73 33 H119 Z M145 25 H166 V54 H198 V73 H166 V111 C166 122 171 127 181 127 C186 127 190 126 194 125 V143 C187 145 181 146 175 146 C155 146 145 136 145 113 Z M207 145 L246 54 H267 L307 145 H284 L257 77 L229 145 Z M319 54 H340 V72 C346 60 357 52 374 53 V74 H367 C349 74 340 86 340 104 V145 H319 Z" fill="#071B2B" fill-rule="evenodd"/><path d="M381 15 H404 L430 110 L459 15 H475 L503 110 L532 15 H555 L516 145 H494 L467 55 L439 145 H418 Z M559 62 C572 56 584 53 598 53 C621 53 634 67 634 91 V145 H613 V132 C605 142 593 147 580 147 C562 147 551 136 551 119 C551 101 566 89 589 89 C598 89 606 90 613 93 V89 C613 77 606 72 595 72 C585 72 576 75 568 79 Z M613 107 C606 105 599 103 590 103 C578 103 572 109 572 118 C572 127 578 132 587 132 C602 132 613 123 613 110 Z M640 54 H663 L689 120 L714 54 H738 L700 145 H678 Z M827 106 H760 C762 122 773 129 788 129 C799 129 807 125 815 120 L829 134 C818 143 804 147 788 147 C758 147 738 128 738 101 C738 73 757 53 784 53 C810 53 827 73 827 100 Z M760 91 H806 C804 77 797 70 784 70 C772 70 763 78 760 91 Z" fill="url(#wordBlue)" fill-rule="evenodd"/></g></svg>
+Files: *
+Copyright: Copyright (c) 2003 by Bitstream, Inc. All Rights Reserved.
+ Bitstream Vera is a trademark of Bitstream, Inc.
+ DejaVu changes are in public domain.
+License: bitstream-vera
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of the fonts accompanying this license (&quot;Fonts&quot;) and associated
+ documentation files (the &quot;Font Software&quot;), to reproduce and distribute the
+ Font Software, including without limitation the rights to use, copy, merge,
+ publish, distribute, and/or sell copies of the Font Software, and to permit
+ persons to whom the Font Software is furnished to do so, subject to the
+ following conditions:
+ .
+ The above copyright and trademark notices and this permission notice shall
+ be included in all copies of one or more of the Font Software typefaces.
+ .
+ The Font Software may be modified, altered, or added to, and in particular
+ the designs of glyphs or characters in the Fonts may be modified and
+ additional glyphs or characters may be added to the Fonts, only if the fonts
+ are renamed to names not containing either the words &quot;Bitstream&quot; or the word
+ &quot;Vera&quot;.
+ .
+ This License becomes null and void to the extent applicable to Fonts or Font
+ Software that has been modified and is distributed under the &quot;Bitstream
+ Vera&quot; names.
+ .
+ The Font Software may be sold as part of a larger software package but no
+ copy of one or more of the Font Software typefaces may be sold by itself.
+ .
+ THE FONT SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS
+ OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF COPYRIGHT, PATENT,
+ TRADEMARK, OR OTHER RIGHT. IN NO EVENT SHALL BITSTREAM OR THE GNOME
+ FOUNDATION BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, INCLUDING
+ ANY GENERAL, SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL DAMAGES,
+ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF
+ THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM OTHER DEALINGS IN THE
+ FONT SOFTWARE.
+ .
+ Except as contained in this notice, the names of Gnome, the Gnome
+ Foundation, and Bitstream Inc., shall not be used in advertising or
+ otherwise to promote the sale, use or other dealings in this Font Software
+ without prior written authorization from the Gnome Foundation or Bitstream
+ Inc., respectively. For further information, contact: fonts at gnome dot
+ org.
+
+Files: debian/*
+Copyright: (C) 2005-2006 Peter Cernak &lt;pce@users.sourceforge.net&gt;
+           (C) 2006-2011 Davide Viti &lt;zinosat@tiscali.it&gt;
+           (C) 2011-2013 Christian Perrier &lt;bubulle@debian.org&gt;
+           (C) 2013 Fabian Greffrath &lt;fabian+debian@greffrath.com&gt;
+License: GPL-2+
+ This program is free software; you can redistribute it
+ and/or modify it under the terms of the GNU General Public
+ License as published by the Free Software Foundation; either
+ version 2 of the License, or (at your option) any later
+ version.
+ .
+ This program is distributed in the hope that it will be
+ useful, but WITHOUT ANY WARRANTY; without even the implied
+ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the GNU General Public License for more
+ details.
+ .
+ You should have received a copy of the GNU General Public
+ License along with this package; if not, write to the Free
+ Software Foundation, Inc., 51 Franklin St, Fifth Floor,
+ Boston, MA  02110-1301 USA
+ .
+ On Debian systems, the full text of the GNU General Public
+ License version 2 can be found in the file
+ /usr/share/common-licenses/GPL-2&#x27;.
+</metadata><defs>
+<linearGradient id="outer" x1="130" y1="250" x2="395" y2="250" gradientUnits="userSpaceOnUse"><stop stop-color="#30dce9"/><stop offset=".38" stop-color="#059bff"/><stop offset=".67" stop-color="#2447ff"/><stop offset="1" stop-color="#b45aff"/></linearGradient>
+<linearGradient id="inner" x1="167" y1="250" x2="345" y2="250" gradientUnits="userSpaceOnUse"><stop stop-color="#78e8ef"/><stop offset=".48" stop-color="#32a9ff"/><stop offset="1" stop-color="#9873ff"/></linearGradient>
+<linearGradient id="wave" x1="110" y1="240" x2="455" y2="240" gradientUnits="userSpaceOnUse"><stop stop-color="#20dce5"/><stop offset=".27" stop-color="#049fff"/><stop offset=".53" stop-color="#1749ff"/><stop offset=".74" stop-color="#a05cf3"/><stop offset="1" stop-color="#ff927c"/></linearGradient>
+<linearGradient id="star" x1="370" y1="135" x2="401" y2="175" gradientUnits="userSpaceOnUse"><stop stop-color="#ff6574"/><stop offset="1" stop-color="#ff9a7b"/></linearGradient>
+</defs><g transform="translate(65 -68) scale(1.45)"><path d="M367 124 C304 66 203 100 158 163 C111 229 119 295 169 346 C226 405 309 392 358 350 C379 332 393 306 398 286 C399 282 396 281 394 285 C365 354 295 391 223 361 C156 332 131 259 158 197 C193 116 293 81 365 127 C368 129 369 126 367 124 Z" fill="url(#outer)"/><path d="M341 159 C283 119 213 150 183 197 C153 244 173 305 217 334 C257 360 308 355 342 333 C303 351 264 346 231 326 C191 302 176 256 192 218 C217 158 282 129 341 159 Z" fill="url(#inner)"/><path d="M110 273 C128 245 146 235 168 252 C188 268 198 280 215 263 C235 243 245 205 273 205 C306 202 315 242 333 262 C352 288 371 253 390 236 C417 212 439 222 455 248 C434 232 415 238 394 258 C371 280 356 295 333 286 C307 277 298 240 281 225 C263 207 251 238 234 260 C218 286 199 291 180 280 C152 262 138 257 110 273 Z" fill="url(#wave)"/><path d="M384 130 C386 148 390 153 409 155 C391 158 387 162 384 181 C382 162 377 158 359 155 C377 153 382 148 384 130 Z" fill="url(#star)"/></g><g fill="#2c323b" transform="translate(210 600) scale(0.053255627009646304 -0.053255627009646304)"><path transform="translate(0 0)" d="M1096 1444V1247Q981 1302 879.0 1329.0Q777 1356 682 1356Q517 1356 427.5 1292.0Q338 1228 338 1110Q338 1011 397.5 960.5Q457 910 623 879L745 854Q971 811 1078.5 702.5Q1186 594 1186 412Q1186 195 1040.5 83.0Q895 -29 614 -29Q508 -29 388.5 -5.0Q269 19 141 66V274Q264 205 382.0 170.0Q500 135 614 135Q787 135 881.0 203.0Q975 271 975 397Q975 507 907.5 569.0Q840 631 686 662L563 686Q337 731 236.0 827.0Q135 923 135 1094Q135 1292 274.5 1406.0Q414 1520 659 1520Q764 1520 873.0 1501.0Q982 1482 1096 1444Z"/><path transform="translate(1300 0)" d="M375 1438V1120H754V977H375V369Q375 232 412.5 193.0Q450 154 565 154H754V0H565Q352 0 271.0 79.5Q190 159 190 369V977H55V1120H190V1438Z"/><path transform="translate(2103 0)" d="M702 563Q479 563 393.0 512.0Q307 461 307 338Q307 240 371.5 182.5Q436 125 547 125Q700 125 792.5 233.5Q885 342 885 522V563ZM1069 639V0H885V170Q822 68 728.0 19.5Q634 -29 498 -29Q326 -29 224.5 67.5Q123 164 123 326Q123 515 249.5 611.0Q376 707 627 707H885V725Q885 852 801.5 921.5Q718 991 567 991Q471 991 380.0 968.0Q289 945 205 899V1069Q306 1108 401.0 1127.5Q496 1147 586 1147Q829 1147 949.0 1021.0Q1069 895 1069 639Z"/><path transform="translate(3358 0)" d="M842 948Q811 966 774.5 974.5Q738 983 694 983Q538 983 454.5 881.5Q371 780 371 590V0H186V1120H371V946Q429 1048 522.0 1097.5Q615 1147 748 1147Q767 1147 790.0 1144.5Q813 1142 841 1137Z"/><path transform="translate(4200 0)" d="M68 1493H272L586 231L899 1493H1126L1440 231L1753 1493H1958L1583 0H1329L1014 1296L696 0H442Z"/><path transform="translate(6225 0)" d="M702 563Q479 563 393.0 512.0Q307 461 307 338Q307 240 371.5 182.5Q436 125 547 125Q700 125 792.5 233.5Q885 342 885 522V563ZM1069 639V0H885V170Q822 68 728.0 19.5Q634 -29 498 -29Q326 -29 224.5 67.5Q123 164 123 326Q123 515 249.5 611.0Q376 707 627 707H885V725Q885 852 801.5 921.5Q718 991 567 991Q471 991 380.0 968.0Q289 945 205 899V1069Q306 1108 401.0 1127.5Q496 1147 586 1147Q829 1147 949.0 1021.0Q1069 895 1069 639Z"/><path transform="translate(7480 0)" d="M61 1120H256L606 180L956 1120H1151L731 0H481Z"/><path transform="translate(8692 0)" d="M1151 606V516H305Q317 326 419.5 226.5Q522 127 705 127Q811 127 910.5 153.0Q1010 179 1108 231V57Q1009 15 905.0 -7.0Q801 -29 694 -29Q426 -29 269.5 127.0Q113 283 113 549Q113 824 261.5 985.5Q410 1147 662 1147Q888 1147 1019.5 1001.5Q1151 856 1151 606ZM967 660Q965 811 882.5 901.0Q800 991 664 991Q510 991 417.5 904.0Q325 817 311 659Z"/></g></svg>

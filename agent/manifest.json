@@ -1,10 +1,17 @@
 {
   "scope": "Public client design previews only. All depicted tasks and data are illustrative; downloads are not yet available. Private implementation excluded.",
   "sha256": {
-    "assets/icon.svg": "9d594960d302b2f2b0c59209ba8ee0acc1c1be5ff7df3d83712df76266d9f027",
+    "assets/favicon.svg": "5086825616f0c8073c7e0ba6b55652e42f8f3e60cb2052cf9324c3bea11c748b",
+    "assets/gallery/desktop-comparison.svg": "21cead680bcb49b65878522dc773a062399c1bec5b7138a6748a930990256451",
+    "assets/gallery/desktop-logs.svg": "a0cc28a75a4667d717c4dbcf44e325531645dd602c5b7d5d8600e2191fd0b8a4",
+    "assets/gallery/desktop-projects.svg": "07f0badfc634930e45d72e294fa3ad2c8645558474d94fce7ea66a70f98d3bbe",
+    "assets/gallery/mobile-connections.svg": "71611763de3f7eb526e360df8c626b3a126744121e3eb6f0d5d1d6a427fd959d",
+    "assets/gallery/mobile-receipt.svg": "e1aaf9a6c9fcc04d50194a8bd9a5b8e921259d08103989719e74cf0fc9eaa745",
+    "assets/gallery/mobile-tasks.svg": "20cdbb830731f16c37420acc147a9ee262f16404c4c437bb0bcf12145788300f",
+    "assets/icon.svg": "c16c30bd242365649db97301e58ca05c0096f440e968a77942e7e0396447dc15",
     "assets/page-qr.svg": "5bd7b80172bd0d6840d69e78288be3b0519003e2b6746c44237df9abcda8d002",
-    "index.html": "54667460641530f12c1265e3355507c8b75ee46321036a38acbeaa5cfafa8d0e",
-    "script.js": "62aa56ae28039a9201ce41b60f78e0215e53567de5786e695b7d00803e02f33f",
-    "style.css": "c90f967a1118a98d116beac67fbc6c3c11dca59339594540eafb228d7453337b"
+    "index.html": "1fa423b1cf535a3ea0a3ad0b7b5b4c36e9b76cfe972ec6aa9df54edafe5c9c76",
+    "script.js": "c2ac130b93546e211a4ec7edc6a3deec9d4653856c6d2438ce1dd07f15b9e94b",
+    "style.css": "7206aa33db9edb73dd668531002f13c41d6295250b7515a114e86e92254eec1b"
   }
 }

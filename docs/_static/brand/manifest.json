@@ -1,17 +1,17 @@
 {
-  "description": "User-provided StarWave logo assets, used unchanged for this documentation site. SVGs are the supplied vector reconstructions; no broader license is asserted.",
+  "description": "Production vector interpretations of user-selected concept 04, not original AI vector source. Cyan/blue/violet wavefronts, flowing wave and coral star. DejaVu Sans wordmark outlines retain the font license in SVG metadata and tools/brand-font-license.txt. The 32px PNG uses the simplified single-wavefront variant. No broader logo license is asserted. The sidebar uses the same silhouette in white for contrast on its blue background.",
   "assets": [
     {
       "file": "starwave-main.svg",
-      "sha256": "ed639f1caace9e5525d63dc31a3abf447d18e72d6c0f5b9c98d91dfec7ef1b55"
+      "sha256": "82021e52d27305e7fd7879896f83a2e5f136a96e021b8668e713b9b8b5eb34cd"
     },
     {
       "file": "starwave-icon-white.svg",
-      "sha256": "10575511b0a981ad5be19fd87f31d245b78765bb7304c5a855ee7fbaa5b76fd0"
+      "sha256": "bc9ed0164a740d5da515458e2027dcb18dd0f7885fc33bb9b82be64b06900b6a"
     },
     {
       "file": "starwave-favicon.png",
-      "sha256": "47453dcece257b3b6bb3f5164775258abb5c1d65a5aff10647b8278538072ce7"
+      "sha256": "aa645864bb740476d2d6aad9c9c021c5ddabe08a88a620ef11e1c3448a9e3b33"
     }
   ]
 }
