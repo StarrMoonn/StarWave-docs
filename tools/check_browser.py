@@ -1117,7 +1117,7 @@ def check_agent_intro(page, base, output):
     assert page.locator('.reveal-pending').count() == 0
     assert page.locator('.hero-stage .desktop').evaluate('(e) => getComputedStyle(e).transform') == 'none'
     page.emulate_media(reduced_motion='no-preference')
-    tabs = page.get_by_role('tab')
+    tabs = page.locator('.platform-picker').get_by_role('tab')
     assert tabs.count() == 3
     for platform in ('windows', 'linux', 'ios'):
         tab = page.locator(f'#tab-{platform}')
