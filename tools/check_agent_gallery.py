@@ -3,6 +3,7 @@ Requires a running candidate; does not start a server.
 """
 from pathlib import Path
 import argparse
+import re
 import xml.etree.ElementTree as ET
 from playwright.sync_api import sync_playwright, expect
 ROOT = Path(__file__).resolve().parents[1]
@@ -59,7 +60,7 @@ def run(url, browser_path=None, browser_channel='chromium'):
         page=browser.new_page(viewport={'width':1440,'height':1200})
         page.clock.install();page.goto(url)
         mobile=page.locator('.mobile-gallery');mobile.scroll_into_view_if_needed()
-        expect(mobile).to_have_class('client-gallery mobile-gallery is-enhanced is-playing')
+        expect(mobile).to_have_class(re.compile(r'\bis-playing\b'))
         page.clock.run_for(6600);expect(page.locator('#mobile-connections')).to_be_visible()
         page.clock.run_for(6600);expect(page.locator('#mobile-receipt')).to_be_visible()
         page.clock.run_for(6600);expect(page.locator('#mobile-tasks')).to_be_visible()
@@ -80,8 +81,10 @@ def run(url, browser_path=None, browser_channel='chromium'):
         expect(mobile.locator('.gallery-panel:visible')).to_have_count(1)
         expect(play).to_be_visible()
         page.locator('.hero h1').scroll_into_view_if_needed()
-        expect(mobile).not_to_have_class('client-gallery mobile-gallery is-enhanced is-playing')
-        page.clock.run_for(15000);expect(page.locator('#mobile-receipt')).to_be_visible()
+        expect(mobile).not_to_have_class(re.compile(r'\bis-playing\b'))
+        selected = mobile.locator('.gallery-panel:not([hidden])').get_attribute('id')
+        page.clock.run_for(15000)
+        expect(mobile.locator('.gallery-panel:not([hidden])')).to_have_attribute('id', selected)
         page.goto(url+'#mobile-receipt');expect(page.locator('#mobile-receipt')).to_be_visible()
         expect(play).to_have_text('播放动画')
         browser.close()
