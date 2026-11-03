@@ -1,16 +1,34 @@
-// Decorative wave drawing only: no telemetry, remote requests, or service connection.
-const waves = document.getElementById('waves');
-if (waves) {
-  for (let line = 0; line < 19; line++) {
-    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    let d = '';
-    for (let x = 0; x <= 600; x += 4) {
-      const envelope = Math.exp(-Math.pow((x - 300) / 145, 2));
-      const y = 225 + line * 6 - Math.sin(x / 55 + line * .13) * (30 + line * 2) * envelope;
-      d += `${x ? 'L' : 'M'}${x} ${y.toFixed(2)} `;
-    }
-    path.setAttribute('d', d);
-    path.setAttribute('opacity', String(.25 + line * .035));
-    waves.appendChild(path);
+/* Progressive enhancement only: no network, storage, tracking, or real tasks. */
+(() => {
+  const picker = document.querySelector('.platform-picker');
+  const tabs = Array.from(picker.querySelectorAll('[data-platform]'));
+  const panels = tabs.map(tab => document.getElementById(`panel-${tab.dataset.platform}`));
+  picker.setAttribute('role', 'tablist');
+  function select(index, focus = false) {
+    tabs.forEach((tab, i) => {
+      tab.setAttribute('aria-selected', String(i === index));
+      tab.tabIndex = i === index ? 0 : -1;
+      panels[i].hidden = i !== index;
+    });
+    if (focus) tabs[index].focus();
   }
-}
+  tabs.forEach((tab, index) => {
+    tab.setAttribute('role', 'tab');
+    tab.setAttribute('aria-controls', panels[index].id);
+    panels[index].setAttribute('role', 'tabpanel');
+    panels[index].tabIndex = 0;
+    tab.addEventListener('click', event => { event.preventDefault(); select(index); });
+    tab.addEventListener('keydown', event => {
+      const next = {ArrowRight: (index + 1) % tabs.length, ArrowLeft: (index + tabs.length - 1) % tabs.length, Home: 0, End: tabs.length - 1}[event.key];
+      if (next !== undefined) { event.preventDefault(); select(next, true); }
+      else if (event.key === ' ') { event.preventDefault(); select(index, true); }
+    });
+  });
+  function selectHash() {
+    const index = panels.findIndex(panel => `#${panel.id}` === location.hash);
+    if (index >= 0) select(index);
+    return index;
+  }
+  if (selectHash() < 0) select(0);
+  window.addEventListener('hashchange', selectHash);
+})();

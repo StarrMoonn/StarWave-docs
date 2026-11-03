@@ -1070,6 +1070,7 @@ def check_agent_intro(page, base, output):
         page.wait_for_url(base + 'agent/index.html')
         assert page.locator('.wy-nav-side').count() == 0
         assert page.locator('h1').count() == 1
+        assert page.locator('.phone').evaluate_all('phones => phones.every(phone => phone.querySelector(".phone-screen").getBoundingClientRect().bottom <= phone.querySelector(".phone-nav").getBoundingClientRect().top + 1)')
         assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
         assert page.locator('a[href^="https://github.com/"]').count() > 0
         assert '私有' in page.locator('#start').inner_text()
@@ -1080,15 +1081,45 @@ def check_agent_intro(page, base, output):
         page.wait_for_url(base + 'zh/index.html')
         page.goto(base + 'zh/index.html')
     page.goto(base + 'agent/index.html', wait_until='networkidle')
+    assert page.locator('.phone').count() == 4
+    assert page.locator('body').evaluate('(e) => getComputedStyle(e).backgroundColor') == 'rgb(255, 255, 255)'
+    tabs = page.get_by_role('tab')
+    assert tabs.count() == 3
+    for platform in ('windows', 'linux', 'ios'):
+        tab = page.locator(f'#tab-{platform}')
+        tab.click()
+        assert tab.get_attribute('aria-selected') == 'true'
+        assert page.locator(f'#panel-{platform}').is_visible()
+        assert page.locator('.platform-panel:visible').count() == 1
+        assert page.locator(f'#panel-{platform} button').is_disabled()
+    page.locator('#tab-ios').focus()
+    page.keyboard.press('ArrowRight')
+    assert page.locator('#tab-windows').get_attribute('aria-selected') == 'true'
+    page.keyboard.press('End')
+    assert page.locator('#tab-ios').get_attribute('aria-selected') == 'true'
+    page.keyboard.press('Home')
+    assert page.locator('#tab-windows').get_attribute('aria-selected') == 'true'
+    page.keyboard.press('ArrowLeft')
+    assert page.locator('#tab-ios').get_attribute('aria-selected') == 'true'
+    page.goto(base + 'agent/index.html#panel-linux', wait_until='networkidle')
+    assert page.locator('#panel-linux').is_visible()
+    assert page.locator('#tab-linux').get_attribute('aria-selected') == 'true'
     resources = page.evaluate('performance.getEntriesByType("resource").map(e => e.name)')
     assert all(url.startswith(base) for url in resources), resources
     assert page.locator('form, iframe').count() == 0
-    plain_context = page.context.browser.new_context(java_script_enabled=False)
+    assert page.locator('a[download]').count() == 0
+    plain_context = page.context.browser.new_context(java_script_enabled=False, viewport={'width': 390, 'height': 844})
     plain = plain_context.new_page()
     plain.goto(base + 'agent/index.html')
     assert plain.locator('h1').is_visible()
+    assert plain.locator('.platform-panel:visible').count() == 3
+    assert plain.locator('.download-button:disabled').count() == 3
+    assert plain.evaluate('document.documentElement.scrollWidth <= innerWidth')
+    plain.locator('#tab-linux').click()
+    assert urlsplit(plain.url).fragment == 'panel-linux'
     plain.locator('.hero a[href="#start"]').click()
     assert urlsplit(plain.url).fragment == 'start'
+    plain.screenshot(path=str(output / 'agent-intro-390-nojs.png'), full_page=True)
     plain_context.close()
 
 
