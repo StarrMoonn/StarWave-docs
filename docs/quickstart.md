@@ -1,5 +1,7 @@
 # 快速入门：一个合成炮集
 
+**历史示例。** 下方示例保留注明的版本基线；当前 Scalar2D 调用与发行 wheel 见 [v10.0.0 API](api-v10.md)。
+
 [V19 Release](https://github.com/StarrMoonn/StarWave/releases/tag/V19) 已发布；本手册对应冻结源码 `0.1.0.dev19`、提交 `46d32877e3336d531520a696d5f2e074e6f4ef74`。[PyPI **9.1.0**](https://pypi.org/project/starwave/9.1.0/) 已发布，对应 V19 源码契约并包含集成 VRR。现有 [9.0.0 wheel](https://pypi.org/project/starwave/9.0.0/) 仍对应 V18，不含集成 VRR。
 
 下方二维 scalar 入门接线也兼容历史 7.1.0 基线。当前三维速度/源梯度见{ref}`三维 scalar 调用 <scalar-3d-example>`；[Born](usage.md#born-function)另有独立 CPU 示例。

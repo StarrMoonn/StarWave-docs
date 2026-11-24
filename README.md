@@ -1,20 +1,22 @@
 # StarWave-docs · 中文 / English
 
-当前 VTI 增量 / Current VTI update: [中文 API](docs/usage.md#vti-function) / [English API](docs/en/usage.md#vti-function) now follow reviewed source `7145b5306af11615eb50c28a9ef64bb991a0bd97`: native CPU/CUDA selective history and `model_gradient_sampling_interval=1` (internal CFL steps; values >1 request approximate material gradients). Frozen V19/V16 snapshots and historical wheel claims below are unchanged.
+当前 v10 API / Current v10 API: [中文](docs/api-v10.md) · [English](docs/en/api-v10.md)。发行包 / Release wheel: `3.3.0`, private GitHub Release, not PyPI.
+
+历史 VTI 增量 / Earlier VTI update: [中文 API](docs/usage.md#vti-function) / [English API](docs/en/usage.md#vti-function) now follow reviewed source `7145b5306af11615eb50c28a9ef64bb991a0bd97`: native CPU/CUDA selective history and `model_gradient_sampling_interval=1` (internal CFL steps; values >1 request approximate material gradients). Frozen V19/V16 snapshots and historical wheel claims below are unchanged.
 
 新增 V21 弹性 VRR：[中文](docs/examples/elastic-vrr.md) / [English](docs/en/examples/elastic-vrr.md)。本次为独立接口与示例增补，要求匹配的授权 V21 源码；下文保留 V19 历史基线，不代表当前 PyPI 包可用性。
 
-StarWave V19 源码契约双语使用手册，使用 Sphinx、Read the Docs 主题与 MyST Markdown；每种语言独立构建、导航和搜索。
+本双语使用手册采用 Sphinx、Read the Docs 主题与 MyST Markdown；每种语言独立构建、导航和搜索。
 
-Bilingual documentation for the StarWave V19 source contract. The complete Chinese and English manuals have independent builds, navigation and search.
+The bilingual StarWave documentation uses Sphinx, the Read the Docs theme and MyST Markdown. The complete Chinese and English manuals have independent builds, navigation and search.
 
-[V19 Release](https://github.com/StarrMoonn/StarWave/releases/tag/V19) 已发布；本手册对应冻结源码 `0.1.0.dev19`、提交 `46d32877e3336d531520a696d5f2e074e6f4ef74`。[PyPI **9.1.0**](https://pypi.org/project/starwave/9.1.0/) 已发布，对应 V19 源码契约并包含集成 VRR。现有 [9.0.0 wheel](https://pypi.org/project/starwave/9.0.0/) 仍对应 V18，不含集成 VRR。
+[V19 Release](https://github.com/StarrMoonn/StarWave/releases/tag/V19) 已发布；历史 V19 Usage 对应冻结源码 `0.1.0.dev19`、提交 `46d32877e3336d531520a696d5f2e074e6f4ef74`。[PyPI **9.1.0**](https://pypi.org/project/starwave/9.1.0/) 已发布，对应 V19 源码契约并包含集成 VRR。现有 [9.0.0 wheel](https://pypi.org/project/starwave/9.0.0/) 仍对应 V18，不含集成 VRR。
 
-[V19 Release](https://github.com/StarrMoonn/StarWave/releases/tag/V19) is published. This manual follows frozen source `0.1.0.dev19`, commit `46d32877e3336d531520a696d5f2e074e6f4ef74`. [PyPI **9.1.0**](https://pypi.org/project/starwave/9.1.0/) is published with the V19 source contract and integrated VRR. The existing [9.0.0 wheel](https://pypi.org/project/starwave/9.0.0/) remains V18 and excludes integrated VRR.
+[V19 Release](https://github.com/StarrMoonn/StarWave/releases/tag/V19) is published. The historical V19 Usage follows frozen source `0.1.0.dev19`, commit `46d32877e3336d531520a696d5f2e074e6f4ef74`. [PyPI **9.1.0**](https://pypi.org/project/starwave/9.1.0/) is published with the V19 source contract and integrated VRR. The existing [9.0.0 wheel](https://pypi.org/project/starwave/9.0.0/) remains V18 and excludes integrated VRR.
 
-## V19 integrated package and examples
+## Historical V19 package and examples
 
-The current main package exposes scalar, Born, VRZ, VRR, VTI, elastic and GSLS propagation. Root installation and `compile_all.py` cover all five native groups including VRR; use `starwave.vrr`, not a separate extension installation. V19 preserves the 23-parameter Scalar API and its differentiable terminal output; callbacks remain detached diagnostics.
+The V19 package exposed scalar, Born, VRZ, VRR, VTI, elastic and GSLS propagation. Root installation and `compile_all.py` cover all five native groups including VRR; use `starwave.vrr`, not a separate extension installation. V19 preserves the 23-parameter Scalar API and its differentiable terminal output; callbacks remain detached diagnostics.
 
 The authorized source contains paired `notebook/Scalar/Scalar2D_TargetWavefield_CUDA.py` / `.ipynb` and `notebook/Scalar/Scalar2D_TargetWavefield_TorchCompile.py` / `.ipynb`. Historical tutorial assets remain unchanged. PyPI 9.1.0 is published with verified artifact identity and CPU checks; the historical 9.0.0 wheel remains V18 without VRR.
 
