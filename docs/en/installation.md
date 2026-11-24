@@ -1,5 +1,7 @@
 # Installation
 
+**Current installation:** See [v10.0.0 wheel installation and support](api-v10.md#installation-and-validation-scope). The instructions below document older releases.
+
 New: [V21 elastic VRR API and runnable CPU example](examples/elastic-vrr.md). This addition requires matching authorized V21 source; older version/package statements below remain historical baseline information and do not establish current PyPI availability or include elastic VRR.
 
 The previous V19 source and binary installation notes below are historical. For the new elastic VRR interface, use the [V21 source installation](examples/elastic-vrr.md#install-matching-source). No V21 PyPI publication is claimed.

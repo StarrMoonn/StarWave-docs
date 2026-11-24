@@ -1,5 +1,7 @@
 # Model, Acquisition, and Time Conventions
 
+**Current axes and sampling:** See the [v10.0.0 API](../api-v10.md). The conventions below retain the V19 baseline with labeled exceptions.
+
 **Current VTI exception:** the VTI API now includes native CPU/CUDA full/boundary, complete replicate-padding/CPML material gradients and optional internal-step sampling. The frozen V19 CPU and cropped-gradient limitations below do not describe current VTI. See the {ref}`current VTI contract <vti>`; other historical equation scopes are not changed here.
 
 This chapter targets frozen V19. Use the [Usage API](../usage.md) for current parameter and backend contracts and [installation](../installation.md) for release channels. Historical derivations and measured examples retain their labeled versions.
