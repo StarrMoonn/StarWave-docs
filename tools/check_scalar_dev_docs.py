@@ -23,6 +23,16 @@ def without_annotations(args):
     return ast.dump(args)
 
 
+def live_contract(contract):
+    """Strict live Scalar extension; immutable V19 snapshots are unchanged."""
+    live = copy.deepcopy(contract)
+    live['signature'] = live['signature'].replace(
+        'callback_frequency: int=1)', 'callback_frequency: int=1, model_gradient_sampling_interval: int=1)')
+    live['types']['model_gradient_sampling_interval'] = 'int'
+    assert parse(live['signature']).args.kwonlyargs[-1].arg == 'model_gradient_sampling_interval'
+    return live
+
+
 def check(source_root=None):
     snapshot = json.loads((ROOT / 'tools/scalar_dev_api_contract.json').read_text())
     assert snapshot['source_commit'] == 'fba1f496b890f2dbaf3fbb3011d39f6d723cfea1'
@@ -48,6 +58,8 @@ def check(source_root=None):
     assert semantics['all_zero_faces'] is True and semantics['positive_widths_equal'] is True
     assert semantics['callback_clock'] == 'completed user steps'
     assert semantics['callback_checkpoint_replay'] is False
+    live = live_contract(contract)
+    current = parse(live['signature'])
     snippets = []
     for locale, folder in [('en', ROOT / 'docs/en'), ('zh', ROOT / 'docs')]:
         usage = (folder / 'usage.md').read_text()
@@ -55,9 +67,9 @@ def check(source_root=None):
         matches = re.findall(r'^```\{py:function\} starwave.scalar(\([^\n]+)\n(.*?)^```', usage, re.M | re.S)
         assert len(matches) == 1
         signature, body = matches[0]
-        assert ast.dump(parse(signature)) == ast.dump(expected), f'{locale}: scalar dev signature drift'
-        assert re.findall(r'^:param (\w+):', body, re.M) == [p.arg for p in expected.args.args + expected.args.kwonlyargs]
-        assert dict(re.findall(r'^:type (\w+): `(.+)`$', body, re.M)) == contract['types']
+        assert ast.dump(parse(signature)) == ast.dump(current), f'{locale}: live Scalar signature drift'
+        assert re.findall(r'^:param (\w+):', body, re.M) == [p.arg for p in current.args.args + current.args.kwonlyargs]
+        assert dict(re.findall(r'^:type (\w+): `(.+)`$', body, re.M)) == live['types']
         for marker in ('20', 'V17', 'V18', 'V19', 'return_wavefield', 'forward_callback', 'callback_frequency',
                        'internal_step', 'internal_dt', 'state.time', '[B,0,D]',
                        'notebook/Scalar/Scalar2D_TargetWavefield_CUDA.ipynb',

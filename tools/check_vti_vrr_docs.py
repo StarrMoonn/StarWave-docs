@@ -16,7 +16,16 @@ def arguments(signature):
 
 def check(source_root=None):
     contract = json.loads((ROOT / 'tools/vti_vrr_api_contract.json').read_text())
-    expected = ast.dump(arguments(contract['signature']))
+    historic = arguments(contract['signature'])
+    expected = ast.dump(historic)
+    assert [arg.arg for arg in historic.kwonlyargs[:3]] == ['dx', 'dz', 'dt']
+    assert historic.kw_defaults[:3] == [None] * 3
+    live = arguments(contract['signature'].replace(
+        '*, dx, dz, dt,', '*, grid_spacing=None, depth_axis=1, dx=None, dz=None, dt,'))
+    assert [arg.arg for arg in live.kwonlyargs[:5]] == ['grid_spacing', 'depth_axis', 'dx', 'dz', 'dt']
+    assert [ast.literal_eval(x) for x in live.kw_defaults[:4]] == [None, 1, None, None]
+    assert live.kw_defaults[4] is None
+    params = contract['parameter_names'][:6]+['grid_spacing','depth_axis']+contract['parameter_names'][6:]
     sections, numbers = section_map()
     assert len(sections) == len(numbers) == len(set(sections)) == len(set(numbers))
     mapping = dict(zip(sections, numbers))
@@ -27,8 +36,8 @@ def check(source_root=None):
         matches = re.findall(r'^```\{py:function\} starwave\.vti_vrr(\([^\n]+)\n(.*?)^```', text, re.M | re.S)
         assert len(matches) == 1, f'{relative}: missing/duplicate VTI-VRR directive'
         signature, body = matches[0]
-        assert ast.dump(arguments(signature)) == expected, f'{relative}: VTI-VRR signature/default drift'
-        assert re.findall(r'^:param (\w+):', body, re.M) == contract['parameter_names']
+        assert ast.dump(arguments(signature)) == ast.dump(live), f'{relative}: VTI-VRR live signature/default drift'
+        assert re.findall(r'^:param (\w+):', body, re.M) == params
         function = ast.parse('def documented' + signature + ': pass').body[0]
         assert ast.unparse(function.returns) == 'tuple[torch.Tensor, ...]'
         assert ':returns:' in body
