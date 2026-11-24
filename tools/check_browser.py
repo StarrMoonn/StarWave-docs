@@ -34,7 +34,7 @@ CHAPTERS = {
     'about', 'presentation', 'installation', 'docker', 'wsl', 'quickstart', 'modeling/conventions',
     'modeling/scalar', 'modeling/gradient', 'modeling/acquisition', 'modeling/wave-propagation',
     'modeling/reconstruction', 'inversion/fwi',
-    'inversion/dataparallel', 'inversion/inr', 'api-v10', 'usage', 'pytorch-backend', 'faq',
+    'inversion/dataparallel', 'inversion/inr', 'usage', 'pytorch-backend', 'faq',
     'release-notes', 'status', 'examples/index', 'examples/enclosed',
     'examples/surface', 'examples/layered', 'examples/reproduce', 'examples/wavefield-snapshots',
 }
@@ -96,10 +96,7 @@ def check_navigation(page, locale, relative):
     assert ('正演模拟' if locale == 'zh' else 'Forward Modeling') in captions, (relative, captions)
     assert next(link['text'] for link in links if urlsplit(link['href']).path == f'/{locale}/wsl.html') == 'WSL'
     usage = [link for link in links if urlsplit(link['href']).path == f'/{locale}/usage.html']
-    assert len(usage) == 1 and usage[0]['text'] == ('历史 Usage' if locale == 'zh' else 'Historical Usage'), usage
-    current_api = [link for link in links if urlsplit(link['href']).path == f'/{locale}/api-v10.html']
-    assert len(current_api) == 1 and current_api[0]['text'] == ('当前 API（v10）' if locale == 'zh' else 'Current API (v10)'), current_api
-    assert links.index(current_api[0]) < links.index(usage[0]), (relative, current_api, usage)
+    assert len(usage) == 1 and usage[0]['text'] == 'Usage', usage
     assert all(not urlsplit(link['href']).fragment for link in links), relative
     # Chapter labels stay readable on one line at the existing sidebar size.
     assert nav.locator('a').evaluate_all("""items => items.every(a => {
@@ -445,7 +442,7 @@ def check_homepage(page, base, locale, output):
     assert 'loss.backward()' in main.locator('.sw-home-code').inner_text()
     assert main.locator('.sw-home-paths a').count() == 3
     actions = main.locator('.sw-home-actions a')
-    assert actions.evaluate_all("items => items.map(e => e.getAttribute('href'))") == ['installation.html', 'quickstart.html', 'api-v10.html']
+    assert actions.evaluate_all("items => items.map(e => e.getAttribute('href'))") == ['installation.html', 'quickstart.html', 'usage.html']
     for button in main.locator('.sw-button').all():
         assert button.bounding_box()['height'] >= 44
     typography = main.locator('.sw-home-lead, .sw-home-hero h2, .sw-home-capabilities h3').evaluate_all("items => items.map(e => getComputedStyle(e).fontFamily)")
@@ -483,13 +480,10 @@ def check_homepage(page, base, locale, output):
     page.screenshot(path=str(output / f'{locale}-homepage-{width}.png'))
     page.screenshot(path=str(output / f'{locale}-homepage-full-{width}.png'), full_page=True)
     # Core buttons must navigate and retain normal Back behavior.
-    for target in ('installation', 'quickstart', 'api-v10'):
+    for target in ('installation', 'quickstart', 'usage'):
         page.locator(f'.sw-home-actions a[href="{target}.html"]').click()
         page.wait_for_url(base + locale + '/' + target + '.html')
         assert urlsplit(page.url).path == f'/{locale}/{target}.html'
-        if target == 'api-v10':
-            assert page.get_by_role('heading', level=1).inner_text().startswith('StarWave v10.0.0 API')
-            assert page.locator('.wy-menu-vertical a[href="usage.html"]').count() == 1
         page.go_back()
         # Back can resolve before a same-document history transition settles.
         page.wait_for_url(base + locale + '/index.html')

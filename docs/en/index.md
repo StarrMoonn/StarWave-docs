@@ -9,7 +9,7 @@
     <nav class="sw-home-actions" aria-label="Get started with StarWave">
       <a class="sw-button sw-button-primary" href="installation.html">Install StarWave <span aria-hidden="true">↗</span></a>
       <a class="sw-button" href="quickstart.html">Quickstart <span aria-hidden="true">→</span></a>
-      <a class="sw-home-api-link" href="api-v10.html">Usage / API <span aria-hidden="true">→</span></a>
+      <a class="sw-home-api-link" href="usage.html">Usage / API <span aria-hidden="true">→</span></a>
     </nav>
   </div>
   <div class="sw-home-identity">
@@ -21,11 +21,11 @@
 
 
 ```{raw} html
-<nav class="sw-start-grid" aria-label="Find your starting point"><a href="quickstart.html"><span>01 · LEARN</span><strong>Run your first wavefield</strong><small>Installation → Quickstart → acquisition</small><b aria-hidden="true">↗</b></a><a href="api-v10.html"><span>02 · REFERENCE</span><strong>Find an API</strong><small>Signatures, parameters and return values</small><b aria-hidden="true">↗</b></a><a href="examples/wavefield-snapshots.html"><span>03 · EXPLORE</span><strong>Build on an experiment</strong><small>Wavefields, gradients and inversion</small><b aria-hidden="true">↗</b></a></nav>
+<nav class="sw-start-grid" aria-label="Find your starting point"><a href="quickstart.html"><span>01 · LEARN</span><strong>Run your first wavefield</strong><small>Installation → Quickstart → acquisition</small><b aria-hidden="true">↗</b></a><a href="usage.html"><span>02 · REFERENCE</span><strong>Find an API</strong><small>Signatures, parameters and return values</small><b aria-hidden="true">↗</b></a><a href="examples/wavefield-snapshots.html"><span>03 · EXPLORE</span><strong>Build on an experiment</strong><small>Wavefields, gradients and inversion</small><b aria-hidden="true">↗</b></a></nav>
 <details class="sw-release-note"><summary>Version and scope · check before you run</summary>
 ```
 
-The [current API](api-v10.md) follows GitHub [v10.0.0](https://github.com/StarrMoonn/StarWave/releases/tag/v10.0.0). The private Linux wheel is version `3.3.0` and is not on PyPI. The [historical Usage](usage.md) and older examples retain their documented baselines.
+[V19 Release](https://github.com/StarrMoonn/StarWave/releases/tag/V19) is published. This manual follows frozen source `0.1.0.dev19`, commit `46d32877e3336d531520a696d5f2e074e6f4ef74`. [PyPI **9.1.0**](https://pypi.org/project/starwave/9.1.0/) is published with the V19 source contract and integrated VRR. The existing [9.0.0 wheel](https://pypi.org/project/starwave/9.0.0/) remains V18 and excludes integrated VRR.
 
 ```{raw} html
 </details>
@@ -40,7 +40,7 @@ The [current API](api-v10.md) follows GitHub [v10.0.0](https://github.com/StarrM
     <svg class="sw-capability-icon" viewBox="0 0 96 64" width="96" height="64" aria-hidden="true" focusable="false"><path d="M10 33h13c5 0 5-18 10-18s7 36 12 36 5-30 10-30 6 12 11 12h20"/><path class="sw-icon-soft" d="M14 46h10m39 0h19M18 56h12m28 0h19"/></svg>
     <h3>Connect models to observations</h3>
     <p>Differentiable propagation for scalar acoustics, acoustic Born scattering, VRZ, vector-reflectivity VRR, acoustic VTI, elasticity and GSLS viscoacoustics. Each entry has its own supported devices and physical conventions.</p>
-    <a href="api-v10.html">Explore the propagators <span aria-hidden="true">→</span></a>
+    <a href="usage.html#propagators">Explore the propagators <span aria-hidden="true">→</span></a>
   </div>
   <div>
     <svg class="sw-capability-icon" viewBox="0 0 96 64" width="96" height="64" aria-hidden="true" focusable="false"><path d="M12 17h56a13 13 0 0 1 0 26H20m10-10L20 43l10 10"/><path class="sw-icon-soft" d="M42 27v7m12-12v12m12-7v7"/><circle cx="12" cy="17" r="4"/></svg>
@@ -117,8 +117,7 @@ Docker <docker>
 :hidden:
 :caption: Usage
 
-Current API (v10) <api-v10>
-Historical Usage <usage>
+Usage <usage>
 PyTorch backend <pytorch-backend>
 ```
 

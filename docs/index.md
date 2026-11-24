@@ -9,7 +9,7 @@
     <nav class="sw-home-actions" aria-label="开始使用 StarWave">
       <a class="sw-button sw-button-primary" href="installation.html">安装 StarWave <span aria-hidden="true">↗</span></a>
       <a class="sw-button" href="quickstart.html">快速入门 <span aria-hidden="true">→</span></a>
-      <a class="sw-home-api-link" href="api-v10.html">Usage / API <span aria-hidden="true">→</span></a>
+      <a class="sw-home-api-link" href="usage.html">Usage / API <span aria-hidden="true">→</span></a>
     </nav>
   </div>
   <div class="sw-home-identity">
@@ -21,11 +21,11 @@
 
 
 ```{raw} html
-<nav class="sw-start-grid" aria-label="选择你的阅读路径"><a href="quickstart.html"><span>01 · 入门</span><strong>运行第一个波场</strong><small>安装 → 快速入门 → 采集设置</small><b aria-hidden="true">↗</b></a><a href="api-v10.html"><span>02 · 查阅</span><strong>直接找到接口</strong><small>函数签名、参数与返回值</small><b aria-hidden="true">↗</b></a><a href="examples/wavefield-snapshots.html"><span>03 · 实验</span><strong>从示例走向反演</strong><small>波场可视化、梯度与 FWI</small><b aria-hidden="true">↗</b></a></nav>
+<nav class="sw-start-grid" aria-label="选择你的阅读路径"><a href="quickstart.html"><span>01 · 入门</span><strong>运行第一个波场</strong><small>安装 → 快速入门 → 采集设置</small><b aria-hidden="true">↗</b></a><a href="usage.html"><span>02 · 查阅</span><strong>直接找到接口</strong><small>函数签名、参数与返回值</small><b aria-hidden="true">↗</b></a><a href="examples/wavefield-snapshots.html"><span>03 · 实验</span><strong>从示例走向反演</strong><small>波场可视化、梯度与 FWI</small><b aria-hidden="true">↗</b></a></nav>
 <details class="sw-release-note"><summary>版本与适用范围 · 阅读前请核对</summary>
 ```
 
-[当前 API](api-v10.md) 对应 GitHub [v10.0.0](https://github.com/StarrMoonn/StarWave/releases/tag/v10.0.0)。私有 Linux wheel 的包版本为 `3.3.0`，未发布到 PyPI。[历史 Usage](usage.md) 与旧示例保留各自注明的版本基线。
+[V19 Release](https://github.com/StarrMoonn/StarWave/releases/tag/V19) 已发布；本手册对应冻结源码 `0.1.0.dev19`、提交 `46d32877e3336d531520a696d5f2e074e6f4ef74`。[PyPI **9.1.0**](https://pypi.org/project/starwave/9.1.0/) 已发布，对应 V19 源码契约并包含集成 VRR。现有 [9.0.0 wheel](https://pypi.org/project/starwave/9.0.0/) 仍对应 V18，不含集成 VRR。
 
 ```{raw} html
 </details>
@@ -40,7 +40,7 @@
     <svg class="sw-capability-icon" viewBox="0 0 96 64" width="96" height="64" aria-hidden="true" focusable="false"><path d="M10 33h13c5 0 5-18 10-18s7 36 12 36 5-30 10-30 6 12 11 12h20"/><path class="sw-icon-soft" d="M14 46h10m39 0h19M18 56h12m28 0h19"/></svg>
     <h3>用波场，连接模型与观测</h3>
     <p>可微分传播覆盖标量声学、声学 Born 散射、VRZ、VRR 矢量反射率、声学 VTI、弹性与 GSLS 黏声；各入口有自己的设备支持和物理约定。</p>
-    <a href="api-v10.html">探索传播接口 <span aria-hidden="true">→</span></a>
+    <a href="usage.html#propagators">探索传播接口 <span aria-hidden="true">→</span></a>
   </div>
   <div>
     <svg class="sw-capability-icon" viewBox="0 0 96 64" width="96" height="64" aria-hidden="true" focusable="false"><path d="M12 17h56a13 13 0 0 1 0 26H20m10-10L20 43l10 10"/><path class="sw-icon-soft" d="M42 27v7m12-12v12m12-7v7"/><circle cx="12" cy="17" r="4"/></svg>
@@ -117,8 +117,7 @@ Docker <docker>
 :hidden:
 :caption: Usage
 
-当前 API（v10） <api-v10>
-历史 Usage <usage>
+Usage <usage>
 PyTorch 后端 <pytorch-backend>
 ```
 

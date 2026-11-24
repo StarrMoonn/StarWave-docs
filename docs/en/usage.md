@@ -1,7 +1,5 @@
 # Usage
 
-**Historical reference.** This page and its API snapshot checks retain the V19 baseline and the later overlays identified below. See the [v10.0.0 API](api-v10.md) for the current contract.
-
 ```{container} sw-page-toc
 
 **On this page**
