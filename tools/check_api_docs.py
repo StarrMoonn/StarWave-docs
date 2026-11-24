@@ -240,7 +240,7 @@ def check(wheel_path=None, source_root=None):
     from check_vti_vrr_docs import check as check_vti_vrr
     check_vti_vrr(Path(source_root) if source_root else None)
     released_contracts = json.loads((project / 'tools' / 'api_contract.json').read_text())
-    from check_scalar_dev_docs import check as check_scalar_dev
+    from check_scalar_dev_docs import check as check_scalar_dev, live_contract
     scalar_dev = check_scalar_dev(source_root)
     contracts = copy.deepcopy(released_contracts)
     contracts['scalar'] = scalar_dev
@@ -250,6 +250,7 @@ def check(wheel_path=None, source_root=None):
     check_scalar3d_examples(project, contracts['scalar'], released_contracts['scalar'])
     check_gsls_contract(project, contracts)
     check_torch_backend_docs(project, contracts)
+    live_contracts = dict(contracts, scalar=live_contract(contracts['scalar']))
     legacy_common = json.loads((project / 'tools' / 'api_legacy_v14_common_contract.json').read_text())
     assert set(legacy_common) == set(MODULES) - {'visco_gsls', 'prepare_visco_gsls', 'visco_gsls_native_status'}
     legacy = json.loads((project / 'tools' / 'api_legacy_v14_contract.json').read_text())['apis']
@@ -295,7 +296,7 @@ def check(wheel_path=None, source_root=None):
                 types = dict(re.findall(r'^:type (\w+): `(.+)`$', body, re.M))
                 assert fields == expected, f'{locale}.{name}: parameter descriptions/order mismatch'
                 assert list(types) == expected, f'{locale}.{name}: parameter types/order mismatch'
-                assert types == contracts[name]['types'], f'{locale}.{name}: public types changed'
+                assert types == live_contracts[name]['types'], f'{locale}.{name}: public types changed'
                 for param, default in parameter_defaults(args):
                     assert param.annotation is not None, f'{locale}.{name}.{param.arg}: missing annotation'
                     assert ast.dump(param.annotation) == ast.dump(parse_python(types[param.arg], mode='eval').body), f'{locale}.{name}.{param.arg}: annotation differs from type field'
@@ -309,7 +310,7 @@ def check(wheel_path=None, source_root=None):
                 rtype = re.search(r'^:rtype: `(.+)`$', body, re.M)[1]
                 assert rtype == contracts[name]['return']
                 assert ast.dump(function.returns) == ast.dump(parse_python(rtype, mode='eval').body)
-                baseline = parse_signature(contracts[name]['signature']).args
+                baseline = parse_signature(live_contracts[name]['signature']).args
                 assert arguments_without_annotations(args) == arguments_without_annotations(baseline), f'{locale}.{name}: public signature changed'
                 functions[name] = args
         assert set(MODULES) <= set(functions), f'{locale}: missing known API names'

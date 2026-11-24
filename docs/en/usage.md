@@ -35,7 +35,7 @@ New: [Maxwell / GPR API](#gpr) covers voxel-based 2D TMz/TEz and 3D electromagne
 GSLS: [visco_gsls](#visco-gsls). VRR: [starwave.vrr](#vrr). Both are included in the V19 root package.
 
 
-This reference targets frozen V19 source `0.1.0.dev19`, commit `46d32877e3336d531520a696d5f2e074e6f4ef74`, published as [Release V19](https://github.com/StarrMoonn/StarWave/releases/tag/V19). Except for the separately labelled V21 elastic VRR, V22 qP TTI, current VTI-VRR and Maxwell/GPR additions, signatures below are checked against that source, including the 23-parameter Scalar API and integrated `starwave.vrr`. These frozen V19 API contracts are a historical compatibility baseline, not a statement of current package availability. Use the matching complete source checkout for the separately labelled additions on this page; do not infer current PyPI availability from historical wheel records. Source, distribution and device-validation evidence remain separate. See [Status](status.md) and [installation](installation.md).
+The original V19 baseline was source `0.1.0.dev19`, commit `46d32877e3336d531520a696d5f2e074e6f4ef74`, published as [Release V19](https://github.com/StarrMoonn/StarWave/releases/tag/V19). Except for the separately labelled V21 elastic VRR, V22 qP TTI, current VTI-VRR and Maxwell/GPR additions, the original signatures were checked against that source, including the 23-parameter Scalar API and integrated `starwave.vrr`. The Scalar, VRR/VRZ, VTI-VRR, GSLS and Elastic gradient-sampling updates on this page follow [v10.0.0](https://github.com/StarrMoonn/StarWave/releases/tag/v10.0.0). These frozen V19 API contracts are a historical compatibility baseline, not a statement of current package availability. Use the matching complete source checkout for the separately labelled additions on this page; do not infer current PyPI availability from historical wheel records. Source, distribution and device-validation evidence remain separate. See [Status](status.md) and [installation](installation.md).
 
 See [Release Notes](release-notes.md) for 6.0.0 internal storage and PML-transpose maintenance, and [Scalar](modeling/scalar.md) for 2D storage changes. These introduce no new public parameters; source upgrades require rebuilt matching native libraries.
 
@@ -76,13 +76,13 @@ Notation: `B` is the number of shots, `S` the sources per shot, `R` the receiver
 
 V19 retains the 23-parameter Scalar contract introduced in V18: arbitrary zero-face subsets (equal positive widths), trainable 2D/3D sources, optional differentiable terminal fields, and read-only diagnostic callbacks. V18 / 9.0.0 introduced this API; V17 / unpublished 8.0.0 and V16 / 7.1.0 retain the historical 20-parameter contract. Native execution requires matching rebuilt libraries.
 
-```{py:function} starwave.scalar(v: torch.Tensor, grid_spacing: float | int | list[float] | tuple[float, ...], dt: float | int, *, source_amplitudes: torch.Tensor, source_locations: torch.Tensor, receiver_locations: torch.Tensor, accuracy: int=8, pml_freq: float | int=25.0, pml_width: int | list[int] | tuple[int, ...]=20, boundary_buffer: int=5, memory: str='boundary', max_vel: float | int | None=None, freq_taper_frac: float | int=0.0, time_pad_frac: float | int=0.0, time_taper: bool=False, illumination: ScalarIllumination | None=None, backend: str | None=None, execution: str='eager', checkpoint_interval: int | None=None, compile_steps: int=1, return_wavefield: bool=False, forward_callback: Callable | None=None, callback_frequency: int=1) -> tuple[torch.Tensor, ...]
+```{py:function} starwave.scalar(v: torch.Tensor, grid_spacing: float | int | list[float] | tuple[float, ...], dt: float | int, *, source_amplitudes: torch.Tensor, source_locations: torch.Tensor, receiver_locations: torch.Tensor, accuracy: int=8, pml_freq: float | int=25.0, pml_width: int | list[int] | tuple[int, ...]=20, boundary_buffer: int=5, memory: str='boundary', max_vel: float | int | None=None, freq_taper_frac: float | int=0.0, time_pad_frac: float | int=0.0, time_taper: bool=False, illumination: ScalarIllumination | None=None, backend: str | None=None, execution: str='eager', checkpoint_interval: int | None=None, compile_steps: int=1, return_wavefield: bool=False, forward_callback: Callable | None=None, callback_frequency: int=1, model_gradient_sampling_interval: int=1) -> tuple[torch.Tensor, ...]
 
 Propagates scalar acoustic waves on a 2D or 3D grid selected by `v.ndim`, with independent shots. Both dimensions support first-order velocity and source-waveform gradients. Coordinates and numerical settings are not differentiable. Each call starts with fresh state; optionally return the differentiable terminal physical wavefield, not a complete restart state.
 
 :param v: **Required; positional or keyword.** Two-dimensional `[N0,N1]` or three-dimensional `[N0,N1,N2]` model, with at least 2 cells per dimension; float32 (native CUDA; Torch CPU/CUDA), typically in m/s. `v.ndim` selects the dimension. Coordinates `[i,j]` / `[i,j,k]` directly index `v[i,j]` / `v[i,j,k]`; the 3D examples use `[nx,ny,nz]`, with no automatic physical-axis permutation. All values must be finite. Signed and zero values are accepted without guaranteeing physical validity. Model-axis transformations preserve autograd; `requires_grad=True` requests a velocity gradient.
 :type v: `torch.Tensor`
-:param grid_spacing: **Required; positional or keyword.** Positive, finite spacing, typically in m. In 2D, accepts one value or two equal values. In 3D, accepts one value or three values in model-axis order (for example `[dx,dy,dz]`); unequal spacings are supported. Booleans, zero/negative values, and mismatched sequence lengths are rejected.
+:param grid_spacing: **Required; positional or keyword.** Positive finite spacing in metres; a scalar for equal spacing or an axis-ordered sequence `[dx,dz]` for `[x,z]` and `[dx,dy,dz]` for `[x,y,z]`. Axis spacings may differ. To use canonical `[x,z]` with a file stored as `[z,x]`, explicitly transpose the model and supply geometry in `[ix,iz]` grid indices. The operator does not infer file layout. Reject booleans, nonpositive values and incorrect lengths.
 :type grid_spacing: `float | int | list[float] | tuple[float, ...]`
 :param dt: **Required; positional or keyword.** Positive, finite sampling interval of the user input/output, typically in s. Internally, the CFL condition may require a smaller time step; the returned sampling interval remains this value. Tensor and Boolean inputs are not accepted, and this parameter is not differentiated.
 :type dt: `float | int`
@@ -126,6 +126,8 @@ Propagates scalar acoustic waves on a 2D or 3D grid selected by `v.ndim`, with i
 :type forward_callback: `Callable | None`
 :param callback_frequency: **Default `1`; keyword-only.** Positive integer, excluding bool, counting user samples. Internal cadence is `CFL_ratio * callback_frequency`; the last update always triggers a callback even for a partial interval. Validated even when forward_callback is None.
 :type callback_frequency: `int`
+:param model_gradient_sampling_interval: **Default `1`; keyword-only.** Positive integer in internal CFL steps. One uses the exact velocity gradient; for s>1 sample at zero-based t divisible by s with weight `min(s, internal_nt-t)`. Forward, adjoint propagation, records and source gradients are unchanged.
+:type model_gradient_sampling_interval: `int`
 :returns: **Default `(receiver_amplitudes,)`; with `return_wavefield=True`, `(terminal_physical_wavefield, receiver_amplitudes)`.** Records are contiguous float32 `[B,R,T]` on the model device, at nominal times `0, dt, ..., (T-1)*dt`; `[-1]` always selects them. The optional differentiable terminal field is `[B,*v.shape]` at `internal_nt*internal_dt = T*dt`, after the last source update. Its time differs from the last record sample; it excludes PML/buffer/ghosts and cannot restart propagation by itself.
 :rtype: `tuple[torch.Tensor, ...]`
 ```
@@ -139,7 +141,7 @@ The public equation convention is `u_tt = v² (Lap(u) - f)`. The user may train 
 
 Post-step recordings are aligned to the user clock before downsampling by prepending zero and dropping the final step. The transposes of temporal resampling and shifting remain in autograd; noncausal FFT filtering can cause ringing in the initial user samples.
 
-Model gradients are conditional on a fixed extended model, CFL configuration, and PML. When replicate padding at the physical edges is regenerated, the current returned gradient does not include the transpose accumulation of the complete extension chain. It must not be treated as the total derivative of the entire boundary-rebuilding process; switching to full mode does not remove this limitation.
+The velocity gradient includes the transpose of the replicate extension: buffer and PML sensitivities accumulate back to physical edges and corners. The CFL ratio, velocity-envelope choice and PML profiles remain fixed for differentiation. Interval 1 gives the exact discrete gradient for that fixed setup; larger intervals approximate velocity-gradient accumulation.
 
 Each zero-width face has `M=accuracy//2` fixed-zero exterior ghost cells and no PML/buffer. Physical edge samples remain active; keep original coordinates. This is a truncated centered stencil, not odd reflection: at second order the effective zero plane lies one grid interval outside the physical edge. Higher interior order does not establish an odd-image closure or surface convergence order. Native full uses full-grid history when zero faces are present; boundary still saves/reconstructs required face strips without a full fallback. Any zero face rejects illumination. Native CUDA full/boundary and Torch CPU/CUDA full/checkpoint eager/compile support the observation options. MPS eligibility remains Scalar2D float32, accuracy=4; no new MPS device acceptance is claimed.
 
@@ -207,7 +209,7 @@ The frozen V19 source contains the full user target-wavefield example at `notebo
 (scalar-time-sampling)=
 ### CFL and internal temporal resampling
 
-Scalar uses the conservative coefficient 0.6, every model-axis spacing, and `max(abs(v))` (or the checked `max_vel`) to compute a time-step bound. The internal ratio `r` is a positive integer satisfying that bound, with `internal_dt=dt/r` and `internal_nt=T*r`. Unequal 3D spacings participate axis by axis. `accuracy` does not enable a different public CFL parameter. Time planning, the velocity envelope, and PML coefficients are fixed setup values outside autograd.
+Scalar uses the conservative coefficient 0.6, every model-axis spacing, and `max(abs(v))` (or the checked `max_vel`) to compute a time-step bound. The internal ratio `r` is a positive integer satisfying that bound, with `internal_dt=dt/r` and `internal_nt=T*r`. Unequal spacings participate axis by axis in 2D and 3D. `accuracy` does not enable a different public CFL parameter. Time planning, the velocity envelope, and PML coefficients are fixed setup values outside autograd.
 
 Sources are FFT-upsampled before source-location velocity scaling. Records are time-aligned before downsampling to `[B,R,T]`. Backward uses the actual transposes of these operations, not simple repetition or decimation. At ratio 1, valid taper/padding settings do not alter the signal. Time substeps cannot repair spatial dispersion.
 
@@ -615,19 +617,19 @@ This section describes frozen V19. Source release, compilation, package publicat
 
 ```{py:function} starwave.vrz(v: torch.Tensor, grid_spacing: float | int | list[float] | tuple[float, ...], dt: float | int, *, impedance: torch.Tensor | None=None, density: torch.Tensor | None=None, source_amplitudes: torch.Tensor, source_locations: torch.Tensor, receiver_locations: torch.Tensor, accuracy: int=8, pml_freq: float | int=25.0, pml_width: int | list[int] | tuple[int, ...]=20, boundary_buffer: int=5, memory: str='boundary', max_vel: float | int | None=None, freq_taper_frac: float | int=0.0, time_pad_frac: float | int=0.0, time_taper: bool=False, illumination: None=None, backend: str | None=None, execution: str='eager', checkpoint_interval: int | None=None, compile_steps: int=1) -> tuple[torch.Tensor]
 
-Performs two-dimensional acoustic propagation using velocity and impedance (or density), with batched shots. Specify exactly one parameterization through `impedance` or `density`. The output supports one first-order gradient with respect to the selected model parameters; source waveforms and acquisition coordinates remain fixed.
+VRZ uses the VRR propagator. Directional spacings apply to both `R_i=-Z D_i(1/Z)/2` and propagation; models and source amplitudes support first-order gradients. Geometry is fixed.
 
-:param v: **Required; positional or keyword.** Two-dimensional model `[N0,N1]`, with at least 2 cells in each dimension; float32 (native CUDA; Torch CPU/CUDA). Typical unit: m/s. Coordinates `[i,j]` directly index `v[i,j]`; physical axis order is not inferred automatically. Velocity must be positive and finite; scalar’s signed/zero model domain is not accepted. Set `requires_grad=True` to request a model gradient.
+:param v: **Required; positional or keyword.** Two-dimensional model `[N0,N1]`, with at least 2 cells in each dimension; float32 (native CUDA) or float32/float64 (native CPU/Torch). Typical unit: m/s. Coordinates `[i,j]` directly index `v[i,j]`; physical axis order is not inferred automatically. Velocity must be positive and finite; scalar’s signed/zero model domain is not accepted. Set `requires_grad=True` to request a model gradient.
 :type v: `torch.Tensor`
-:param grid_spacing: **Required; positional or keyword.** Positive, finite grid spacing, typically in m. Accepts one value or two equal values; scalar/VRZ do not support unequal spacing along the two axes. Booleans, zero/negative values, and mismatched sequence lengths are rejected.
+:param grid_spacing: **Required; positional or keyword.** Positive finite scalar or `[dx,dz]` (m) for a `[x,z]` grid, allowing unequal spacings. Geometry uses `[ix,iz]` indices.
 :type grid_spacing: `float | int | list[float] | tuple[float, ...]`
 :param dt: **Required; positional or keyword.** Positive, finite sampling interval of the user input/output, typically in s. Internally, the CFL condition may require a smaller time step; the returned sampling interval remains this value. Tensor and Boolean inputs are not accepted, and this parameter is not differentiated.
 :type dt: `float | int`
-:param impedance: **Default `None`; keyword-only.** Acoustic impedance `Z`, float32 (native CUDA; Torch CPU/CUDA), with the same shape and device as `v`, positive and finite. Typical SI unit: kg/(m²·s), consistent with `v*rho`. Provide exactly one of this parameter and `density`; providing both or neither is invalid. Training this input uses an independent velocity/impedance parameterization.
+:param impedance: **Default `None`; keyword-only.** Acoustic impedance `Z`, float32 (native CUDA) or float32/float64 (native CPU/Torch), with the same shape and device as `v`, positive and finite. Typical SI unit: kg/(m²·s), consistent with `v*rho`. Provide exactly one of this parameter and `density`; providing both or neither is invalid. Training this input uses an independent velocity/impedance parameterization.
 :type impedance: `torch.Tensor | None`
-:param density: **Default `None`; keyword-only.** Density `rho`, float32 (native CUDA; Torch CPU/CUDA), with the same shape and device as `v`, positive and finite. Choose a consistent unit system; the SI unit is kg/m³. The interface uses the differentiable conversion `Z=v*rho`, and gradients include this chain rule. No implicit unit conversion is performed. Provide exactly one of this parameter and `impedance`.
+:param density: **Default `None`; keyword-only.** Density `rho`, float32 (native CUDA) or float32/float64 (native CPU/Torch), with the same shape and device as `v`, positive and finite. Choose a consistent unit system; the SI unit is kg/m³. The interface uses the differentiable conversion `Z=v*rho`, and gradients include this chain rule. No implicit unit conversion is performed. Provide exactly one of this parameter and `impedance`.
 :type density: `torch.Tensor | None`
-:param source_amplitudes: **Required; keyword-only.** Fixed real-valued tensor `[B,S,T]`, with all three dimensions nonempty and `requires_grad=True` forbidden. Values must be finite and representable as float32; the tensor is converted to the model device and float32. This is the normalized forcing `f`, not a pressure increment per step; if the wavefield is in Pa and length is in m, its unit is Pa/m². A tensor of shape `[T]` or `[B,T]` alone is not accepted: explicitly expand the shot/source dimensions for a shared waveform.
+:param source_amplitudes: **Required; keyword-only.** Matching real tensor `[B,S,T]` of normalized forcing, with optional first-order gradients.
 :type source_amplitudes: `torch.Tensor`
 :param source_locations: **Required; keyword-only.** Fixed integer tensor `[B,S,2]`; `[B,2]` is also accepted for a single source per shot. `torch.long` is recommended. Uses physical-grid indices in the input model axis order, without PML offsets or out-of-bounds values. Each source has a corresponding waveform; increments from coincident sources within a shot are added.
 :type source_locations: `torch.Tensor`
@@ -639,7 +641,7 @@ Performs two-dimensional acoustic propagation using velocity and impedance (or d
 :type pml_freq: `float | int`
 :param pml_width: **Default `20`; keyword-only.** Positive integer thickness in cells or four equal positive widths, in `[x-low,x-high,z-low,z-high]` order. V19 accepts `[A,A,0,A]` for a flat top, where A is one positive integer width on the remaining faces. Other zero faces, all-zero, unequal remaining widths, negative/noninteger/bool values are rejected. The first physical row remains active; see below.
 :type pml_width: `int | list[int] | tuple[int, ...]`
-:param boundary_buffer: **Default `5`; keyword-only.** Nonnegative buffer in spatial grid cells, not a number of time steps or a checkpoint interval. Boundary mode requires at least `accuracy // 2 + 1`, which is 5 at eighth order; full mode allows 0. All absorbing sides use total padding `pml_width + boundary_buffer + accuracy // 2`; a top-zero face uses only `accuracy // 2` halo cells, without top PML or buffer. Torch VRZ additionally requires at least accuracy//2 in both full/checkpoint.
+:param boundary_buffer: **Default `5`; keyword-only.** Spatial cells, at least `accuracy//2+1`.
 :type boundary_buffer: `int`
 :param memory: **Default `'boundary'`; keyword-only.** History strategy for model backpropagation. `"boundary"` stores boundary strips and reconstructs the wavefield; `"full"` stores the complete history. Full mode can exhaust GPU memory; native has no automatic fallback or checkpoint. Torch separately supports full/checkpoint (no boundary), with a different graph/checkpoint layout. Forward propagation without a requested model gradient does not retain model-backpropagation history.
 :type memory: `str`
@@ -653,7 +655,7 @@ Performs two-dimensional acoustic propagation using velocity and impedance (or d
 :type time_taper: `bool`
 :param illumination: **Default `None`; keyword-only.** Compatibility keyword only; must be `None`. VRZ does not support illumination. Explicitly passing a collector or any other value raises `NotImplementedError`; do not reuse scalar’s illumination setup. Must be None for Torch.
 :type illumination: `None`
-:param backend: **Default `None`; keyword-only.** None preserves native behavior and never automatically selects Torch. `'cuda'` explicitly requires CUDA models; `'torch'` selects CPU/CUDA tensor propagation and autograd. Device follows inputs without implicit model transfer. `'cpu'` and MPS are rejected. Explicitly select full/checkpoint for scalar/VRZ/VTI Torch calls.
+:param backend: **Default `None`; keyword-only.** None selects native CPU/CUDA by model device. Explicit `native_cpu`, `cuda` or `torch` selects the implementation. Torch supports full/checkpoint; no fallback.
 :type backend: `str | None`
 :param execution: **Default `'eager'`; keyword-only.** Torch accepts `'eager'` or `'compile'`. Compile uses PyTorch Inductor/AOTAutograd and raises on failure without eager fallback. Native propagation only accepts eager.
 :type execution: `str`
@@ -661,7 +663,7 @@ Performs two-dimensional acoustic propagation using velocity and impedance (or d
 :type checkpoint_interval: `int | None`
 :param compile_steps: **Default `1`; keyword-only.** Positive integer, excluding bool; consecutive internal steps per Torch execution block. Try 4 for compile; the final partial block is retained. Does not change dt, nt, shots or loss. Native propagation accepts only 1.
 :type compile_steps: `int`
-:returns: **`(receiver_amplitudes,)`**, a one-element tuple. Its only recording tensor has shape `[B,R,T]`, is contiguous float32 (native CUDA; Torch CPU/CUDA) on the same device as the model, and has nominal times `0, dt, ..., (T-1)*dt`. These are pressure-like recordings, accessible with `[0]` or `[-1]`; no final wavefield or boundary state is included.
+:returns: **`(receiver_amplitudes,)`**, a one-element tuple. Its only recording tensor has shape `[B,R,T]`, is contiguous float32 (native CUDA) or float32/float64 (native CPU/Torch) on the same device as the model, and has nominal times `0, dt, ..., (T-1)*dt`. These are pressure-like recordings, accessible with `[0]` or `[-1]`; no final wavefield or boundary state is included.
 :rtype: `tuple[torch.Tensor]`
 ```
 
@@ -676,9 +678,9 @@ Sources use the same normalized-forcing convention as scalar: the internal incre
 
 Positivity, finiteness, coefficient representability, and CFL checks do not guarantee stability for arbitrarily strong impedance contrasts. Near-zero and strong-contrast models may be severely ill-conditioned.
 
-Model gradients are conditional on a fixed extended model, CFL configuration, and PML. When replicate padding at the physical edges is regenerated, the current returned gradient does not include the transpose accumulation of the complete extension chain. It must not be treated as the total derivative of the entire boundary-rebuilding process; switching to full mode does not remove this limitation.
+Gradients include the transpose of replicate padding and the impedance/density chain. CFL, velocity-envelope selection and PML setup are fixed.
 
-The top-zero form `[A,A,0,A]` uses the scalar/VRZ zero-halo convention: the M exterior cells are zero, user `z=0` remains active, and top PML/buffer is removed. Do not offset source/receiver coordinates. Second order has its effective pressure-release plane one cell above the first physical row; a higher interior order does not establish an odd-image high-order surface. CUDA full/boundary and Torch full/checkpoint retain fixed public sources, the velocity-dependent source chain and the existing cropped model-gradient limitation.
+A flat top uses `[A,A,0,A]` on `[x,z]`; the exterior halo is zero and the physical `z=0` remains active. Do not offset geometry.
 
 (vrz-examples)=
 ### Examples
@@ -702,7 +704,7 @@ For the impedance parameterization, replace `density=rho` with `impedance=Z`; do
 (vrz-notes)=
 ### Notes
 
-- Native supports CUDA FP32 on the default stream only; each forward permits one first-order backward pass. Source gradients, higher-order derivatives, AMP, CUDA graphs, custom streams, and public initial/final states are unsupported.
+- Native CUDA supports float32, native CPU/Torch float32/float64. First-order backward may repeat with a retained graph. Higher-order derivatives and public initial/final states are unsupported.
 - CFL time substeps cannot compensate for inadequate spatial sampling. Spatial-resolution warnings are diagnostics, not certificates of accuracy or stability.
 - For DataParallel, place the complete model in a Module and split acquisition inputs only along the shot dimension; see [Multi-GPU introduction](inversion/dataparallel.md).
 - This page’s interface contract has been checked. Target-GPU numerical, performance, and FWI acceptance tests have not been completed.
@@ -719,7 +721,7 @@ VRR is integrated in V19 as `starwave.vrr` and `starwave.vrr_reference`. Install
 
 :param v: **Required.** Positive finite velocity [nx,nz], m/s. Each model axis has at least 2 cells.
 :type v: `torch.Tensor`
-:param grid_spacing: **Required.** Positive uniform spacing: scalar or equal pair, metres.
+:param grid_spacing: **Required.** Positive scalar or possibly unequal `[dx,dz]` (m), following `[x,z]` model and `[ix,iz]` geometry order.
 :type grid_spacing: `float | int | list[float] | tuple[float, ...]`
 :param dt: **Required.** Positive user sampling interval, seconds.
 :type dt: `float | int`
@@ -772,7 +774,7 @@ Explicit tensor reference for CPU/CUDA float32/float64. All four differentiable 
 
 :param v: **Required.** Positive finite velocity [nx,nz], m/s. Each model axis has at least 2 cells.
 :type v: `torch.Tensor`
-:param grid_spacing: **Required.** Positive uniform spacing: scalar or equal pair, metres.
+:param grid_spacing: **Required.** Positive scalar or possibly unequal `[dx,dz]` (m), following `[x,z]` model and `[ix,iz]` geometry order.
 :type grid_spacing: `float | int | list[float] | tuple[float, ...]`
 :param dt: **Required.** Positive user sampling interval, seconds.
 :type dt: `float | int`
@@ -826,13 +828,14 @@ The unified builder includes core, elastic, Born, GSLS and VRR. `backend="torch"
 | Backend | Device / dtype | Memory | Execution |
 |---|---|---|---|
 | `cuda` (default) | CUDA float32 | `full`, `boundary` (default) | `eager` selector; native execution |
+| `native_cpu` | CPU float32/float64 | `full`, `boundary` | `eager` |
 | `torch` | CPU/CUDA float32/float64 | `full`, `checkpoint` | `eager`, `compile` |
 
 Selecting Torch alone does not change the boundary default: also pass `memory="full"` or `"checkpoint"`. Invalid combinations raise rather than silently falling back. Torch compile explicitly uses installed Inductor and propagates compilation errors. Native CUDA requires `execution="eager"`, `compile_steps=1`, `checkpoint_interval=None`.
 
-CUDA full stores the six-state trajectory (two pressure levels and four CPML memories). Boundary stores shell history and final states and reconstructs the interior; history still grows with time and shell size. Torch checkpoint stores complete six-state segment boundaries and recomputes forward segments during backward. It is not native boundary reconstruction.
+Native full stores the velocity/reflectivity-gradient operands per cell and internal step. Boundary stores a pressure band, C-PML checkpoints and final pressure fields. Torch checkpoint replays complete state segments, not native boundary reconstruction.
 
-One first-order backward supports independent `v`, `rx`, `rz` and source amplitudes, including source velocity scaling and the full replicated-padding transpose. Geometry and planning inputs are not trainable. MPS, AMP/autocast, CUDA graphs, native checkpoint, Torch boundary, VRR3D and higher-order AD are unsupported. `starwave.vrr_reference` is an explicitly selected CPU/CUDA float32/64 full-history reference; it has no backend/execution/checkpoint/compile selectors and is not a fallback.
+First-order backward can repeat if retaining the graph and supports independent `v`, `rx`, `rz` and source amplitudes, including source velocity scaling and the full replicated-padding transpose. Geometry and planning inputs are not trainable. MPS, AMP/autocast, CUDA graphs, native checkpoint, Torch boundary, VRR3D and higher-order AD are unsupported. `starwave.vrr_reference` is an explicitly selected CPU/CUDA float32/64 full-history reference; it has no backend/execution/checkpoint/compile selectors and is not a fallback.
 
 (vrr-physics)=
 ### Models, source and time conventions
@@ -845,7 +848,7 @@ The 2D acoustic vector-reflectivity model uses public `[x,z]` arrays, depth last
 
 If pressure has unit P, source forcing has unit P/m²: injection is `-v_source² * dt_internal² * U(source)`, where U is time upsampling. Initial states are zero. Public records apply downsampling to the pre-update-aligned sequence `[0, raw[:-1]]` at user times `0,dt,...`; FFT resampling can ring, so the first public sample need not be exactly zero for every substep ratio.
 
-Internal planning uses `max_dt=0.6*h/(max_vel*sqrt(2))` and `ratio=max(1,ceil(dt/max_dt))`. This principal-speed bound does not guarantee stability for arbitrary reflectivity, velocity gradients or CPML. Use a fixed covering `max_vel` for optimization and finite differences, test the actual time horizon, and refine space/time. The propagator does not clamp/smooth models, repair losses or choose an optimizer.
+Internal planning uses `max_dt=0.6/(max_vel*hypot(1/dx,1/dz))` and `ratio=max(1,ceil(dt/max_dt))`. This principal-speed bound does not guarantee stability for arbitrary reflectivity, velocity gradients or CPML. Use a fixed covering `max_vel` for optimization and finite differences, test the actual time horizon, and refine space/time. The propagator does not clamp/smooth models, repair losses or choose an optimizer.
 
 (vrr-top)=
 ### Flat top boundary
@@ -890,7 +893,7 @@ For native CUDA, move every model, source and geometry tensor to the same CUDA d
 (vrr-status)=
 ### Source and validation scope
 
-This reference targets frozen V19 source `0.1.0.dev19`, commit `46d32877e3336d531520a696d5f2e074e6f4ef74`, published as [Release V19](https://github.com/StarrMoonn/StarWave/releases/tag/V19). Except for the separately labelled V21 elastic VRR and V22 qP TTI additions, signatures below are checked against that source, including the 23-parameter Scalar API and integrated `starwave.vrr`. These frozen V19 API contracts are a historical compatibility baseline, not a statement of current package availability. Use the matching complete source checkout for the separately labelled additions on this page; do not infer current PyPI availability from historical wheel records. Source, distribution and device-validation evidence remain separate. See [Status](status.md) and [installation](installation.md).
+The original V19 baseline was source `0.1.0.dev19`, commit `46d32877e3336d531520a696d5f2e074e6f4ef74`, published as [Release V19](https://github.com/StarrMoonn/StarWave/releases/tag/V19). Except for the separately labelled V21 elastic VRR and V22 qP TTI additions, the original signatures were checked against that source, including the 23-parameter Scalar API and integrated `starwave.vrr`. These frozen V19 API contracts are a historical compatibility baseline, not a statement of current package availability. Use the matching complete source checkout for the separately labelled additions on this page; do not infer current PyPI availability from historical wheel records. Source, distribution and device-validation evidence remain separate. See [Status](status.md) and [installation](installation.md).
 
 The physical parameterization follows [Whitmore et al., EAGE 2020](https://doi.org/10.3997/2214-4609.202010332). The tensor top convention follows [SWEEP dev](https://github.com/DeepWave-KAUST/sweep/tree/32235f796ffa5b272ca81b9016f8cc85e25ecdf1) commit `32235f796ffa5b272ca81b9016f8cc85e25ecdf1`; the native VRR CUDA step/VJP and boundary reconstruction are independent implementations, not an upstream CUDA port.
 
@@ -1014,7 +1017,7 @@ This example uses 2D inputs. A 3D call needs all four models shaped `[nx,ny,nz]`
 
 This addition documents the integrated expanded-Eq. (15) VTI vector-reflectivity operator, not the frozen V19 package. Use matching current source and rebuilt native libraries. It is distinct from conventional `starwave.vti`, isotropic `starwave.vrr` and qP `starwave.tti`; their observations are not interchangeable.
 
-```{py:function} starwave.vti_vrr(c, epsilon, delta, source_amplitudes, source_locations, receiver_locations, *, dx, dz, dt, rx, rz, backend=None, accuracy=2, memory='full', memory_mode=None, formulation='eq15_expanded', boundary='none', free_surface=False, sponge_width=0, sponge_strength=0.0, pml_width=20, pml_max_vel=6000.0, pml_freq=25.0, pml_reflection=1e-6, pml_kappa=5.0, receiver_fields=('sV',), density=None, max_vel=None, cfl_resample=True, freq_taper_frac=0.0, time_pad_frac=0.0, time_taper=False, execution='eager', checkpoint_interval=None, compile_steps=1) -> tuple[torch.Tensor, ...]
+```{py:function} starwave.vti_vrr(c, epsilon, delta, source_amplitudes, source_locations, receiver_locations, *, grid_spacing=None, depth_axis=1, dx=None, dz=None, dt, rx, rz, backend=None, accuracy=2, memory='full', memory_mode=None, formulation='eq15_expanded', boundary='none', free_surface=False, sponge_width=0, sponge_strength=0.0, pml_width=20, pml_max_vel=6000.0, pml_freq=25.0, pml_reflection=1e-6, pml_kappa=5.0, receiver_fields=('sV',), density=None, max_vel=None, cfl_resample=True, freq_taper_frac=0.0, time_pad_frac=0.0, time_taper=False, execution='eager', checkpoint_interval=None, compile_steps=1) -> tuple[torch.Tensor, ...]
 
 Propagate 2D VTI stress/momentum with independently specified vector reflectivity.
 
@@ -1024,8 +1027,10 @@ Propagate 2D VTI stress/momentum with independently specified vector reflectivit
 :param source_amplitudes: Stress rate in Pa/s, [shot, source, time]; legacy [shot, time] is accepted for one source.
 :param source_locations: In-bounds int64 [shot, source, 2]; legacy [shot, 2] for one source.
 :param receiver_locations: In-bounds int64 [receiver, 2] shared across shots, or [shot, receiver, 2].
-:param dx: Positive finite x spacing in metres.
-:param dz: Positive finite z spacing in metres.
+:param grid_spacing: Positive scalar or model-axis pair in metres. Use this or legacy dx and dz, not both.
+:param depth_axis: 1 for [x,z], 0 for [z,x]. Use the same order for spacing, integer survey columns and PML face pairs.
+:param dx: Optional physical x spacing in metres, supplied with dz.
+:param dz: Optional physical z spacing in metres, supplied with dx.
 :param dt: Positive finite user sampling interval in seconds.
 :param rx: Finite x reflectivity in 1/m, same shape, dtype and device as c.
 :param rz: Finite z reflectivity in 1/m, same shape, dtype and device as c.
@@ -1038,7 +1043,7 @@ Propagate 2D VTI stress/momentum with independently specified vector reflectivit
 :param free_surface: Explicit flat top traction-free closure; requires boundary="pml".
 :param sponge_width: Sponge thickness in cells, positive and less than half the minimum model dimension when enabled.
 :param sponge_strength: Nonnegative sponge decay rate; nonzero sponge settings require boundary="sponge".
-:param pml_width: Positive scalar cell width or (x_low, x_high, z_low, z_high); free surface uses zero z_low and positive other sides.
+:param pml_width: Positive scalar or four face widths (low then high per model axis). With `free_surface=True` and `boundary="pml"`, place the only zero on the low depth face.
 :param pml_max_vel: Fixed velocity scale for CPML profiles in m/s; distinct from max_vel.
 :param pml_freq: CPML reference frequency in Hz.
 :param pml_reflection: CPML target reflection parameter, strictly between 0 and 1.
@@ -1077,7 +1082,7 @@ The record clock is **(n+1)*user_dt**, not a nominal zero-time sample. Tensile `
 
 Native boundary storage saves directional core traces, terminal states and sparse outer-shell checkpoints; it replays the outer shell while reverse-reconstructing the lossless core, not damping inversion or AD replay. Small grids need not save memory. Torch checkpointing replays ordinary AD in internal-time chunks; Torch `memory="boundary"` is rejected, not silently translated. Native higher derivatives are unsupported. Compiling a CUDA library is not GPU numerical or performance acceptance.
 
-CPML replicates c/epsilon/delta; normal R is zero outside its physical axis while tangential R is replicated, retaining the padding transpose. `free_surface=True` supports accuracy 2/4/6/8 with side/bottom CPML. Scalar width w becomes (w,w,0,w); explicit widths must have zero top. Top sV is zero; sources and sV receivers must have z >= 1, while sH/vx/vz can use z=0. No topography is implemented.
+CPML replicates c/epsilon/delta; normal R is zero outside its physical axis while tangential R is replicated, retaining the padding transpose. `free_surface=True` supports accuracy 2/4/6/8 with side/bottom CPML. For [x,z] a scalar width w becomes (w,w,0,w), and for [z,x] it becomes (0,w,w,w); explicit widths must have zero top. Top sV is zero; sources and sV receivers must have z >= 1, while sH/vx/vz can use z=0. No topography is implemented.
 
 **Accuracy is the interior wave stencil, not a global PDE convergence promise.** Material-coefficient derivatives D and interpolation A remain second order, and heterogeneous/free-surface closure is not globally eighth order. Time stepping uses the initialized stress-kick/momentum-drift scheme. CFL screening includes anisotropy and speed-gradient/reflectivity terms, but is not a stability proof for arbitrary large or nonintegrable R. CFL extrema, substep ratio and CPML profiles are frozen for differentiation; finite-difference checks must keep the same internal time grid and profiles. Upsampled sources and anti-aliased receivers retain their gradient chains and completed-step phase.
 
@@ -1306,7 +1311,7 @@ for value in (vp, epsilon, delta, theta, source):
 :type origin: `Optional[Sequence[int]]`
 :param nt: **Default `None`.** Number of user time samples, required when no source amplitudes are supplied. With source amplitudes, duration is normally inferred from their final dimension; an explicit nt must equal that length. Source-free calls still need coordinates or initial fields sufficient to infer dimensions/shots.
 :type nt: `Optional[int]`
-:param model_gradient_sampling_interval: **Default `1`.** Material-gradient time-sampling interval, an integer ≥1. The internal accumulation stride is the CFL ratio q times this value. The default 1 is the simplest choice; larger values use sampled gradients rather than promising every-step equivalence. Current native paths process complete sampling groups; see storage and sampling below. Torch accepts only 1 and differentiates all internal steps.
+:param model_gradient_sampling_interval: **Default `1`.** Positive integer in user steps. When material gradients are active, the interval must divide user_nt. Otherwise the effective interval is 1. The native stride is CFL ratio times the effective interval; the forward still propagates every step.
 :type model_gradient_sampling_interval: `int`
 :param freq_taper_frac: **Default `0.0`.** Fraction of the high-frequency end to cosine-taper during CFL-driven FFT resampling of sources and receivers; does not change user output length.
 :type freq_taper_frac: `float`
@@ -1386,7 +1391,7 @@ For the reconstruction order, material gradients and storage formulas, see {ref}
 - `memory="full"` is the default, supporting 2D/3D CPU/float32 (native CUDA; Torch CPU/CUDA)/float64. Native `storage_mode="device"` stores histories on the current device; `"cpu"` uses host storage for CUDA and is normalized to device storage for CPU models; `"disk"` uses storage_path. `storage_compression=True` is lossy.
 - `storage_mode="none"` disables propagation-history contributions to material gradients and cannot provide full material gradients for inversion. Material-dependent force-source scaling can still contribute partial gradients. Trainable materials trigger a warning; source/initial-state gradients are a separate path.
 - `memory="boundary"` is a StarWave extension: CUDA only, with `python_backend=False`, `storage_mode="device"` and `storage_compression=False`. Every cropped physical extent must exceed accuracy; active staggered buoyancy must be nonzero when its gradient is requested, except the fixed top-vacuum tangential slots of the top-zero preparation. CPU, offload and compression are unsupported, with no automatic full fallback. Memory/speed benefits depend on domain shape, PML and sampling.
-- Keep `model_gradient_sampling_interval=1` for the simplest behavior; when CFL ratio q>1, the material-gradient stride is still q, rather than every internal step. For larger integers, current native full/boundary paths execute complete sampling groups only: an incomplete tail is not propagated, and a positive duration shorter than one group raises an error (possibly during backward when callbacks are used). If sampling is needed, use an interval no larger than user nt that divides nt, and assess the sampled gradient for your application.
+- When material gradients are active, the interval must divide user_nt. Otherwise the effective interval is 1. The native stride is CFL ratio times the effective interval; the forward still propagates every step.
 - Ordinary backward releases tensor histories saved by autograd; retaining a graph can extend their lifetime. Disk temporary files live with the corresponding output/loss graph. Log detached values, and do not delete files still needed for backward.
 
 Torch supports full/checkpoint with `model_gradient_sampling_interval=1`, `forward_callback=None`, `storage_mode="device"`, `storage_compression=False`, and python_backend False or eager only. It differentiates every internal step. Native samples material gradients at CFL step_ratio × sampling_interval, so exact native/Torch material-gradient comparisons also require step_ratio=1.
@@ -1570,7 +1575,7 @@ See the [runnable CPU forward/backward example and backend/build limits](example
 (visco-gsls)=
 ## GSLS Function
 
-This section describes frozen V19 GSLS, including its top-zero pressure-release closure and import lifecycle. `starwave.visco_gsls` is the viscoacoustic entry point; single-mechanism compatibility uses `mode="sls_compat", n_mechanisms=1`. Standalone SLS APIs remain removed. See [Status](status.md) and [installation](installation.md) for publication channels.
+`starwave.visco_gsls` is the viscoacoustic entry point; single-mechanism compatibility uses `mode="sls_compat", n_mechanisms=1`. Standalone SLS APIs remain removed. See [Status](status.md) and [installation](installation.md) for publication channels.
 
 Supported: fixed spatially varying density, float32/float64, and first-order Vp/Q/source/provider-parameter gradients. Native CPU/CUDA support full/checkpoint; explicit Torch supports full/checkpoint and eager/compile. All main propagators gain execution options while native defaults remain unchanged; see the [PyTorch backend](pytorch-backend.md).
 
@@ -1582,13 +1587,13 @@ Supported: fixed spatially varying density, float32/float64, and first-order Vp/
 :type q: `torch.Tensor`
 :param rho: **Required; positional-or-keyword.** Matching fixed positive finite density tensor, kg/m³; spatial variation supported, `requires_grad=True` rejected
 :type rho: `torch.Tensor`
-:param grid_spacing: **Required; positional-or-keyword.** Positive scalar or `(dz,dx)` in metres
+:param grid_spacing: **Required; positional-or-keyword.** Positive scalar or model-axis pair, `(dz,dx)` for `[z,x]` and `(dx,dz)` for `[x,z]`, in metres.
 :type grid_spacing: `float | int | list[float] | tuple[float, float]`
 :param dt: **Required; positional-or-keyword.** Positive seconds; conservative CFL guard uses unrelaxed speed and density contrast; no resampling
 :type dt: `float | int`
 :param source_amplitudes: **Required; keyword-only.** Matching float tensor `[shot,source,time]`; second-order forcing Pa/m²; optional gradients
 :type source_amplitudes: `torch.Tensor`
-:param source_locations: **Required; keyword-only.** Integer `[shot,source,2]`, unpadded `[z,x]` coordinates; duplicates add. Top-zero requires source z>=1
+:param source_locations: **Required; keyword-only.** Integer `[shot,source,2]`, unpadded model-axis coordinates; duplicates add. Top-zero requires source z>=1
 :type source_locations: `torch.Tensor`
 :param receiver_locations: **Required; keyword-only.** Integer `[shot,receiver,2]`; duplicates repeat samples. Top-zero surface pressure receivers return zero
 :type receiver_locations: `torch.Tensor`
@@ -1596,7 +1601,7 @@ Supported: fixed spatially varying density, float32/float64, and first-order Vp/
 :type f_ref: `float | int`
 :param accuracy: **Default `4`; keyword-only.** Staggered FD order 2,4,6,8
 :type accuracy: `int`
-:param pml_width: **Default `20`; keyword-only.** Positive integer or positive `(z,x)` pair for symmetric absorbing faces; alternatively `[0,bottom,left,right]` selects the flat top, with all remaining widths positive and allowed to differ. Zero scalar/pair entries, all-positive four-face lists, other zero faces, bool and negative/noninteger values are rejected. Replicate extension retains its full accumulating gradient
+:param pml_width: **Default `20`; keyword-only.** Positive scalar, positive axis pair, or four positive widths symmetric within each axis. For a flat top use `[0,bottom,left,right]` with `[z,x]`, or `[left,right,0,bottom]` with `[x,z]`. The other three faces remain positive.
 :type pml_width: `int | list[int] | tuple[int, int]`
 :param memory: **Default `'full'`; keyword-only.** full or checkpoint with native CPU/CUDA; Torch also supports full/checkpoint; boundary is unsupported
 :type memory: `str`
@@ -1645,14 +1650,14 @@ The first five parameters are positional-or-keyword; all others are keyword-only
 | `vp` | `positional-or-keyword` | `required` | Tensor [nz,nx]; m/s | Reference phase speed| Positive finite float32/64 tensor `[z,x]`; phase speed at f_ref, m/s; optionally trainable |
 | `q` | `positional-or-keyword` | `required` | Tensor [nz,nx]; dimensionless | Mode-specific Q| Matching positive tensor `[z,x]`, including +infinity. `hao1` (default): paper nominal Q0, not exact Qref; passivity Q0>S. `band_fit`: spatial fitting target, not exact Qref. `sls_compat`: exact modulus Q at f_ref. Optionally trainable |
 | `rho` | `positional-or-keyword` | `required` | Tensor [nz,nx]; kg/m³ | Fixed density| Matching fixed positive finite density tensor, kg/m³; spatial variation supported, `requires_grad=True` rejected |
-| `grid_spacing` | `positional-or-keyword` | `required` | real or pair; m | Grid spacing| Positive scalar or `(dz,dx)` in metres |
+| `grid_spacing` | `positional-or-keyword` | `required` | real or pair; m | Grid spacing| Positive scalar or a model-axis pair in metres |
 | `dt` | `positional-or-keyword` | `required` | real; s | Fixed time step| Positive seconds; conservative CFL guard uses unrelaxed speed and density contrast; no resampling |
 | `source_amplitudes` | `keyword-only` | `required` | Tensor [B,S,T]; Pa/m² | Second-order forcing| Matching float tensor `[shot,source,time]`; second-order forcing Pa/m²; optional gradients |
-| `source_locations` | `keyword-only` | `required` | int32/int64 Tensor [B,S,2]; cells | Unpadded source indices| Integer `[shot,source,2]`, unpadded `[z,x]` coordinates; duplicates add. Top-zero requires source z>=1 |
+| `source_locations` | `keyword-only` | `required` | int32/int64 Tensor [B,S,2]; cells | Unpadded source indices| Integer `[shot,source,2]`, unpadded model-axis coordinates; duplicates add. Top-zero requires source z>=1 |
 | `receiver_locations` | `keyword-only` | `required` | int32/int64 Tensor [B,R,2]; cells | Unpadded receiver indices| Integer `[shot,receiver,2]`; duplicates repeat samples. Top-zero surface pressure receivers return zero |
 | `f_ref` | `keyword-only` | `required` | real; Hz | Phase reference| Positive Hz; exact phase-reference frequency, also used for fixed PML setup |
 | `accuracy` | `keyword-only` | `4` | integer; dimensionless | Staggered spatial order| Staggered FD order 2,4,6,8 |
-| `pml_width` | `keyword-only` | `20` | integer, pair or top-zero face list; cells | Absorbing PML or flat top| Positive integer or positive `(z,x)` pair for symmetric absorbing faces; alternatively `[0,bottom,left,right]` selects the flat top, with all remaining widths positive and allowed to differ. Zero scalar/pair entries, all-positive four-face lists, other zero faces, bool and negative/noninteger values are rejected. Replicate extension retains its full accumulating gradient |
+| `pml_width` | `keyword-only` | `20` | integer, pair or top-zero face list; cells | Absorbing PML or flat top| Positive scalar, positive axis pair, or four positive widths symmetric within each axis. For a flat top use `[0,bottom,left,right]` with `[z,x]`, or `[left,right,0,bottom]` with `[x,z]`. The other three faces remain positive. |
 | `memory` | `keyword-only` | `'full'` | str | Native history strategy| full or checkpoint with native CPU/CUDA; Torch also supports full/checkpoint; boundary is unsupported |
 | `max_vel` | `keyword-only` | `None` | None or real; m/s | Unrelaxed envelope| Optional fixed unrelaxed-speed envelope, m/s. Required for any trainable material coefficients (including closure parameters) with nonzero PML. Too-small values reject |
 | `backend` | `keyword-only` | `'cuda'` | str | Explicit implementation| Explicit `cuda`, `native_cpu` or `torch`; no fallback. CUDA/native require built matching library |
@@ -1687,7 +1692,7 @@ Migration from standalone SLS requires both mode and mechanism count; changing o
 (visco-gsls-physics)=
 ### Source, coordinates, sampling and input domain
 
-Models have shape `[nz,nx]`, in `[z,x]` order, with both extents at least two. All three models and sources must share dtype/device. CPU/CUDA float32/64 strided tensors and noncontiguous views are supported; contiguous copies retain autograd chains. Model/source dtype and device are not implicitly changed. Density is fixed, positive and finite, with a representable reciprocal. Only Q may contain +inf.
+Models may use `[z,x]` or `[x,z]` order, with both extents at least two. All three models and sources must share dtype/device. CPU/CUDA float32/64 strided tensors and noncontiguous views are supported; contiguous copies retain autograd chains. Model/source dtype and device are not implicitly changed. Density is fixed, positive and finite, with a representable reciprocal. Only Q may contain +inf.
 
 Geometry must explicitly have shapes `[B,S,2]` and `[B,R,2]`, with integer `[z,x]` cell indices inside the original unpadded model. Omitted source dimensions and out-of-domain points are rejected. Coordinates are copied to the model device as int64. Coincident sources add; repeated receivers repeat samples and accumulate cotangents during backward. B, S, R and T must each be at least one.
 
@@ -1700,7 +1705,7 @@ Records sample pre-update `p[n]` at `t=n*dt`, for T samples. The first sample is
 
 - Vp, Q, source and provider closure parameters may be trained independently or together; only first-order propagation derivatives are supported. Density, geometry, dt, spacing, FD and CPML settings are fixed.
 - Replicate padding produces `[nz+top+bottom,nx+left+right]`; a positive `(z,x)` pair uses symmetric opposite faces, while top-zero has no top PML extension. Its complete transpose accumulates padded sensitivities into original edges and corners rather than using crop-backward. Model dependence of the source c_rel2 factor remains in the gradient chain.
-- The top-zero list `[0,bottom,left,right]` enforces `p(z=0)=0`: pressure is extended oddly and vertical face fields evenly, with divergence the exact negative transpose of the gradient. The same pair applies to relaxation and CPML states. Sources must have z>=1 and surface pressure receivers are zero; every material mode remains available with fixed rho. Other zero-face/no-PML requests are rejected. CPML damping, alpha and the velocity envelope remain fixed numerical setup; no dissipative boundary reconstruction is introduced.
+- The low-depth-zero list (e.g. `[0,bottom,left,right]` for `[z,x]`) enforces `p(z=0)=0`: pressure is extended oddly and vertical face fields evenly, with divergence the exact negative transpose of the gradient. The same pair applies to relaxation and CPML states. Sources must have z>=1 and surface pressure receivers are zero; every material mode remains available with fixed rho. Other zero-face/no-PML requests are rejected. CPML damping, alpha and the velocity envelope remain fixed numerical setup; no dissipative boundary reconstruction is introduced.
 - With gradients enabled and nonzero PML, trainable Vp/Q or any trainable material output (including provider closure parameters) requires explicit fixed max_vel covering `sqrt(c_rel2*(1+strength.sum(0)))`, not merely Vp. Keep the same envelope across optimization steps and paired finite differences.
 - Forward-only or source-only gradients can use max_vel=None; the inferred envelope is detached from autograd. Too-small explicit envelopes raise.
 - Every forward has independent state/history. Loss, normalization, masks, batching and optimizers belong to the caller. There is no implicit clipping, shot reduction, dt repair or NaN replacement; invalid coefficients and nonfinite inputs/receiver cotangents raise.
