@@ -27,9 +27,12 @@ def live_contract(contract):
     """Strict live Scalar extension; immutable V19 snapshots are unchanged."""
     live = copy.deepcopy(contract)
     live['signature'] = live['signature'].replace(
-        'callback_frequency: int=1)', 'callback_frequency: int=1, model_gradient_sampling_interval: int=1)')
+        'callback_frequency: int=1)', 'callback_frequency: int=1, model_gradient_sampling_interval: int=1, model_batch: bool=False)')
     live['types']['model_gradient_sampling_interval'] = 'int'
-    assert parse(live['signature']).args.kwonlyargs[-1].arg == 'model_gradient_sampling_interval'
+    live['types']['model_batch'] = 'bool'
+    args = parse(live['signature']).args
+    assert [p.arg for p in args.kwonlyargs[-2:]] == ['model_gradient_sampling_interval', 'model_batch']
+    assert [ast.literal_eval(v) for v in args.kw_defaults[-2:]] == [1, False]
     return live
 
 
@@ -72,6 +75,7 @@ def check(source_root=None):
         assert dict(re.findall(r'^:type (\w+): `(.+)`$', body, re.M)) == live['types']
         for marker in ('20', 'V17', 'V18', 'V19', 'return_wavefield', 'forward_callback', 'callback_frequency',
                        'internal_step', 'internal_dt', 'state.time', '[B,0,D]',
+                       'model_batch=True', '[B,nx,nz]', 'k*dt', 'k*r', 'T/k',
                        'notebook/Scalar/Scalar2D_TargetWavefield_CUDA.ipynb',
                        'notebook/Scalar/Scalar2D_TargetWavefield_TorchCompile.py'):
             assert marker in text, f'{locale}: missing dev scope marker {marker}'
